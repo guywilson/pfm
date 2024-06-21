@@ -61,7 +61,7 @@ int main(int argc, char ** argv) {
     AccountDB db = AccountDB::getInstance();
 
     db.open(pszDatabase);
-    
+
     while (loop) {
         pszCommand = readline("pfm > ");
 
@@ -77,8 +77,10 @@ int main(int argc, char ** argv) {
             else if (strncmp(pszCommand, "version", 7) == 0) {
                 printVersion();
             }
-            else if (strncmp(pszCommand, "init", 4) == 0) {
-                printVersion();
+            else if (strncmp(pszCommand, "add account", 11) == 0 || strncmp(pszCommand, "aa", 2) == 0) {
+                sqlite3_int64 id = db.createAccount("Natwest", 625.03);
+
+                printf("Created account with ID %lld\n", id);
             }
         }
     }
