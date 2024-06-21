@@ -27,7 +27,7 @@ class AccountDB {
 
         bool            open(string dbName);
 
-        sqlite3_int64   createAccount(string name, double openingBalance);
+        sqlite3_int64   createAccount(string name, string code, double openingBalance);
 
 };
 

@@ -21,12 +21,46 @@ static void printVersion(void) {
 
 }
 
+static void add_account(void) {
+    string          accountName;
+    string          accountCode;
+    string          openingBalance;
+    double          balance;
+    sqlite3_int64   accountId;
+
+    cout << "*** Add account ***" << endl;
+
+    cout << "Account name: ";
+    cin >> accountName;
+
+    cout << "Account code (max. 3 chars): ";
+    cin >> accountCode;
+
+    cout << "Opening balance [0.00]: ";
+    cin >> openingBalance;
+
+    if (openingBalance.length() > 0) {
+        balance = strtod(openingBalance.c_str(), NULL);
+    }
+    else {
+        balance = 0.0;
+    }
+
+    AccountDB db = AccountDB::getInstance();
+
+    accountId = db.createAccount(
+                        accountName, 
+                        accountCode, 
+                        balance);
+
+    cout << "Created account with ID " << accountId << endl;
+}
+
 int main(int argc, char ** argv) {
     int             i;
     char *          pszCommand;
     char *          pszDatabase;
     bool            loop = true;
-    bool            isDumpConfig = false;
 
     rl_bind_key('\t', rl_complete);
 
@@ -37,9 +71,6 @@ int main(int argc, char ** argv) {
 			if (argv[i][0] == '-') {
 				if (strncmp(&argv[i][1], "db", 2) == 0) {
 					pszDatabase = strdup(&argv[++i][0]);
-				}
-				else if (strcmp(&argv[i][1], "-dump-config") == 0) {
-					isDumpConfig = true;
 				}
 				else if (argv[i][1] == 'h' || argv[i][1] == '?') {
 					printUsage();
@@ -65,6 +96,12 @@ int main(int argc, char ** argv) {
     while (loop) {
         pszCommand = readline("pfm > ");
 
+        /*
+        ** Commands:
+        **
+        ** add account      n:name, c:code, b:opening_balance
+        ** add transaction  
+        */
         if (strlen(pszCommand)) {
             add_history(pszCommand);
 
@@ -78,9 +115,7 @@ int main(int argc, char ** argv) {
                 printVersion();
             }
             else if (strncmp(pszCommand, "add account", 11) == 0 || strncmp(pszCommand, "aa", 2) == 0) {
-                sqlite3_int64 id = db.createAccount("Natwest", 625.03);
-
-                printf("Created account with ID %lld\n", id);
+                add_account();
             }
         }
     }

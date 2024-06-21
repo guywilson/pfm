@@ -11,7 +11,7 @@
 #include "db.h"
 #include "pfm_error.h"
 
-#define SQLITE_ERROR_BUFFER_LEN                     256
+#define SQLITE_ERROR_BUFFER_LEN                     512
 
 using namespace std;
 
@@ -19,6 +19,7 @@ static const char * pszCreateAccountTable =
     "CREATE TABLE account (" \
     "id INTEGER PRIMARY KEY," \
     "name TEXT NOT NULL," \
+    "code TEXT NOT NULL," \
     "opening_balance NUMERIC NOT NULL," \
     "current_balance NUMERIC NOT NULL" \
     ");";
@@ -42,8 +43,10 @@ static const char * pszCreateRCTable =
     "id INTEGER PRIMARY KEY," \
     "account_id INTEGER," \
     "payee_id INTEGER," \
+    "date TEXT," \
     "description TEXT NOT NULL," \
     "amount NUMERIC NOT NULL," \
+    "frequency TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id)," \
     "FOREIGN KEY(payee_id) REFERENCES payee(id)" \
     ");";
@@ -195,7 +198,7 @@ void AccountDB::createSchema() {
     sqlite3_free(pszErrorMsg);
 }
 
-sqlite3_int64 AccountDB::createAccount(string name, double openingBalance) {
+sqlite3_int64 AccountDB::createAccount(string name, string code, double openingBalance) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -206,21 +209,20 @@ sqlite3_int64 AccountDB::createAccount(string name, double openingBalance) {
     snprintf(
         pszInsertStatement, 
         512,
-        "INSERT INTO account (name, opening_balance, current_balance) VALUES ('%s', %.2f, %.2f);",
+        "INSERT INTO account (name, code, opening_balance, current_balance) VALUES ('%s', '%s', %.2f, %.2f);",
         name.c_str(),
+        code.c_str(),
         openingBalance,
         openingBalance);
 
     error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
 
     if (error) {
-        sqlite3_free(pszErrorMsg);
-
         throw pfm_error(
             pfm_error::buildMsg(
-                "Failed to create account using %s: %s", 
-                pszInsertStatement,
-                name.c_str()), 
+                "Failed to create account %s: %s", 
+                name.c_str(),
+                pszErrorMsg), 
             __FILE__, 
             __LINE__);
     }
