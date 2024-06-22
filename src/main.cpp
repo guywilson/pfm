@@ -21,6 +21,32 @@ static void printVersion(void) {
 
 }
 
+static char * promptStr(const char * pszPrompt, const char * pszDefault, const size_t maxLength) {
+    char        szLengthFormat[8];
+    char        szFormat[8];
+    char *      pszAnswer;
+
+    pszAnswer = readline(pszPrompt);
+
+    if (strlen(pszAnswer) == 0 && pszDefault != NULL) {
+        pszAnswer = strndup(pszDefault, maxLength);
+    }
+
+    return pszAnswer;
+}
+
+static char promptChar(const char * pszPrompt) {
+    char        answer;
+
+    printf("%s", pszPrompt);
+    fflush(stdout);
+
+    answer = getchar();
+    fflush(stdin);
+
+    return answer;
+}
+
 static void add_account(void) {
     string          accountName;
     string          accountCode;
@@ -30,14 +56,9 @@ static void add_account(void) {
 
     cout << "*** Add account ***" << endl;
 
-    cout << "Account name: ";
-    cin >> accountName;
-
-    cout << "Account code (max. 3 chars): ";
-    cin >> accountCode;
-
-    cout << "Opening balance [0.00]: ";
-    cin >> openingBalance;
+    accountName = promptStr("Account name: ", NULL, 32);
+    accountCode = promptStr("Account code (max. 3 chars): ", NULL, 3);
+    openingBalance = promptStr("Opening balance [0.00]: ", "0.00", 32);
 
     if (openingBalance.length() > 0) {
         balance = strtod(openingBalance.c_str(), NULL);
@@ -46,7 +67,7 @@ static void add_account(void) {
         balance = 0.0;
     }
 
-    AccountDB db = AccountDB::getInstance();
+    AccountDB & db = AccountDB::getInstance();
 
     accountId = db.createAccount(
                         accountName, 
@@ -89,7 +110,7 @@ int main(int argc, char ** argv) {
 		return -1;
 	}
 
-    AccountDB db = AccountDB::getInstance();
+    AccountDB & db = AccountDB::getInstance();
 
     db.open(pszDatabase);
 

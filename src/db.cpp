@@ -204,11 +204,11 @@ sqlite3_int64 AccountDB::createAccount(string name, string code, double openingB
     int             error;
 
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
-    pszInsertStatement = (char *)sqlite3_malloc(512);
+    pszInsertStatement = (char *)sqlite3_malloc(256);
 
     snprintf(
         pszInsertStatement, 
-        512,
+        256,
         "INSERT INTO account (name, code, opening_balance, current_balance) VALUES ('%s', '%s', %.2f, %.2f);",
         name.c_str(),
         code.c_str(),
@@ -222,7 +222,7 @@ sqlite3_int64 AccountDB::createAccount(string name, string code, double openingB
             pfm_error::buildMsg(
                 "Failed to create account %s: %s", 
                 name.c_str(),
-                pszErrorMsg), 
+                sqlite3_errmsg(dbHandle)), 
             __FILE__, 
             __LINE__);
     }
