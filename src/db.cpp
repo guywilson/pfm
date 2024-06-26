@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <vector>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +10,7 @@
 
 #include <sqlite3.h>
 
+#include "account.h"
 #include "db.h"
 #include "pfm_error.h"
 
@@ -231,4 +234,56 @@ sqlite3_int64 AccountDB::createAccount(string name, string code, double openingB
     sqlite3_free(pszErrorMsg);
 
     return sqlite3_last_insert_rowid(dbHandle);
+}
+
+static int accountCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
+    int                     columnIndex = 0;
+    Account                 account;
+    AccountResult *         result = (AccountResult *)p;
+
+    while (columnIndex < numColumns) {
+        if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
+            account.id= strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "name", 4) == 0) {
+            account.name.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "code", 4) == 0) {
+            account.code.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "opening_balance", 16) == 0) {
+            account.openingBalance = strtod(&columns[columnIndex][0], NULL);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "current_balance", 16) == 0) {
+            account.currentBalance = strtod(&columns[columnIndex][0], NULL);
+        }
+
+        columnIndex++;
+    }
+
+    result->results.push_back(account);
+    result->numRows++;
+
+    return SQLITE_OK;
+}
+
+int AccountDB::getAccounts(AccountResult * result) {
+    char *          pszErrorMsg;
+    int             error;
+
+    const char * pszStatement = 
+                "SELECT id, name, code, opening_balance, current_balance FROM account;";
+
+    error = sqlite3_exec(dbHandle, pszStatement, accountCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get accounts list: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    return result->numRows;
 }

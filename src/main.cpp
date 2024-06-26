@@ -21,9 +21,7 @@ static void printVersion(void) {
 
 }
 
-static char * promptStr(const char * pszPrompt, const char * pszDefault, const size_t maxLength) {
-    char        szLengthFormat[8];
-    char        szFormat[8];
+static char * readString(const char * pszPrompt, const char * pszDefault, const size_t maxLength) {
     char *      pszAnswer;
 
     pszAnswer = readline(pszPrompt);
@@ -35,7 +33,7 @@ static char * promptStr(const char * pszPrompt, const char * pszDefault, const s
     return pszAnswer;
 }
 
-static char promptChar(const char * pszPrompt) {
+static char readChar(const char * pszPrompt) {
     char        answer;
 
     printf("%s", pszPrompt);
@@ -48,20 +46,20 @@ static char promptChar(const char * pszPrompt) {
 }
 
 static void add_account(void) {
-    string          accountName;
-    string          accountCode;
-    string          openingBalance;
+    char *          accountName;
+    char *          accountCode;
+    char *          openingBalance;
     double          balance;
     sqlite3_int64   accountId;
 
     cout << "*** Add account ***" << endl;
 
-    accountName = promptStr("Account name: ", NULL, 32);
-    accountCode = promptStr("Account code (max. 3 chars): ", NULL, 3);
-    openingBalance = promptStr("Opening balance [0.00]: ", "0.00", 32);
+    accountName = readString("Account name: ", NULL, 32);
+    accountCode = readString("Account code (max. 3 chars): ", NULL, 3);
+    openingBalance = readString("Opening balance [0.00]: ", "0.00", 32);
 
-    if (openingBalance.length() > 0) {
-        balance = strtod(openingBalance.c_str(), NULL);
+    if (strlen(openingBalance) > 0) {
+        balance = strtod(openingBalance, NULL);
     }
     else {
         balance = 0.0;
@@ -75,6 +73,33 @@ static void add_account(void) {
                         balance);
 
     cout << "Created account with ID " << accountId << endl;
+}
+
+static void list_accounts(void) {
+    AccountResult           result;
+    int                     numAccounts;
+    int                     i;
+
+    AccountDB & db = AccountDB::getInstance();
+
+    numAccounts = db.getAccounts(&result);
+
+    if (numAccounts > 5) {
+        cout << "Got num accounts: " << numAccounts << endl;
+        numAccounts = 5;
+    }
+
+    cout << "*** Accounts (" << numAccounts << ") ***" << endl << endl;
+    cout << "| Code | Name            | Balance" << endl;
+    cout << "----------------------------------" << endl;
+
+    for (i = 0;i < numAccounts;i++) {
+        Account account = result.results[i];
+
+        cout << "| " << account.code << "  | " << account.name.substr(0, 14) << ".. | " << account.currentBalance << endl;
+    }
+
+    cout << endl;
 }
 
 int main(int argc, char ** argv) {
@@ -137,6 +162,9 @@ int main(int argc, char ** argv) {
             }
             else if (strncmp(pszCommand, "add account", 11) == 0 || strncmp(pszCommand, "aa", 2) == 0) {
                 add_account();
+            }
+            else if (strncmp(pszCommand, "list accounts", 14) == 0 || strncmp(pszCommand, "la", 2) == 0) {
+                list_accounts();
             }
         }
     }

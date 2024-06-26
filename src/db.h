@@ -3,6 +3,8 @@
 
 #include <sqlite3.h>
 
+#include "account.h"
+
 using namespace std;
 
 #ifndef __INCL_DB
@@ -28,6 +30,7 @@ class AccountDB {
         bool            open(string dbName);
 
         sqlite3_int64   createAccount(string name, string code, double openingBalance);
+        int             getAccounts(AccountResult * result);
 
 };
 
