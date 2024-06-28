@@ -21,6 +21,35 @@ static void printVersion(void) {
 
 }
 
+static string fixStrWidth(string & src, int requiredLen) {
+    string          target;
+
+    if (src.length() > requiredLen) {
+        target = src.substr(0, requiredLen - 2);
+        target.append("..");
+    }
+    else if (src.length() < requiredLen) {
+        target = src;
+        
+        for (int i = 0;i < requiredLen - src.length();i++) {
+            target.append(" ");
+        }
+    }
+    else {
+        target = src;
+    }
+
+    return target;
+}
+
+static string formatCurrency(double src) {
+    static char szAmount[16];
+
+    snprintf(szAmount, 15, "£%.2f", (float)src);
+
+    return string(szAmount);
+}
+
 static char * readString(const char * pszPrompt, const char * pszDefault, const size_t maxLength) {
     char *      pszAnswer;
 
@@ -84,11 +113,6 @@ static void list_accounts(void) {
 
     numAccounts = db.getAccounts(&result);
 
-    if (numAccounts > 5) {
-        cout << "Got num accounts: " << numAccounts << endl;
-        numAccounts = 5;
-    }
-
     cout << "*** Accounts (" << numAccounts << ") ***" << endl << endl;
     cout << "| Code | Name            | Balance" << endl;
     cout << "----------------------------------" << endl;
@@ -96,7 +120,13 @@ static void list_accounts(void) {
     for (i = 0;i < numAccounts;i++) {
         Account account = result.results[i];
 
-        cout << "| " << account.code << "  | " << account.name.substr(0, 14) << ".. | " << account.currentBalance << endl;
+        cout << 
+            "| " << 
+            fixStrWidth(account.code, 4) << 
+            " | " << 
+            fixStrWidth(account.name, 15) << 
+            " | " << 
+            formatCurrency(account.currentBalance) << endl;
     }
 
     cout << endl;
