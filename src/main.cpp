@@ -132,11 +132,27 @@ static void list_accounts(void) {
     cout << endl;
 }
 
+static Account choose_account(void) {
+    char *          accountCode;
+    Account         account;
+
+    cout << "*** Use account ***" << endl;
+
+    accountCode = readString("Account code (max. 3 chars): ", NULL, 3);
+
+    AccountDB & db = AccountDB::getInstance();
+
+    db.getAccount(accountCode, &account);
+
+    return account;
+}
+
 int main(int argc, char ** argv) {
     int             i;
     char *          pszCommand;
     char *          pszDatabase;
     bool            loop = true;
+    Account         selectedAccount;
 
     rl_bind_key('\t', rl_complete);
 
@@ -195,6 +211,9 @@ int main(int argc, char ** argv) {
             }
             else if (strncmp(pszCommand, "list accounts", 14) == 0 || strncmp(pszCommand, "la", 2) == 0) {
                 list_accounts();
+            }
+            else if (strncmp(pszCommand, "use account", 12) == 0 || strncmp(pszCommand, "use", 3) == 0) {
+                selectedAccount.set(choose_account());
             }
         }
     }

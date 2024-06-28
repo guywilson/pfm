@@ -10,6 +10,15 @@ using namespace std;
 
 class Account {
     public:
+        void set(const Account & src) {
+            this->id = src.id;
+
+            this->name =            src.name;
+            this->code =            src.code;
+            this->openingBalance =  src.openingBalance;
+            this->currentBalance =  src.currentBalance;
+        }
+
         sqlite3_int64           id;
 
         string                  name;
@@ -23,7 +32,7 @@ class AccountResult {
         AccountResult() {
             numRows = 0;
         }
-        
+
         int                     numRows;
 
         vector<Account>         results;

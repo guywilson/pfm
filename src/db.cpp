@@ -24,7 +24,8 @@ static const char * pszCreateAccountTable =
     "name TEXT NOT NULL," \
     "code TEXT NOT NULL," \
     "opening_balance NUMERIC NOT NULL," \
-    "current_balance NUMERIC NOT NULL" \
+    "current_balance NUMERIC NOT NULL," \
+    "UNIQUE(code) ON CONFLICT ROLLBACK" \
     ");";
 
 static const char * pszCreateCategoryTable = 
@@ -286,4 +287,39 @@ int AccountDB::getAccounts(AccountResult * result) {
     }
 
     return result->numRows;
+}
+
+int AccountDB::getAccount(string code, Account * account) {
+    AccountResult   result;
+    char *          pszErrorMsg;
+    char            szStatement[256];
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT id, name, code, opening_balance, current_balance FROM account where code = '%s';";
+
+    snprintf(szStatement, 255, pszTemplate, code.c_str());
+
+    error = sqlite3_exec(dbHandle, szStatement, accountCallback, &result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get account: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+    else if (result.numRows != 1) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Expected 1 result, got %d", 
+                result.numRows),
+            __FILE__,
+            __LINE__);
+    }
+
+    account->set(result.results[0]);
+
+    return result.numRows;
 }

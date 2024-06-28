@@ -31,6 +31,7 @@ class AccountDB {
 
         sqlite3_int64   createAccount(string name, string code, double openingBalance);
         int             getAccounts(AccountResult * result);
+        int             getAccount(string code, Account * result);
 
 };
 
