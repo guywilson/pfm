@@ -13,6 +13,10 @@ using namespace std;
 class Account {
     public:
         Account() {
+            clear();
+        }
+
+        void clear(void) {
             this->id = 0;
 
             this->name = "";

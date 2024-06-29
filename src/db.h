@@ -31,8 +31,9 @@ class AccountDB {
 
         sqlite3_int64   createAccount(string name, string code, double openingBalance);
         int             getAccounts(AccountResult * result);
-        int             getAccount(string code, Account * result);
-
+        int             getAccount(string code, AccountResult * result);
+        int             updateAccount(Account & account);
+        int             deleteAccount(Account & account);
 };
 
 #endif

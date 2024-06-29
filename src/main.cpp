@@ -15,6 +15,10 @@
 
 #define DEFAULT_DATABASE_NAME                   ".pfm"
 
+#define FIELD_STRING_LEN                        64
+#define MAX_PROMPT_LENGTH                      128
+#define AMOUNT_FIELD_STRING_LEN                 16
+
 static void printUsage(void) {
 
 }
@@ -86,7 +90,7 @@ static void add_account(void) {
     cout << "*** Add account ***" << endl;
 
     accountName = readString("Account name: ", NULL, 32);
-    accountCode = readString("Account code (max. 3 chars): ", NULL, 3);
+    accountCode = readString("Account code (max. 4 chars): ", NULL, 4);
     openingBalance = readString("Opening balance [0.00]: ", "0.00", 32);
 
     if (strlen(openingBalance) > 0) {
@@ -94,6 +98,11 @@ static void add_account(void) {
     }
     else {
         balance = 0.0;
+    }
+
+    if (strlen(accountCode) == 0) {
+        fprintf(stderr, "\nAccount code must have a value.\n");
+        return;
     }
 
     AccountDB & db = AccountDB::getInstance();
@@ -104,6 +113,10 @@ static void add_account(void) {
                         balance);
 
     cout << "Created account with ID " << accountId << endl;
+
+    free(openingBalance);
+    free(accountCode);
+    free(accountName);
 }
 
 static void list_accounts(void) {
@@ -134,19 +147,66 @@ static void list_accounts(void) {
     cout << endl;
 }
 
-static Account choose_account(void) {
+static Account choose_account(const char * szAccountCode) {
     char *          accountCode;
-    Account         account;
+    AccountResult   result;
 
-    cout << "*** Use account ***" << endl;
-
-    accountCode = readString("Account code (max. 3 chars): ", NULL, 3);
+    if (szAccountCode == NULL || strlen(szAccountCode) == 0) {
+        cout << "*** Use account ***" << endl;
+        accountCode = readString("Account code (max. 4 chars): ", NULL, 4);
+    }
+    else {
+        accountCode = strdup(szAccountCode);
+    }
 
     AccountDB & db = AccountDB::getInstance();
 
-    db.getAccount(accountCode, &account);
+    db.getAccount(accountCode, &result);
 
-    return account;
+    free(accountCode);
+
+    return result.results[0];
+}
+
+static void update_account(Account & account) {
+    char            szPrompt[MAX_PROMPT_LENGTH];
+    char            szBalance[AMOUNT_FIELD_STRING_LEN];
+    char *          pszBalance;
+
+    cout << "*** Update account ***" << endl;
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Account name ['%s']: ", account.name.c_str());
+    account.name = readString(szPrompt, account.name.c_str(), FIELD_STRING_LEN);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Account code ['%s']: ", account.code.c_str());
+    account.code = readString(szPrompt, account.code.c_str(), FIELD_STRING_LEN);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%.2f]: ", account.openingBalance);
+    snprintf(szBalance, AMOUNT_FIELD_STRING_LEN, "%.2f", account.openingBalance);
+    pszBalance = readString(szPrompt, szBalance, AMOUNT_FIELD_STRING_LEN);
+    account.openingBalance = strtod(pszBalance, NULL);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Current balance [%.2f]: ", account.currentBalance);
+    snprintf(szBalance, AMOUNT_FIELD_STRING_LEN, "%.2f", account.currentBalance);
+    pszBalance = readString(szPrompt, szBalance, AMOUNT_FIELD_STRING_LEN);
+    account.currentBalance = strtod(pszBalance, NULL);
+
+    if (account.code.length() == 0) {
+        fprintf(stderr, "\nAccount code must have a value.\n");
+        return;
+    }
+
+    AccountDB & db = AccountDB::getInstance();
+
+    db.updateAccount(account);
+
+    free(pszBalance);
+}
+
+static void delete_account(Account & account) {
+    AccountDB & db = AccountDB::getInstance();
+
+    db.deleteAccount(account);
 }
 
 int main(int argc, char ** argv) {
@@ -209,7 +269,27 @@ int main(int argc, char ** argv) {
                 list_accounts();
             }
             else if (strncmp(pszCommand, "use account", 12) == 0 || strncmp(pszCommand, "use", 3) == 0) {
-                selectedAccount.setAccount(choose_account());
+                char * accountCode = NULL;
+
+                if (strncmp(pszCommand, "use account", 12) == 0) {
+                    if (strlen(pszCommand) >= 16) {
+                        accountCode = &pszCommand[13];
+                    }
+                }
+                else if (strncmp(pszCommand, "use", 3) == 0) {
+                    if (strlen(pszCommand) >= 7) {
+                        accountCode = &pszCommand[4];
+                    }
+                }
+
+                selectedAccount.setAccount(choose_account(accountCode));
+            }
+            else if (strncmp(pszCommand, "update account", 15) == 0 || strncmp(pszCommand, "ua", 2) == 0) {
+                update_account(selectedAccount);
+            }
+            else if (strncmp(pszCommand, "delete account", 15) == 0 || strncmp(pszCommand, "da", 2) == 0) {
+                delete_account(selectedAccount);
+                selectedAccount.clear();
             }
         }
     }

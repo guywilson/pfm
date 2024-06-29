@@ -15,6 +15,7 @@
 #include "pfm_error.h"
 
 #define SQLITE_ERROR_BUFFER_LEN                     512
+#define SQL_STATEMENT_BUFFER_LEN                    256
 
 using namespace std;
 
@@ -208,11 +209,11 @@ sqlite3_int64 AccountDB::createAccount(string name, string code, double openingB
     int             error;
 
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
-    pszInsertStatement = (char *)sqlite3_malloc(256);
+    pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
     snprintf(
         pszInsertStatement, 
-        256,
+        SQL_STATEMENT_BUFFER_LEN,
         "INSERT INTO account (name, code, opening_balance, current_balance) VALUES ('%s', '%s', %.2f, %.2f);",
         name.c_str(),
         code.c_str(),
@@ -289,18 +290,17 @@ int AccountDB::getAccounts(AccountResult * result) {
     return result->numRows;
 }
 
-int AccountDB::getAccount(string code, Account * account) {
-    AccountResult   result;
+int AccountDB::getAccount(string code, AccountResult * result) {
     char *          pszErrorMsg;
-    char            szStatement[256];
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             error;
 
     const char * pszTemplate = 
                 "SELECT id, name, code, opening_balance, current_balance FROM account where code = '%s';";
 
-    snprintf(szStatement, 255, pszTemplate, code.c_str());
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, code.c_str());
 
-    error = sqlite3_exec(dbHandle, szStatement, accountCallback, &result, &pszErrorMsg);
+    error = sqlite3_exec(dbHandle, szStatement, accountCallback, result, &pszErrorMsg);
 
     if (error) {
         throw pfm_error(
@@ -310,18 +310,84 @@ int AccountDB::getAccount(string code, Account * account) {
                 __FILE__, 
                 __LINE__);
     }
-    else if (result.numRows != 1) {
+    else if (result->numRows != 1) {
         throw pfm_error(
             pfm_error::buildMsg(
                 "Expected 1 result, got %d", 
-                result.numRows),
+                result->numRows),
             __FILE__,
             __LINE__);
     }
 
-    account->setAccount(result.results[0]);
+    result->results[0].print();
 
-    account->print();
+    return result->numRows;
+}
 
-    return result.numRows;
+int AccountDB::updateAccount(Account & account) {
+    char *          pszErrorMsg;
+    char *          pszUpdateStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszUpdateStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszUpdateStatement, 
+        SQL_STATEMENT_BUFFER_LEN - 1,
+        "UPDATE account SET code = '%s', name = '%s', opening_balance = %.2f, current_balance = %.2f WHERE id = %lld;",
+        account.code.c_str(),
+        account.name.c_str(),
+        account.openingBalance,
+        account.currentBalance,
+        account.id);
+
+    error = sqlite3_exec(dbHandle, pszUpdateStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to update account with id %lld: %s", 
+                account.id,
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszUpdateStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return 0;
+}
+
+int AccountDB::deleteAccount(Account & account) {
+    char *          pszErrorMsg;
+    char *          pszDeleteStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszDeleteStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszDeleteStatement, 
+        SQL_STATEMENT_BUFFER_LEN - 1,
+        "DELETE FROM account WHERE id = %lld;",
+        account.id);
+
+    error = sqlite3_exec(dbHandle, pszDeleteStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to update account with id %lld: %s", 
+                account.id,
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszDeleteStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return 0;
 }
