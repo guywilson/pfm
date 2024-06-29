@@ -19,6 +19,43 @@
 
 using namespace std;
 
+/*
+** You must get this right, there is no way of the
+** code that uses the array of categories, just how
+** many there are, unless you tell it...
+*/
+#define NUM_DEFAULT_CATEGORIES                       27
+
+static const char * defaultCategories[][2] = {
+    {"INCME", "Income"},
+    {"UTILS", "Utility bills"},
+    {"GROCS", "Food & groceries"},
+    {"RENT", "Rent payments"},
+    {"MTGE", "Mortgage payments"},
+    {"FUEL", "Vehicle fuel"},
+    {"CARD", "Credit card payments"},
+    {"LOAN", "Loan repayments"},
+    {"BUSE", "Business expenses"},
+    {"PETS", "Pets food and supplies"},
+    {"HOME", "Home and DIY"},
+    {"FOOD", "Eating out & take-away"},
+    {"CASH", "ATM withdrawal"},
+    {"CARM", "Car maintenance"},
+    {"GIFT", "Gifts & presents"},
+    {"INTE", "Interest & bank charges"},
+    {"HHOLD", "Household expenses"},
+    {"HEALT", "Health expenses"},
+    {"INSUR", "Insurance payments"},
+    {"LEISR", "Leisure and fun"},
+    {"LUNCH", "Lunch at work"},
+    {"DRINK", "Drinking & going out"},
+    {"ENTMT", "Books, music and cinema"},
+    {"CLOTH", "Shoes & clothing"},
+    {"EDUCN", "Education costs"},
+    {"TRAVL", "Travel expenses"},
+    {"CHARY", "Charities & giving"}
+};
+
 static const char * pszCreateAccountTable = 
     "CREATE TABLE account (" \
     "id INTEGER PRIMARY KEY," \
@@ -193,7 +230,37 @@ void AccountDB::createSchema() {
                     pszErrorMsg), 
                 __FILE__, 
                 __LINE__);
-        }        
+        }
+
+        const char * pszCategoryInsertTemplate = 
+            "INSERT INTO category (code, description) VALUES ('%s', '%s');";
+
+        char szInsertStmnt[SQL_STATEMENT_BUFFER_LEN];
+
+        for (int i = 0;i < NUM_DEFAULT_CATEGORIES;i++) {
+            snprintf(
+                szInsertStmnt, 
+                SQL_STATEMENT_BUFFER_LEN - 1, 
+                pszCategoryInsertTemplate,
+                defaultCategories[i][0],
+                defaultCategories[i][1]);
+
+            error = sqlite3_exec(
+                            dbHandle, 
+                            szInsertStmnt,
+                            NULL,
+                            NULL,
+                            &pszErrorMsg);
+
+            if (error) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Execute failed in createSchema(): %s", 
+                        pszErrorMsg), 
+                    __FILE__, 
+                    __LINE__);
+            }
+        }
     }
     catch (pfm_error & e) {
         sqlite3_free(pszErrorMsg);
