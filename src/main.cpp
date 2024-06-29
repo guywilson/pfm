@@ -13,6 +13,8 @@
 
 #include "db.h"
 
+#define DEFAULT_DATABASE_NAME                   ".pfm"
+
 static void printUsage(void) {
 
 }
@@ -150,7 +152,7 @@ static Account choose_account(void) {
 int main(int argc, char ** argv) {
     int             i;
     char *          pszCommand;
-    char *          pszDatabase;
+    char *          pszDatabase = NULL;
     bool            loop = true;
     Account         selectedAccount;
 
@@ -176,10 +178,10 @@ int main(int argc, char ** argv) {
 			}
 		}
 	}
-	else {
-		printUsage();
-		return -1;
-	}
+
+    if (pszDatabase == NULL) {
+        pszDatabase = strdup(DEFAULT_DATABASE_NAME);
+    }
 
     AccountDB & db = AccountDB::getInstance();
 
@@ -188,12 +190,6 @@ int main(int argc, char ** argv) {
     while (loop) {
         pszCommand = readline("pfm > ");
 
-        /*
-        ** Commands:
-        **
-        ** add account      n:name, c:code, b:opening_balance
-        ** add transaction  
-        */
         if (strlen(pszCommand)) {
             add_history(pszCommand);
 
@@ -213,7 +209,7 @@ int main(int argc, char ** argv) {
                 list_accounts();
             }
             else if (strncmp(pszCommand, "use account", 12) == 0 || strncmp(pszCommand, "use", 3) == 0) {
-                selectedAccount.set(choose_account());
+                selectedAccount.setAccount(choose_account());
             }
         }
     }

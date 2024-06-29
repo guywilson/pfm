@@ -319,7 +319,9 @@ int AccountDB::getAccount(string code, Account * account) {
             __LINE__);
     }
 
-    account->set(result.results[0]);
+    account->setAccount(result.results[0]);
+
+    account->print();
 
     return result.numRows;
 }
