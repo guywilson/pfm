@@ -105,12 +105,15 @@ static void add_account(void) {
         return;
     }
 
+    Account account;
+    account.name = accountName;
+    account.code = accountCode;
+    account.openingBalance = balance;
+    account.currentBalance = balance;
+
     AccountDB & db = AccountDB::getInstance();
 
-    accountId = db.createAccount(
-                        accountName, 
-                        accountCode, 
-                        balance);
+    accountId = db.createAccount(account);
 
     cout << "Created account with ID " << accountId << endl;
 
@@ -209,6 +212,32 @@ static void delete_account(Account & account) {
     db.deleteAccount(account);
 }
 
+static void list_categories(void) {
+    CategoryResult          result;
+    int                     numCategories;
+    int                     i;
+
+    AccountDB & db = AccountDB::getInstance();
+
+    numCategories = db.getCategories(&result);
+
+    cout << "*** Categories (" << numCategories << ") ***" << endl << endl;
+    cout << "| Code  | Description              " << endl;
+    cout << "-----------------------------------" << endl;
+
+    for (i = 0;i < numCategories;i++) {
+        Category category = result.results[i];
+
+        cout << 
+            "| " << 
+            fixStrWidth(category.code, 5) << 
+            " | " << 
+            fixStrWidth(category.description, 25) << endl;
+    }
+
+    cout << endl;
+}
+
 int main(int argc, char ** argv) {
     int             i;
     char *          pszCommand;
@@ -290,6 +319,9 @@ int main(int argc, char ** argv) {
             else if (strncmp(pszCommand, "delete account", 15) == 0 || strncmp(pszCommand, "da", 2) == 0) {
                 delete_account(selectedAccount);
                 selectedAccount.clear();
+            }
+            else if (strncmp(pszCommand, "list categories", 16) == 0 || strncmp(pszCommand, "lc", 2) == 0) {
+                list_categories();
             }
         }
     }

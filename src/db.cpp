@@ -232,34 +232,15 @@ void AccountDB::createSchema() {
                 __LINE__);
         }
 
-        const char * pszCategoryInsertTemplate = 
-            "INSERT INTO category (code, description) VALUES ('%s', '%s');";
-
-        char szInsertStmnt[SQL_STATEMENT_BUFFER_LEN];
+        Category category;
 
         for (int i = 0;i < NUM_DEFAULT_CATEGORIES;i++) {
-            snprintf(
-                szInsertStmnt, 
-                SQL_STATEMENT_BUFFER_LEN - 1, 
-                pszCategoryInsertTemplate,
-                defaultCategories[i][0],
-                defaultCategories[i][1]);
+            category.clear();
 
-            error = sqlite3_exec(
-                            dbHandle, 
-                            szInsertStmnt,
-                            NULL,
-                            NULL,
-                            &pszErrorMsg);
+            category.code = defaultCategories[i][0];
+            category.description = defaultCategories[i][1];
 
-            if (error) {
-                throw pfm_error(
-                    pfm_error::buildMsg(
-                        "Execute failed in createSchema(): %s", 
-                        pszErrorMsg), 
-                    __FILE__, 
-                    __LINE__);
-            }
+            createCategory(category);
         }
     }
     catch (pfm_error & e) {
@@ -270,7 +251,7 @@ void AccountDB::createSchema() {
     sqlite3_free(pszErrorMsg);
 }
 
-sqlite3_int64 AccountDB::createAccount(string name, string code, double openingBalance) {
+sqlite3_int64 AccountDB::createAccount(Account & account) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -282,10 +263,10 @@ sqlite3_int64 AccountDB::createAccount(string name, string code, double openingB
         pszInsertStatement, 
         SQL_STATEMENT_BUFFER_LEN,
         "INSERT INTO account (name, code, opening_balance, current_balance) VALUES ('%s', '%s', %.2f, %.2f);",
-        name.c_str(),
-        code.c_str(),
-        openingBalance,
-        openingBalance);
+        account.name.c_str(),
+        account.code.c_str(),
+        account.openingBalance,
+        account.currentBalance);
 
     error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
 
@@ -293,7 +274,7 @@ sqlite3_int64 AccountDB::createAccount(string name, string code, double openingB
         throw pfm_error(
             pfm_error::buildMsg(
                 "Failed to create account %s: %s", 
-                name.c_str(),
+                account.name.c_str(),
                 sqlite3_errmsg(dbHandle)), 
             __FILE__, 
             __LINE__);
@@ -457,4 +438,83 @@ int AccountDB::deleteAccount(Account & account) {
     sqlite3_free(pszErrorMsg);
 
     return 0;
+}
+
+sqlite3_int64 AccountDB::createCategory(Category & category) {
+    char *          pszErrorMsg;
+    char *          pszInsertStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszInsertStatement, 
+        SQL_STATEMENT_BUFFER_LEN,
+        "INSERT INTO category (description, code) VALUES ('%s', '%s');",
+        category.description.c_str(),
+        category.code.c_str());
+
+    error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to create account %s: %s", 
+                category.description.c_str(),
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszInsertStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return sqlite3_last_insert_rowid(dbHandle);
+}
+
+static int categoryCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
+    int                     columnIndex = 0;
+    Category                category;
+    CategoryResult *        result = (CategoryResult *)p;
+
+    while (columnIndex < numColumns) {
+        if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
+            category.id= strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "code", 4) == 0) {
+            category.code.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "description", 12) == 0) {
+            category.description.assign(&columns[columnIndex][0]);
+        }
+
+        columnIndex++;
+    }
+
+    result->results.push_back(category);
+    result->numRows++;
+
+    return SQLITE_OK;
+}
+
+int AccountDB::getCategories(CategoryResult * result) {
+    char *          pszErrorMsg;
+    int             error;
+
+    const char * pszStatement = 
+                "SELECT id, code, description FROM category;";
+
+    error = sqlite3_exec(dbHandle, pszStatement, categoryCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get categories list: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    return result->numRows;
 }
