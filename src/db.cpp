@@ -108,7 +108,7 @@ static const char * pszCreateTransationTable =
     "FOREIGN KEY(payee_id) REFERENCES payee(id)" \
     ");";
 
-bool AccountDB::open(string dbName) {
+bool PFMDB::open(string dbName) {
     int error = sqlite3_open_v2(
                     dbName.c_str(), 
                     &this->dbHandle, 
@@ -141,11 +141,11 @@ bool AccountDB::open(string dbName) {
     return true;
 }
 
-AccountDB::~AccountDB() {
+PFMDB::~PFMDB() {
     sqlite3_close_v2(this->dbHandle);
 }
 
-void AccountDB::createSchema() {
+void PFMDB::createSchema() {
     int     error = SQLITE_OK;
     char *  pszErrorMsg;
 
@@ -251,7 +251,7 @@ void AccountDB::createSchema() {
     sqlite3_free(pszErrorMsg);
 }
 
-sqlite3_int64 AccountDB::createAccount(Account & account) {
+sqlite3_int64 PFMDB::createAccount(Account & account) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -317,7 +317,7 @@ static int accountCallback(void * p, int numColumns, char ** columns, char ** co
     return SQLITE_OK;
 }
 
-int AccountDB::getAccounts(AccountResult * result) {
+int PFMDB::getAccounts(AccountResult * result) {
     char *          pszErrorMsg;
     int             error;
 
@@ -338,7 +338,7 @@ int AccountDB::getAccounts(AccountResult * result) {
     return result->numRows;
 }
 
-int AccountDB::getAccount(string code, AccountResult * result) {
+int PFMDB::getAccount(string code, AccountResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             error;
@@ -372,7 +372,7 @@ int AccountDB::getAccount(string code, AccountResult * result) {
     return result->numRows;
 }
 
-int AccountDB::updateAccount(Account & account) {
+int PFMDB::updateAccount(Account & account) {
     char *          pszErrorMsg;
     char *          pszUpdateStatement;
     int             error;
@@ -408,7 +408,7 @@ int AccountDB::updateAccount(Account & account) {
     return 0;
 }
 
-int AccountDB::deleteAccount(Account & account) {
+int PFMDB::deleteAccount(Account & account) {
     char *          pszErrorMsg;
     char *          pszDeleteStatement;
     int             error;
@@ -440,7 +440,7 @@ int AccountDB::deleteAccount(Account & account) {
     return 0;
 }
 
-sqlite3_int64 AccountDB::createCategory(Category & category) {
+sqlite3_int64 PFMDB::createCategory(Category & category) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -498,7 +498,7 @@ static int categoryCallback(void * p, int numColumns, char ** columns, char ** c
     return SQLITE_OK;
 }
 
-int AccountDB::getCategories(CategoryResult * result) {
+int PFMDB::getCategories(CategoryResult * result) {
     char *          pszErrorMsg;
     int             error;
 
