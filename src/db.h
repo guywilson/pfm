@@ -5,6 +5,7 @@
 
 #include "account.h"
 #include "category.h"
+#include "payee.h"
 
 using namespace std;
 
@@ -41,6 +42,12 @@ class PFM_DB {
         int             getCategory(string code, CategoryResult * result);
         int             updateCategory(Category & category);
         int             deleteCategory(Category & category);
+
+        sqlite3_int64   createPayee(Payee & payee);
+        int             getPayees(PayeeResult * result);
+        int             getPayee(string code, PayeeResult * result);
+        int             updatePayee(Payee & payee);
+        int             deletePayee(Payee & payee);
 };
 
 #endif

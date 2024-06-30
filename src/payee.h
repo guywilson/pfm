@@ -6,50 +6,50 @@
 
 using namespace std;
 
-#ifndef __INCL_CATEGORY
-#define __INCL_CATEGORY
+#ifndef __INCL_PAYEE
+#define __INCL_PAYEE
 
-class Category {
+class Payee {
     public:
-        Category() {
+        Payee() {
             clear();
         }
 
         void clear(void) {
             this->id = 0;
 
-            this->description = "";
+            this->name = "";
             this->code = "";
         }
 
-        void setCategory(const Category & src) {
+        void setPayee(const Payee & src) {
             this->id = src.id;
 
-            this->description =     src.description;
+            this->name =            src.name;
             this->code =            src.code;
         }
 
         void print(void) {
             cout << "ID: " << id << endl;
-            cout << "Description: '" << description << "'" << endl;
+            cout << "Description: '" << name << "'" << endl;
             cout << "Code: '" << code << "'" << endl;
         }
 
         sqlite3_int64           id;
 
-        string                  description;
+        string                  name;
         string                  code;
 };
 
-class CategoryResult {
+class PayeeResult {
     public:
-        CategoryResult() {
+        PayeeResult() {
             numRows = 0;
         }
 
         int                     numRows;
 
-        vector<Category>        results;
+        vector<Payee>           results;
 };
 
 #endif

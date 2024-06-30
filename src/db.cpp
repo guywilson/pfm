@@ -11,102 +11,97 @@
 #include <sqlite3.h>
 
 #include "account.h"
+#include "category.h"
+#include "payee.h"
 #include "db.h"
 #include "pfm_error.h"
+#include "schema.h"
 
 #define SQLITE_ERROR_BUFFER_LEN                     512
 #define SQL_STATEMENT_BUFFER_LEN                    256
 
 using namespace std;
 
-/*
-** You must get this right, there is no way of the
-** code that uses the array of categories, just how
-** many there are, unless you tell it...
-*/
-#define NUM_DEFAULT_CATEGORIES                       27
+static int accountCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
+    int                     columnIndex = 0;
+    Account                 account;
+    AccountResult *         result = (AccountResult *)p;
 
-static const char * defaultCategories[][2] = {
-    {"INCME", "Income"},
-    {"UTILS", "Utility bills"},
-    {"GROCS", "Food & groceries"},
-    {"RENT", "Rent payments"},
-    {"MTGE", "Mortgage payments"},
-    {"FUEL", "Vehicle fuel"},
-    {"CARD", "Credit card payments"},
-    {"LOAN", "Loan repayments"},
-    {"BUSE", "Business expenses"},
-    {"PETS", "Pets food and supplies"},
-    {"HOME", "Home and DIY"},
-    {"FOOD", "Eating out & take-away"},
-    {"CASH", "ATM withdrawal"},
-    {"CARM", "Car maintenance"},
-    {"GIFT", "Gifts & presents"},
-    {"INTE", "Interest & bank charges"},
-    {"HHOLD", "Household expenses"},
-    {"HEALT", "Health expenses"},
-    {"INSUR", "Insurance payments"},
-    {"LEISR", "Leisure and fun"},
-    {"LUNCH", "Lunch at work"},
-    {"DRINK", "Drinking & going out"},
-    {"ENTMT", "Books, music and cinema"},
-    {"CLOTH", "Shoes & clothing"},
-    {"EDUCN", "Education costs"},
-    {"TRAVL", "Travel expenses"},
-    {"CHARY", "Charities & giving"}
-};
+    while (columnIndex < numColumns) {
+        if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
+            account.id= strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "name", 4) == 0) {
+            account.name.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "code", 4) == 0) {
+            account.code.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "opening_balance", 16) == 0) {
+            account.openingBalance = strtod(&columns[columnIndex][0], NULL);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "current_balance", 16) == 0) {
+            account.currentBalance = strtod(&columns[columnIndex][0], NULL);
+        }
 
-static const char * pszCreateAccountTable = 
-    "CREATE TABLE account (" \
-    "id INTEGER PRIMARY KEY," \
-    "name TEXT NOT NULL," \
-    "code TEXT NOT NULL," \
-    "opening_balance NUMERIC NOT NULL," \
-    "current_balance NUMERIC NOT NULL," \
-    "UNIQUE(code) ON CONFLICT ROLLBACK" \
-    ");";
+        columnIndex++;
+    }
 
-static const char * pszCreateCategoryTable = 
-    "CREATE TABLE category (" \
-    "id INTEGER PRIMARY KEY," \
-    "code TEXT NOT NULL," \
-    "description TEXT NOT NULL" \
-    ");";
+    result->results.push_back(account);
+    result->numRows++;
 
-static const char * pszCreatePayeeTable = 
-    "CREATE TABLE payee (" \
-    "id INTEGER PRIMARY KEY," \
-    "code TEXT NOT NULL," \
-    "name TEXT NOT NULL" \
-    ");";
+    return SQLITE_OK;
+}
 
-static const char * pszCreateRCTable = 
-    "CREATE TABLE recurring_charge (" \
-    "id INTEGER PRIMARY KEY," \
-    "account_id INTEGER," \
-    "payee_id INTEGER," \
-    "date TEXT," \
-    "description TEXT NOT NULL," \
-    "amount NUMERIC NOT NULL," \
-    "frequency TEXT NOT NULL," \
-    "FOREIGN KEY(account_id) REFERENCES account(id)," \
-    "FOREIGN KEY(payee_id) REFERENCES payee(id)" \
-    ");";
+static int categoryCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
+    int                     columnIndex = 0;
+    Category                category;
+    CategoryResult *        result = (CategoryResult *)p;
 
-static const char * pszCreateTransationTable = 
-    "CREATE TABLE account_transaction (" \
-    "id INTEGER PRIMARY KEY," \
-    "account_id INTEGER," \
-    "category_id INTEGER," \
-    "payee_id INTEGER," \
-    "date TEXT NOT NULL," \
-    "description TEXT NOT NULL," \
-    "credit_debit TEXT NOT NULL," \
-    "amount NUMERIC NOT NULL," \
-    "FOREIGN KEY(account_id) REFERENCES account(id)," \
-    "FOREIGN KEY(category_id) REFERENCES category(id)," \
-    "FOREIGN KEY(payee_id) REFERENCES payee(id)" \
-    ");";
+    while (columnIndex < numColumns) {
+        if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
+            category.id= strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "code", 4) == 0) {
+            category.code.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "description", 12) == 0) {
+            category.description.assign(&columns[columnIndex][0]);
+        }
+
+        columnIndex++;
+    }
+
+    result->results.push_back(category);
+    result->numRows++;
+
+    return SQLITE_OK;
+}
+
+static int payeeCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
+    int                     columnIndex = 0;
+    Payee                   payee;
+    PayeeResult *           result = (PayeeResult *)p;
+
+    while (columnIndex < numColumns) {
+        if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
+            payee.id= strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "code", 4) == 0) {
+            payee.code.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "name", 4) == 0) {
+            payee.name.assign(&columns[columnIndex][0]);
+        }
+
+        columnIndex++;
+    }
+
+    result->results.push_back(payee);
+    result->numRows++;
+
+    return SQLITE_OK;
+}
 
 bool PFM_DB::open(string dbName) {
     int error = sqlite3_open_v2(
@@ -286,37 +281,6 @@ sqlite3_int64 PFM_DB::createAccount(Account & account) {
     return sqlite3_last_insert_rowid(dbHandle);
 }
 
-static int accountCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
-    int                     columnIndex = 0;
-    Account                 account;
-    AccountResult *         result = (AccountResult *)p;
-
-    while (columnIndex < numColumns) {
-        if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
-            account.id= strtoll(&columns[columnIndex][0], NULL, 10);
-        }
-        else if (strncmp(&columnNames[columnIndex][0], "name", 4) == 0) {
-            account.name.assign(&columns[columnIndex][0]);
-        }
-        else if (strncmp(&columnNames[columnIndex][0], "code", 4) == 0) {
-            account.code.assign(&columns[columnIndex][0]);
-        }
-        else if (strncmp(&columnNames[columnIndex][0], "opening_balance", 16) == 0) {
-            account.openingBalance = strtod(&columns[columnIndex][0], NULL);
-        }
-        else if (strncmp(&columnNames[columnIndex][0], "current_balance", 16) == 0) {
-            account.currentBalance = strtod(&columns[columnIndex][0], NULL);
-        }
-
-        columnIndex++;
-    }
-
-    result->results.push_back(account);
-    result->numRows++;
-
-    return SQLITE_OK;
-}
-
 int PFM_DB::getAccounts(AccountResult * result) {
     char *          pszErrorMsg;
     int             error;
@@ -473,31 +437,6 @@ sqlite3_int64 PFM_DB::createCategory(Category & category) {
     return sqlite3_last_insert_rowid(dbHandle);
 }
 
-static int categoryCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
-    int                     columnIndex = 0;
-    Category                category;
-    CategoryResult *        result = (CategoryResult *)p;
-
-    while (columnIndex < numColumns) {
-        if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
-            category.id= strtoll(&columns[columnIndex][0], NULL, 10);
-        }
-        else if (strncmp(&columnNames[columnIndex][0], "code", 4) == 0) {
-            category.code.assign(&columns[columnIndex][0]);
-        }
-        else if (strncmp(&columnNames[columnIndex][0], "description", 12) == 0) {
-            category.description.assign(&columns[columnIndex][0]);
-        }
-
-        columnIndex++;
-    }
-
-    result->results.push_back(category);
-    result->numRows++;
-
-    return SQLITE_OK;
-}
-
 int PFM_DB::getCategories(CategoryResult * result) {
     char *          pszErrorMsg;
     int             error;
@@ -608,6 +547,160 @@ int PFM_DB::deleteCategory(Category & category) {
             pfm_error::buildMsg(
                 "Failed to delete category with id %lld: %s", 
                 category.id,
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszDeleteStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return 0;
+}
+
+sqlite3_int64 PFM_DB::createPayee(Payee & payee) {
+    char *          pszErrorMsg;
+    char *          pszInsertStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszInsertStatement, 
+        SQL_STATEMENT_BUFFER_LEN,
+        "INSERT INTO payee (name, code) VALUES ('%s', '%s');",
+        payee.name.c_str(),
+        payee.code.c_str());
+
+    error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to create payee %s: %s", 
+                payee.name.c_str(),
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszInsertStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return sqlite3_last_insert_rowid(dbHandle);
+}
+
+int PFM_DB::getPayees(PayeeResult * result) {
+    char *          pszErrorMsg;
+    int             error;
+
+    const char * pszStatement = 
+                "SELECT id, code, name FROM payee;";
+
+    error = sqlite3_exec(dbHandle, pszStatement, payeeCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get payees list: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    return result->numRows;
+}
+
+int PFM_DB::getPayee(string code, PayeeResult * result) {
+    char *          pszErrorMsg;
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT id, code, name FROM payee where code = '%s';";
+
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, code.c_str());
+
+    error = sqlite3_exec(dbHandle, szStatement, payeeCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get payee: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+    else if (result->numRows != 1) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Expected 1 result, got %d", 
+                result->numRows),
+            __FILE__,
+            __LINE__);
+    }
+
+    result->results[0].print();
+
+    return result->numRows;
+}
+
+int PFM_DB::updatePayee(Payee & payee) {
+    char *          pszErrorMsg;
+    char *          pszUpdateStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszUpdateStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszUpdateStatement, 
+        SQL_STATEMENT_BUFFER_LEN - 1,
+        "UPDATE payee SET code = '%s', name = '%s' WHERE id = %lld;",
+        payee.code.c_str(),
+        payee.name.c_str(),
+        payee.id);
+
+    error = sqlite3_exec(dbHandle, pszUpdateStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to update payee with id %lld: %s", 
+                payee.id,
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszUpdateStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return 0;
+}
+
+int PFM_DB::deletePayee(Payee & payee) {
+    char *          pszErrorMsg;
+    char *          pszDeleteStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszDeleteStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszDeleteStatement, 
+        SQL_STATEMENT_BUFFER_LEN - 1,
+        "DELETE FROM payee WHERE id = %lld;",
+        payee.id);
+
+    error = sqlite3_exec(dbHandle, pszDeleteStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to delete payee with id %lld: %s", 
+                payee.id,
                 sqlite3_errmsg(dbHandle)), 
             __FILE__, 
             __LINE__);

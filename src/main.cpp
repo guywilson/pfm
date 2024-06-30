@@ -6,22 +6,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <gmp.h>
-#include <mpfr.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
 #include "db.h"
 #include "account.h"
 #include "category.h"
+#include "cli.h"
 
 using namespace std;
 
 #define DEFAULT_DATABASE_NAME                   ".pfm"
-
-#define FIELD_STRING_LEN                        64
-#define MAX_PROMPT_LENGTH                      128
-#define AMOUNT_FIELD_STRING_LEN                 16
 
 static void printUsage(void) {
 
@@ -29,291 +24,6 @@ static void printUsage(void) {
 
 static void printVersion(void) {
 
-}
-
-static string fixStrWidth(string & src, int requiredLen) {
-    string          target;
-
-    if (src.length() > requiredLen) {
-        target = src.substr(0, requiredLen - 2);
-        target.append("..");
-    }
-    else if (src.length() < requiredLen) {
-        target = src;
-        
-        for (int i = 0;i < requiredLen - src.length();i++) {
-            target.append(" ");
-        }
-    }
-    else {
-        target = src;
-    }
-
-    return target;
-}
-
-static string formatCurrency(double src) {
-    static char szAmount[16];
-
-    snprintf(szAmount, 15, "£%.2f", (float)src);
-
-    return string(szAmount);
-}
-
-static char * readString(const char * pszPrompt, const char * pszDefault, const size_t maxLength) {
-    char *      pszAnswer;
-
-    pszAnswer = readline(pszPrompt);
-
-    if (strlen(pszAnswer) == 0 && pszDefault != NULL) {
-        pszAnswer = strndup(pszDefault, maxLength);
-    }
-
-    return pszAnswer;
-}
-
-static char readChar(const char * pszPrompt) {
-    char        answer;
-
-    printf("%s", pszPrompt);
-    fflush(stdout);
-
-    answer = getchar();
-    fflush(stdin);
-
-    return answer;
-}
-
-static void add_account(void) {
-    char *          accountName;
-    char *          accountCode;
-    char *          openingBalance;
-    double          balance;
-    sqlite3_int64   accountId;
-
-    cout << "*** Add account ***" << endl;
-
-    accountName = readString("Account name: ", NULL, 32);
-    accountCode = readString("Account code (max. 4 chars): ", NULL, 4);
-    openingBalance = readString("Opening balance [0.00]: ", "0.00", 32);
-
-    if (strlen(openingBalance) > 0) {
-        balance = strtod(openingBalance, NULL);
-    }
-    else {
-        balance = 0.0;
-    }
-
-    if (strlen(accountCode) == 0) {
-        fprintf(stderr, "\nAccount code must have a value.\n");
-        return;
-    }
-
-    Account account;
-    account.name = accountName;
-    account.code = accountCode;
-    account.openingBalance = balance;
-    account.currentBalance = balance;
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    accountId = db.createAccount(account);
-
-    cout << "Created account with ID " << accountId << endl;
-
-    free(openingBalance);
-    free(accountCode);
-    free(accountName);
-}
-
-static void list_accounts(void) {
-    AccountResult           result;
-    int                     numAccounts;
-    int                     i;
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    numAccounts = db.getAccounts(&result);
-
-    cout << "*** Accounts (" << numAccounts << ") ***" << endl << endl;
-    cout << "| Code | Name            | Balance" << endl;
-    cout << "----------------------------------" << endl;
-
-    for (i = 0;i < numAccounts;i++) {
-        Account account = result.results[i];
-
-        cout << 
-            "| " << 
-            fixStrWidth(account.code, 4) << 
-            " | " << 
-            fixStrWidth(account.name, 15) << 
-            " | " << 
-            formatCurrency(account.currentBalance) << endl;
-    }
-
-    cout << endl;
-}
-
-static Account choose_account(const char * szAccountCode) {
-    char *          accountCode;
-    AccountResult   result;
-
-    if (szAccountCode == NULL || strlen(szAccountCode) == 0) {
-        cout << "*** Use account ***" << endl;
-        accountCode = readString("Account code (max. 4 chars): ", NULL, 4);
-    }
-    else {
-        accountCode = strdup(szAccountCode);
-    }
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    db.getAccount(accountCode, &result);
-
-    free(accountCode);
-
-    return result.results[0];
-}
-
-static void update_account(Account & account) {
-    char            szPrompt[MAX_PROMPT_LENGTH];
-    char            szBalance[AMOUNT_FIELD_STRING_LEN];
-    char *          pszBalance;
-
-    cout << "*** Update account ***" << endl;
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Account name ['%s']: ", account.name.c_str());
-    account.name = readString(szPrompt, account.name.c_str(), FIELD_STRING_LEN);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Account code ['%s']: ", account.code.c_str());
-    account.code = readString(szPrompt, account.code.c_str(), FIELD_STRING_LEN);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%.2f]: ", account.openingBalance);
-    snprintf(szBalance, AMOUNT_FIELD_STRING_LEN, "%.2f", account.openingBalance);
-    pszBalance = readString(szPrompt, szBalance, AMOUNT_FIELD_STRING_LEN);
-    account.openingBalance = strtod(pszBalance, NULL);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Current balance [%.2f]: ", account.currentBalance);
-    snprintf(szBalance, AMOUNT_FIELD_STRING_LEN, "%.2f", account.currentBalance);
-    pszBalance = readString(szPrompt, szBalance, AMOUNT_FIELD_STRING_LEN);
-    account.currentBalance = strtod(pszBalance, NULL);
-
-    if (account.code.length() == 0) {
-        fprintf(stderr, "\nAccount code must have a value.\n");
-        return;
-    }
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    db.updateAccount(account);
-
-    free(pszBalance);
-}
-
-static void delete_account(Account & account) {
-    PFM_DB & db = PFM_DB::getInstance();
-
-    db.deleteAccount(account);
-}
-
-static void add_category(void) {
-    char *          categoryDescription;
-    char *          categoryCode;
-
-    cout << "*** Add category ***" << endl;
-
-    categoryDescription = readString("Category description: ", NULL, 32);
-    categoryCode = readString("Category code (max. 5 chars): ", NULL, 5);
-
-    if (strlen(categoryCode) == 0) {
-        fprintf(stderr, "\nCategory code must have a value.\n");
-        return;
-    }
-
-    Category category;
-    category.code = categoryCode;
-    category.description = categoryDescription;
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    db.createCategory(category);
-
-    free(categoryCode);
-    free(categoryDescription);
-}
-
-static void list_categories(void) {
-    CategoryResult          result;
-    int                     numCategories;
-    int                     i;
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    numCategories = db.getCategories(&result);
-
-    cout << "*** Categories (" << numCategories << ") ***" << endl << endl;
-    cout << "| Code  | Description              " << endl;
-    cout << "-----------------------------------" << endl;
-
-    for (i = 0;i < numCategories;i++) {
-        Category category = result.results[i];
-
-        cout << 
-            "| " << 
-            fixStrWidth(category.code, 5) << 
-            " | " << 
-            fixStrWidth(category.description, 25) << endl;
-    }
-
-    cout << endl;
-}
-
-static Category get_category(const char * pszCategoryCode) {
-    char *          categoryCode;
-    CategoryResult  result;
-
-    if (pszCategoryCode == NULL || strlen(pszCategoryCode) == 0) {
-        cout << "*** Get category ***" << endl;
-        categoryCode = readString("Category code (max. 5 chars): ", NULL, 5);
-    }
-    else {
-        categoryCode = strdup(pszCategoryCode);
-    }
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    db.getCategory(categoryCode, &result);
-
-    free(categoryCode);
-
-    return result.results[0];
-}
-
-static void update_category(Category & category) {
-    char            szPrompt[MAX_PROMPT_LENGTH];
-
-    cout << "*** Update category ***" << endl;
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category description ['%s']: ", category.description.c_str());
-    category.description = readString(szPrompt, category.description.c_str(), FIELD_STRING_LEN);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']: ", category.code.c_str());
-    category.code = readString(szPrompt, category.code.c_str(), FIELD_STRING_LEN);
-
-    if (category.code.length() == 0) {
-        fprintf(stderr, "\nCategory code must have a value.\n");
-        return;
-    }
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    db.updateCategory(category);
-}
-
-static void delete_category(Category & category) {
-    PFM_DB & db = PFM_DB::getInstance();
-
-    db.deleteCategory(category);
 }
 
 int main(int argc, char ** argv) {
@@ -442,6 +152,51 @@ int main(int argc, char ** argv) {
                 c.print();
 
                 delete_category(c);
+            }
+            else if (strncmp(pszCommand, "add payee", 9) == 0 || strncmp(pszCommand, "ap", 2) == 0) {
+                add_payee();
+            }
+            else if (strncmp(pszCommand, "list payees", 11) == 0 || strncmp(pszCommand, "lp", 2) == 0) {
+                list_payees();
+            }
+            else if (strncmp(pszCommand, "update payee", 12) == 0 || strncmp(pszCommand, "up", 2) == 0) {
+                char * payeeCode = NULL;
+
+                if (strncmp(pszCommand, "update payee", 12) == 0) {
+                    if (strlen(pszCommand) >= 16) {
+                        payeeCode = &pszCommand[13];
+                    }
+                }
+                else if (strncmp(pszCommand, "up", 2) == 0) {
+                    if (strlen(pszCommand) >= 6) {
+                        payeeCode = &pszCommand[3];
+                    }
+                }
+
+                Payee p;
+                p.setPayee(get_payee(payeeCode));
+
+                update_payee(p);
+            }
+            else if (strncmp(pszCommand, "delete payee", 12) == 0 || strncmp(pszCommand, "dc", 2) == 0) {
+                char * payeeCode = NULL;
+
+                if (strncmp(pszCommand, "delete payee", 12) == 0) {
+                    if (strlen(pszCommand) >= 16) {
+                        payeeCode = &pszCommand[13];
+                    }
+                }
+                else if (strncmp(pszCommand, "dc", 2) == 0) {
+                    if (strlen(pszCommand) >= 6) {
+                        payeeCode = &pszCommand[3];
+                    }
+                }
+
+                Payee p;
+                p.setPayee(get_payee(payeeCode));
+                p.print();
+
+                delete_payee(p);
             }
         }
     }
