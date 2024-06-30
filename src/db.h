@@ -11,22 +11,22 @@ using namespace std;
 #ifndef __INCL_DB
 #define __INCL_DB
 
-class PFMDB {
+class PFM_DB {
     public:
-        static PFMDB & getInstance() {
-            static PFMDB instance;
+        static PFM_DB & getInstance() {
+            static PFM_DB instance;
             return instance;
         }
 
     private:
-        PFMDB() {}
+        PFM_DB() {}
 
         sqlite3 *       dbHandle;
 
         void            createSchema();
 
     public:
-        ~PFMDB();
+        ~PFM_DB();
 
         bool            open(string dbName);
 

@@ -108,7 +108,7 @@ static const char * pszCreateTransationTable =
     "FOREIGN KEY(payee_id) REFERENCES payee(id)" \
     ");";
 
-bool PFMDB::open(string dbName) {
+bool PFM_DB::open(string dbName) {
     int error = sqlite3_open_v2(
                     dbName.c_str(), 
                     &this->dbHandle, 
@@ -141,11 +141,11 @@ bool PFMDB::open(string dbName) {
     return true;
 }
 
-PFMDB::~PFMDB() {
+PFM_DB::~PFM_DB() {
     sqlite3_close_v2(this->dbHandle);
 }
 
-void PFMDB::createSchema() {
+void PFM_DB::createSchema() {
     int     error = SQLITE_OK;
     char *  pszErrorMsg;
 
@@ -251,7 +251,7 @@ void PFMDB::createSchema() {
     sqlite3_free(pszErrorMsg);
 }
 
-sqlite3_int64 PFMDB::createAccount(Account & account) {
+sqlite3_int64 PFM_DB::createAccount(Account & account) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -317,7 +317,7 @@ static int accountCallback(void * p, int numColumns, char ** columns, char ** co
     return SQLITE_OK;
 }
 
-int PFMDB::getAccounts(AccountResult * result) {
+int PFM_DB::getAccounts(AccountResult * result) {
     char *          pszErrorMsg;
     int             error;
 
@@ -338,7 +338,7 @@ int PFMDB::getAccounts(AccountResult * result) {
     return result->numRows;
 }
 
-int PFMDB::getAccount(string code, AccountResult * result) {
+int PFM_DB::getAccount(string code, AccountResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             error;
@@ -372,7 +372,7 @@ int PFMDB::getAccount(string code, AccountResult * result) {
     return result->numRows;
 }
 
-int PFMDB::updateAccount(Account & account) {
+int PFM_DB::updateAccount(Account & account) {
     char *          pszErrorMsg;
     char *          pszUpdateStatement;
     int             error;
@@ -408,7 +408,7 @@ int PFMDB::updateAccount(Account & account) {
     return 0;
 }
 
-int PFMDB::deleteAccount(Account & account) {
+int PFM_DB::deleteAccount(Account & account) {
     char *          pszErrorMsg;
     char *          pszDeleteStatement;
     int             error;
@@ -427,7 +427,7 @@ int PFMDB::deleteAccount(Account & account) {
     if (error) {
         throw pfm_error(
             pfm_error::buildMsg(
-                "Failed to update account with id %lld: %s", 
+                "Failed to delete account with id %lld: %s", 
                 account.id,
                 sqlite3_errmsg(dbHandle)), 
             __FILE__, 
@@ -440,7 +440,7 @@ int PFMDB::deleteAccount(Account & account) {
     return 0;
 }
 
-sqlite3_int64 PFMDB::createCategory(Category & category) {
+sqlite3_int64 PFM_DB::createCategory(Category & category) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -498,7 +498,7 @@ static int categoryCallback(void * p, int numColumns, char ** columns, char ** c
     return SQLITE_OK;
 }
 
-int PFMDB::getCategories(CategoryResult * result) {
+int PFM_DB::getCategories(CategoryResult * result) {
     char *          pszErrorMsg;
     int             error;
 
@@ -517,4 +517,104 @@ int PFMDB::getCategories(CategoryResult * result) {
     }
 
     return result->numRows;
+}
+
+int PFM_DB::getCategory(string code, CategoryResult * result) {
+    char *          pszErrorMsg;
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT id, code, description FROM category where code = '%s';";
+
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, code.c_str());
+
+    error = sqlite3_exec(dbHandle, szStatement, categoryCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get category: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+    else if (result->numRows != 1) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Expected 1 result, got %d", 
+                result->numRows),
+            __FILE__,
+            __LINE__);
+    }
+
+    result->results[0].print();
+
+    return result->numRows;
+}
+
+int PFM_DB::updateCategory(Category & category) {
+    char *          pszErrorMsg;
+    char *          pszUpdateStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszUpdateStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszUpdateStatement, 
+        SQL_STATEMENT_BUFFER_LEN - 1,
+        "UPDATE category SET code = '%s', description = '%s' WHERE id = %lld;",
+        category.code.c_str(),
+        category.description.c_str(),
+        category.id);
+
+    error = sqlite3_exec(dbHandle, pszUpdateStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to update category with id %lld: %s", 
+                category.id,
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszUpdateStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return 0;
+}
+
+int PFM_DB::deleteCategory(Category & category) {
+    char *          pszErrorMsg;
+    char *          pszDeleteStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszDeleteStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszDeleteStatement, 
+        SQL_STATEMENT_BUFFER_LEN - 1,
+        "DELETE FROM category WHERE id = %lld;",
+        category.id);
+
+    error = sqlite3_exec(dbHandle, pszDeleteStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to delete category with id %lld: %s", 
+                category.id,
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszDeleteStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return 0;
 }

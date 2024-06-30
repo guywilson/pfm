@@ -12,6 +12,10 @@
 #include <readline/history.h>
 
 #include "db.h"
+#include "account.h"
+#include "category.h"
+
+using namespace std;
 
 #define DEFAULT_DATABASE_NAME                   ".pfm"
 
@@ -111,7 +115,7 @@ static void add_account(void) {
     account.openingBalance = balance;
     account.currentBalance = balance;
 
-    PFMDB & db = PFMDB::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
 
     accountId = db.createAccount(account);
 
@@ -127,7 +131,7 @@ static void list_accounts(void) {
     int                     numAccounts;
     int                     i;
 
-    PFMDB & db = PFMDB::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
 
     numAccounts = db.getAccounts(&result);
 
@@ -162,7 +166,7 @@ static Account choose_account(const char * szAccountCode) {
         accountCode = strdup(szAccountCode);
     }
 
-    PFMDB & db = PFMDB::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
 
     db.getAccount(accountCode, &result);
 
@@ -199,7 +203,7 @@ static void update_account(Account & account) {
         return;
     }
 
-    PFMDB & db = PFMDB::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
 
     db.updateAccount(account);
 
@@ -207,7 +211,7 @@ static void update_account(Account & account) {
 }
 
 static void delete_account(Account & account) {
-    PFMDB & db = PFMDB::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
 
     db.deleteAccount(account);
 }
@@ -230,7 +234,7 @@ static void add_category(void) {
     category.code = categoryCode;
     category.description = categoryDescription;
 
-    PFMDB & db = PFMDB::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
 
     db.createCategory(category);
 
@@ -243,7 +247,7 @@ static void list_categories(void) {
     int                     numCategories;
     int                     i;
 
-    PFMDB & db = PFMDB::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
 
     numCategories = db.getCategories(&result);
 
@@ -262,6 +266,54 @@ static void list_categories(void) {
     }
 
     cout << endl;
+}
+
+static Category get_category(const char * pszCategoryCode) {
+    char *          categoryCode;
+    CategoryResult  result;
+
+    if (pszCategoryCode == NULL || strlen(pszCategoryCode) == 0) {
+        cout << "*** Get category ***" << endl;
+        categoryCode = readString("Category code (max. 5 chars): ", NULL, 5);
+    }
+    else {
+        categoryCode = strdup(pszCategoryCode);
+    }
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    db.getCategory(categoryCode, &result);
+
+    free(categoryCode);
+
+    return result.results[0];
+}
+
+static void update_category(Category & category) {
+    char            szPrompt[MAX_PROMPT_LENGTH];
+
+    cout << "*** Update category ***" << endl;
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category description ['%s']: ", category.description.c_str());
+    category.description = readString(szPrompt, category.description.c_str(), FIELD_STRING_LEN);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']: ", category.code.c_str());
+    category.code = readString(szPrompt, category.code.c_str(), FIELD_STRING_LEN);
+
+    if (category.code.length() == 0) {
+        fprintf(stderr, "\nCategory code must have a value.\n");
+        return;
+    }
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    db.updateCategory(category);
+}
+
+static void delete_category(Category & category) {
+    PFM_DB & db = PFM_DB::getInstance();
+
+    db.deleteCategory(category);
 }
 
 int main(int argc, char ** argv) {
@@ -298,7 +350,7 @@ int main(int argc, char ** argv) {
         pszDatabase = strdup(DEFAULT_DATABASE_NAME);
     }
 
-    PFMDB & db = PFMDB::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
 
     db.open(pszDatabase);
 
@@ -352,37 +404,44 @@ int main(int argc, char ** argv) {
             else if (strncmp(pszCommand, "list categories", 16) == 0 || strncmp(pszCommand, "lc", 2) == 0) {
                 list_categories();
             }
-            else if (strncmp(pszCommand, "update category", 16) == 0 || strncmp(pszCommand, "uc", 2) == 0) {
+            else if (strncmp(pszCommand, "update category", 15) == 0 || strncmp(pszCommand, "uc", 2) == 0) {
                 char * categoryCode = NULL;
 
-                if (strncmp(pszCommand, "update category", 16) == 0) {
-                    if (strlen(pszCommand) >= 22) {
-                        categoryCode = &pszCommand[17];
+                if (strncmp(pszCommand, "update category", 15) == 0) {
+                    if (strlen(pszCommand) >= 19) {
+                        categoryCode = &pszCommand[16];
                     }
                 }
                 else if (strncmp(pszCommand, "uc", 2) == 0) {
-                    if (strlen(pszCommand) >= 8) {
+                    if (strlen(pszCommand) >= 6) {
                         categoryCode = &pszCommand[3];
                     }
                 }
 
-                // update_category(get_category(categoryCode));
+                Category c;
+                c.setCategory(get_category(categoryCode));
+
+                update_category(c);
             }
-            else if (strncmp(pszCommand, "delete category", 16) == 0 || strncmp(pszCommand, "dc", 2) == 0) {
+            else if (strncmp(pszCommand, "delete category", 15) == 0 || strncmp(pszCommand, "dc", 2) == 0) {
                 char * categoryCode = NULL;
 
-                if (strncmp(pszCommand, "delete category", 16) == 0) {
-                    if (strlen(pszCommand) >= 22) {
-                        categoryCode = &pszCommand[17];
+                if (strncmp(pszCommand, "delete category", 15) == 0) {
+                    if (strlen(pszCommand) >= 19) {
+                        categoryCode = &pszCommand[16];
                     }
                 }
                 else if (strncmp(pszCommand, "dc", 2) == 0) {
-                    if (strlen(pszCommand) >= 8) {
+                    if (strlen(pszCommand) >= 6) {
                         categoryCode = &pszCommand[3];
                     }
                 }
 
-                // delete_category(get_category(categoryCode));
+                Category c;
+                c.setCategory(get_category(categoryCode));
+                c.print();
+
+                delete_category(c);
             }
         }
     }
