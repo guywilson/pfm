@@ -66,12 +66,14 @@ const char * pszCreateRCTable =
     "CREATE TABLE recurring_charge (" \
     "id INTEGER PRIMARY KEY," \
     "account_id INTEGER," \
+    "category_id INTEGER," \
     "payee_id INTEGER," \
     "date TEXT," \
     "description TEXT NOT NULL," \
     "amount NUMERIC NOT NULL," \
     "frequency TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id)," \
+    "FOREIGN KEY(category_id) REFERENCES category(id)," \
     "FOREIGN KEY(payee_id) REFERENCES payee(id)" \
     ");";
 
