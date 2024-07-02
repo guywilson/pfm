@@ -13,6 +13,7 @@
 #include "cli.h"
 #include "account.h"
 #include "category.h"
+#include "recurring_charge.h"
 
 using namespace std;
 
@@ -346,4 +347,128 @@ void delete_payee(Payee & payee) {
     PFM_DB & db = PFM_DB::getInstance();
 
     db.deletePayee(payee);
+}
+
+void add_recurring_charge(Account & account) {
+    RecurringCharge charge;
+    char *          today;
+    char *          categoryCode;
+    char *          payeeCode;
+    char *          date;
+    char *          description;
+    char *          frequency;
+    char *          amount;
+    bool            isValid = false;
+
+    // clear_history();
+    // add_history();
+
+    today = getToday();
+
+    cout << "*** Add recurring charge ***" << endl;
+
+    categoryCode =  readString("Category code (max. 5 chars): ", NULL, 4);
+    payeeCode =     readString("Payee code (max. 5 chars): ", NULL, 5);
+
+    while (!isValid) {
+        date = readString("First payment date (yyyy-mm-dd): ", today, 10);
+
+        isValid = isDateValid(date);
+    }
+
+    description =   readString("Charge description: ", description, 32);
+    frequency =     readString("Frequency (N[ymd]): ", "1m", 8);
+    amount =        readString("Amount: ", NULL, 32);
+
+    if (strlen(categoryCode) == 0) {
+        fprintf(stderr, "\nCategory code must have a value.\n");
+        return;
+    }
+
+    if (strlen(payeeCode) == 0) {
+        fprintf(stderr, "\nPayee code must have a value.\n");
+        return;
+    }
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    CategoryResult cr;
+
+    db.getCategory(categoryCode, &cr);
+
+    PayeeResult pr;
+
+    db.getPayee(payeeCode, &pr);
+
+    charge.accountId = account.id;
+    charge.categoryId = cr.results[0].id;
+    charge.payeeId = pr.results[0].id;
+
+    charge.date = date;
+    charge.description = description;
+    charge.frequency = frequency;
+    charge.amount = strtod(amount, NULL);
+
+    db.createRecurringCharge(charge);
+
+    free(payeeCode);
+    free(categoryCode);
+    free(date);
+    free(description);
+    free(frequency);
+    free(amount);
+}
+
+void list_recurring_charges(Account & account) {
+    RecurringChargeResult   result;
+    int                     numCharges;
+    int                     i;
+    char                    seq[4];
+    char                    amount[16];
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    numCharges = db.getRecurringChargesForAccount(account.id, &result);
+
+    cout << "*** Recurring charges for account: '" << account.code << "' (" << numCharges << ") ***" << endl << endl;
+    cout << "| Seq | Date       | Description          | Cat.  | Payee | Freq. | Amnt         " << endl;
+    cout << "---------------------------------------------------------------------------------" << endl;
+
+    for (i = 0;i < numCharges;i++) {
+        RecurringCharge charge = result.results[i];
+
+        snprintf(seq, 4, "%03d", charge.sequence);
+        snprintf(amount, 16, "%0.2f", charge.amount);
+
+        cout << 
+            "| " << 
+            seq <<
+            " | " <<
+            charge.date <<
+            " | " <<
+            fixStrWidth(charge.description, 20) << 
+            " | " << 
+            fixStrWidth(charge.category.code, 5) << 
+            " | " <<
+            fixStrWidth(charge.payee.code, 5) <<
+            " | " <<
+            fixStrWidth(charge.frequency, 5) <<
+            " | " <<
+            amount <<
+            endl;
+    }
+
+    cout << endl;
+}
+
+RecurringCharge get_recurring_charge(sqlite3_int64 id) {
+
+}
+
+void update_recurring_charge(RecurringCharge & charge) {
+
+}
+
+void delete_recurring_charge(RecurringCharge & charge) {
+
 }

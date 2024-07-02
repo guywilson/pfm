@@ -2,8 +2,12 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <stdint.h>
 
 #include <sqlite3.h>
+
+#include "category.h"
+#include "payee.h"
 
 using namespace std;
 
@@ -19,9 +23,14 @@ class RecurringCharge {
         void clear(void) {
             this->id = 0;
 
+            this->sequence = 0;
+
             this->accountId = 0;
             this->categoryId = 0;
             this->payeeId = 0;
+
+            this->category.clear();
+            this->payee.clear();
 
             this->date = "";
             this->description = "";
@@ -31,6 +40,8 @@ class RecurringCharge {
 
         void setRecurringCharge(const RecurringCharge & src) {
             this->id = src.id;
+
+            this->sequence = src.sequence;
 
             this->accountId = src.accountId;
             this->categoryId = src.categoryId;
@@ -44,6 +55,7 @@ class RecurringCharge {
 
         void print(void) {
             cout << "ID: " << id << endl;
+            cout << "Sequence: " << sequence << endl;
             cout << "AccountID: " << accountId << endl;
             cout << "CategoryID: " << categoryId << endl;
             cout << "PayeeID: " << payeeId << endl;
@@ -54,13 +66,24 @@ class RecurringCharge {
 
             cout << fixed << setprecision(2);
             cout << "Amount: " << amount << endl;
+
+            cout << "Category (encapsulated object):" << endl;
+            category.print();
+
+            cout << "Payee (encapsulated object):" << endl;
+            payee.print();
         }
 
         sqlite3_int64           id;
 
+        uint32_t                sequence;           // Not persistent
+
         sqlite3_int64           accountId;
         sqlite3_int64           categoryId;
         sqlite3_int64           payeeId;
+
+        Category                category;
+        Payee                   payee;
 
         string                  date;
         string                  description;

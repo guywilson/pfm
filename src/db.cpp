@@ -13,12 +13,13 @@
 #include "account.h"
 #include "category.h"
 #include "payee.h"
+#include "recurring_charge.h"
 #include "db.h"
 #include "pfm_error.h"
 #include "schema.h"
 
 #define SQLITE_ERROR_BUFFER_LEN                     512
-#define SQL_STATEMENT_BUFFER_LEN                    256
+#define SQL_STATEMENT_BUFFER_LEN                    512
 
 using namespace std;
 
@@ -65,7 +66,7 @@ static int categoryCallback(void * p, int numColumns, char ** columns, char ** c
         else if (strncmp(&columnNames[columnIndex][0], "code", 4) == 0) {
             category.code.assign(&columns[columnIndex][0]);
         }
-        else if (strncmp(&columnNames[columnIndex][0], "description", 12) == 0) {
+        else if (strncmp(&columnNames[columnIndex][0], "description", 11) == 0) {
             category.description.assign(&columns[columnIndex][0]);
         }
 
@@ -102,6 +103,47 @@ static int payeeCallback(void * p, int numColumns, char ** columns, char ** colu
 
     return SQLITE_OK;
 }
+
+static int recurringChargeCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
+    int                     columnIndex = 0;
+    RecurringCharge         charge;
+    RecurringChargeResult * result = (RecurringChargeResult *)p;
+
+    while (columnIndex < numColumns) {
+        if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
+            charge.id = strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "account_id", 10) == 0) {
+            charge.accountId = strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "category_id", 11) == 0) {
+            charge.categoryId = strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "payee_id", 8) == 0) {
+            charge.payeeId = strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "date", 4) == 0) {
+            charge.date.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "description", 11) == 0) {
+            charge.description.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "amount", 6) == 0) {
+            charge.amount = strtod(&columns[columnIndex][0], NULL);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "frequency", 9) == 0) {
+            charge.frequency.assign(&columns[columnIndex][0]);
+        }
+
+        columnIndex++;
+    }
+
+    result->results.push_back(charge);
+    result->numRows++;
+
+    return SQLITE_OK;
+}
+
 
 bool PFM_DB::open(string dbName) {
     int error = sqlite3_open_v2(
@@ -458,6 +500,40 @@ int PFM_DB::getCategories(CategoryResult * result) {
     return result->numRows;
 }
 
+int PFM_DB::getCategory(sqlite3_int64 id, CategoryResult * result) {
+    char *          pszErrorMsg;
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT id, code, description FROM category where id= %lld;";
+
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, id);
+
+    error = sqlite3_exec(dbHandle, szStatement, categoryCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get category: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+    else if (result->numRows != 1) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Expected 1 result, got %d", 
+                result->numRows),
+            __FILE__,
+            __LINE__);
+    }
+
+    result->results[0].print();
+
+    return result->numRows;
+}
+
 int PFM_DB::getCategory(string code, CategoryResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
@@ -612,6 +688,40 @@ int PFM_DB::getPayees(PayeeResult * result) {
     return result->numRows;
 }
 
+int PFM_DB::getPayee(sqlite3_int64 id, PayeeResult * result) {
+    char *          pszErrorMsg;
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT id, code, name FROM payee where id = %lld;";
+
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, id);
+
+    error = sqlite3_exec(dbHandle, szStatement, payeeCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get payee: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+    else if (result->numRows != 1) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Expected 1 result, got %d", 
+                result->numRows),
+            __FILE__,
+            __LINE__);
+    }
+
+    result->results[0].print();
+
+    return result->numRows;
+}
+
 int PFM_DB::getPayee(string code, PayeeResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
@@ -701,6 +811,202 @@ int PFM_DB::deletePayee(Payee & payee) {
             pfm_error::buildMsg(
                 "Failed to delete payee with id %lld: %s", 
                 payee.id,
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszDeleteStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return 0;
+}
+
+sqlite3_int64 PFM_DB::createRecurringCharge(RecurringCharge & charge) {
+    char *          pszErrorMsg;
+    char *          pszInsertStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszInsertStatement, 
+        SQL_STATEMENT_BUFFER_LEN,
+        "INSERT INTO recurring_charge " \
+        "(account_id, category_id, payee_id, date, description, amount, frequency) " \
+        "VALUES (%lld, %lld, %lld, '%s', '%s', %.2f, '%s');",
+        charge.accountId,
+        charge.categoryId,
+        charge.payeeId,
+        charge.date.c_str(),
+        charge.description.c_str(),
+        charge.amount,
+        charge.frequency.c_str());
+
+    error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to create recurring charge %s: %s", 
+                charge.description.c_str(),
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszInsertStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return sqlite3_last_insert_rowid(dbHandle);
+}
+
+int PFM_DB::getRecurringChargesForAccount(sqlite3_int64 accountId, RecurringChargeResult * result) {
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    char *          pszErrorMsg;
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT " \
+                "id, account_id, category_id, payee_id, date, description, amount, frequency " \
+                "FROM recurring_charge " \
+                "WHERE account_id = %lld;";
+
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, accountId);
+
+    error = sqlite3_exec(dbHandle, szStatement, recurringChargeCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get payees list: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    uint32_t seq = 1;
+
+    for (int i = 0;i < result->numRows;i++) {
+        CategoryResult  rc;
+        PayeeResult     rp;
+
+        getCategory(result->results[i].categoryId, &rc);
+        getPayee(result->results[i].payeeId, &rp);
+
+        if (rc.numRows == 1) {
+            result->results[i].category.setCategory(rc.results[0]);
+        }
+
+        if (rp.numRows == 1) {
+            result->results[i].payee.setPayee(rp.results[0]);
+        }
+
+        result->results[i].sequence = seq++;
+    }
+
+    return result->numRows;
+}
+
+int PFM_DB::getRecurringCharge(sqlite3_int64 id, RecurringChargeResult * result) {
+    char *          pszErrorMsg;
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT " \
+                "id, account_id, category_id, payee_id, date, description, amount, frequency " \
+                "FROM recurring_charge " \
+                "WHERE id = %lld;";
+
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, id);
+
+    error = sqlite3_exec(dbHandle, szStatement, recurringChargeCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get recurring charge: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+    else if (result->numRows != 1) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Expected 1 result, got %d", 
+                result->numRows),
+            __FILE__,
+            __LINE__);
+    }
+
+    result->results[0].print();
+
+    return result->numRows;
+}
+
+int PFM_DB::updateRecurringCharge(RecurringCharge & charge) {
+    char *          pszErrorMsg;
+    char *          pszUpdateStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszUpdateStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszUpdateStatement, 
+        SQL_STATEMENT_BUFFER_LEN - 1,
+        "UPDATE recurring_charge " \
+        "SET category_id = %lld, payee_id = %lld, date = '%s', description = '%s', amount = %.2f, frequency = '%s' " \
+        "WHERE id = %lld;",
+        charge.categoryId,
+        charge.payeeId,
+        charge.date.c_str(),
+        charge.description.c_str(),
+        charge.amount,
+        charge.frequency.c_str(),
+        charge.id);
+
+    error = sqlite3_exec(dbHandle, pszUpdateStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to update recurring charge with id %lld: %s", 
+                charge.id,
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszUpdateStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return 0;
+}
+
+int PFM_DB::deleteRecurringCharge(RecurringCharge & charge) {
+    char *          pszErrorMsg;
+    char *          pszDeleteStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszDeleteStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszDeleteStatement, 
+        SQL_STATEMENT_BUFFER_LEN - 1,
+        "DELETE FROM recurring_charge WHERE id = %lld;",
+        charge.id);
+
+    error = sqlite3_exec(dbHandle, pszDeleteStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to delete recurring charge with id %lld: %s", 
+                charge.id,
                 sqlite3_errmsg(dbHandle)), 
             __FILE__, 
             __LINE__);

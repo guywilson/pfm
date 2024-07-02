@@ -87,6 +87,7 @@ static const char * pszCreateTransationTable =
     "description TEXT NOT NULL," \
     "credit_debit TEXT NOT NULL," \
     "amount NUMERIC NOT NULL," \
+    "is_reconciled TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id)," \
     "FOREIGN KEY(category_id) REFERENCES category(id)," \
     "FOREIGN KEY(payee_id) REFERENCES payee(id)" \

@@ -1,5 +1,7 @@
 #include <string>
 
+#include <sqlite3.h>
+
 #include "account.h"
 #include "category.h"
 #include "payee.h"
@@ -18,15 +20,23 @@ void        list_accounts(void);
 Account     choose_account(const char * szAccountCode);
 void        update_account(Account & account);
 void        delete_account(Account & account);
+
 void        add_category(void);
 void        list_categories(void);
 Category    get_category(const char * pszCategoryCode);
 void        update_category(Category & category);
 void        delete_category(Category & category);
+
 void        add_payee(void);
 void        list_payees(void);
 Payee       get_payee(const char * pszPayeeCode);
 void        update_payee(Payee & payee);
 void        delete_payee(Payee & payee);
+
+void            add_recurring_charge(Account & account);
+void            list_recurring_charges(Account & account);
+RecurringCharge get_recurring_charge(sqlite3_int64 id);
+void            update_recurring_charge(RecurringCharge & charge);
+void            delete_recurring_charge(RecurringCharge & charge);
 
 #endif

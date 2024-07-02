@@ -198,6 +198,12 @@ int main(int argc, char ** argv) {
 
                 delete_payee(p);
             }
+            else if (strncmp(pszCommand, "add recurring charge", 20) == 0 || strncmp(pszCommand, "arc", 3) == 0) {
+                add_recurring_charge(selectedAccount);
+            }
+            else if (strncmp(pszCommand, "list recurring charges", 22) == 0 || strncmp(pszCommand, "lrc", 3) == 0) {
+                list_recurring_charges(selectedAccount);
+            }
         }
     }
 
