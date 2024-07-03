@@ -35,7 +35,7 @@ void        delete_payee(Payee & payee);
 
 void            add_recurring_charge(Account & account);
 void            list_recurring_charges(Account & account);
-RecurringCharge get_recurring_charge(sqlite3_int64 id);
+RecurringCharge get_recurring_charge(int sequence);
 void            update_recurring_charge(RecurringCharge & charge);
 void            delete_recurring_charge(RecurringCharge & charge);
 

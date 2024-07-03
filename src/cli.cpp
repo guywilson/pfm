@@ -10,6 +10,7 @@
 
 #include "db.h"
 #include "utils.h"
+#include "cache.h"
 #include "cli.h"
 #include "account.h"
 #include "category.h"
@@ -383,7 +384,7 @@ void add_recurring_charge(Account & account) {
         add_history(catResult.results[i].code.c_str());
     }
 
-    categoryCode = readString("Category code (max. 5 chars) ^ ", NULL, 4);
+    categoryCode = readString("Category code (max. 5 chars)^ ", NULL, 4);
 
     using_history();
     clear_history();
@@ -395,7 +396,7 @@ void add_recurring_charge(Account & account) {
         add_history(payResult.results[i].code.c_str());
     }
 
-    payeeCode = readString("Payee code (max. 5 chars) ^ ", NULL, 5);
+    payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
 
     while (!isDateValid) {
         date = readString("Start date (yyyy-mm-dd): ", today, 10);
@@ -465,8 +466,12 @@ void list_recurring_charges(Account & account) {
     cout << "| Seq | Date       | Description               | Cat.  | Payee | Frq. | Amnt         |" << endl;
     cout << "--------------------------------------------------------------------------------------" << endl;
 
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
     for (i = 0;i < numCharges;i++) {
         RecurringCharge charge = result.results[i];
+
+        cacheMgr.addRecurringCharge(charge.sequence, charge);
 
         snprintf(seq, 4, "%03d", charge.sequence);
 
@@ -492,14 +497,102 @@ void list_recurring_charges(Account & account) {
     cout << endl;
 }
 
-RecurringCharge get_recurring_charge(sqlite3_int64 id) {
+RecurringCharge get_recurring_charge(int sequence) {
+    RecurringCharge         charge;
+    char *                  pszSequence;
 
+    if (sequence == 0) {
+        cout << "*** Get recurring charge ***" << endl;
+        pszSequence = readString("Sequence no.: ", NULL, 3);
+
+        sequence = atoi(pszSequence);
+
+        free(pszSequence);
+    }
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    charge = cacheMgr.getRecurringCharge(sequence);
+
+    return charge;
 }
 
 void update_recurring_charge(RecurringCharge & charge) {
+    char            szPrompt[MAX_PROMPT_LENGTH];
+    char            amountStr[AMOUNT_FIELD_STRING_LEN];
+    char *          categoryCode;
+    char *          payeeCode;
+    char *          date;
+    char *          description;
+    char *          frequency;
+    char *          amount;
+    bool            isDateValid = false;
+    bool            isFrequencyValid = false;
 
+    cout << "*** Update recurring charge ***" << endl;
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']^ ", charge.category.code.c_str());
+    categoryCode = readString(szPrompt, charge.category.code.c_str(), FIELD_STRING_LEN);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", charge.payee.code.c_str());
+    payeeCode = readString(szPrompt, charge.payee.code.c_str(), FIELD_STRING_LEN);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", charge.date.c_str());
+
+    while (!isDateValid) {
+        date = readString(szPrompt, charge.date.c_str(), FIELD_STRING_LEN);
+
+        isDateValid = validateDate(date);
+    }
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", charge.description.c_str());
+    description = readString(szPrompt, charge.payee.code.c_str(), FIELD_STRING_LEN);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Frequency (N[wmy])['%s']: ", charge.frequency.c_str());
+
+    while (!isFrequencyValid) {
+        frequency = readString(szPrompt, charge.frequency.c_str(), FIELD_STRING_LEN);
+
+        isFrequencyValid = validatePaymentFrequency(frequency);
+    }
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%.2f]: ", charge.amount);
+    snprintf(amountStr, AMOUNT_FIELD_STRING_LEN, "%.2f", charge.amount);
+    amount = readString(szPrompt, amountStr, AMOUNT_FIELD_STRING_LEN);
+
+    if (strlen(categoryCode) == 0) {
+        fprintf(stderr, "\nCategory code must have a value.\n");
+        return;
+    }
+
+    if (strlen(payeeCode) == 0) {
+        fprintf(stderr, "\nPayee code must have a value.\n");
+        return;
+    }
+
+    CategoryResult cr;
+
+    db.getCategory(categoryCode, &cr);
+
+    PayeeResult pr;
+
+    db.getPayee(payeeCode, &pr);
+
+    charge.categoryId = cr.results[0].id;
+    charge.payeeId = pr.results[0].id;
+
+    charge.date = date;
+    charge.description = description;
+    charge.frequency = frequency;
+    charge.amount = strtod(amount, NULL);
+
+    db.updateRecurringCharge(charge);
 }
 
 void delete_recurring_charge(RecurringCharge & charge) {
+    PFM_DB & db = PFM_DB::getInstance();
 
+    db.deleteRecurringCharge(charge);
 }
