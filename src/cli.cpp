@@ -27,7 +27,7 @@ void add_account(void) {
     cout << "*** Add account ***" << endl;
 
     accountName = readString("Account name: ", NULL, 32);
-    accountCode = readString("Account code (max. 4 chars): ", NULL, 4);
+    accountCode = readString("Account code (max. 5 chars): ", NULL, 4);
     openingBalance = readString("Opening balance [0.00]: ", "0.00", 32);
 
     if (strlen(openingBalance) > 0) {
@@ -69,19 +69,21 @@ void list_accounts(void) {
     numAccounts = db.getAccounts(&result);
 
     cout << "*** Accounts (" << numAccounts << ") ***" << endl << endl;
-    cout << "| Code | Name            | Balance" << endl;
-    cout << "----------------------------------" << endl;
+    cout << "| Code  | Name                      | Balance      |" << endl;
+    cout << "----------------------------------------------------" << endl;
 
     for (i = 0;i < numAccounts;i++) {
         Account account = result.results[i];
 
         cout << 
             "| " << 
-            fixStrWidth(account.code, 4) << 
+            left << setw(5) << account.code << 
             " | " << 
-            fixStrWidth(account.name, 15) << 
+            left << setw(25) << account.name << 
             " | " << 
-            formatCurrency(account.currentBalance) << endl;
+            right << setw(13) << formatCurrency(account.currentBalance) << 
+            " |" <<
+            endl;
     }
 
     cout << endl;
@@ -185,17 +187,19 @@ void list_categories(void) {
     numCategories = db.getCategories(&result);
 
     cout << "*** Categories (" << numCategories << ") ***" << endl << endl;
-    cout << "| Code  | Description              " << endl;
-    cout << "-----------------------------------" << endl;
+    cout << "| Code  | Description               |" << endl;
+    cout << "-------------------------------------" << endl;
 
     for (i = 0;i < numCategories;i++) {
         Category category = result.results[i];
 
         cout << 
             "| " << 
-            fixStrWidth(category.code, 5) << 
+            left << setw(5) << category.code << 
             " | " << 
-            fixStrWidth(category.description, 25) << endl;
+            left << setw(25) << category.description << 
+            " |" <<
+            endl;
     }
 
     cout << endl;
@@ -285,17 +289,19 @@ void list_payees(void) {
     numPayees = db.getPayees(&result);
 
     cout << "*** Payees (" << numPayees << ") ***" << endl << endl;
-    cout << "| Code  | Name                     " << endl;
-    cout << "-----------------------------------" << endl;
+    cout << "| Code  | Name                      |" << endl;
+    cout << "-------------------------------------" << endl;
 
     for (i = 0;i < numPayees;i++) {
         Payee payee = result.results[i];
 
         cout << 
             "| " << 
-            fixStrWidth(payee.code, 5) << 
+            left << setw(5) << payee.code << 
             " | " << 
-            fixStrWidth(payee.name, 25) << endl;
+            left << setw(25) << payee.name << 
+            " |" <<
+            endl;
     }
 
     cout << endl;
@@ -358,27 +364,54 @@ void add_recurring_charge(Account & account) {
     char *          description;
     char *          frequency;
     char *          amount;
-    bool            isValid = false;
-
-    // clear_history();
-    // add_history();
+    bool            isDateValid = false;
+    bool            isFrequencyValid = false;
 
     today = getToday();
 
+    PFM_DB & db = PFM_DB::getInstance();
+
     cout << "*** Add recurring charge ***" << endl;
 
-    categoryCode =  readString("Category code (max. 5 chars): ", NULL, 4);
-    payeeCode =     readString("Payee code (max. 5 chars): ", NULL, 5);
+    using_history();
+    clear_history();
 
-    while (!isValid) {
-        date = readString("First payment date (yyyy-mm-dd): ", today, 10);
+    CategoryResult catResult;
+    db.getCategories(&catResult);
 
-        isValid = isDateValid(date);
+    for (int i = 0;i < catResult.numRows;i++) {
+        add_history(catResult.results[i].code.c_str());
     }
 
-    description =   readString("Charge description: ", description, 32);
-    frequency =     readString("Frequency (N[ymd]): ", "1m", 8);
-    amount =        readString("Amount: ", NULL, 32);
+    categoryCode = readString("Category code (max. 5 chars) ^ ", NULL, 4);
+
+    using_history();
+    clear_history();
+
+    PayeeResult payResult;
+    db.getPayees(&payResult);
+
+    for (int i = 0;i < payResult.numRows;i++) {
+        add_history(payResult.results[i].code.c_str());
+    }
+
+    payeeCode = readString("Payee code (max. 5 chars) ^ ", NULL, 5);
+
+    while (!isDateValid) {
+        date = readString("Start date (yyyy-mm-dd): ", today, 10);
+
+        isDateValid = validateDate(date);
+    }
+
+    description = readString("Charge description: ", description, 32);
+
+    while (!isFrequencyValid) {
+        frequency = readString("Frequency (N[wmy]): ", "1m", 3);
+
+        isFrequencyValid = validatePaymentFrequency(frequency);
+    }
+
+    amount = readString("Amount: ", NULL, 32);
 
     if (strlen(categoryCode) == 0) {
         fprintf(stderr, "\nCategory code must have a value.\n");
@@ -389,8 +422,6 @@ void add_recurring_charge(Account & account) {
         fprintf(stderr, "\nPayee code must have a value.\n");
         return;
     }
-
-    PFM_DB & db = PFM_DB::getInstance();
 
     CategoryResult cr;
 
@@ -424,21 +455,20 @@ void list_recurring_charges(Account & account) {
     int                     numCharges;
     int                     i;
     char                    seq[4];
-    char                    amount[16];
 
     PFM_DB & db = PFM_DB::getInstance();
 
     numCharges = db.getRecurringChargesForAccount(account.id, &result);
 
     cout << "*** Recurring charges for account: '" << account.code << "' (" << numCharges << ") ***" << endl << endl;
-    cout << "| Seq | Date       | Description          | Cat.  | Payee | Freq. | Amnt         " << endl;
-    cout << "---------------------------------------------------------------------------------" << endl;
+
+    cout << "| Seq | Date       | Description               | Cat.  | Payee | Frq. | Amnt         |" << endl;
+    cout << "--------------------------------------------------------------------------------------" << endl;
 
     for (i = 0;i < numCharges;i++) {
         RecurringCharge charge = result.results[i];
 
         snprintf(seq, 4, "%03d", charge.sequence);
-        snprintf(amount, 16, "%0.2f", charge.amount);
 
         cout << 
             "| " << 
@@ -446,15 +476,16 @@ void list_recurring_charges(Account & account) {
             " | " <<
             charge.date <<
             " | " <<
-            fixStrWidth(charge.description, 20) << 
+            left << setw(25) << charge.description << 
             " | " << 
-            fixStrWidth(charge.category.code, 5) << 
+            left << setw(5) << charge.category.code << 
             " | " <<
-            fixStrWidth(charge.payee.code, 5) <<
+            left << setw(5) << charge.payee.code <<
             " | " <<
-            fixStrWidth(charge.frequency, 5) <<
+            right << setw(4) << charge.frequency <<
             " | " <<
-            amount <<
+            right << setw(13) << formatCurrency(charge.amount) <<
+            " |" <<
             endl;
     }
 

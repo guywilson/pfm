@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -14,6 +15,7 @@
 using namespace std;
 
 #define TIME_STAMP_BUFFER_LEN               12
+#define CURRENCY_BUFFER_LEN                 16
 
 static const char * months[] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -42,9 +44,9 @@ string fixStrWidth(string & src, int requiredLen) {
 }
 
 string formatCurrency(double src) {
-    static char szAmount[16];
+    static char szAmount[CURRENCY_BUFFER_LEN];
 
-    snprintf(szAmount, 15, "£%.2f", (float)src);
+    snprintf(szAmount, CURRENCY_BUFFER_LEN, "£%.2f", (float)src);
 
     return string(szAmount);
 }
@@ -129,7 +131,7 @@ char * formatPrintDate(char * pszDate) {
     return pszFormattedDate;
 }
 
-bool isDateValid(char * pszDate) {
+bool validateDate(char * pszDate) {
 	struct timeval		tv;
     struct tm *         localTime;
 	time_t				t;
@@ -171,6 +173,24 @@ bool isDateValid(char * pszDate) {
         return false;
     }
     if ((month == 2) && day > 29) {
+        return false;
+    }
+
+    return true;
+}
+
+bool validatePaymentFrequency(char * pszFrequency) {
+    uint32_t            frequencyLen;
+
+    frequencyLen = strlen(pszFrequency);
+
+    if (frequencyLen < 2) {
+        return false;
+    }
+    if (!isdigit(pszFrequency[0])) {
+        return false;
+    }
+    if (pszFrequency[frequencyLen - 1] != 'w' && pszFrequency[frequencyLen - 1] != 'm' && pszFrequency[frequencyLen - 1] != 'y') {
         return false;
     }
 

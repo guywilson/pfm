@@ -10,7 +10,8 @@ string  formatCurrency(double src);
 char *  readString(const char * pszPrompt, const char * pszDefault, const size_t maxLength);
 char    readChar(const char * pszPrompt);
 char *  getToday(void);
-bool    isDateValid(char * pszDate);
+bool    validateDate(char * pszDate);
 char *  formatPrintDate(char * pszDate);
+bool    validatePaymentFrequency(char * pszFrequency);
 
 #endif
