@@ -533,8 +533,36 @@ void update_recurring_charge(RecurringCharge & charge) {
 
     PFM_DB & db = PFM_DB::getInstance();
 
+    using_history();
+    clear_history();
+
+    CategoryResult catResult;
+    db.getCategories(&catResult);
+
+    for (int i = 0;i < catResult.numRows;i++) {
+        add_history(catResult.results[i].code.c_str());
+    }
+
+    catResult.clear();
+    db.getCategory(charge.categoryId, &catResult);
+    charge.category.setCategory(catResult.results[0]);
+
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']^ ", charge.category.code.c_str());
     categoryCode = readString(szPrompt, charge.category.code.c_str(), FIELD_STRING_LEN);
+
+    using_history();
+    clear_history();
+
+    PayeeResult payResult;
+    db.getPayees(&payResult);
+
+    for (int i = 0;i < payResult.numRows;i++) {
+        add_history(payResult.results[i].code.c_str());
+    }
+
+    payResult.clear();
+    db.getPayee(charge.payeeId, &payResult);
+    charge.payee.setPayee(payResult.results[0]);
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", charge.payee.code.c_str());
     payeeCode = readString(szPrompt, charge.payee.code.c_str(), FIELD_STRING_LEN);
@@ -548,7 +576,7 @@ void update_recurring_charge(RecurringCharge & charge) {
     }
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", charge.description.c_str());
-    description = readString(szPrompt, charge.payee.code.c_str(), FIELD_STRING_LEN);
+    description = readString(szPrompt, charge.description.c_str(), FIELD_STRING_LEN);
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Frequency (N[wmy])['%s']: ", charge.frequency.c_str());
 

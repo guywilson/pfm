@@ -58,6 +58,11 @@ class AccountResult {
             numRows = 0;
         }
 
+        void clear() {
+            numRows = 0;
+            results.clear();
+        }
+
         int                     numRows;
 
         vector<Account>         results;

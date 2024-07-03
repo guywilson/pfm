@@ -25,8 +25,8 @@ class Category {
         void setCategory(const Category & src) {
             this->id = src.id;
 
-            this->description =     src.description;
-            this->code =            src.code;
+            this->description.assign(src.description);
+            this->code.assign(src.code);
         }
 
         void print(void) {
@@ -45,6 +45,11 @@ class CategoryResult {
     public:
         CategoryResult() {
             numRows = 0;
+        }
+
+        void clear() {
+            numRows = 0;
+            results.clear();
         }
 
         int                     numRows;
