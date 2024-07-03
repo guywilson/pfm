@@ -204,6 +204,44 @@ int main(int argc, char ** argv) {
             else if (strncmp(pszCommand, "list recurring charges", 22) == 0 || strncmp(pszCommand, "lrc", 3) == 0) {
                 list_recurring_charges(selectedAccount);
             }
+            else if (strncmp(pszCommand, "update recurring charge", 23) == 0 || strncmp(pszCommand, "urc", 3) == 0) {
+                int sequence = 0;
+
+                if (strncmp(pszCommand, "update recurring charge", 23) == 0) {
+                    if (strlen(pszCommand) >= 25) {
+                        sequence = atoi(&pszCommand[24]);
+                    }
+                }
+                else if (strncmp(pszCommand, "urc", 3) == 0) {
+                    if (strlen(pszCommand) >= 5) {
+                        sequence = atoi(&pszCommand[4]);
+                    }
+                }
+
+                RecurringCharge rc;
+                rc.setRecurringCharge(get_recurring_charge(sequence));
+
+                update_recurring_charge(rc);
+            }
+            else if (strncmp(pszCommand, "delete recurring charge", 23) == 0 || strncmp(pszCommand, "drc", 3) == 0) {
+                int sequence = 0;
+
+                if (strncmp(pszCommand, "delete recurring charge", 23) == 0) {
+                    if (strlen(pszCommand) >= 25) {
+                        sequence = atoi(&pszCommand[24]);
+                    }
+                }
+                else if (strncmp(pszCommand, "drc", 3) == 0) {
+                    if (strlen(pszCommand) >= 5) {
+                        sequence = atoi(&pszCommand[4]);
+                    }
+                }
+
+                RecurringCharge rc;
+                rc.setRecurringCharge(get_recurring_charge(sequence));
+
+                delete_recurring_charge(rc);
+            }
         }
     }
 
