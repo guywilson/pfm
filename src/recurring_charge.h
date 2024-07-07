@@ -77,6 +77,7 @@ class RecurringCharge {
         sqlite3_int64           id;
 
         uint32_t                sequence;           // Not persistent
+        string                  nextPaymentDate;    // Not persistent
 
         sqlite3_int64           accountId;
         sqlite3_int64           categoryId;

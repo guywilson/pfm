@@ -13,5 +13,8 @@ char *  getToday(void);
 bool    validateDate(char * pszDate);
 char *  formatPrintDate(char * pszDate);
 bool    validatePaymentFrequency(char * pszFrequency);
+void    getDateFromString(tm * dt, string & s);
+bool    isDateGreaterThan(string & lhDate, string rhDate);
+bool    isDateLessThan(string & lhDate, string rhDate);
 
 #endif

@@ -6,8 +6,8 @@
 
 using namespace std;
 
-#ifndef _CALC_ERROR
-#define _CALC_ERROR
+#ifndef __PFM_ERROR
+#define __PFM_ERROR
 
 class pfm_error : public exception
 {
@@ -71,4 +71,16 @@ class pfm_fatal : public pfm_error {
         pfm_fatal(const char * msg) : pfm_error(msg) {}
         pfm_fatal(const char * msg, const char * file, int line) : pfm_error(msg, file, line) {}
 };
+
+class pfm_validation_error : public pfm_error {
+    public:
+        const char * getTitle() {
+            return "Validation error: ";
+        }
+
+        pfm_validation_error() : pfm_error() {}
+        pfm_validation_error(const char * msg) : pfm_error(msg) {}
+        pfm_validation_error(const char * msg, const char * file, int line) : pfm_error(msg, file, line) {}
+};
+
 #endif
