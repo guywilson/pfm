@@ -12,6 +12,7 @@
 #include "utils.h"
 #include "cache.h"
 #include "cli.h"
+#include "strdate.h"
 #include "account.h"
 #include "category.h"
 #include "recurring_charge.h"
@@ -358,7 +359,7 @@ void delete_payee(Payee & payee) {
 
 void add_recurring_charge(Account & account) {
     RecurringCharge charge;
-    char *          today;
+    const char *    today;
     char *          categoryCode;
     char *          payeeCode;
     char *          date;
@@ -368,7 +369,9 @@ void add_recurring_charge(Account & account) {
     bool            isDateValid = false;
     bool            isFrequencyValid = false;
 
-    today = getToday();
+    today = StrDate::today().c_str();
+
+    cout << "Today = '" << today << "'" << endl;
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -401,7 +404,9 @@ void add_recurring_charge(Account & account) {
     while (!isDateValid) {
         date = readString("Start date (yyyy-mm-dd): ", today, 10);
 
-        isDateValid = validateDate(date);
+        cout << "Got date: '" << date << "'" << endl;
+        
+        isDateValid = StrDate::validateDate(date);
     }
 
     description = readString("Charge description: ", description, 32);
@@ -463,8 +468,8 @@ void list_recurring_charges(Account & account) {
 
     cout << "*** Recurring charges for account: '" << account.code << "' (" << numCharges << ") ***" << endl << endl;
 
-    cout << "| Seq | Date       | Description               | Cat.  | Payee | Frq. | Amnt         |" << endl;
-    cout << "--------------------------------------------------------------------------------------" << endl;
+    cout << "| Seq | Start Date | Nxt Pmnt   | Description               | Cat.  | Payee | Frq. | Amnt         |" << endl;
+    cout << "---------------------------------------------------------------------------------------------------" << endl;
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
@@ -480,6 +485,8 @@ void list_recurring_charges(Account & account) {
             seq <<
             " | " <<
             charge.date <<
+            " | " <<
+            charge.nextPaymentDate <<
             " | " <<
             left << setw(25) << charge.description << 
             " | " << 
@@ -572,7 +579,7 @@ void update_recurring_charge(RecurringCharge & charge) {
     while (!isDateValid) {
         date = readString(szPrompt, charge.date.c_str(), FIELD_STRING_LEN);
 
-        isDateValid = validateDate(date);
+        isDateValid = StrDate::validateDate(date);
     }
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", charge.description.c_str());

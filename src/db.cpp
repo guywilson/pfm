@@ -155,8 +155,12 @@ function createDate(year, month, day):
 */
 static void setNextPaymentDate(RecurringCharge * charge) {
     StrDate     chargeDate(charge->date);
-    string      today = StrDate::today();
+    StrDate     dateToday;
+    char        frequencyUnit;
+    int         frequencyValue;
 
+    frequencyValue = getFrequencyValue(charge->frequency);
+    frequencyUnit = getFrequencyUnit(charge->frequency);
 
     // # Parse the payment frequency
     // frequencyValue = integer part of paymentFrequency
@@ -179,11 +183,38 @@ static void setNextPaymentDate(RecurringCharge * charge) {
 
     // return nextPaymentDate
 
-    if (chargeDate > today || chargeDate == today) {
+    if (chargeDate > dateToday || chargeDate == dateToday) {
         charge->nextPaymentDate.assign(charge->date);
     }
     else {
-        
+        switch (frequencyUnit) {
+            case 'y':
+                chargeDate.addYears(frequencyValue * (dateToday.year() - chargeDate.year() + 1));
+                break;
+
+            case 'm':
+                chargeDate.addMonths(frequencyValue * (dateToday.month() - chargeDate.month() + 1));
+                break;
+
+            case 'w':
+                chargeDate.addWeeks(frequencyValue * ((dateToday.day() - chargeDate.day() + 1) / 7));
+                break;
+
+            case 'd':
+                chargeDate.addDays(frequencyValue * (dateToday.day() - chargeDate.day() + 1));
+                break;
+
+            default:
+                throw pfm_validation_error(
+                            pfm_error::buildMsg(
+                                "Invalid frequency unit '%c'", 
+                                frequencyUnit), 
+                            __FILE__, 
+                            __LINE__);
+                break;
+
+            charge->nextPaymentDate.assign(chargeDate.shortDate());
+        }
     }
 }
 
@@ -1066,6 +1097,8 @@ int PFM_DB::getRecurringChargesForAccount(sqlite3_int64 accountId, RecurringChar
         if (rp.numRows == 1) {
             result->results[i].payee.setPayee(rp.results[0]);
         }
+
+        setNextPaymentDate(&result->results[i]);
 
         result->results[i].sequence = seq++;
     }

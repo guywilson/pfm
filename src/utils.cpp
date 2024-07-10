@@ -94,3 +94,11 @@ bool validatePaymentFrequency(char * pszFrequency) {
 
     return true;
 }
+
+int getFrequencyValue(string & frequency) {
+    return atoi(frequency.substr(0, frequency.length() - 1).c_str());
+}
+
+char getFrequencyUnit(string & frequency) {
+    return frequency.substr(frequency.length() - 1, 1).c_str()[0];
+}
