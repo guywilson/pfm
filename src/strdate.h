@@ -306,24 +306,20 @@ class StrDate {
             int m = month();
             int d = day();
             
-            int totalDays = d + days - 1;
-            // 8 + 14 - 1 = 21
-            
-            while (totalDays > 0) {
-                if (totalDays > StrDate::daysInMonth(y, m)) {
-                    totalDays -= StrDate::daysInMonth(y, m);
-                    // totalDays = totalDays - 31 = 5
-                    
-                    m++;
+            int dayCounter = days;
+
+            while (dayCounter > 0) {
+                d++;
+                dayCounter--;
+
+                if (d > StrDate::daysInMonth(y, m)) {
                     d = 1;
+                    m++;
                 }
                 if (m > 12) {
                     y++;
                     m = 1;
                 }
-
-                d++;
-                totalDays--;
             }
             
             set(y, m, d);
