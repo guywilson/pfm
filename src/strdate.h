@@ -241,18 +241,6 @@ class StrDate {
             return atoi(date.substr(8, 2).c_str());
         }
 
-//    function addYears(date, years):
-//        year = getYear(date)
-//        month = getMonth(date)
-//        day = getDay(date)
-//        
-//        newYear = year + years
-//        
-//        # Adjust day if necessary for leap years, end of month, etc.
-//        if month == 2 and day == 29 and not isLeapYear(newYear):
-//            day = 28
-//
-//        return createDate(newYear, month, day)
         void addYears(int years) {
             int y = year();
             int m = month();
@@ -267,21 +255,6 @@ class StrDate {
             set(newYear, m, d);
         }
 
-//    function addMonths(date, months):
-//        year = getYear(date)
-//        month = getMonth(date)
-//        day = getDay(date)
-//        
-//        totalMonths = month + months
-//        newYear = year + (totalMonths - 1) // 12
-//        newMonth = (totalMonths - 1) % 12 + 1
-//        
-//        # Adjust day if necessary for end of month, etc.
-//        maxDay = daysInMonth(newYear, newMonth)
-//        if day > maxDay:
-//            day = maxDay
-//
-//        return createDate(newYear, newMonth, day)
         void addMonths(int months) {
             int y = year();
             int m = month();
