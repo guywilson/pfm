@@ -989,6 +989,7 @@ int PFM_DB::getRecurringCharge(sqlite3_int64 id, RecurringChargeResult * result)
             __LINE__);
     }
 
+    setNextPaymentDate(&result->results[0]);
     // result->results[0].print();
 
     return result->numRows;
