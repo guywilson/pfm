@@ -201,7 +201,7 @@ static void setNextPaymentDate(RecurringCharge * charge) {
                 break;
 
             case 'd':
-                chargeDate.addDays(frequencyValue * (dateToday.day() - chargeDate.day() + 1));
+                chargeDate.addDays(frequencyValue);
                 break;
 
             default:
@@ -212,9 +212,9 @@ static void setNextPaymentDate(RecurringCharge * charge) {
                             __FILE__, 
                             __LINE__);
                 break;
-
-            charge->nextPaymentDate.assign(chargeDate.shortDate());
         }
+
+        charge->nextPaymentDate.assign(chargeDate.shortDate());
     }
 }
 
@@ -568,7 +568,7 @@ int PFM_DB::getAccount(string code, AccountResult * result) {
             __LINE__);
     }
 
-    result->results[0].print();
+    // result->results[0].print();
 
     return result->numRows;
 }
@@ -724,7 +724,7 @@ int PFM_DB::getCategory(sqlite3_int64 id, CategoryResult * result) {
             __LINE__);
     }
 
-    result->results[0].print();
+    // result->results[0].print();
 
     return result->numRows;
 }
@@ -758,7 +758,7 @@ int PFM_DB::getCategory(string code, CategoryResult * result) {
             __LINE__);
     }
 
-    result->results[0].print();
+    // result->results[0].print();
 
     return result->numRows;
 }
@@ -912,7 +912,7 @@ int PFM_DB::getPayee(sqlite3_int64 id, PayeeResult * result) {
             __LINE__);
     }
 
-    result->results[0].print();
+    // result->results[0].print();
 
     return result->numRows;
 }
@@ -946,7 +946,7 @@ int PFM_DB::getPayee(string code, PayeeResult * result) {
             __LINE__);
     }
 
-    result->results[0].print();
+    // result->results[0].print();
 
     return result->numRows;
 }
@@ -1138,7 +1138,7 @@ int PFM_DB::getRecurringCharge(sqlite3_int64 id, RecurringChargeResult * result)
             __LINE__);
     }
 
-    result->results[0].print();
+    // result->results[0].print();
 
     return result->numRows;
 }

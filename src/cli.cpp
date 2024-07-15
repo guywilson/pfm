@@ -468,7 +468,7 @@ void list_recurring_charges(Account & account) {
 
     cout << "*** Recurring charges for account: '" << account.code << "' (" << numCharges << ") ***" << endl << endl;
 
-    cout << "| Seq | Start Date | Nxt Pmnt   | Description               | Cat.  | Payee | Frq. | Amnt         |" << endl;
+    cout << "| Seq | Start Date | Nxt Pmnt   | Description               | Cat.  | Payee | Frq. | Amount       |" << endl;
     cout << "---------------------------------------------------------------------------------------------------" << endl;
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
