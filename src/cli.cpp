@@ -29,8 +29,8 @@ void add_account(void) {
 
     cout << "*** Add account ***" << endl;
 
-    accountName = readString("DBAccount name: ", NULL, 32);
-    accountCode = readString("DBAccount code (max. 5 chars): ", NULL, 4);
+    accountName = readString("Account name: ", NULL, 32);
+    accountCode = readString("Account code (max. 5 chars): ", NULL, 4);
     openingBalance = readString("Opening balance [0.00]: ", "0.00", 32);
 
     if (strlen(openingBalance) > 0) {
@@ -98,7 +98,7 @@ DBAccount choose_account(const char * szAccountCode) {
 
     if (szAccountCode == NULL || strlen(szAccountCode) == 0) {
         cout << "*** Use account ***" << endl;
-        accountCode = readString("DBAccount code (max. 4 chars): ", NULL, 4);
+        accountCode = readString("Account code (max. 4 chars): ", NULL, 4);
     }
     else {
         accountCode = strdup(szAccountCode);
@@ -120,10 +120,10 @@ void update_account(DBAccount & account) {
 
     cout << "*** Update account ***" << endl;
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBAccount name ['%s']: ", account.name.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Account name ['%s']: ", account.name.c_str());
     account.name = readString(szPrompt, account.name.c_str(), FIELD_STRING_LEN);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBAccount code ['%s']: ", account.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Account code ['%s']: ", account.code.c_str());
     account.code = readString(szPrompt, account.code.c_str(), FIELD_STRING_LEN);
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%.2f]: ", account.openingBalance);
@@ -160,8 +160,8 @@ void add_category(void) {
 
     cout << "*** Add category ***" << endl;
 
-    categoryDescription = readString("DBCategory description: ", NULL, 32);
-    categoryCode = readString("DBCategory code (max. 5 chars): ", NULL, 5);
+    categoryDescription = readString("Category description: ", NULL, 32);
+    categoryCode = readString("Category code (max. 5 chars): ", NULL, 5);
 
     if (strlen(categoryCode) == 0) {
         fprintf(stderr, "\nCategory code must have a value.\n");
@@ -214,7 +214,7 @@ DBCategory get_category(const char * pszCategoryCode) {
 
     if (pszCategoryCode == NULL || strlen(pszCategoryCode) == 0) {
         cout << "*** Get category ***" << endl;
-        categoryCode = readString("DBCategory code (max. 5 chars): ", NULL, 5);
+        categoryCode = readString("Category code (max. 5 chars): ", NULL, 5);
     }
     else {
         categoryCode = strdup(pszCategoryCode);
@@ -234,10 +234,10 @@ void update_category(DBCategory & category) {
 
     cout << "*** Update category ***" << endl;
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBCategory description ['%s']: ", category.description.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category description ['%s']: ", category.description.c_str());
     category.description = readString(szPrompt, category.description.c_str(), FIELD_STRING_LEN);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBCategory code ['%s']: ", category.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']: ", category.code.c_str());
     category.code = readString(szPrompt, category.code.c_str(), FIELD_STRING_LEN);
 
     if (category.code.length() == 0) {
@@ -262,8 +262,8 @@ void add_payee(void) {
 
     cout << "*** Add payee ***" << endl;
 
-    payeeName = readString("DBPayee name: ", NULL, 32);
-    payeeCode = readString("DBPayee code (max. 5 chars): ", NULL, 5);
+    payeeName = readString("Payee name: ", NULL, 32);
+    payeeCode = readString("Payee code (max. 5 chars): ", NULL, 5);
 
     if (strlen(payeeCode) == 0) {
         fprintf(stderr, "\nPayee code must have a value.\n");
@@ -316,7 +316,7 @@ DBPayee get_payee(const char * pszPayeeCode) {
 
     if (pszPayeeCode == NULL || strlen(pszPayeeCode) == 0) {
         cout << "*** Get payee ***" << endl;
-        payeeCode = readString("DBPayee code (max. 5 chars): ", NULL, 5);
+        payeeCode = readString("Payee code (max. 5 chars): ", NULL, 5);
     }
     else {
         payeeCode = strdup(pszPayeeCode);
@@ -336,10 +336,10 @@ void update_payee(DBPayee & payee) {
 
     cout << "*** Update payee ***" << endl;
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBPayee name ['%s']: ", payee.name.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee name ['%s']: ", payee.name.c_str());
     payee.name = readString(szPrompt, payee.name.c_str(), FIELD_STRING_LEN);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBPayee code ['%s']: ", payee.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']: ", payee.code.c_str());
     payee.code = readString(szPrompt, payee.code.c_str(), FIELD_STRING_LEN);
 
     if (payee.code.length() == 0) {
@@ -386,7 +386,7 @@ void add_recurring_charge(DBAccount & account) {
         add_history(catResult.results[i].code.c_str());
     }
 
-    categoryCode = readString("DBCategory code (max. 5 chars)^ ", NULL, 4);
+    categoryCode = readString("Category code (max. 5 chars)^ ", NULL, 4);
 
     using_history();
     clear_history();
@@ -398,7 +398,7 @@ void add_recurring_charge(DBAccount & account) {
         add_history(payResult.results[i].code.c_str());
     }
 
-    payeeCode = readString("DBPayee code (max. 5 chars)^ ", NULL, 5);
+    payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
 
     while (!isDateValid) {
         date = readString("Start date (yyyy-mm-dd)[today]: ", today, 10);
@@ -551,7 +551,7 @@ void update_recurring_charge(DBRecurringCharge & charge) {
     db.getCategory(charge.categoryId, &catResult);
     charge.category.set(catResult.results[0]);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBCategory code ['%s']^ ", charge.category.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']^ ", charge.category.code.c_str());
     categoryCode = readString(szPrompt, charge.category.code.c_str(), FIELD_STRING_LEN);
 
     using_history();
@@ -568,7 +568,7 @@ void update_recurring_charge(DBRecurringCharge & charge) {
     db.getPayee(charge.payeeId, &payResult);
     charge.payee.set(payResult.results[0]);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBPayee code ['%s']^ ", charge.payee.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", charge.payee.code.c_str());
     payeeCode = readString(szPrompt, charge.payee.code.c_str(), FIELD_STRING_LEN);
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", charge.date.c_str());
@@ -659,7 +659,7 @@ void add_transaction(DBAccount & account) {
         add_history(catResult.results[i].code.c_str());
     }
 
-    categoryCode = readString("DBCategory code (max. 5 chars)^ ", NULL, 4);
+    categoryCode = readString("Category code (max. 5 chars)^ ", NULL, 4);
 
     using_history();
     clear_history();
@@ -671,10 +671,10 @@ void add_transaction(DBAccount & account) {
         add_history(payResult.results[i].code.c_str());
     }
 
-    payeeCode = readString("DBPayee code (max. 5 chars)^ ", NULL, 5);
+    payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
 
     while (!isDateValid) {
-        date = readString("DBTransaction date (yyyy-mm-dd)[today]: ", today, 10);
+        date = readString("Transaction date (yyyy-mm-dd)[today]: ", today, 10);
 
         isDateValid = StrDate::validateDate(date);
     }
@@ -834,7 +834,7 @@ void update_transaction(DBTransaction & transaction) {
     db.getCategory(transaction.categoryId, &catResult);
     transaction.category.set(catResult.results[0]);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBCategory code ['%s']^ ", transaction.category.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']^ ", transaction.category.code.c_str());
     categoryCode = readString(szPrompt, transaction.category.code.c_str(), FIELD_STRING_LEN);
 
     using_history();
@@ -851,10 +851,10 @@ void update_transaction(DBTransaction & transaction) {
     db.getPayee(transaction.payeeId, &payResult);
     transaction.payee.set(payResult.results[0]);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBPayee code ['%s']^ ", transaction.payee.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", transaction.payee.code.c_str());
     payeeCode = readString(szPrompt, transaction.payee.code.c_str(), FIELD_STRING_LEN);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBTransaction date ['%s']: ", transaction.date.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Transaction date ['%s']: ", transaction.date.c_str());
 
     while (!isDateValid) {
         date = readString(szPrompt, transaction.date.c_str(), FIELD_STRING_LEN);

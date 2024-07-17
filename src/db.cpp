@@ -416,7 +416,7 @@ sqlite3_int64 PFM_DB::createAccount(DBAccount & account) {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
     pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
-    const char * now = StrDate::now().c_str();
+    string now = StrDate::now();
 
     snprintf(
         pszInsertStatement, 
@@ -426,8 +426,8 @@ sqlite3_int64 PFM_DB::createAccount(DBAccount & account) {
         account.code.c_str(),
         account.openingBalance,
         account.currentBalance,
-        now,
-        now);
+        now.c_str(),
+        now.c_str());
 
     error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
 
@@ -510,7 +510,7 @@ int PFM_DB::updateAccount(DBAccount & account) {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
     pszUpdateStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
-    const char * now = StrDate::now().c_str();
+    string now = StrDate::now();
 
     snprintf(
         pszUpdateStatement, 
@@ -520,7 +520,7 @@ int PFM_DB::updateAccount(DBAccount & account) {
         account.name.c_str(),
         account.openingBalance,
         account.currentBalance,
-        now,
+        now.c_str(),
         account.id);
 
     error = sqlite3_exec(dbHandle, pszUpdateStatement, NULL, NULL, &pszErrorMsg);
@@ -581,7 +581,7 @@ sqlite3_int64 PFM_DB::createCategory(DBCategory & category) {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
     pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
-    const char * now = StrDate::now().c_str();
+    string now = StrDate::now();
 
     snprintf(
         pszInsertStatement, 
@@ -589,8 +589,8 @@ sqlite3_int64 PFM_DB::createCategory(DBCategory & category) {
         "INSERT INTO category (description, code, created, updated) VALUES ('%s', '%s', '%s', '%s');",
         category.description.c_str(),
         category.code.c_str(),
-        now,
-        now);
+        now.c_str(),
+        now.c_str());
 
     error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
 
@@ -707,7 +707,7 @@ int PFM_DB::updateCategory(DBCategory & category) {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
     pszUpdateStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
-    const char * now = StrDate::now().c_str();
+    string now = StrDate::now();
 
     snprintf(
         pszUpdateStatement, 
@@ -715,7 +715,7 @@ int PFM_DB::updateCategory(DBCategory & category) {
         "UPDATE category SET code = '%s', description = '%s', updated = '%s' WHERE id = %lld;",
         category.code.c_str(),
         category.description.c_str(),
-        now,
+        now.c_str(),
         category.id);
 
     error = sqlite3_exec(dbHandle, pszUpdateStatement, NULL, NULL, &pszErrorMsg);
@@ -776,7 +776,7 @@ sqlite3_int64 PFM_DB::createPayee(DBPayee & payee) {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
     pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
-    const char * now = StrDate::now().c_str();
+    string now = StrDate::now();
 
     snprintf(
         pszInsertStatement, 
@@ -784,8 +784,8 @@ sqlite3_int64 PFM_DB::createPayee(DBPayee & payee) {
         "INSERT INTO payee (name, code, created, updated) VALUES ('%s', '%s', '%s', '%s');",
         payee.name.c_str(),
         payee.code.c_str(),
-        now,
-        now);
+        now.c_str(),
+        now.c_str());
 
     error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
 
@@ -902,7 +902,7 @@ int PFM_DB::updatePayee(DBPayee & payee) {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
     pszUpdateStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
-    const char * now = StrDate::now().c_str();
+    string now = StrDate::now();
 
     snprintf(
         pszUpdateStatement, 
@@ -910,7 +910,7 @@ int PFM_DB::updatePayee(DBPayee & payee) {
         "UPDATE payee SET code = '%s', name = '%s', updated = '%s' WHERE id = %lld;",
         payee.code.c_str(),
         payee.name.c_str(),
-        now,
+        now.c_str(),
         payee.id);
 
     error = sqlite3_exec(dbHandle, pszUpdateStatement, NULL, NULL, &pszErrorMsg);
@@ -971,7 +971,7 @@ sqlite3_int64 PFM_DB::createRecurringCharge(DBRecurringCharge & charge) {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
     pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
-    const char * now = StrDate::now().c_str();
+    string now = StrDate::now();
 
     snprintf(
         pszInsertStatement, 
@@ -986,8 +986,8 @@ sqlite3_int64 PFM_DB::createRecurringCharge(DBRecurringCharge & charge) {
         charge.description.c_str(),
         charge.amount,
         charge.frequency.c_str(),
-        now,
-        now);
+        now.c_str(),
+        now.c_str());
 
     error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
 
@@ -1102,7 +1102,7 @@ int PFM_DB::updateRecurringCharge(DBRecurringCharge & charge) {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
     pszUpdateStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
-    const char * now = StrDate::now().c_str();
+    string now = StrDate::now();
 
     snprintf(
         pszUpdateStatement, 
@@ -1116,7 +1116,7 @@ int PFM_DB::updateRecurringCharge(DBRecurringCharge & charge) {
         charge.description.c_str(),
         charge.amount,
         charge.frequency.c_str(),
-        now,
+        now.c_str(),
         charge.id);
 
     error = sqlite3_exec(dbHandle, pszUpdateStatement, NULL, NULL, &pszErrorMsg);
@@ -1177,14 +1177,14 @@ sqlite3_int64 PFM_DB::createTransaction(DBTransaction & transaction) {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
     pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
-    const char * now = StrDate::now().c_str();
+    string now = StrDate::now();
 
     snprintf(
         pszInsertStatement, 
         SQL_STATEMENT_BUFFER_LEN,
         "INSERT INTO account_transaction " \
         "(account_id, category_id, payee_id, date, description, credit_debit, amount, is_reconciled, created, updated) " \
-        "VALUES (%lld, %lld, %lld, '%s', '%s', '%s', %.2f, '%s');",
+        "VALUES (%lld, %lld, %lld, '%s', '%s', '%s', %.2f, '%s', '%s', '%s');",
         transaction.accountId,
         transaction.categoryId,
         transaction.payeeId,
@@ -1193,8 +1193,8 @@ sqlite3_int64 PFM_DB::createTransaction(DBTransaction & transaction) {
         (transaction.isCredit ? "CR" : "DB"),
         transaction.amount,
         (transaction.isReconciled ? "Y" : "N"),
-        now,
-        now);
+        now.c_str(),
+        now.c_str());
 
     error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
 
@@ -1306,7 +1306,7 @@ int PFM_DB::updateTransaction(DBTransaction & transaction) {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
     pszUpdateStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
 
-    const char * now = StrDate::now().c_str();
+    string now = StrDate::now();
 
     snprintf(
         pszUpdateStatement, 
@@ -1321,7 +1321,7 @@ int PFM_DB::updateTransaction(DBTransaction & transaction) {
         (transaction.isCredit ? "CR" : "DB"),
         transaction.amount,
         (transaction.isReconciled ? "Y" : "N"),
-        now,
+        now.c_str(),
         transaction.id);
 
     error = sqlite3_exec(dbHandle, pszUpdateStatement, NULL, NULL, &pszErrorMsg);
