@@ -401,10 +401,8 @@ void add_recurring_charge(Account & account) {
     payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
 
     while (!isDateValid) {
-        date = readString("Start date (yyyy-mm-dd): ", today, 10);
+        date = readString("Start date (yyyy-mm-dd)[today]: ", today, 10);
 
-        cout << "Got date: '" << date << "'" << endl;
-        
         isDateValid = StrDate::validateDate(date);
     }
 
@@ -676,10 +674,8 @@ void add_transaction(Account & account) {
     payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
 
     while (!isDateValid) {
-        date = readString("Transaction date (yyyy-mm-dd): ", today, 10);
+        date = readString("Transaction date (yyyy-mm-dd)[today]: ", today, 10);
 
-        cout << "Got date: '" << date << "'" << endl;
-        
         isDateValid = StrDate::validateDate(date);
     }
 
@@ -858,7 +854,7 @@ void update_transaction(Transaction & transaction) {
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", transaction.payee.code.c_str());
     payeeCode = readString(szPrompt, transaction.payee.code.c_str(), FIELD_STRING_LEN);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", transaction.date.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Transaction date ['%s']: ", transaction.date.c_str());
 
     while (!isDateValid) {
         date = readString(szPrompt, transaction.date.c_str(), FIELD_STRING_LEN);
