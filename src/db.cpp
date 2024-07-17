@@ -14,6 +14,7 @@
 #include "category.h"
 #include "payee.h"
 #include "recurring_charge.h"
+#include "transaction.h"
 #include "db.h"
 #include "utils.h"
 #include "strdate.h"
@@ -185,6 +186,49 @@ static int recurringChargeCallback(void * p, int numColumns, char ** columns, ch
     }
 
     result->results.push_back(charge);
+    result->numRows++;
+
+    return SQLITE_OK;
+}
+
+static int transactionCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
+    int                     columnIndex = 0;
+    Transaction             transaction;
+    TransactionResult *     result = (TransactionResult *)p;
+
+    while (columnIndex < numColumns) {
+        if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
+            transaction.id = strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "account_id", 10) == 0) {
+            transaction.accountId = strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "category_id", 11) == 0) {
+            transaction.categoryId = strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "payee_id", 8) == 0) {
+            transaction.payeeId = strtoll(&columns[columnIndex][0], NULL, 10);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "date", 4) == 0) {
+            transaction.date.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "description", 11) == 0) {
+            transaction.description.assign(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "debit_credit", 12) == 0) {
+            transaction.isCredit = decodeCreditDebit(&columns[columnIndex][0]);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "amount", 6) == 0) {
+            transaction.amount = strtod(&columns[columnIndex][0], NULL);
+        }
+        else if (strncmp(&columnNames[columnIndex][0], "is_reconciled", 13) == 0) {
+            transaction.isReconciled = strtobool(&columns[columnIndex][0]);
+        }
+
+        columnIndex++;
+    }
+
+    result->results.push_back(transaction);
     result->numRows++;
 
     return SQLITE_OK;
@@ -1056,6 +1100,204 @@ int PFM_DB::deleteRecurringCharge(RecurringCharge & charge) {
             pfm_error::buildMsg(
                 "Failed to delete recurring charge with id %lld: %s", 
                 charge.id,
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszDeleteStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return 0;
+}
+
+sqlite3_int64 PFM_DB::createTransaction(Transaction & transaction) {
+    char *          pszErrorMsg;
+    char *          pszInsertStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszInsertStatement, 
+        SQL_STATEMENT_BUFFER_LEN,
+        "INSERT INTO account_transaction " \
+        "(account_id, category_id, payee_id, date, description, credit_debit, amount, is_reconciled) " \
+        "VALUES (%lld, %lld, %lld, '%s', '%s', '%s', %.2f, '%s');",
+        transaction.accountId,
+        transaction.categoryId,
+        transaction.payeeId,
+        transaction.date.c_str(),
+        transaction.description.c_str(),
+        (transaction.isCredit ? "CR" : "DB"),
+        transaction.amount,
+        (transaction.isReconciled ? "Y" : "N"));
+
+    error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to create transaction %s: %s", 
+                transaction.description.c_str(),
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszInsertStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return sqlite3_last_insert_rowid(dbHandle);
+}
+
+int PFM_DB::getTransactionsForAccount(sqlite3_int64 accountId, TransactionResult * result) {
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    char *          pszErrorMsg;
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT " \
+                "id, account_id, category_id, payee_id, date, description, credit_debit, amount, is_reconciled " \
+                "FROM account_transaction " \
+                "WHERE account_id = %lld;";
+
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, accountId);
+
+    error = sqlite3_exec(dbHandle, szStatement, transactionCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get payees list: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    uint32_t seq = 1;
+
+    for (int i = 0;i < result->numRows;i++) {
+        CategoryResult  rc;
+        PayeeResult     rp;
+
+        getCategory(result->results[i].categoryId, &rc);
+        getPayee(result->results[i].payeeId, &rp);
+
+        if (rc.numRows == 1) {
+            result->results[i].category.setCategory(rc.results[0]);
+        }
+
+        if (rp.numRows == 1) {
+            result->results[i].payee.setPayee(rp.results[0]);
+        }
+
+        result->results[i].sequence = seq++;
+    }
+
+    return result->numRows;
+}
+
+int PFM_DB::getTransaction(sqlite3_int64 id, TransactionResult * result) {
+    char *          pszErrorMsg;
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT " \
+                "id, account_id, category_id, payee_id, date, description, credit_debit, amount, is_reconciled " \
+                "FROM account_transaction " \
+                "WHERE id = %lld;";
+
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, id);
+
+    error = sqlite3_exec(dbHandle, szStatement, transactionCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get transaction: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+    else if (result->numRows != 1) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Expected 1 result, got %d", 
+                result->numRows),
+            __FILE__,
+            __LINE__);
+    }
+
+    // result->results[0].print();
+
+    return result->numRows;
+}
+
+int PFM_DB::updateTransaction(Transaction & transaction) {
+    char *          pszErrorMsg;
+    char *          pszUpdateStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszUpdateStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszUpdateStatement, 
+        SQL_STATEMENT_BUFFER_LEN - 1,
+        "UPDATE account_transaction " \
+        "SET category_id = %lld, payee_id = %lld, date = '%s', description = '%s', credit_debit = '%s', amount = %.2f, is_reconciled = '%s' " \
+        "WHERE id = %lld;",
+        transaction.categoryId,
+        transaction.payeeId,
+        transaction.date.c_str(),
+        transaction.description.c_str(),
+        (transaction.isCredit ? "CR" : "DB"),
+        transaction.amount,
+        (transaction.isReconciled ? "Y" : "N"),
+        transaction.id);
+
+    error = sqlite3_exec(dbHandle, pszUpdateStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to update transaction with id %lld: %s", 
+                transaction.id,
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszUpdateStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return 0;
+}
+
+int PFM_DB::deleteTransaction(Transaction & transaction) {
+    char *          pszErrorMsg;
+    char *          pszDeleteStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszDeleteStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    snprintf(
+        pszDeleteStatement, 
+        SQL_STATEMENT_BUFFER_LEN - 1,
+        "DELETE FROM account_transaction WHERE id = %lld;",
+        transaction.id);
+
+    error = sqlite3_exec(dbHandle, pszDeleteStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to delete transaction with id %lld: %s", 
+                transaction.id,
                 sqlite3_errmsg(dbHandle)), 
             __FILE__, 
             __LINE__);

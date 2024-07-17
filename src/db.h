@@ -6,6 +6,7 @@
 #include "account.h"
 #include "category.h"
 #include "payee.h"
+#include "transaction.h"
 #include "recurring_charge.h"
 
 using namespace std;
@@ -57,6 +58,12 @@ class PFM_DB {
         int             getRecurringCharge(sqlite3_int64 id, RecurringChargeResult * result);
         int             updateRecurringCharge(RecurringCharge & charge);
         int             deleteRecurringCharge(RecurringCharge & charge);
+
+        sqlite3_int64   createTransaction(Transaction & transaction);
+        int             getTransactionsForAccount(sqlite3_int64 accountId, TransactionResult * result);
+        int             getTransaction(sqlite3_int64 id, TransactionResult * result);
+        int             updateTransaction(Transaction & transaction);
+        int             deleteTransaction(Transaction & transaction);
 };
 
 #endif

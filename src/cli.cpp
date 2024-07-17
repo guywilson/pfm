@@ -16,6 +16,7 @@
 #include "account.h"
 #include "category.h"
 #include "recurring_charge.h"
+#include "transaction.h"
 
 using namespace std;
 
@@ -371,8 +372,6 @@ void add_recurring_charge(Account & account) {
 
     today = StrDate::today().c_str();
 
-    cout << "Today = '" << today << "'" << endl;
-
     PFM_DB & db = PFM_DB::getInstance();
 
     cout << "*** Add recurring charge ***" << endl;
@@ -630,4 +629,298 @@ void delete_recurring_charge(RecurringCharge & charge) {
     PFM_DB & db = PFM_DB::getInstance();
 
     db.deleteRecurringCharge(charge);
+}
+
+void add_transaction(Account & account) {
+    Transaction     transaction;
+    const char *    today;
+    char *          categoryCode;
+    char *          payeeCode;
+    char *          date;
+    char *          description;
+    char *          credit_debit;
+    char *          amount;
+    char *          is_reconciled = NULL;
+    bool            isDateValid = false;
+    bool            isCreditDebitValid = false;
+    bool            isReconciledValid = false;
+
+    today = StrDate::today().c_str();
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    cout << "*** Add transaction ***" << endl;
+
+    using_history();
+    clear_history();
+
+    CategoryResult catResult;
+    db.getCategories(&catResult);
+
+    for (int i = 0;i < catResult.numRows;i++) {
+        add_history(catResult.results[i].code.c_str());
+    }
+
+    categoryCode = readString("Category code (max. 5 chars)^ ", NULL, 4);
+
+    using_history();
+    clear_history();
+
+    PayeeResult payResult;
+    db.getPayees(&payResult);
+
+    for (int i = 0;i < payResult.numRows;i++) {
+        add_history(payResult.results[i].code.c_str());
+    }
+
+    payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
+
+    while (!isDateValid) {
+        date = readString("Transaction date (yyyy-mm-dd): ", today, 10);
+
+        cout << "Got date: '" << date << "'" << endl;
+        
+        isDateValid = StrDate::validateDate(date);
+    }
+
+    description = readString("Description: ", description, 32);
+
+    while (!isCreditDebitValid) {
+        credit_debit = readString("Credit/Debit [DB]: ", "DB", 2);
+
+        isCreditDebitValid = validateCreditDebit(credit_debit);
+    }
+
+    amount = readString("Amount: ", NULL, 32);
+
+    while (!isReconciledValid) {
+        is_reconciled = readString("Is reconciled [N]: ", "N", 1);
+
+        isReconciledValid = (is_reconciled[0] == 'Y' || is_reconciled[0] == 'N');
+    }
+
+    if (strlen(categoryCode) == 0) {
+        fprintf(stderr, "\nCategory code must have a value.\n");
+        return;
+    }
+
+    if (strlen(payeeCode) == 0) {
+        fprintf(stderr, "\nPayee code must have a value.\n");
+        return;
+    }
+
+    CategoryResult cr;
+
+    db.getCategory(categoryCode, &cr);
+
+    PayeeResult pr;
+
+    db.getPayee(payeeCode, &pr);
+
+    transaction.accountId = account.id;
+    transaction.categoryId = cr.results[0].id;
+    transaction.payeeId = pr.results[0].id;
+
+    transaction.date = date;
+    transaction.description = description;
+    transaction.isCredit = decodeCreditDebit(credit_debit);
+    transaction.amount = strtod(amount, NULL);
+    transaction.isReconciled = strtobool(is_reconciled);
+
+    db.createTransaction(transaction);
+
+    free(payeeCode);
+    free(categoryCode);
+    free(date);
+    free(description);
+    free(credit_debit);
+    free(amount);
+    free(is_reconciled);
+}
+
+void list_transactions(Account & account) {
+    TransactionResult       result;
+    int                     numTransactions;
+    int                     i;
+    char                    seq[4];
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    numTransactions = db.getTransactionsForAccount(account.id, &result);
+
+    cout << "*** Transactions for account: '" << account.code << "' (" << numTransactions << ") ***" << endl << endl;
+
+    cout << "| Seq | Date       | Description               | Cat.  | Payee | CR/DB | Amount       | Rec |" << endl;
+    cout << "---------------------------------------------------------------------------------------------" << endl;
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    for (i = 0;i < numTransactions;i++) {
+        Transaction transaction = result.results[i];
+
+        cacheMgr.addTransaction(transaction.sequence, transaction);
+
+        snprintf(seq, 4, "%03d", transaction.sequence);
+
+        cout << 
+            "| " << 
+            seq <<
+            " | " <<
+            transaction.date <<
+            " | " <<
+            left << setw(25) << transaction.description << 
+            " | " << 
+            left << setw(5) << transaction.category.code << 
+            " | " <<
+            left << setw(5) << transaction.payee.code <<
+            " | " <<
+            left << setw(5) << (transaction.isCredit ? "CR" : "DB") <<
+            " | " <<
+            right << setw(13) << formatCurrency(transaction.amount) <<
+            " | " <<
+            left << setw(3) << (transaction.isReconciled ? "Y" : "N") <<
+            " |" <<
+            endl;
+    }
+
+    cout << endl;
+}
+
+Transaction get_transaction(int sequence) {
+    Transaction             transaction;
+    char *                  pszSequence;
+
+    if (sequence == 0) {
+        cout << "*** Get transaction ***" << endl;
+        pszSequence = readString("Sequence no.: ", NULL, 3);
+
+        sequence = atoi(pszSequence);
+
+        free(pszSequence);
+    }
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    transaction = cacheMgr.getTransaction(sequence);
+
+    return transaction;
+}
+
+void update_transaction(Transaction & transaction) {
+    char            szPrompt[MAX_PROMPT_LENGTH];
+    char            amountStr[AMOUNT_FIELD_STRING_LEN];
+    char *          categoryCode;
+    char *          payeeCode;
+    char *          date;
+    char *          description;
+    char *          credit_debit;
+    char *          amount;
+    char *          is_reconciled = NULL;
+    bool            isDateValid = false;
+    bool            isCreditDebitValid = false;
+    bool            isReconciledValid = false;
+
+    cout << "*** Update transaction ***" << endl;
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    using_history();
+    clear_history();
+
+    CategoryResult catResult;
+    db.getCategories(&catResult);
+
+    for (int i = 0;i < catResult.numRows;i++) {
+        add_history(catResult.results[i].code.c_str());
+    }
+
+    catResult.clear();
+    db.getCategory(transaction.categoryId, &catResult);
+    transaction.category.setCategory(catResult.results[0]);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']^ ", transaction.category.code.c_str());
+    categoryCode = readString(szPrompt, transaction.category.code.c_str(), FIELD_STRING_LEN);
+
+    using_history();
+    clear_history();
+
+    PayeeResult payResult;
+    db.getPayees(&payResult);
+
+    for (int i = 0;i < payResult.numRows;i++) {
+        add_history(payResult.results[i].code.c_str());
+    }
+
+    payResult.clear();
+    db.getPayee(transaction.payeeId, &payResult);
+    transaction.payee.setPayee(payResult.results[0]);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", transaction.payee.code.c_str());
+    payeeCode = readString(szPrompt, transaction.payee.code.c_str(), FIELD_STRING_LEN);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", transaction.date.c_str());
+
+    while (!isDateValid) {
+        date = readString(szPrompt, transaction.date.c_str(), FIELD_STRING_LEN);
+
+        isDateValid = StrDate::validateDate(date);
+    }
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", transaction.description.c_str());
+    description = readString(szPrompt, transaction.description.c_str(), FIELD_STRING_LEN);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Credit/Debit ['%s']: ", (transaction.isCredit ? "CR" : "DB"));
+
+    while (!isCreditDebitValid) {
+        credit_debit = readString(szPrompt, (transaction.isCredit ? "CR" : "DB"), 2);
+
+        isCreditDebitValid = validateCreditDebit(credit_debit);
+    }
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%.2f]: ", transaction.amount);
+    snprintf(amountStr, AMOUNT_FIELD_STRING_LEN, "%.2f", transaction.amount);
+    amount = readString(szPrompt, amountStr, AMOUNT_FIELD_STRING_LEN);
+
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Is reconciled ['%s']: ", (transaction.isReconciled ? "Y" : "N"));
+
+    while (!isReconciledValid) {
+        is_reconciled = readString(szPrompt, (transaction.isReconciled ? "Y" : "N"), 1);
+
+        isReconciledValid = (is_reconciled[0] == 'Y' || is_reconciled[0] == 'N');
+    }
+
+    if (strlen(categoryCode) == 0) {
+        fprintf(stderr, "\nCategory code must have a value.\n");
+        return;
+    }
+
+    if (strlen(payeeCode) == 0) {
+        fprintf(stderr, "\nPayee code must have a value.\n");
+        return;
+    }
+
+    CategoryResult cr;
+
+    db.getCategory(categoryCode, &cr);
+
+    PayeeResult pr;
+
+    db.getPayee(payeeCode, &pr);
+
+    transaction.categoryId = cr.results[0].id;
+    transaction.payeeId = pr.results[0].id;
+
+    transaction.date = date;
+    transaction.description = description;
+    transaction.isCredit = decodeCreditDebit(credit_debit);
+    transaction.amount = strtod(amount, NULL);
+    transaction.isReconciled = strtobool(is_reconciled);
+
+    db.updateTransaction(transaction);
+}
+
+void delete_transaction(Transaction & transaction) {
+    PFM_DB & db = PFM_DB::getInstance();
+
+    db.deleteTransaction(transaction);
 }

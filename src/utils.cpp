@@ -102,3 +102,36 @@ int getFrequencyValue(string & frequency) {
 char getFrequencyUnit(string & frequency) {
     return frequency.substr(frequency.length() - 1, 1).c_str()[0];
 }
+
+bool validateCreditDebit(char * pszCD) {
+    if (strlen(pszCD) != 2) {
+        return false;
+    }
+    else if (strncmp(pszCD, "CR", 2) != 0 && strncmp(pszCD, "DB", 2) != 0) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+bool strtobool(const char * yes_no) {
+    if (yes_no[0] == 'y' || yes_no[0] == 'Y') {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool decodeCreditDebit(const char * credit_debit) {
+    if (strncmp(credit_debit, "CR", 2) == 0) {
+        return true;
+    }
+    else if (strncmp(credit_debit, "DB", 2) == 0) {
+        return false;
+    }
+    else {
+        return false;
+    }
+}

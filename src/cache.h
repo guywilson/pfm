@@ -9,6 +9,7 @@
 #include "category.h"
 #include "payee.h"
 #include "recurring_charge.h"
+#include "transaction.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ class CacheMgr {
         CacheMgr() {}
 
         unordered_map<int, RecurringCharge> recurringChargeBySequence;
+        unordered_map<int, Transaction> transactionBySequence;
 
     public:
         ~CacheMgr() {}
@@ -42,6 +44,20 @@ class CacheMgr {
             }
 
             throw pfm_error("RecurringCharge not found in cache.");
+        }
+
+        void addTransaction(int sequence, Transaction & transaction) {
+            transactionBySequence.insert({sequence, transaction});
+        }
+
+        Transaction getTransaction(int sequence) {
+            unordered_map<int, Transaction>::const_iterator item = transactionBySequence.find(sequence);
+
+            if (item != transactionBySequence.end()) {
+                return item->second;
+            }
+
+            throw pfm_error("Transaction not found in cache.");
         }
 };
 

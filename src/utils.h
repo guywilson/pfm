@@ -18,5 +18,7 @@ bool        isDateGreaterThan(string & lhDate, string rhDate);
 bool        isDateLessThan(string & lhDate, string rhDate);
 int         getFrequencyValue(string & frequency);
 char        getFrequencyUnit(string & frequency);
-
+bool        strtobool(const char * yes_no);
+bool        decodeCreditDebit(const char * credit_debit);
+bool        validateCreditDebit(char * pszCD);
 #endif

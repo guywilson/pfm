@@ -242,6 +242,50 @@ int main(int argc, char ** argv) {
 
                 delete_recurring_charge(rc);
             }
+            else if (strncmp(pszCommand, "add transaction", 15) == 0 || strncmp(pszCommand, "at", 2) == 0) {
+                add_transaction(selectedAccount);
+            }
+            else if (strncmp(pszCommand, "list transactions", 17) == 0 || strncmp(pszCommand, "lt", 2) == 0) {
+                list_transactions(selectedAccount);
+            }
+            else if (strncmp(pszCommand, "update transaction", 18) == 0 || strncmp(pszCommand, "ut", 2) == 0) {
+                int sequence = 0;
+
+                if (strncmp(pszCommand, "update transaction", 18) == 0) {
+                    if (strlen(pszCommand) >= 20) {
+                        sequence = atoi(&pszCommand[19]);
+                    }
+                }
+                else if (strncmp(pszCommand, "ut", 2) == 0) {
+                    if (strlen(pszCommand) >= 4) {
+                        sequence = atoi(&pszCommand[3]);
+                    }
+                }
+
+                Transaction t;
+                t.setTransaction(get_transaction(sequence));
+
+                update_transaction(t);
+            }
+            else if (strncmp(pszCommand, "delete transaction", 18) == 0 || strncmp(pszCommand, "dt", 2) == 0) {
+                int sequence = 0;
+
+                if (strncmp(pszCommand, "delete transaction", 18) == 0) {
+                    if (strlen(pszCommand) >= 20) {
+                        sequence = atoi(&pszCommand[19]);
+                    }
+                }
+                else if (strncmp(pszCommand, "dt", 2) == 0) {
+                    if (strlen(pszCommand) >= 4) {
+                        sequence = atoi(&pszCommand[3]);
+                    }
+                }
+
+                Transaction t;
+                t.setTransaction(get_transaction(sequence));
+
+                delete_transaction(t);
+            }
         }
     }
 
