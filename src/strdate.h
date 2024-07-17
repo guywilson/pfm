@@ -12,7 +12,8 @@ using namespace std;
 #ifndef __INCL_STRDATE
 #define __INCL_STRDATE
 
-#define TIME_STAMP_BUFFER_LEN               12
+#define TIME_STAMP_BUFFER_LEN               20
+#define DATE_STAMP_BUFFER_LEN               12
 
 class StrDate {
     private:
@@ -59,12 +60,12 @@ class StrDate {
             t = tv.tv_sec;
             localTime = localtime(&t);
 
-            today = (char *)malloc(TIME_STAMP_BUFFER_LEN);
+            today = (char *)malloc(DATE_STAMP_BUFFER_LEN);
 
             if (today != NULL) {
                 snprintf(
                     today, 
-                    TIME_STAMP_BUFFER_LEN, 
+                    DATE_STAMP_BUFFER_LEN, 
                     "%d-%02d-%02d", 
                     localTime->tm_year + 1900, 
                     localTime->tm_mon + 1, 
@@ -72,6 +73,34 @@ class StrDate {
             }
 
             return string(today);
+        }
+
+        static string now() {
+            struct timeval		tv;
+            struct tm *         localTime;
+            time_t				t;
+            char *              now;
+
+            gettimeofday(&tv, NULL);
+            t = tv.tv_sec;
+            localTime = localtime(&t);
+
+            now = (char *)malloc(TIME_STAMP_BUFFER_LEN);
+
+            if (now != NULL) {
+                snprintf(
+                    now, 
+                    TIME_STAMP_BUFFER_LEN, 
+                    "%d-%02d-%02d %02d:%02d:%02d", 
+                    localTime->tm_year + 1900, 
+                    localTime->tm_mon + 1, 
+                    localTime->tm_mday,
+                    localTime->tm_hour,
+                    localTime->tm_min,
+                    localTime->tm_sec);
+            }
+
+            return string(now);
         }
 
         static bool validateDate(const string & date) {

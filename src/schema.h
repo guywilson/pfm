@@ -45,6 +45,8 @@ const char * pszCreateAccountTable =
     "code TEXT NOT NULL," \
     "opening_balance NUMERIC NOT NULL," \
     "current_balance NUMERIC NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
     "UNIQUE(code) ON CONFLICT ROLLBACK" \
     ");";
 
@@ -53,6 +55,8 @@ const char * pszCreateCategoryTable =
     "id INTEGER PRIMARY KEY," \
     "code TEXT NOT NULL," \
     "description TEXT NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
     "UNIQUE(code) ON CONFLICT ROLLBACK" \
     ");";
 
@@ -61,6 +65,8 @@ const char * pszCreatePayeeTable =
     "id INTEGER PRIMARY KEY," \
     "code TEXT NOT NULL," \
     "name TEXT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
     "UNIQUE(code) ON CONFLICT ROLLBACK" \
     ");";
 
@@ -74,6 +80,8 @@ const char * pszCreateRCTable =
     "description TEXT NOT NULL," \
     "amount NUMERIC NOT NULL," \
     "frequency TEXT NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id)," \
     "FOREIGN KEY(category_id) REFERENCES category(id)," \
     "FOREIGN KEY(payee_id) REFERENCES payee(id)" \
@@ -90,6 +98,8 @@ static const char * pszCreateTransationTable =
     "credit_debit TEXT NOT NULL," \
     "amount NUMERIC NOT NULL," \
     "is_reconciled TEXT NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id)," \
     "FOREIGN KEY(category_id) REFERENCES category(id)," \
     "FOREIGN KEY(payee_id) REFERENCES payee(id)" \
