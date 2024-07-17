@@ -5,19 +5,21 @@
 
 #include <sqlite3.h>
 
+#include "db_base.h"
+
 using namespace std;
 
 #ifndef __INCL_ACCOUNT
 #define __INCL_ACCOUNT
 
-class DBAccount {
+class DBAccount : public DBBase {
     public:
-        DBAccount() {
+        DBAccount() : DBBase() {
             clear();
         }
 
         void clear(void) {
-            this->id = 0;
+            DBBase::clear();
 
             this->name = "";
             this->code = "";
@@ -25,8 +27,8 @@ class DBAccount {
             this->currentBalance = 0.0;
         }
 
-        void setAccount(const DBAccount & src) {
-            this->id = src.id;
+        void set(const DBAccount & src) {
+            DBBase::set(src);
 
             this->name =            src.name;
             this->code =            src.code;
@@ -35,7 +37,8 @@ class DBAccount {
         }
 
         void print(void) {
-            cout << "ID: " << id << endl;
+            DBBase::print();
+
             cout << "Name: '" << name << "'" << endl;
             cout << "Code: '" << code << "'" << endl;
 
@@ -43,8 +46,6 @@ class DBAccount {
             cout << "Opening balance: " << openingBalance << endl;
             cout << "Current balance: " << currentBalance << endl;
         }
-
-        sqlite3_int64           id;
 
         string                  name;
         string                  code;

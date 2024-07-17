@@ -8,22 +8,21 @@
 
 #include "db_category.h"
 #include "db_payee.h"
+#include "db_base.h"
 
 using namespace std;
 
 #ifndef __INCL_RECURRING_CHARGE
 #define __INCL_RECURRING_CHARGE
 
-class DBRecurringCharge {
+class DBRecurringCharge : public DBBase {
     public:
-        DBRecurringCharge() {
+        DBRecurringCharge() : DBBase() {
             clear();
         }
 
         void clear(void) {
-            this->id = 0;
-
-            this->sequence = 0;
+            DBBase::clear();
 
             this->accountId = 0;
             this->categoryId = 0;
@@ -38,10 +37,8 @@ class DBRecurringCharge {
             this->amount = 0.0;
         }
 
-        void setRecurringCharge(const DBRecurringCharge & src) {
-            this->id = src.id;
-
-            this->sequence = src.sequence;
+        void set(const DBRecurringCharge & src) {
+            DBBase::set(src);
 
             this->accountId = src.accountId;
             this->categoryId = src.categoryId;
@@ -54,8 +51,8 @@ class DBRecurringCharge {
         }
 
         void print(void) {
-            cout << "ID: " << id << endl;
-            cout << "Sequence: " << sequence << endl;
+            DBBase::print();
+
             cout << "AccountID: " << accountId << endl;
             cout << "CategoryID: " << categoryId << endl;
             cout << "PayeeID: " << payeeId << endl;
@@ -74,9 +71,6 @@ class DBRecurringCharge {
             payee.print();
         }
 
-        sqlite3_int64           id;
-
-        uint32_t                sequence;           // Not persistent
         string                  nextPaymentDate;    // Not persistent
 
         sqlite3_int64           accountId;

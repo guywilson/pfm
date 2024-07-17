@@ -549,7 +549,7 @@ void update_recurring_charge(DBRecurringCharge & charge) {
 
     catResult.clear();
     db.getCategory(charge.categoryId, &catResult);
-    charge.category.setCategory(catResult.results[0]);
+    charge.category.set(catResult.results[0]);
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBCategory code ['%s']^ ", charge.category.code.c_str());
     categoryCode = readString(szPrompt, charge.category.code.c_str(), FIELD_STRING_LEN);
@@ -566,7 +566,7 @@ void update_recurring_charge(DBRecurringCharge & charge) {
 
     payResult.clear();
     db.getPayee(charge.payeeId, &payResult);
-    charge.payee.setPayee(payResult.results[0]);
+    charge.payee.set(payResult.results[0]);
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBPayee code ['%s']^ ", charge.payee.code.c_str());
     payeeCode = readString(szPrompt, charge.payee.code.c_str(), FIELD_STRING_LEN);
@@ -832,7 +832,7 @@ void update_transaction(DBTransaction & transaction) {
 
     catResult.clear();
     db.getCategory(transaction.categoryId, &catResult);
-    transaction.category.setCategory(catResult.results[0]);
+    transaction.category.set(catResult.results[0]);
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBCategory code ['%s']^ ", transaction.category.code.c_str());
     categoryCode = readString(szPrompt, transaction.category.code.c_str(), FIELD_STRING_LEN);
@@ -849,7 +849,7 @@ void update_transaction(DBTransaction & transaction) {
 
     payResult.clear();
     db.getPayee(transaction.payeeId, &payResult);
-    transaction.payee.setPayee(payResult.results[0]);
+    transaction.payee.set(payResult.results[0]);
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBPayee code ['%s']^ ", transaction.payee.code.c_str());
     payeeCode = readString(szPrompt, transaction.payee.code.c_str(), FIELD_STRING_LEN);

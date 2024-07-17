@@ -102,7 +102,7 @@ int main(int argc, char ** argv) {
                     }
                 }
 
-                selectedAccount.setAccount(choose_account(accountCode));
+                selectedAccount.set(choose_account(accountCode));
             }
             else if (strncmp(pszCommand, "update account", 15) == 0 || strncmp(pszCommand, "ua", 2) == 0) {
                 update_account(selectedAccount);
@@ -132,7 +132,7 @@ int main(int argc, char ** argv) {
                 }
 
                 DBCategory c;
-                c.setCategory(get_category(categoryCode));
+                c.set(get_category(categoryCode));
 
                 update_category(c);
             }
@@ -151,7 +151,7 @@ int main(int argc, char ** argv) {
                 }
 
                 DBCategory c;
-                c.setCategory(get_category(categoryCode));
+                c.set(get_category(categoryCode));
                 c.print();
 
                 delete_category(c);
@@ -177,7 +177,7 @@ int main(int argc, char ** argv) {
                 }
 
                 DBPayee p;
-                p.setPayee(get_payee(payeeCode));
+                p.set(get_payee(payeeCode));
 
                 update_payee(p);
             }
@@ -196,7 +196,7 @@ int main(int argc, char ** argv) {
                 }
 
                 DBPayee p;
-                p.setPayee(get_payee(payeeCode));
+                p.set(get_payee(payeeCode));
                 p.print();
 
                 delete_payee(p);
@@ -222,7 +222,7 @@ int main(int argc, char ** argv) {
                 }
 
                 DBRecurringCharge rc;
-                rc.setRecurringCharge(get_recurring_charge(sequence));
+                rc.set(get_recurring_charge(sequence));
 
                 update_recurring_charge(rc);
             }
@@ -241,7 +241,7 @@ int main(int argc, char ** argv) {
                 }
 
                 DBRecurringCharge rc;
-                rc.setRecurringCharge(get_recurring_charge(sequence));
+                rc.set(get_recurring_charge(sequence));
 
                 delete_recurring_charge(rc);
             }
@@ -266,7 +266,7 @@ int main(int argc, char ** argv) {
                 }
 
                 DBTransaction t;
-                t.setTransaction(get_transaction(sequence));
+                t.set(get_transaction(sequence));
 
                 update_transaction(t);
             }
@@ -285,7 +285,7 @@ int main(int argc, char ** argv) {
                 }
 
                 DBTransaction t;
-                t.setTransaction(get_transaction(sequence));
+                t.set(get_transaction(sequence));
 
                 delete_transaction(t);
             }

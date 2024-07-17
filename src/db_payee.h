@@ -4,38 +4,39 @@
 
 #include <sqlite3.h>
 
+#include "db_base.h"
+
 using namespace std;
 
 #ifndef __INCL_PAYEE
 #define __INCL_PAYEE
 
-class DBPayee {
+class DBPayee : public DBBase {
     public:
-        DBPayee() {
+        DBPayee() : DBBase() {
             clear();
         }
 
         void clear(void) {
-            this->id = 0;
+            DBBase::clear();
 
             this->name = "";
             this->code = "";
         }
 
-        void setPayee(const DBPayee & src) {
-            this->id = src.id;
+        void set(const DBPayee & src) {
+            DBBase::set(src);
 
             this->name =            src.name;
             this->code =            src.code;
         }
 
         void print(void) {
-            cout << "ID: " << id << endl;
+            DBBase::print();
+
             cout << "Description: '" << name << "'" << endl;
             cout << "Code: '" << code << "'" << endl;
         }
-
-        sqlite3_int64           id;
 
         string                  name;
         string                  code;

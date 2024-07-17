@@ -986,11 +986,11 @@ int PFM_DB::getRecurringChargesForAccount(sqlite3_int64 accountId, DBRecurringCh
         getPayee(result->results[i].payeeId, &rp);
 
         if (rc.numRows == 1) {
-            result->results[i].category.setCategory(rc.results[0]);
+            result->results[i].category.set(rc.results[0]);
         }
 
         if (rp.numRows == 1) {
-            result->results[i].payee.setPayee(rp.results[0]);
+            result->results[i].payee.set(rp.results[0]);
         }
 
         setNextPaymentDate(&result->results[i]);
@@ -1186,11 +1186,11 @@ int PFM_DB::getTransactionsForAccount(sqlite3_int64 accountId, DBTransactionResu
         getPayee(result->results[i].payeeId, &rp);
 
         if (rc.numRows == 1) {
-            result->results[i].category.setCategory(rc.results[0]);
+            result->results[i].category.set(rc.results[0]);
         }
 
         if (rp.numRows == 1) {
-            result->results[i].payee.setPayee(rp.results[0]);
+            result->results[i].payee.set(rp.results[0]);
         }
 
         result->results[i].sequence = seq++;

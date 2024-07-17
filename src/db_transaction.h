@@ -8,22 +8,21 @@
 
 #include "db_category.h"
 #include "db_payee.h"
+#include "db_base.h"
 
 using namespace std;
 
 #ifndef __INCL_TRANSACTION
 #define __INCL_TRANSACTION
 
-class DBTransaction {
+class DBTransaction : public DBBase {
     public:
-        DBTransaction() {
+        DBTransaction() : DBBase() {
             clear();
         }
 
         void clear(void) {
-            this->id = 0;
-
-            this->sequence = 0;
+            DBBase::clear();
 
             this->accountId = 0;
             this->categoryId = 0;
@@ -39,8 +38,8 @@ class DBTransaction {
             this->amount = 0.0;
         }
 
-        void setTransaction(const DBTransaction & src) {
-            this->id = src.id;
+        void set(const DBTransaction & src) {
+            DBBase::set(src);
 
             this->sequence = src.sequence;
 
@@ -56,8 +55,8 @@ class DBTransaction {
         }
 
         void print(void) {
-            cout << "ID: " << id << endl;
-            cout << "Sequence: " << sequence << endl;
+            DBBase::print();
+
             cout << "AccountID: " << accountId << endl;
             cout << "CategoryID: " << categoryId << endl;
             cout << "PayeeID: " << payeeId << endl;
@@ -76,10 +75,6 @@ class DBTransaction {
             cout << "DBPayee (encapsulated object):" << endl;
             payee.print();
         }
-
-        sqlite3_int64           id;
-
-        uint32_t                sequence;           // Not persistent
 
         sqlite3_int64           accountId;
         sqlite3_int64           categoryId;

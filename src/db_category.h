@@ -4,38 +4,39 @@
 
 #include <sqlite3.h>
 
+#include "db_base.h"
+
 using namespace std;
 
 #ifndef __INCL_CATEGORY
 #define __INCL_CATEGORY
 
-class DBCategory {
+class DBCategory : public DBBase {
     public:
-        DBCategory() {
+        DBCategory() : DBBase() {
             clear();
         }
 
         void clear(void) {
-            this->id = 0;
+            DBBase::clear();
 
             this->description = "";
             this->code = "";
         }
 
-        void setCategory(const DBCategory & src) {
-            this->id = src.id;
+        void set(const DBCategory & src) {
+            DBBase::set(src);
 
             this->description.assign(src.description);
             this->code.assign(src.code);
         }
 
         void print(void) {
-            cout << "ID: " << id << endl;
+            DBBase::print();
+
             cout << "Description: '" << description << "'" << endl;
             cout << "Code: '" << code << "'" << endl;
         }
-
-        sqlite3_int64           id;
 
         string                  description;
         string                  code;
