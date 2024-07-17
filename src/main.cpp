@@ -10,11 +10,11 @@
 #include <readline/history.h>
 
 #include "db.h"
-#include "account.h"
-#include "category.h"
-#include "payee.h"
-#include "recurring_charge.h"
-#include "transaction.h"
+#include "db_account.h"
+#include "db_category.h"
+#include "db_payee.h"
+#include "db_recurring_charge.h"
+#include "db_transaction.h"
 #include "cli.h"
 
 using namespace std;
@@ -34,7 +34,7 @@ int main(int argc, char ** argv) {
     char *          pszCommand;
     char *          pszDatabase = NULL;
     bool            loop = true;
-    Account         selectedAccount;
+    DBAccount         selectedAccount;
 
     rl_bind_key('\t', rl_complete);
 
@@ -131,7 +131,7 @@ int main(int argc, char ** argv) {
                     }
                 }
 
-                Category c;
+                DBCategory c;
                 c.setCategory(get_category(categoryCode));
 
                 update_category(c);
@@ -150,7 +150,7 @@ int main(int argc, char ** argv) {
                     }
                 }
 
-                Category c;
+                DBCategory c;
                 c.setCategory(get_category(categoryCode));
                 c.print();
 
@@ -176,7 +176,7 @@ int main(int argc, char ** argv) {
                     }
                 }
 
-                Payee p;
+                DBPayee p;
                 p.setPayee(get_payee(payeeCode));
 
                 update_payee(p);
@@ -195,7 +195,7 @@ int main(int argc, char ** argv) {
                     }
                 }
 
-                Payee p;
+                DBPayee p;
                 p.setPayee(get_payee(payeeCode));
                 p.print();
 
@@ -221,7 +221,7 @@ int main(int argc, char ** argv) {
                     }
                 }
 
-                RecurringCharge rc;
+                DBRecurringCharge rc;
                 rc.setRecurringCharge(get_recurring_charge(sequence));
 
                 update_recurring_charge(rc);
@@ -240,7 +240,7 @@ int main(int argc, char ** argv) {
                     }
                 }
 
-                RecurringCharge rc;
+                DBRecurringCharge rc;
                 rc.setRecurringCharge(get_recurring_charge(sequence));
 
                 delete_recurring_charge(rc);
@@ -265,7 +265,7 @@ int main(int argc, char ** argv) {
                     }
                 }
 
-                Transaction t;
+                DBTransaction t;
                 t.setTransaction(get_transaction(sequence));
 
                 update_transaction(t);
@@ -284,7 +284,7 @@ int main(int argc, char ** argv) {
                     }
                 }
 
-                Transaction t;
+                DBTransaction t;
                 t.setTransaction(get_transaction(sequence));
 
                 delete_transaction(t);

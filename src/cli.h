@@ -2,10 +2,10 @@
 
 #include <sqlite3.h>
 
-#include "account.h"
-#include "category.h"
-#include "payee.h"
-#include "transaction.h"
+#include "db_account.h"
+#include "db_category.h"
+#include "db_payee.h"
+#include "db_transaction.h"
 
 using namespace std;
 
@@ -18,32 +18,32 @@ using namespace std;
 
 void            add_account(void);
 void            list_accounts(void);
-Account         choose_account(const char * szAccountCode);
-void            update_account(Account & account);
-void            delete_account(Account & account);
+DBAccount         choose_account(const char * szAccountCode);
+void            update_account(DBAccount & account);
+void            delete_account(DBAccount & account);
 
 void            add_category(void);
 void            list_categories(void);
-Category        get_category(const char * pszCategoryCode);
-void            update_category(Category & category);
-void            delete_category(Category & category);
+DBCategory        get_category(const char * pszCategoryCode);
+void            update_category(DBCategory & category);
+void            delete_category(DBCategory & category);
 
 void            add_payee(void);
 void            list_payees(void);
-Payee           get_payee(const char * pszPayeeCode);
-void            update_payee(Payee & payee);
-void            delete_payee(Payee & payee);
+DBPayee           get_payee(const char * pszPayeeCode);
+void            update_payee(DBPayee & payee);
+void            delete_payee(DBPayee & payee);
 
-void            add_recurring_charge(Account & account);
-void            list_recurring_charges(Account & account);
-RecurringCharge get_recurring_charge(int sequence);
-void            update_recurring_charge(RecurringCharge & charge);
-void            delete_recurring_charge(RecurringCharge & charge);
+void            add_recurring_charge(DBAccount & account);
+void            list_recurring_charges(DBAccount & account);
+DBRecurringCharge get_recurring_charge(int sequence);
+void            update_recurring_charge(DBRecurringCharge & charge);
+void            delete_recurring_charge(DBRecurringCharge & charge);
 
-void            add_transaction(Account & account);
-void            list_transactions(Account & account);
-Transaction     get_transaction(int sequence);
-void            update_transaction(Transaction & transaction);
-void            delete_transaction(Transaction & transaction);
+void            add_transaction(DBAccount & account);
+void            list_transactions(DBAccount & account);
+DBTransaction     get_transaction(int sequence);
+void            update_transaction(DBTransaction & transaction);
+void            delete_transaction(DBTransaction & transaction);
 
 #endif

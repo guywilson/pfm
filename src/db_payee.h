@@ -1,5 +1,4 @@
 #include <iostream>
-#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -7,12 +6,12 @@
 
 using namespace std;
 
-#ifndef __INCL_ACCOUNT
-#define __INCL_ACCOUNT
+#ifndef __INCL_PAYEE
+#define __INCL_PAYEE
 
-class Account {
+class DBPayee {
     public:
-        Account() {
+        DBPayee() {
             clear();
         }
 
@@ -21,40 +20,30 @@ class Account {
 
             this->name = "";
             this->code = "";
-            this->openingBalance = 0.0;
-            this->currentBalance = 0.0;
         }
 
-        void setAccount(const Account & src) {
+        void setPayee(const DBPayee & src) {
             this->id = src.id;
 
             this->name =            src.name;
             this->code =            src.code;
-            this->openingBalance =  src.openingBalance;
-            this->currentBalance =  src.currentBalance;
         }
 
         void print(void) {
             cout << "ID: " << id << endl;
-            cout << "Name: '" << name << "'" << endl;
+            cout << "Description: '" << name << "'" << endl;
             cout << "Code: '" << code << "'" << endl;
-
-            cout << fixed << setprecision(2);
-            cout << "Opening balance: " << openingBalance << endl;
-            cout << "Current balance: " << currentBalance << endl;
         }
 
         sqlite3_int64           id;
 
         string                  name;
         string                  code;
-        double                  openingBalance;
-        double                  currentBalance;
 };
 
-class AccountResult {
+class DBPayeeResult {
     public:
-        AccountResult() {
+        DBPayeeResult() {
             numRows = 0;
         }
 
@@ -65,7 +54,7 @@ class AccountResult {
 
         int                     numRows;
 
-        vector<Account>         results;
+        vector<DBPayee>           results;
 };
 
 #endif

@@ -5,11 +5,11 @@
 #include <sqlite3.h>
 
 #include "pfm_error.h"
-#include "account.h"
-#include "category.h"
-#include "payee.h"
-#include "recurring_charge.h"
-#include "transaction.h"
+#include "db_account.h"
+#include "db_category.h"
+#include "db_payee.h"
+#include "db_recurring_charge.h"
+#include "db_transaction.h"
 
 using namespace std;
 
@@ -26,38 +26,38 @@ class CacheMgr {
     private:
         CacheMgr() {}
 
-        unordered_map<int, RecurringCharge> recurringChargeBySequence;
-        unordered_map<int, Transaction> transactionBySequence;
+        unordered_map<int, DBRecurringCharge> recurringChargeBySequence;
+        unordered_map<int, DBTransaction> transactionBySequence;
 
     public:
         ~CacheMgr() {}
 
-        void addRecurringCharge(int sequence, RecurringCharge & charge) {
+        void addRecurringCharge(int sequence, DBRecurringCharge & charge) {
             recurringChargeBySequence.insert({sequence, charge});
         }
 
-        RecurringCharge getRecurringCharge(int sequence) {
-            unordered_map<int, RecurringCharge>::const_iterator item = recurringChargeBySequence.find(sequence);
+        DBRecurringCharge getRecurringCharge(int sequence) {
+            unordered_map<int, DBRecurringCharge>::const_iterator item = recurringChargeBySequence.find(sequence);
 
             if (item != recurringChargeBySequence.end()) {
                 return item->second;
             }
 
-            throw pfm_error("RecurringCharge not found in cache.");
+            throw pfm_error("DBRecurringCharge not found in cache.");
         }
 
-        void addTransaction(int sequence, Transaction & transaction) {
+        void addTransaction(int sequence, DBTransaction & transaction) {
             transactionBySequence.insert({sequence, transaction});
         }
 
-        Transaction getTransaction(int sequence) {
-            unordered_map<int, Transaction>::const_iterator item = transactionBySequence.find(sequence);
+        DBTransaction getTransaction(int sequence) {
+            unordered_map<int, DBTransaction>::const_iterator item = transactionBySequence.find(sequence);
 
             if (item != transactionBySequence.end()) {
                 return item->second;
             }
 
-            throw pfm_error("Transaction not found in cache.");
+            throw pfm_error("DBTransaction not found in cache.");
         }
 };
 

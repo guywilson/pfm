@@ -10,11 +10,11 @@
 
 #include <sqlite3.h>
 
-#include "account.h"
-#include "category.h"
-#include "payee.h"
-#include "recurring_charge.h"
-#include "transaction.h"
+#include "db_account.h"
+#include "db_category.h"
+#include "db_payee.h"
+#include "db_recurring_charge.h"
+#include "db_transaction.h"
 #include "db.h"
 #include "utils.h"
 #include "strdate.h"
@@ -26,7 +26,7 @@
 
 using namespace std;
 
-static void setNextPaymentDate(RecurringCharge * charge) {
+static void setNextPaymentDate(DBRecurringCharge * charge) {
     StrDate     chargeDate(charge->date);
     StrDate     dateToday;
     char        frequencyUnit;
@@ -72,8 +72,8 @@ static void setNextPaymentDate(RecurringCharge * charge) {
 
 static int accountCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
     int                     columnIndex = 0;
-    Account                 account;
-    AccountResult *         result = (AccountResult *)p;
+    DBAccount                 account;
+    DBAccountResult *         result = (DBAccountResult *)p;
 
     while (columnIndex < numColumns) {
         if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
@@ -103,8 +103,8 @@ static int accountCallback(void * p, int numColumns, char ** columns, char ** co
 
 static int categoryCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
     int                     columnIndex = 0;
-    Category                category;
-    CategoryResult *        result = (CategoryResult *)p;
+    DBCategory                category;
+    DBCategoryResult *        result = (DBCategoryResult *)p;
 
     while (columnIndex < numColumns) {
         if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
@@ -128,8 +128,8 @@ static int categoryCallback(void * p, int numColumns, char ** columns, char ** c
 
 static int payeeCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
     int                     columnIndex = 0;
-    Payee                   payee;
-    PayeeResult *           result = (PayeeResult *)p;
+    DBPayee                   payee;
+    DBPayeeResult *           result = (DBPayeeResult *)p;
 
     while (columnIndex < numColumns) {
         if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
@@ -153,8 +153,8 @@ static int payeeCallback(void * p, int numColumns, char ** columns, char ** colu
 
 static int recurringChargeCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
     int                     columnIndex = 0;
-    RecurringCharge         charge;
-    RecurringChargeResult * result = (RecurringChargeResult *)p;
+    DBRecurringCharge         charge;
+    DBRecurringChargeResult * result = (DBRecurringChargeResult *)p;
 
     while (columnIndex < numColumns) {
         if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
@@ -193,8 +193,8 @@ static int recurringChargeCallback(void * p, int numColumns, char ** columns, ch
 
 static int transactionCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
     int                     columnIndex = 0;
-    Transaction             transaction;
-    TransactionResult *     result = (TransactionResult *)p;
+    DBTransaction             transaction;
+    DBTransactionResult *     result = (DBTransactionResult *)p;
 
     while (columnIndex < numColumns) {
         if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
@@ -359,7 +359,7 @@ void PFM_DB::createSchema() {
                 __LINE__);
         }
 
-        Category category;
+        DBCategory category;
 
         for (int i = 0;i < NUM_DEFAULT_CATEGORIES;i++) {
             category.clear();
@@ -378,7 +378,7 @@ void PFM_DB::createSchema() {
     sqlite3_free(pszErrorMsg);
 }
 
-sqlite3_int64 PFM_DB::createAccount(Account & account) {
+sqlite3_int64 PFM_DB::createAccount(DBAccount & account) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -413,7 +413,7 @@ sqlite3_int64 PFM_DB::createAccount(Account & account) {
     return sqlite3_last_insert_rowid(dbHandle);
 }
 
-int PFM_DB::getAccounts(AccountResult * result) {
+int PFM_DB::getAccounts(DBAccountResult * result) {
     char *          pszErrorMsg;
     int             error;
 
@@ -434,7 +434,7 @@ int PFM_DB::getAccounts(AccountResult * result) {
     return result->numRows;
 }
 
-int PFM_DB::getAccount(string code, AccountResult * result) {
+int PFM_DB::getAccount(string code, DBAccountResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             error;
@@ -468,7 +468,7 @@ int PFM_DB::getAccount(string code, AccountResult * result) {
     return result->numRows;
 }
 
-int PFM_DB::updateAccount(Account & account) {
+int PFM_DB::updateAccount(DBAccount & account) {
     char *          pszErrorMsg;
     char *          pszUpdateStatement;
     int             error;
@@ -504,7 +504,7 @@ int PFM_DB::updateAccount(Account & account) {
     return 0;
 }
 
-int PFM_DB::deleteAccount(Account & account) {
+int PFM_DB::deleteAccount(DBAccount & account) {
     char *          pszErrorMsg;
     char *          pszDeleteStatement;
     int             error;
@@ -536,7 +536,7 @@ int PFM_DB::deleteAccount(Account & account) {
     return 0;
 }
 
-sqlite3_int64 PFM_DB::createCategory(Category & category) {
+sqlite3_int64 PFM_DB::createCategory(DBCategory & category) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -569,7 +569,7 @@ sqlite3_int64 PFM_DB::createCategory(Category & category) {
     return sqlite3_last_insert_rowid(dbHandle);
 }
 
-int PFM_DB::getCategories(CategoryResult * result) {
+int PFM_DB::getCategories(DBCategoryResult * result) {
     char *          pszErrorMsg;
     int             error;
 
@@ -590,7 +590,7 @@ int PFM_DB::getCategories(CategoryResult * result) {
     return result->numRows;
 }
 
-int PFM_DB::getCategory(sqlite3_int64 id, CategoryResult * result) {
+int PFM_DB::getCategory(sqlite3_int64 id, DBCategoryResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             error;
@@ -624,7 +624,7 @@ int PFM_DB::getCategory(sqlite3_int64 id, CategoryResult * result) {
     return result->numRows;
 }
 
-int PFM_DB::getCategory(string code, CategoryResult * result) {
+int PFM_DB::getCategory(string code, DBCategoryResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             error;
@@ -658,7 +658,7 @@ int PFM_DB::getCategory(string code, CategoryResult * result) {
     return result->numRows;
 }
 
-int PFM_DB::updateCategory(Category & category) {
+int PFM_DB::updateCategory(DBCategory & category) {
     char *          pszErrorMsg;
     char *          pszUpdateStatement;
     int             error;
@@ -692,7 +692,7 @@ int PFM_DB::updateCategory(Category & category) {
     return 0;
 }
 
-int PFM_DB::deleteCategory(Category & category) {
+int PFM_DB::deleteCategory(DBCategory & category) {
     char *          pszErrorMsg;
     char *          pszDeleteStatement;
     int             error;
@@ -724,7 +724,7 @@ int PFM_DB::deleteCategory(Category & category) {
     return 0;
 }
 
-sqlite3_int64 PFM_DB::createPayee(Payee & payee) {
+sqlite3_int64 PFM_DB::createPayee(DBPayee & payee) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -757,7 +757,7 @@ sqlite3_int64 PFM_DB::createPayee(Payee & payee) {
     return sqlite3_last_insert_rowid(dbHandle);
 }
 
-int PFM_DB::getPayees(PayeeResult * result) {
+int PFM_DB::getPayees(DBPayeeResult * result) {
     char *          pszErrorMsg;
     int             error;
 
@@ -778,7 +778,7 @@ int PFM_DB::getPayees(PayeeResult * result) {
     return result->numRows;
 }
 
-int PFM_DB::getPayee(sqlite3_int64 id, PayeeResult * result) {
+int PFM_DB::getPayee(sqlite3_int64 id, DBPayeeResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             error;
@@ -812,7 +812,7 @@ int PFM_DB::getPayee(sqlite3_int64 id, PayeeResult * result) {
     return result->numRows;
 }
 
-int PFM_DB::getPayee(string code, PayeeResult * result) {
+int PFM_DB::getPayee(string code, DBPayeeResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             error;
@@ -846,7 +846,7 @@ int PFM_DB::getPayee(string code, PayeeResult * result) {
     return result->numRows;
 }
 
-int PFM_DB::updatePayee(Payee & payee) {
+int PFM_DB::updatePayee(DBPayee & payee) {
     char *          pszErrorMsg;
     char *          pszUpdateStatement;
     int             error;
@@ -880,7 +880,7 @@ int PFM_DB::updatePayee(Payee & payee) {
     return 0;
 }
 
-int PFM_DB::deletePayee(Payee & payee) {
+int PFM_DB::deletePayee(DBPayee & payee) {
     char *          pszErrorMsg;
     char *          pszDeleteStatement;
     int             error;
@@ -912,7 +912,7 @@ int PFM_DB::deletePayee(Payee & payee) {
     return 0;
 }
 
-sqlite3_int64 PFM_DB::createRecurringCharge(RecurringCharge & charge) {
+sqlite3_int64 PFM_DB::createRecurringCharge(DBRecurringCharge & charge) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -952,7 +952,7 @@ sqlite3_int64 PFM_DB::createRecurringCharge(RecurringCharge & charge) {
     return sqlite3_last_insert_rowid(dbHandle);
 }
 
-int PFM_DB::getRecurringChargesForAccount(sqlite3_int64 accountId, RecurringChargeResult * result) {
+int PFM_DB::getRecurringChargesForAccount(sqlite3_int64 accountId, DBRecurringChargeResult * result) {
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     char *          pszErrorMsg;
     int             error;
@@ -979,8 +979,8 @@ int PFM_DB::getRecurringChargesForAccount(sqlite3_int64 accountId, RecurringChar
     uint32_t seq = 1;
 
     for (int i = 0;i < result->numRows;i++) {
-        CategoryResult  rc;
-        PayeeResult     rp;
+        DBCategoryResult  rc;
+        DBPayeeResult     rp;
 
         getCategory(result->results[i].categoryId, &rc);
         getPayee(result->results[i].payeeId, &rp);
@@ -1001,7 +1001,7 @@ int PFM_DB::getRecurringChargesForAccount(sqlite3_int64 accountId, RecurringChar
     return result->numRows;
 }
 
-int PFM_DB::getRecurringCharge(sqlite3_int64 id, RecurringChargeResult * result) {
+int PFM_DB::getRecurringCharge(sqlite3_int64 id, DBRecurringChargeResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             error;
@@ -1039,7 +1039,7 @@ int PFM_DB::getRecurringCharge(sqlite3_int64 id, RecurringChargeResult * result)
     return result->numRows;
 }
 
-int PFM_DB::updateRecurringCharge(RecurringCharge & charge) {
+int PFM_DB::updateRecurringCharge(DBRecurringCharge & charge) {
     char *          pszErrorMsg;
     char *          pszUpdateStatement;
     int             error;
@@ -1079,7 +1079,7 @@ int PFM_DB::updateRecurringCharge(RecurringCharge & charge) {
     return 0;
 }
 
-int PFM_DB::deleteRecurringCharge(RecurringCharge & charge) {
+int PFM_DB::deleteRecurringCharge(DBRecurringCharge & charge) {
     char *          pszErrorMsg;
     char *          pszDeleteStatement;
     int             error;
@@ -1111,7 +1111,7 @@ int PFM_DB::deleteRecurringCharge(RecurringCharge & charge) {
     return 0;
 }
 
-sqlite3_int64 PFM_DB::createTransaction(Transaction & transaction) {
+sqlite3_int64 PFM_DB::createTransaction(DBTransaction & transaction) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
     int             error;
@@ -1152,7 +1152,7 @@ sqlite3_int64 PFM_DB::createTransaction(Transaction & transaction) {
     return sqlite3_last_insert_rowid(dbHandle);
 }
 
-int PFM_DB::getTransactionsForAccount(sqlite3_int64 accountId, TransactionResult * result) {
+int PFM_DB::getTransactionsForAccount(sqlite3_int64 accountId, DBTransactionResult * result) {
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     char *          pszErrorMsg;
     int             error;
@@ -1179,8 +1179,8 @@ int PFM_DB::getTransactionsForAccount(sqlite3_int64 accountId, TransactionResult
     uint32_t seq = 1;
 
     for (int i = 0;i < result->numRows;i++) {
-        CategoryResult  rc;
-        PayeeResult     rp;
+        DBCategoryResult  rc;
+        DBPayeeResult     rp;
 
         getCategory(result->results[i].categoryId, &rc);
         getPayee(result->results[i].payeeId, &rp);
@@ -1199,7 +1199,7 @@ int PFM_DB::getTransactionsForAccount(sqlite3_int64 accountId, TransactionResult
     return result->numRows;
 }
 
-int PFM_DB::getTransaction(sqlite3_int64 id, TransactionResult * result) {
+int PFM_DB::getTransaction(sqlite3_int64 id, DBTransactionResult * result) {
     char *          pszErrorMsg;
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             error;
@@ -1236,7 +1236,7 @@ int PFM_DB::getTransaction(sqlite3_int64 id, TransactionResult * result) {
     return result->numRows;
 }
 
-int PFM_DB::updateTransaction(Transaction & transaction) {
+int PFM_DB::updateTransaction(DBTransaction & transaction) {
     char *          pszErrorMsg;
     char *          pszUpdateStatement;
     int             error;
@@ -1277,7 +1277,7 @@ int PFM_DB::updateTransaction(Transaction & transaction) {
     return 0;
 }
 
-int PFM_DB::deleteTransaction(Transaction & transaction) {
+int PFM_DB::deleteTransaction(DBTransaction & transaction) {
     char *          pszErrorMsg;
     char *          pszDeleteStatement;
     int             error;

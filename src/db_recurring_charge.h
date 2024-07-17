@@ -6,17 +6,17 @@
 
 #include <sqlite3.h>
 
-#include "category.h"
-#include "payee.h"
+#include "db_category.h"
+#include "db_payee.h"
 
 using namespace std;
 
-#ifndef __INCL_TRANSACTION
-#define __INCL_TRANSACTION
+#ifndef __INCL_RECURRING_CHARGE
+#define __INCL_RECURRING_CHARGE
 
-class Transaction {
+class DBRecurringCharge {
     public:
-        Transaction() {
+        DBRecurringCharge() {
             clear();
         }
 
@@ -34,12 +34,11 @@ class Transaction {
 
             this->date = "";
             this->description = "";
-            this->isCredit = false;
-            this->isReconciled = false;
+            this->frequency = "";
             this->amount = 0.0;
         }
 
-        void setTransaction(const Transaction & src) {
+        void setRecurringCharge(const DBRecurringCharge & src) {
             this->id = src.id;
 
             this->sequence = src.sequence;
@@ -50,8 +49,7 @@ class Transaction {
 
             this->date = src.date;
             this->description = src.description;
-            this->isCredit = src.isCredit;
-            this->isReconciled = src.isReconciled;
+            this->frequency = src.frequency;
             this->amount = src.amount;
         }
 
@@ -64,40 +62,39 @@ class Transaction {
 
             cout << "Date: '" << date << "'" << endl;
             cout << "Description: '" << description << "'" << endl;
-            cout << "Debit/Credit: '" << (isCredit ? "CR" : "DB") << "'" << endl;
-            cout << "isReconciled: " << isReconciled << endl;
+            cout << "Frequency: '" << frequency << "'" << endl;
 
             cout << fixed << setprecision(2);
             cout << "Amount: " << amount << endl;
 
-            cout << "Category (encapsulated object):" << endl;
+            cout << "DBCategory (encapsulated object):" << endl;
             category.print();
 
-            cout << "Payee (encapsulated object):" << endl;
+            cout << "DBPayee (encapsulated object):" << endl;
             payee.print();
         }
 
         sqlite3_int64           id;
 
         uint32_t                sequence;           // Not persistent
+        string                  nextPaymentDate;    // Not persistent
 
         sqlite3_int64           accountId;
         sqlite3_int64           categoryId;
         sqlite3_int64           payeeId;
 
-        Category                category;
-        Payee                   payee;
+        DBCategory                category;
+        DBPayee                   payee;
 
         string                  date;
         string                  description;
-        bool                    isCredit;
-        bool                    isReconciled;
+        string                  frequency;
         double                  amount;
 };
 
-class TransactionResult {
+class DBRecurringChargeResult {
     public:
-        TransactionResult() {
+        DBRecurringChargeResult() {
             numRows = 0;
         }
 
@@ -108,7 +105,7 @@ class TransactionResult {
 
         int                     numRows;
 
-        vector<Transaction> results;
+        vector<DBRecurringCharge> results;
 };
 
 #endif

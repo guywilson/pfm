@@ -6,44 +6,44 @@
 
 using namespace std;
 
-#ifndef __INCL_PAYEE
-#define __INCL_PAYEE
+#ifndef __INCL_CATEGORY
+#define __INCL_CATEGORY
 
-class Payee {
+class DBCategory {
     public:
-        Payee() {
+        DBCategory() {
             clear();
         }
 
         void clear(void) {
             this->id = 0;
 
-            this->name = "";
+            this->description = "";
             this->code = "";
         }
 
-        void setPayee(const Payee & src) {
+        void setCategory(const DBCategory & src) {
             this->id = src.id;
 
-            this->name =            src.name;
-            this->code =            src.code;
+            this->description.assign(src.description);
+            this->code.assign(src.code);
         }
 
         void print(void) {
             cout << "ID: " << id << endl;
-            cout << "Description: '" << name << "'" << endl;
+            cout << "Description: '" << description << "'" << endl;
             cout << "Code: '" << code << "'" << endl;
         }
 
         sqlite3_int64           id;
 
-        string                  name;
+        string                  description;
         string                  code;
 };
 
-class PayeeResult {
+class DBCategoryResult {
     public:
-        PayeeResult() {
+        DBCategoryResult() {
             numRows = 0;
         }
 
@@ -54,7 +54,7 @@ class PayeeResult {
 
         int                     numRows;
 
-        vector<Payee>           results;
+        vector<DBCategory>        results;
 };
 
 #endif

@@ -13,10 +13,10 @@
 #include "cache.h"
 #include "cli.h"
 #include "strdate.h"
-#include "account.h"
-#include "category.h"
-#include "recurring_charge.h"
-#include "transaction.h"
+#include "db_account.h"
+#include "db_category.h"
+#include "db_recurring_charge.h"
+#include "db_transaction.h"
 
 using namespace std;
 
@@ -29,8 +29,8 @@ void add_account(void) {
 
     cout << "*** Add account ***" << endl;
 
-    accountName = readString("Account name: ", NULL, 32);
-    accountCode = readString("Account code (max. 5 chars): ", NULL, 4);
+    accountName = readString("DBAccount name: ", NULL, 32);
+    accountCode = readString("DBAccount code (max. 5 chars): ", NULL, 4);
     openingBalance = readString("Opening balance [0.00]: ", "0.00", 32);
 
     if (strlen(openingBalance) > 0) {
@@ -45,7 +45,7 @@ void add_account(void) {
         return;
     }
 
-    Account account;
+    DBAccount account;
     account.name = accountName;
     account.code = accountCode;
     account.openingBalance = balance;
@@ -63,7 +63,7 @@ void add_account(void) {
 }
 
 void list_accounts(void) {
-    AccountResult           result;
+    DBAccountResult           result;
     int                     numAccounts;
     int                     i;
 
@@ -76,7 +76,7 @@ void list_accounts(void) {
     cout << "----------------------------------------------------" << endl;
 
     for (i = 0;i < numAccounts;i++) {
-        Account account = result.results[i];
+        DBAccount account = result.results[i];
 
         cout << 
             "| " << 
@@ -92,13 +92,13 @@ void list_accounts(void) {
     cout << endl;
 }
 
-Account choose_account(const char * szAccountCode) {
+DBAccount choose_account(const char * szAccountCode) {
     char *          accountCode;
-    AccountResult   result;
+    DBAccountResult   result;
 
     if (szAccountCode == NULL || strlen(szAccountCode) == 0) {
         cout << "*** Use account ***" << endl;
-        accountCode = readString("Account code (max. 4 chars): ", NULL, 4);
+        accountCode = readString("DBAccount code (max. 4 chars): ", NULL, 4);
     }
     else {
         accountCode = strdup(szAccountCode);
@@ -113,17 +113,17 @@ Account choose_account(const char * szAccountCode) {
     return result.results[0];
 }
 
-void update_account(Account & account) {
+void update_account(DBAccount & account) {
     char            szPrompt[MAX_PROMPT_LENGTH];
     char            szBalance[AMOUNT_FIELD_STRING_LEN];
     char *          pszBalance;
 
     cout << "*** Update account ***" << endl;
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Account name ['%s']: ", account.name.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBAccount name ['%s']: ", account.name.c_str());
     account.name = readString(szPrompt, account.name.c_str(), FIELD_STRING_LEN);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Account code ['%s']: ", account.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBAccount code ['%s']: ", account.code.c_str());
     account.code = readString(szPrompt, account.code.c_str(), FIELD_STRING_LEN);
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%.2f]: ", account.openingBalance);
@@ -148,7 +148,7 @@ void update_account(Account & account) {
     free(pszBalance);
 }
 
-void delete_account(Account & account) {
+void delete_account(DBAccount & account) {
     PFM_DB & db = PFM_DB::getInstance();
 
     db.deleteAccount(account);
@@ -160,15 +160,15 @@ void add_category(void) {
 
     cout << "*** Add category ***" << endl;
 
-    categoryDescription = readString("Category description: ", NULL, 32);
-    categoryCode = readString("Category code (max. 5 chars): ", NULL, 5);
+    categoryDescription = readString("DBCategory description: ", NULL, 32);
+    categoryCode = readString("DBCategory code (max. 5 chars): ", NULL, 5);
 
     if (strlen(categoryCode) == 0) {
         fprintf(stderr, "\nCategory code must have a value.\n");
         return;
     }
 
-    Category category;
+    DBCategory category;
     category.code = categoryCode;
     category.description = categoryDescription;
 
@@ -181,7 +181,7 @@ void add_category(void) {
 }
 
 void list_categories(void) {
-    CategoryResult          result;
+    DBCategoryResult          result;
     int                     numCategories;
     int                     i;
 
@@ -194,7 +194,7 @@ void list_categories(void) {
     cout << "-------------------------------------" << endl;
 
     for (i = 0;i < numCategories;i++) {
-        Category category = result.results[i];
+        DBCategory category = result.results[i];
 
         cout << 
             "| " << 
@@ -208,13 +208,13 @@ void list_categories(void) {
     cout << endl;
 }
 
-Category get_category(const char * pszCategoryCode) {
+DBCategory get_category(const char * pszCategoryCode) {
     char *          categoryCode;
-    CategoryResult  result;
+    DBCategoryResult  result;
 
     if (pszCategoryCode == NULL || strlen(pszCategoryCode) == 0) {
         cout << "*** Get category ***" << endl;
-        categoryCode = readString("Category code (max. 5 chars): ", NULL, 5);
+        categoryCode = readString("DBCategory code (max. 5 chars): ", NULL, 5);
     }
     else {
         categoryCode = strdup(pszCategoryCode);
@@ -229,15 +229,15 @@ Category get_category(const char * pszCategoryCode) {
     return result.results[0];
 }
 
-void update_category(Category & category) {
+void update_category(DBCategory & category) {
     char            szPrompt[MAX_PROMPT_LENGTH];
 
     cout << "*** Update category ***" << endl;
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category description ['%s']: ", category.description.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBCategory description ['%s']: ", category.description.c_str());
     category.description = readString(szPrompt, category.description.c_str(), FIELD_STRING_LEN);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']: ", category.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBCategory code ['%s']: ", category.code.c_str());
     category.code = readString(szPrompt, category.code.c_str(), FIELD_STRING_LEN);
 
     if (category.code.length() == 0) {
@@ -250,7 +250,7 @@ void update_category(Category & category) {
     db.updateCategory(category);
 }
 
-void delete_category(Category & category) {
+void delete_category(DBCategory & category) {
     PFM_DB & db = PFM_DB::getInstance();
 
     db.deleteCategory(category);
@@ -262,15 +262,15 @@ void add_payee(void) {
 
     cout << "*** Add payee ***" << endl;
 
-    payeeName = readString("Payee name: ", NULL, 32);
-    payeeCode = readString("Payee code (max. 5 chars): ", NULL, 5);
+    payeeName = readString("DBPayee name: ", NULL, 32);
+    payeeCode = readString("DBPayee code (max. 5 chars): ", NULL, 5);
 
     if (strlen(payeeCode) == 0) {
         fprintf(stderr, "\nPayee code must have a value.\n");
         return;
     }
 
-    Payee payee;
+    DBPayee payee;
     payee.code = payeeCode;
     payee.name = payeeName;
 
@@ -283,7 +283,7 @@ void add_payee(void) {
 }
 
 void list_payees(void) {
-    PayeeResult             result;
+    DBPayeeResult             result;
     int                     numPayees;
     int                     i;
 
@@ -296,7 +296,7 @@ void list_payees(void) {
     cout << "-------------------------------------" << endl;
 
     for (i = 0;i < numPayees;i++) {
-        Payee payee = result.results[i];
+        DBPayee payee = result.results[i];
 
         cout << 
             "| " << 
@@ -310,13 +310,13 @@ void list_payees(void) {
     cout << endl;
 }
 
-Payee get_payee(const char * pszPayeeCode) {
+DBPayee get_payee(const char * pszPayeeCode) {
     char *          payeeCode;
-    PayeeResult     result;
+    DBPayeeResult     result;
 
     if (pszPayeeCode == NULL || strlen(pszPayeeCode) == 0) {
         cout << "*** Get payee ***" << endl;
-        payeeCode = readString("Payee code (max. 5 chars): ", NULL, 5);
+        payeeCode = readString("DBPayee code (max. 5 chars): ", NULL, 5);
     }
     else {
         payeeCode = strdup(pszPayeeCode);
@@ -331,15 +331,15 @@ Payee get_payee(const char * pszPayeeCode) {
     return result.results[0];
 }
 
-void update_payee(Payee & payee) {
+void update_payee(DBPayee & payee) {
     char            szPrompt[MAX_PROMPT_LENGTH];
 
     cout << "*** Update payee ***" << endl;
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee name ['%s']: ", payee.name.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBPayee name ['%s']: ", payee.name.c_str());
     payee.name = readString(szPrompt, payee.name.c_str(), FIELD_STRING_LEN);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']: ", payee.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBPayee code ['%s']: ", payee.code.c_str());
     payee.code = readString(szPrompt, payee.code.c_str(), FIELD_STRING_LEN);
 
     if (payee.code.length() == 0) {
@@ -352,14 +352,14 @@ void update_payee(Payee & payee) {
     db.updatePayee(payee);
 }
 
-void delete_payee(Payee & payee) {
+void delete_payee(DBPayee & payee) {
     PFM_DB & db = PFM_DB::getInstance();
 
     db.deletePayee(payee);
 }
 
-void add_recurring_charge(Account & account) {
-    RecurringCharge charge;
+void add_recurring_charge(DBAccount & account) {
+    DBRecurringCharge charge;
     const char *    today;
     char *          categoryCode;
     char *          payeeCode;
@@ -379,26 +379,26 @@ void add_recurring_charge(Account & account) {
     using_history();
     clear_history();
 
-    CategoryResult catResult;
+    DBCategoryResult catResult;
     db.getCategories(&catResult);
 
     for (int i = 0;i < catResult.numRows;i++) {
         add_history(catResult.results[i].code.c_str());
     }
 
-    categoryCode = readString("Category code (max. 5 chars)^ ", NULL, 4);
+    categoryCode = readString("DBCategory code (max. 5 chars)^ ", NULL, 4);
 
     using_history();
     clear_history();
 
-    PayeeResult payResult;
+    DBPayeeResult payResult;
     db.getPayees(&payResult);
 
     for (int i = 0;i < payResult.numRows;i++) {
         add_history(payResult.results[i].code.c_str());
     }
 
-    payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
+    payeeCode = readString("DBPayee code (max. 5 chars)^ ", NULL, 5);
 
     while (!isDateValid) {
         date = readString("Start date (yyyy-mm-dd)[today]: ", today, 10);
@@ -426,11 +426,11 @@ void add_recurring_charge(Account & account) {
         return;
     }
 
-    CategoryResult cr;
+    DBCategoryResult cr;
 
     db.getCategory(categoryCode, &cr);
 
-    PayeeResult pr;
+    DBPayeeResult pr;
 
     db.getPayee(payeeCode, &pr);
 
@@ -453,8 +453,8 @@ void add_recurring_charge(Account & account) {
     free(amount);
 }
 
-void list_recurring_charges(Account & account) {
-    RecurringChargeResult   result;
+void list_recurring_charges(DBAccount & account) {
+    DBRecurringChargeResult   result;
     int                     numCharges;
     int                     i;
     char                    seq[4];
@@ -465,13 +465,13 @@ void list_recurring_charges(Account & account) {
 
     cout << "*** Recurring charges for account: '" << account.code << "' (" << numCharges << ") ***" << endl << endl;
 
-    cout << "| Seq | Start Date | Nxt Pmnt   | Description               | Cat.  | Payee | Frq. | Amount       |" << endl;
+    cout << "| Seq | Start Date | Nxt Pmnt   | Description               | Cat.  | DBPayee | Frq. | Amount       |" << endl;
     cout << "---------------------------------------------------------------------------------------------------" << endl;
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
     for (i = 0;i < numCharges;i++) {
-        RecurringCharge charge = result.results[i];
+        DBRecurringCharge charge = result.results[i];
 
         cacheMgr.addRecurringCharge(charge.sequence, charge);
 
@@ -501,8 +501,8 @@ void list_recurring_charges(Account & account) {
     cout << endl;
 }
 
-RecurringCharge get_recurring_charge(int sequence) {
-    RecurringCharge         charge;
+DBRecurringCharge get_recurring_charge(int sequence) {
+    DBRecurringCharge         charge;
     char *                  pszSequence;
 
     if (sequence == 0) {
@@ -521,7 +521,7 @@ RecurringCharge get_recurring_charge(int sequence) {
     return charge;
 }
 
-void update_recurring_charge(RecurringCharge & charge) {
+void update_recurring_charge(DBRecurringCharge & charge) {
     char            szPrompt[MAX_PROMPT_LENGTH];
     char            amountStr[AMOUNT_FIELD_STRING_LEN];
     char *          categoryCode;
@@ -540,7 +540,7 @@ void update_recurring_charge(RecurringCharge & charge) {
     using_history();
     clear_history();
 
-    CategoryResult catResult;
+    DBCategoryResult catResult;
     db.getCategories(&catResult);
 
     for (int i = 0;i < catResult.numRows;i++) {
@@ -551,13 +551,13 @@ void update_recurring_charge(RecurringCharge & charge) {
     db.getCategory(charge.categoryId, &catResult);
     charge.category.setCategory(catResult.results[0]);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']^ ", charge.category.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBCategory code ['%s']^ ", charge.category.code.c_str());
     categoryCode = readString(szPrompt, charge.category.code.c_str(), FIELD_STRING_LEN);
 
     using_history();
     clear_history();
 
-    PayeeResult payResult;
+    DBPayeeResult payResult;
     db.getPayees(&payResult);
 
     for (int i = 0;i < payResult.numRows;i++) {
@@ -568,7 +568,7 @@ void update_recurring_charge(RecurringCharge & charge) {
     db.getPayee(charge.payeeId, &payResult);
     charge.payee.setPayee(payResult.results[0]);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", charge.payee.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBPayee code ['%s']^ ", charge.payee.code.c_str());
     payeeCode = readString(szPrompt, charge.payee.code.c_str(), FIELD_STRING_LEN);
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", charge.date.c_str());
@@ -604,11 +604,11 @@ void update_recurring_charge(RecurringCharge & charge) {
         return;
     }
 
-    CategoryResult cr;
+    DBCategoryResult cr;
 
     db.getCategory(categoryCode, &cr);
 
-    PayeeResult pr;
+    DBPayeeResult pr;
 
     db.getPayee(payeeCode, &pr);
 
@@ -623,14 +623,14 @@ void update_recurring_charge(RecurringCharge & charge) {
     db.updateRecurringCharge(charge);
 }
 
-void delete_recurring_charge(RecurringCharge & charge) {
+void delete_recurring_charge(DBRecurringCharge & charge) {
     PFM_DB & db = PFM_DB::getInstance();
 
     db.deleteRecurringCharge(charge);
 }
 
-void add_transaction(Account & account) {
-    Transaction     transaction;
+void add_transaction(DBAccount & account) {
+    DBTransaction     transaction;
     const char *    today;
     char *          categoryCode;
     char *          payeeCode;
@@ -652,29 +652,29 @@ void add_transaction(Account & account) {
     using_history();
     clear_history();
 
-    CategoryResult catResult;
+    DBCategoryResult catResult;
     db.getCategories(&catResult);
 
     for (int i = 0;i < catResult.numRows;i++) {
         add_history(catResult.results[i].code.c_str());
     }
 
-    categoryCode = readString("Category code (max. 5 chars)^ ", NULL, 4);
+    categoryCode = readString("DBCategory code (max. 5 chars)^ ", NULL, 4);
 
     using_history();
     clear_history();
 
-    PayeeResult payResult;
+    DBPayeeResult payResult;
     db.getPayees(&payResult);
 
     for (int i = 0;i < payResult.numRows;i++) {
         add_history(payResult.results[i].code.c_str());
     }
 
-    payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
+    payeeCode = readString("DBPayee code (max. 5 chars)^ ", NULL, 5);
 
     while (!isDateValid) {
-        date = readString("Transaction date (yyyy-mm-dd)[today]: ", today, 10);
+        date = readString("DBTransaction date (yyyy-mm-dd)[today]: ", today, 10);
 
         isDateValid = StrDate::validateDate(date);
     }
@@ -705,11 +705,11 @@ void add_transaction(Account & account) {
         return;
     }
 
-    CategoryResult cr;
+    DBCategoryResult cr;
 
     db.getCategory(categoryCode, &cr);
 
-    PayeeResult pr;
+    DBPayeeResult pr;
 
     db.getPayee(payeeCode, &pr);
 
@@ -734,8 +734,8 @@ void add_transaction(Account & account) {
     free(is_reconciled);
 }
 
-void list_transactions(Account & account) {
-    TransactionResult       result;
+void list_transactions(DBAccount & account) {
+    DBTransactionResult       result;
     int                     numTransactions;
     int                     i;
     char                    seq[4];
@@ -746,13 +746,13 @@ void list_transactions(Account & account) {
 
     cout << "*** Transactions for account: '" << account.code << "' (" << numTransactions << ") ***" << endl << endl;
 
-    cout << "| Seq | Date       | Description               | Cat.  | Payee | CR/DB | Amount       | Rec |" << endl;
+    cout << "| Seq | Date       | Description               | Cat.  | DBPayee | CR/DB | Amount       | Rec |" << endl;
     cout << "---------------------------------------------------------------------------------------------" << endl;
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
     for (i = 0;i < numTransactions;i++) {
-        Transaction transaction = result.results[i];
+        DBTransaction transaction = result.results[i];
 
         cacheMgr.addTransaction(transaction.sequence, transaction);
 
@@ -782,8 +782,8 @@ void list_transactions(Account & account) {
     cout << endl;
 }
 
-Transaction get_transaction(int sequence) {
-    Transaction             transaction;
+DBTransaction get_transaction(int sequence) {
+    DBTransaction             transaction;
     char *                  pszSequence;
 
     if (sequence == 0) {
@@ -802,7 +802,7 @@ Transaction get_transaction(int sequence) {
     return transaction;
 }
 
-void update_transaction(Transaction & transaction) {
+void update_transaction(DBTransaction & transaction) {
     char            szPrompt[MAX_PROMPT_LENGTH];
     char            amountStr[AMOUNT_FIELD_STRING_LEN];
     char *          categoryCode;
@@ -823,7 +823,7 @@ void update_transaction(Transaction & transaction) {
     using_history();
     clear_history();
 
-    CategoryResult catResult;
+    DBCategoryResult catResult;
     db.getCategories(&catResult);
 
     for (int i = 0;i < catResult.numRows;i++) {
@@ -834,13 +834,13 @@ void update_transaction(Transaction & transaction) {
     db.getCategory(transaction.categoryId, &catResult);
     transaction.category.setCategory(catResult.results[0]);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']^ ", transaction.category.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBCategory code ['%s']^ ", transaction.category.code.c_str());
     categoryCode = readString(szPrompt, transaction.category.code.c_str(), FIELD_STRING_LEN);
 
     using_history();
     clear_history();
 
-    PayeeResult payResult;
+    DBPayeeResult payResult;
     db.getPayees(&payResult);
 
     for (int i = 0;i < payResult.numRows;i++) {
@@ -851,10 +851,10 @@ void update_transaction(Transaction & transaction) {
     db.getPayee(transaction.payeeId, &payResult);
     transaction.payee.setPayee(payResult.results[0]);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", transaction.payee.code.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBPayee code ['%s']^ ", transaction.payee.code.c_str());
     payeeCode = readString(szPrompt, transaction.payee.code.c_str(), FIELD_STRING_LEN);
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Transaction date ['%s']: ", transaction.date.c_str());
+    snprintf(szPrompt, MAX_PROMPT_LENGTH, "DBTransaction date ['%s']: ", transaction.date.c_str());
 
     while (!isDateValid) {
         date = readString(szPrompt, transaction.date.c_str(), FIELD_STRING_LEN);
@@ -895,11 +895,11 @@ void update_transaction(Transaction & transaction) {
         return;
     }
 
-    CategoryResult cr;
+    DBCategoryResult cr;
 
     db.getCategory(categoryCode, &cr);
 
-    PayeeResult pr;
+    DBPayeeResult pr;
 
     db.getPayee(payeeCode, &pr);
 
@@ -915,7 +915,7 @@ void update_transaction(Transaction & transaction) {
     db.updateTransaction(transaction);
 }
 
-void delete_transaction(Transaction & transaction) {
+void delete_transaction(DBTransaction & transaction) {
     PFM_DB & db = PFM_DB::getInstance();
 
     db.deleteTransaction(transaction);

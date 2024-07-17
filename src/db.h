@@ -3,11 +3,11 @@
 
 #include <sqlite3.h>
 
-#include "account.h"
-#include "category.h"
-#include "payee.h"
-#include "transaction.h"
-#include "recurring_charge.h"
+#include "db_account.h"
+#include "db_category.h"
+#include "db_payee.h"
+#include "db_transaction.h"
+#include "db_recurring_charge.h"
 
 using namespace std;
 
@@ -33,37 +33,37 @@ class PFM_DB {
 
         bool            open(string dbName);
 
-        sqlite3_int64   createAccount(Account & account);
-        int             getAccounts(AccountResult * result);
-        int             getAccount(string code, AccountResult * result);
-        int             updateAccount(Account & account);
-        int             deleteAccount(Account & account);
+        sqlite3_int64   createAccount(DBAccount & account);
+        int             getAccounts(DBAccountResult * result);
+        int             getAccount(string code, DBAccountResult * result);
+        int             updateAccount(DBAccount & account);
+        int             deleteAccount(DBAccount & account);
 
-        sqlite3_int64   createCategory(Category & category);
-        int             getCategories(CategoryResult * result);
-        int             getCategory(sqlite3_int64 id, CategoryResult * result);
-        int             getCategory(string code, CategoryResult * result);
-        int             updateCategory(Category & category);
-        int             deleteCategory(Category & category);
+        sqlite3_int64   createCategory(DBCategory & category);
+        int             getCategories(DBCategoryResult * result);
+        int             getCategory(sqlite3_int64 id, DBCategoryResult * result);
+        int             getCategory(string code, DBCategoryResult * result);
+        int             updateCategory(DBCategory & category);
+        int             deleteCategory(DBCategory & category);
 
-        sqlite3_int64   createPayee(Payee & payee);
-        int             getPayees(PayeeResult * result);
-        int             getPayee(sqlite3_int64 id, PayeeResult * result);
-        int             getPayee(string code, PayeeResult * result);
-        int             updatePayee(Payee & payee);
-        int             deletePayee(Payee & payee);
+        sqlite3_int64   createPayee(DBPayee & payee);
+        int             getPayees(DBPayeeResult * result);
+        int             getPayee(sqlite3_int64 id, DBPayeeResult * result);
+        int             getPayee(string code, DBPayeeResult * result);
+        int             updatePayee(DBPayee & payee);
+        int             deletePayee(DBPayee & payee);
 
-        sqlite3_int64   createRecurringCharge(RecurringCharge & charge);
-        int             getRecurringChargesForAccount(sqlite3_int64 accountId, RecurringChargeResult * result);
-        int             getRecurringCharge(sqlite3_int64 id, RecurringChargeResult * result);
-        int             updateRecurringCharge(RecurringCharge & charge);
-        int             deleteRecurringCharge(RecurringCharge & charge);
+        sqlite3_int64   createRecurringCharge(DBRecurringCharge & charge);
+        int             getRecurringChargesForAccount(sqlite3_int64 accountId, DBRecurringChargeResult * result);
+        int             getRecurringCharge(sqlite3_int64 id, DBRecurringChargeResult * result);
+        int             updateRecurringCharge(DBRecurringCharge & charge);
+        int             deleteRecurringCharge(DBRecurringCharge & charge);
 
-        sqlite3_int64   createTransaction(Transaction & transaction);
-        int             getTransactionsForAccount(sqlite3_int64 accountId, TransactionResult * result);
-        int             getTransaction(sqlite3_int64 id, TransactionResult * result);
-        int             updateTransaction(Transaction & transaction);
-        int             deleteTransaction(Transaction & transaction);
+        sqlite3_int64   createTransaction(DBTransaction & transaction);
+        int             getTransactionsForAccount(sqlite3_int64 accountId, DBTransactionResult * result);
+        int             getTransaction(sqlite3_int64 id, DBTransactionResult * result);
+        int             updateTransaction(DBTransaction & transaction);
+        int             deleteTransaction(DBTransaction & transaction);
 };
 
 #endif
