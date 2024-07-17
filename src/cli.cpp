@@ -774,7 +774,7 @@ void list_transactions(Account & account) {
             " | " <<
             right << setw(13) << formatCurrency(transaction.amount) <<
             " | " <<
-            left << setw(3) << (transaction.isReconciled ? "Y" : "N") <<
+            left << setw(3) << (transaction.isReconciled ? " Y " : " N ") <<
             " |" <<
             endl;
     }

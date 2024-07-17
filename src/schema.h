@@ -52,14 +52,16 @@ const char * pszCreateCategoryTable =
     "CREATE TABLE category (" \
     "id INTEGER PRIMARY KEY," \
     "code TEXT NOT NULL," \
-    "description TEXT NOT NULL" \
+    "description TEXT NOT NULL," \
+    "UNIQUE(code) ON CONFLICT ROLLBACK" \
     ");";
 
 const char * pszCreatePayeeTable = 
     "CREATE TABLE payee (" \
     "id INTEGER PRIMARY KEY," \
     "code TEXT NOT NULL," \
-    "name TEXT NOT NULL" \
+    "name TEXT NULL," \
+    "UNIQUE(code) ON CONFLICT ROLLBACK" \
     ");";
 
 const char * pszCreateRCTable = 

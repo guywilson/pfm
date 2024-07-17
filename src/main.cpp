@@ -12,6 +12,9 @@
 #include "db.h"
 #include "account.h"
 #include "category.h"
+#include "payee.h"
+#include "recurring_charge.h"
+#include "transaction.h"
 #include "cli.h"
 
 using namespace std;
