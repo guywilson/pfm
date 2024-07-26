@@ -768,6 +768,33 @@ int PFM_DB::deleteCategory(DBCategory & category) {
     return 0;
 }
 
+void PFM_DB::translateCategoryCriteria(DBCriteria * c) {
+    DBCategoryResult    r;
+    char                szID[32];
+
+    getCategory(c->value, &r);
+
+    cout << "Category id: " << r.results[0].id << endl;
+
+    if (r.numRows) {
+        snprintf(szID, 32, "%lld", r.results[0].id);
+
+        c->columnName = "category_id";
+        c->value = szID;
+        c->columnType = db_column_type::numeric;
+
+        cout << "column: " << c->columnName << ", value: " << c->value << endl;
+    }
+    else {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Category '%s' does not exist", 
+                c->value.c_str()), 
+            __FILE__, 
+            __LINE__);
+    }
+}
+
 sqlite3_int64 PFM_DB::createPayee(DBPayee & payee) {
     char *          pszErrorMsg;
     char *          pszInsertStatement;
@@ -880,14 +907,6 @@ int PFM_DB::getPayee(string code, DBPayeeResult * result) {
                 __FILE__, 
                 __LINE__);
     }
-    else if (result->numRows != 1) {
-        throw pfm_error(
-            pfm_error::buildMsg(
-                "Expected 1 result, got %d", 
-                result->numRows),
-            __FILE__,
-            __LINE__);
-    }
 
     // result->results[0].print();
 
@@ -961,6 +980,29 @@ int PFM_DB::deletePayee(DBPayee & payee) {
     sqlite3_free(pszErrorMsg);
 
     return 0;
+}
+
+void PFM_DB::translatePayeeCriteria(DBCriteria * c) {
+    DBPayeeResult   r;
+    char            szID[32];
+
+    getPayee(c->value, &r);
+
+    if (r.numRows) {
+        snprintf(szID, 32, "%lld", r.results[0].id);
+
+        c->columnName = "payee_id";
+        c->value = szID;
+        c->columnType = db_column_type::numeric;
+    }
+    else {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Payee '%s' does not exist", 
+                c->value.c_str()), 
+            __FILE__, 
+            __LINE__);
+    }
 }
 
 sqlite3_int64 PFM_DB::createRecurringCharge(DBRecurringCharge & charge) {
@@ -1223,7 +1265,9 @@ int PFM_DB::getTransactionsForAccount(sqlite3_int64 accountId, DBTransactionResu
                 "SELECT " \
                 "id, account_id, category_id, payee_id, date, description, credit_debit, amount, is_reconciled, created, updated " \
                 "FROM account_transaction " \
-                "WHERE account_id = %lld;";
+                "WHERE account_id = %lld " \
+                "ORDER BY date DESC " \
+                "LIMIT 50";
 
     snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, accountId);
 
@@ -1233,6 +1277,116 @@ int PFM_DB::getTransactionsForAccount(sqlite3_int64 accountId, DBTransactionResu
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Failed to get payees list: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    uint32_t seq = 1;
+
+    for (int i = 0;i < result->numRows;i++) {
+        DBCategoryResult  rc;
+        DBPayeeResult     rp;
+
+        getCategory(result->results[i].categoryId, &rc);
+        getPayee(result->results[i].payeeId, &rp);
+
+        if (rc.numRows == 1) {
+            result->results[i].category.set(rc.results[0]);
+        }
+
+        if (rp.numRows == 1) {
+            result->results[i].payee.set(rp.results[0]);
+        }
+
+        result->results[i].sequence = seq++;
+    }
+
+    return result->numRows;
+}
+
+int PFM_DB::findTransactionsForAccount(sqlite3_int64 accountId, DBCriteria * criteria, int numCriteria, DBTransactionResult * result) {
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    char *          pszErrorMsg;
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT " \
+                "id, account_id, category_id, payee_id, date, description, credit_debit, amount, is_reconciled, created, updated " \
+                "FROM account_transaction " \
+                "WHERE account_id = %lld";
+
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, accountId);
+
+    if (numCriteria > 0 && criteria != NULL) {
+        for (int i = 0;i < numCriteria;i++) {
+            strcat(szStatement, " AND ");
+            strcat(szStatement, criteria[i].columnName.c_str());
+            strcat(szStatement, " ");
+
+            switch (criteria[i].operation) {
+                case less_than:
+                    strcat(szStatement, "< ");
+                    break;
+
+                case less_than_or_equal_to:
+                    strcat(szStatement, "<= ");
+                    break;
+
+                case greater_than:
+                    strcat(szStatement, "> ");
+                    break;
+
+                case greater_than_or_equal_to:
+                    strcat(szStatement, ">= ");
+                    break;
+
+                case equals:
+                    strcat(szStatement, "= ");
+                    break;
+
+                case not_equals:
+                    strcat(szStatement, "<> ");
+                    break;
+
+                case like:
+                    strcat(szStatement, "~ ");
+                    break;
+
+                case unknown:
+                    break;
+            }
+
+            switch (criteria[i].columnType) {
+                case date:
+                    strcat(szStatement, "'");
+                    strcat(szStatement, criteria[i].value.c_str());
+                    strcat(szStatement, "'");
+                    break;
+
+                case text:
+                    strcat(szStatement, "'");
+                    strcat(szStatement, criteria[i].value.c_str());
+                    strcat(szStatement, "'");
+                    break;
+
+                case numeric:
+                    strcat(szStatement, criteria[i].value.c_str());
+                    break;
+            }
+        }
+    }
+
+    strcat(szStatement, " ORDER BY date DESC LIMIT 50;");
+
+    cout << "SQL: " << szStatement << endl;
+
+    error = sqlite3_exec(dbHandle, szStatement, transactionCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get transactions: %s", 
                     pszErrorMsg), 
                 __FILE__, 
                 __LINE__);

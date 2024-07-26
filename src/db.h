@@ -3,6 +3,7 @@
 
 #include <sqlite3.h>
 
+#include "db_criteria.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
@@ -45,6 +46,7 @@ class PFM_DB {
         int             getCategory(string code, DBCategoryResult * result);
         int             updateCategory(DBCategory & category);
         int             deleteCategory(DBCategory & category);
+        void            translateCategoryCriteria(DBCriteria * c);
 
         sqlite3_int64   createPayee(DBPayee & payee);
         int             getPayees(DBPayeeResult * result);
@@ -52,6 +54,7 @@ class PFM_DB {
         int             getPayee(string code, DBPayeeResult * result);
         int             updatePayee(DBPayee & payee);
         int             deletePayee(DBPayee & payee);
+        void            translatePayeeCriteria(DBCriteria * c);
 
         sqlite3_int64   createRecurringCharge(DBRecurringCharge & charge);
         int             getRecurringChargesForAccount(sqlite3_int64 accountId, DBRecurringChargeResult * result);
@@ -61,6 +64,7 @@ class PFM_DB {
 
         sqlite3_int64   createTransaction(DBTransaction & transaction);
         int             getTransactionsForAccount(sqlite3_int64 accountId, DBTransactionResult * result);
+        int             findTransactionsForAccount(sqlite3_int64 accountId, DBCriteria * criteria, int numCriteria, DBTransactionResult * result);
         int             getTransaction(sqlite3_int64 id, DBTransactionResult * result);
         int             updateTransaction(DBTransaction & transaction);
         int             deleteTransaction(DBTransaction & transaction);

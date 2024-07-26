@@ -251,6 +251,9 @@ int main(int argc, char ** argv) {
             else if (strncmp(pszCommand, "list transactions", 17) == 0 || strncmp(pszCommand, "lt", 2) == 0) {
                 list_transactions(selectedAccount);
             }
+            else if (strncmp(pszCommand, "find transactions", 17) == 0 || strncmp(pszCommand, "ft", 2) == 0) {
+                find_transactions(selectedAccount);
+            }
             else if (strncmp(pszCommand, "update transaction", 18) == 0 || strncmp(pszCommand, "ut", 2) == 0) {
                 int sequence = 0;
 

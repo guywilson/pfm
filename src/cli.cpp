@@ -363,6 +363,7 @@ void add_recurring_charge(DBAccount & account) {
     const char *    today;
     char *          categoryCode;
     char *          payeeCode;
+    char *          payeeName;
     char *          date;
     char *          description;
     char *          frequency;
@@ -399,6 +400,22 @@ void add_recurring_charge(DBAccount & account) {
     }
 
     payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
+
+    /*
+    ** If the payee does not exist, add it here for convenience...
+    */
+    payResult.clear();
+    if (db.getPayee(string(payeeCode), &payResult) == 0) {
+        payeeName = readString("Payee name: ", NULL, 32);
+
+        DBPayee payee;
+        payee.code = payeeCode;
+        payee.name = payeeName;
+
+        db.createPayee(payee);
+
+        free(payeeName);
+    }
 
     while (!isDateValid) {
         date = readString("Start date (yyyy-mm-dd)[today]: ", today, 10);
@@ -465,7 +482,7 @@ void list_recurring_charges(DBAccount & account) {
 
     cout << "*** Recurring charges for account: '" << account.code << "' (" << numCharges << ") ***" << endl << endl;
 
-    cout << "| Seq | Start Date | Nxt Pmnt   | Description               | Cat.  | DBPayee | Frq. | Amount       |" << endl;
+    cout << "| Seq | Start Date | Nxt Pmnt   | Description               | Cat.  | Payee | Frq. | Amount       |" << endl;
     cout << "---------------------------------------------------------------------------------------------------" << endl;
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
@@ -526,6 +543,7 @@ void update_recurring_charge(DBRecurringCharge & charge) {
     char            amountStr[AMOUNT_FIELD_STRING_LEN];
     char *          categoryCode;
     char *          payeeCode;
+    char *          payeeName;
     char *          date;
     char *          description;
     char *          frequency;
@@ -570,6 +588,22 @@ void update_recurring_charge(DBRecurringCharge & charge) {
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", charge.payee.code.c_str());
     payeeCode = readString(szPrompt, charge.payee.code.c_str(), FIELD_STRING_LEN);
+
+    /*
+    ** If the payee does not exist, add it here for convenience...
+    */
+    payResult.clear();
+    if (db.getPayee(string(payeeCode), &payResult) == 0) {
+        payeeName = readString("Payee name: ", NULL, 32);
+
+        DBPayee payee;
+        payee.code = payeeCode;
+        payee.name = payeeName;
+
+        db.createPayee(payee);
+
+        free(payeeName);
+    }
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", charge.date.c_str());
 
@@ -634,6 +668,7 @@ void add_transaction(DBAccount & account) {
     const char *    today;
     char *          categoryCode;
     char *          payeeCode;
+    char *          payeeName;
     char *          date;
     char *          description;
     char *          credit_debit;
@@ -673,13 +708,29 @@ void add_transaction(DBAccount & account) {
 
     payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
 
+    /*
+    ** If the payee does not exist, add it here for convenience...
+    */
+    payResult.clear();
+    if (db.getPayee(string(payeeCode), &payResult) == 0) {
+        payeeName = readString("Payee name: ", NULL, 32);
+
+        DBPayee payee;
+        payee.code = payeeCode;
+        payee.name = payeeName;
+
+        db.createPayee(payee);
+
+        free(payeeName);
+    }
+
     while (!isDateValid) {
         date = readString("Transaction date (yyyy-mm-dd)[today]: ", today, 10);
 
         isDateValid = StrDate::validateDate(date);
     }
 
-    description = readString("Description: ", description, 32);
+    description = readString("Description: ", NULL, 32);
 
     while (!isCreditDebitValid) {
         credit_debit = readString("Credit/Debit [DB]: ", "DB", 2);
@@ -735,7 +786,7 @@ void add_transaction(DBAccount & account) {
 }
 
 void list_transactions(DBAccount & account) {
-    DBTransactionResult       result;
+    DBTransactionResult     result;
     int                     numTransactions;
     int                     i;
     char                    seq[4];
@@ -746,7 +797,162 @@ void list_transactions(DBAccount & account) {
 
     cout << "*** Transactions for account: '" << account.code << "' (" << numTransactions << ") ***" << endl << endl;
 
-    cout << "| Seq | Date       | Description               | Cat.  | DBPayee | CR/DB | Amount       | Rec |" << endl;
+    cout << "| Seq | Date       | Description               | Cat.  | Payee | CR/DB | Amount       | Rec |" << endl;
+    cout << "---------------------------------------------------------------------------------------------" << endl;
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    for (i = 0;i < numTransactions;i++) {
+        DBTransaction transaction = result.results[i];
+
+        cacheMgr.addTransaction(transaction.sequence, transaction);
+
+        snprintf(seq, 4, "%03d", transaction.sequence);
+
+        cout << 
+            "| " << 
+            seq <<
+            " | " <<
+            transaction.date <<
+            " | " <<
+            left << setw(25) << transaction.description << 
+            " | " << 
+            left << setw(5) << transaction.category.code << 
+            " | " <<
+            left << setw(5) << transaction.payee.code <<
+            " | " <<
+            left << setw(5) << (transaction.isCredit ? "CR" : "DB") <<
+            " | " <<
+            right << setw(13) << formatCurrency(transaction.amount) <<
+            " | " <<
+            left << setw(3) << (transaction.isReconciled ? " Y " : " N ") <<
+            " |" <<
+            endl;
+    }
+
+    cout << endl;
+}
+
+void find_transactions(DBAccount & account) {
+    DBTransactionResult     result;
+    int                     numTransactions = 0;
+    int                     i;
+    int                     numCriteria = 0;
+    bool                    isDateValid = false;
+    bool                    isCreditDebitValid = false;
+    bool                    isReconciledValid = false;
+    DBCriteria              criterion[8];
+    char                    seq[4];
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    cout << "*** Find transactions ***" << endl;
+
+    using_history();
+    clear_history();
+
+    DBCategoryResult catResult;
+    db.getCategories(&catResult);
+
+    for (int i = 0;i < catResult.numRows;i++) {
+        add_history(catResult.results[i].code.c_str());
+    }
+
+    const db_operator ops1[] = {db_operator::equals};
+    int hasCategory = readCriteria("category_code", db_column_type::text, true, ops1, 1, &criterion[numCriteria]);
+
+    if (hasCategory) {
+        db.translateCategoryCriteria(&criterion[numCriteria++]);
+    }
+
+    using_history();
+    clear_history();
+
+    DBPayeeResult payResult;
+    db.getPayees(&payResult);
+
+    for (int i = 0;i < payResult.numRows;i++) {
+        add_history(payResult.results[i].code.c_str());
+    }
+
+    const db_operator ops2[] = {db_operator::equals};
+    int hasPayee = readCriteria("payee_code", db_column_type::text, false, ops2, 1, &criterion[numCriteria]);
+
+    if (hasPayee) {
+        db.translatePayeeCriteria(&criterion[numCriteria++]);
+    }
+
+    while (!isDateValid) {
+        const db_operator ops3[] = {
+                    db_operator::equals, 
+                    db_operator::less_than, 
+                    db_operator::less_than_or_equal_to, 
+                    db_operator::greater_than, 
+                    db_operator::greater_than_or_equal_to};
+        int hasDate = readCriteria("date", db_column_type::text, false, ops3, 5, &criterion[numCriteria]);
+
+        if (hasDate) {
+            isDateValid = StrDate::validateDate(criterion[numCriteria].value);
+
+            if (isDateValid) {
+                numCriteria++;
+            }
+        }
+        else {
+            isDateValid = true;
+        }
+    }
+
+    const db_operator ops4[] = {db_operator::equals, db_operator::like};
+    numCriteria += readCriteria("description", db_column_type::text, false, ops4, 2, &criterion[numCriteria]);
+
+    while (!isCreditDebitValid) {
+        const db_operator ops5[] = {db_operator::equals};
+        int hasCreditDebit = readCriteria("credit_debit", db_column_type::text, false, ops5, 1, &criterion[numCriteria]);
+
+        if (hasCreditDebit) {
+            isCreditDebitValid = validateCreditDebit(criterion[numCriteria].value.c_str());
+
+            if (hasCreditDebit) {
+                numCriteria++;
+            }
+        }
+        else {
+            isCreditDebitValid = true;
+        }
+    }
+
+    const db_operator ops6[] = {
+                    db_operator::equals, 
+                    db_operator::greater_than,
+                    db_operator::greater_than_or_equal_to,
+                    db_operator::less_than,
+                    db_operator::less_than_or_equal_to};
+    numCriteria += readCriteria("amount", db_column_type::numeric, false, ops6, 5, &criterion[numCriteria]);
+
+    while (!isReconciledValid) {
+        const db_operator ops7[] = {db_operator::equals};
+        int hasReconciled = readCriteria("is_reconciled", db_column_type::text, false, ops7, 1, &criterion[numCriteria]);
+
+        if (hasReconciled) {
+            isReconciledValid = (criterion[numCriteria].value.at(0) == 'Y' || criterion[numCriteria].value.at(0) == 'N');
+
+            if (isReconciledValid) {
+                numCriteria++;
+            }
+        }
+        else {
+            isReconciledValid = true;
+        }
+    }
+
+    if (numCriteria) {
+        numTransactions = db.findTransactionsForAccount(account.id, criterion, numCriteria, &result);
+    }
+
+    cout << "*** Transactions for account: '" << account.code << "' (" << numTransactions << ") ***" << endl << endl;
+
+    cout << "| Seq | Date       | Description               | Cat.  | Payee | CR/DB | Amount       | Rec |" << endl;
     cout << "---------------------------------------------------------------------------------------------" << endl;
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
@@ -783,7 +989,7 @@ void list_transactions(DBAccount & account) {
 }
 
 DBTransaction get_transaction(int sequence) {
-    DBTransaction             transaction;
+    DBTransaction           transaction;
     char *                  pszSequence;
 
     if (sequence == 0) {
@@ -807,6 +1013,7 @@ void update_transaction(DBTransaction & transaction) {
     char            amountStr[AMOUNT_FIELD_STRING_LEN];
     char *          categoryCode;
     char *          payeeCode;
+    char *          payeeName;
     char *          date;
     char *          description;
     char *          credit_debit;
@@ -853,6 +1060,22 @@ void update_transaction(DBTransaction & transaction) {
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", transaction.payee.code.c_str());
     payeeCode = readString(szPrompt, transaction.payee.code.c_str(), FIELD_STRING_LEN);
+
+    /*
+    ** If the payee does not exist, add it here for convenience...
+    */
+    payResult.clear();
+    if (db.getPayee(string(payeeCode), &payResult) == 0) {
+        payeeName = readString("Payee name: ", NULL, 32);
+
+        DBPayee payee;
+        payee.code = payeeCode;
+        payee.name = payeeName;
+
+        db.createPayee(payee);
+
+        free(payeeName);
+    }
 
     snprintf(szPrompt, MAX_PROMPT_LENGTH, "Transaction date ['%s']: ", transaction.date.c_str());
 
