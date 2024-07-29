@@ -28,6 +28,7 @@ class PFM_DB {
         sqlite3 *       dbHandle;
 
         void            createSchema();
+        // sqlite3_int64   createCurrency();
 
     public:
         ~PFM_DB();

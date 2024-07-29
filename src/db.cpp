@@ -23,6 +23,7 @@
 
 #define SQLITE_ERROR_BUFFER_LEN                     512
 #define SQL_STATEMENT_BUFFER_LEN                    512
+#define SQL_ROW_LIMIT                                50
 
 using namespace std;
 
@@ -309,6 +310,38 @@ void PFM_DB::createSchema() {
     pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
 
     try {
+        error = sqlite3_exec(
+                        dbHandle, 
+                        pszCreateConfigTable,
+                        NULL,
+                        NULL,
+                        &pszErrorMsg);
+
+        if (error) {
+            throw pfm_error(
+                pfm_error::buildMsg(
+                    "Execute failed in createSchema(): %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+        }
+
+        error = sqlite3_exec(
+                        dbHandle, 
+                        pszCreateCurrencyTable,
+                        NULL,
+                        NULL,
+                        &pszErrorMsg);
+
+        if (error) {
+            throw pfm_error(
+                pfm_error::buildMsg(
+                    "Execute failed in createSchema(): %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+        }
+
         error = sqlite3_exec(
                         dbHandle, 
                         pszCreateAccountTable,
@@ -1308,6 +1341,7 @@ int PFM_DB::getTransactionsForAccount(sqlite3_int64 accountId, DBTransactionResu
 int PFM_DB::findTransactionsForAccount(sqlite3_int64 accountId, DBCriteria * criteria, int numCriteria, DBTransactionResult * result) {
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     char *          pszErrorMsg;
+    int             sqlRowLimit = SQL_ROW_LIMIT;
     int             error;
 
     const char * pszTemplate = 
@@ -1377,9 +1411,13 @@ int PFM_DB::findTransactionsForAccount(sqlite3_int64 accountId, DBCriteria * cri
         }
     }
 
-    strcat(szStatement, " ORDER BY date DESC LIMIT 50;");
+    snprintf(
+        &szStatement[strlen(szStatement)], 
+        SQL_STATEMENT_BUFFER_LEN, 
+        " ORDER BY date DESC LIMIT %d;", 
+        sqlRowLimit);
 
-    cout << "SQL: " << szStatement << endl;
+    // cout << "SQL: " << szStatement << endl;
 
     error = sqlite3_exec(dbHandle, szStatement, transactionCallback, result, &pszErrorMsg);
 
