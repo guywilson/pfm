@@ -192,11 +192,18 @@ class StrDate {
         ** Calculates the number of seconds since Jan 1, 1970
         */
         static time_t epoch(string & date) {
-            const time_t secsPerDay = 3600 * 24;
-            time_t value = 0;
+            const time_t    secsPerDay = 3600 * 24;
+            time_t          value = 0;
+            int             month = StrDate::month(date);
+            int             year = StrDate::year(date);
+            int             i;
             
             value += ((StrDate::year(date) - 1970) * secsPerDay * 365);
-            value += (secsPerDay * StrDate::daysInMonth(date));
+
+            for (i = 0;i < month;i++) {
+                value += (secsPerDay * StrDate::daysInMonth(year, i));
+            }
+
             value += (day(date) * secsPerDay);
             
             return value;

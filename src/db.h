@@ -4,6 +4,8 @@
 #include <sqlite3.h>
 
 #include "db_criteria.h"
+#include "db_config.h"
+#include "db_currency.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
@@ -28,7 +30,8 @@ class PFM_DB {
         sqlite3 *       dbHandle;
 
         void            createSchema();
-        // sqlite3_int64   createCurrency();
+        sqlite3_int64   createCurrency(DBCurrency & currency);
+        sqlite3_int64   createConfig(DBConfig & config);
 
     public:
         ~PFM_DB();

@@ -9,6 +9,7 @@
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_base.h"
+#include "strdate.h"
 
 using namespace std;
 
@@ -71,14 +72,66 @@ class DBRecurringCharge : public DBBase {
             payee.print();
         }
 
+        int getFrequencyValue(void) {
+            return atoi(frequency.substr(0, frequency.length() - 1).c_str());
+        }
+
+        char getFrequencyUnit(void) {
+            return frequency.substr(frequency.length() - 1, 1).c_str()[0];
+        }
+
+        void setNextPaymentDate(void) {
+            StrDate     chargeDate(date);
+            StrDate     dateToday;
+            char        frequencyUnit;
+            int         frequencyValue;
+
+            frequencyValue = getFrequencyValue();
+            frequencyUnit = getFrequencyUnit();
+
+            if (chargeDate > dateToday || chargeDate == dateToday) {
+                nextPaymentDate.assign(date);
+            }
+            else {
+                switch (frequencyUnit) {
+                    case 'y':
+                        chargeDate.addYears(frequencyValue * (dateToday.year() - chargeDate.year() + 1));
+                        break;
+
+                    case 'm':
+                        chargeDate.addMonths(frequencyValue * (dateToday.month() - chargeDate.month() + 1));
+                        break;
+
+                    case 'w':
+                        chargeDate.addWeeks(frequencyValue * ((dateToday.day() - chargeDate.day() + 1) / 7));
+                        break;
+
+                    case 'd':
+                        chargeDate.addDays(frequencyValue);
+                        break;
+
+                    default:
+                        throw pfm_validation_error(
+                                    pfm_error::buildMsg(
+                                        "Invalid frequency unit '%c'", 
+                                        frequencyUnit), 
+                                    __FILE__, 
+                                    __LINE__);
+                        break;
+                }
+
+                nextPaymentDate.assign(chargeDate.shortDate());
+            }
+        }
+
         string                  nextPaymentDate;    // Not persistent
 
         sqlite3_int64           accountId;
         sqlite3_int64           categoryId;
         sqlite3_int64           payeeId;
 
-        DBCategory                category;
-        DBPayee                   payee;
+        DBCategory              category;
+        DBPayee                 payee;
 
         string                  date;
         string                  description;

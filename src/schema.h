@@ -2,9 +2,9 @@
 #define __INCL_SCHEMA
 
 /*
-** You must get this right, there is no way of the
-** code that uses the array of categories, just how
-** many there are, unless you tell it...
+** You must get this right, there is no way for the code
+** that uses the arrays, to know just how many there are, 
+** unless you tell it...
 */
 #define NUM_DEFAULT_CATEGORIES                       27
 #define NUM_CURRENCIES                              168
@@ -17,19 +17,19 @@ const char * defaultCategories[][2] = {
     {"INCME", "Income"},
     {"UTILS", "Utility bills"},
     {"GROCS", "Food & groceries"},
-    {"RENT", "Rent payments"},
-    {"MTGE", "Mortgage payments"},
-    {"FUEL", "Vehicle fuel"},
-    {"CARD", "Credit card payments"},
-    {"LOAN", "Loan repayments"},
-    {"BUSE", "Business expenses"},
-    {"PETS", "Pets food and supplies"},
-    {"HOME", "Home and DIY"},
-    {"FOOD", "Eating out & take-away"},
-    {"CASH", "ATM withdrawal"},
-    {"CARM", "Car maintenance"},
-    {"GIFT", "Gifts & presents"},
-    {"INTE", "Interest & bank charges"},
+    {"RENT ", "Rent payments"},
+    {"MTGE ", "Mortgage payments"},
+    {"FUEL ", "Vehicle fuel"},
+    {"CARD ", "Credit card payments"},
+    {"LOAN ", "Loan repayments"},
+    {"BUSE ", "Business expenses"},
+    {"PETS ", "Pets food and supplies"},
+    {"HOME ", "Home and DIY"},
+    {"FOOD ", "Eating out & take-away"},
+    {"CASH ", "ATM withdrawal"},
+    {"CARM ", "Car maintenance"},
+    {"GIFT ", "Gifts & presents"},
+    {"INTE ", "Interest & bank charges"},
     {"HHOLD", "Household expenses"},
     {"HEALT", "Health expenses"},
     {"INSUR", "Insurance payments"},

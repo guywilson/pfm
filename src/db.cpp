@@ -10,6 +10,8 @@
 
 #include <sqlite3.h>
 
+#include "db_config.h"
+#include "db_currency.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
@@ -26,50 +28,6 @@
 #define SQL_ROW_LIMIT                                50
 
 using namespace std;
-
-static void setNextPaymentDate(DBRecurringCharge * charge) {
-    StrDate     chargeDate(charge->date);
-    StrDate     dateToday;
-    char        frequencyUnit;
-    int         frequencyValue;
-
-    frequencyValue = getFrequencyValue(charge->frequency);
-    frequencyUnit = getFrequencyUnit(charge->frequency);
-
-    if (chargeDate > dateToday || chargeDate == dateToday) {
-        charge->nextPaymentDate.assign(charge->date);
-    }
-    else {
-        switch (frequencyUnit) {
-            case 'y':
-                chargeDate.addYears(frequencyValue * (dateToday.year() - chargeDate.year() + 1));
-                break;
-
-            case 'm':
-                chargeDate.addMonths(frequencyValue * (dateToday.month() - chargeDate.month() + 1));
-                break;
-
-            case 'w':
-                chargeDate.addWeeks(frequencyValue * ((dateToday.day() - chargeDate.day() + 1) / 7));
-                break;
-
-            case 'd':
-                chargeDate.addDays(frequencyValue);
-                break;
-
-            default:
-                throw pfm_validation_error(
-                            pfm_error::buildMsg(
-                                "Invalid frequency unit '%c'", 
-                                frequencyUnit), 
-                            __FILE__, 
-                            __LINE__);
-                break;
-        }
-
-        charge->nextPaymentDate.assign(chargeDate.shortDate());
-    }
-}
 
 static int accountCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
     int                     columnIndex = 0;
@@ -171,9 +129,9 @@ static int payeeCallback(void * p, int numColumns, char ** columns, char ** colu
 }
 
 static int recurringChargeCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
-    int                     columnIndex = 0;
-    DBRecurringCharge         charge;
-    DBRecurringChargeResult * result = (DBRecurringChargeResult *)p;
+    int                         columnIndex = 0;
+    DBRecurringCharge           charge;
+    DBRecurringChargeResult *   result = (DBRecurringChargeResult *)p;
 
     while (columnIndex < numColumns) {
         if (strncmp(&columnNames[columnIndex][0], "id", 2) == 0) {
@@ -432,6 +390,30 @@ void PFM_DB::createSchema() {
 
             createCategory(category);
         }
+
+        DBCurrency currency;
+
+        for (int i = 0;i < NUM_CURRENCIES;i++) {
+            currency.clear();
+
+            currency.code = currencies[i][0];
+            currency.name = currencies[i][1];
+            currency.symbol = currencies[i][2];
+
+            createCurrency(currency);
+        }
+
+        DBConfig config;
+
+        for (int i = 0;i < NUM_CONFIG_ITEMS;i++) {
+            config.clear();
+
+            config.key = defaultConfig[i][0];
+            config.value = defaultConfig[i][1];
+            config.description = defaultConfig[i][2];
+
+            createConfig(config);
+        }
     }
     catch (pfm_error & e) {
         sqlite3_free(pszErrorMsg);
@@ -439,6 +421,82 @@ void PFM_DB::createSchema() {
     }
     
     sqlite3_free(pszErrorMsg);
+}
+
+sqlite3_int64 PFM_DB::createCurrency(DBCurrency & currency) {
+    char *          pszErrorMsg;
+    char *          pszInsertStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    string now = StrDate::now();
+
+    snprintf(
+        pszInsertStatement, 
+        SQL_STATEMENT_BUFFER_LEN,
+        "INSERT INTO currency (code, name, symbol, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s');",
+        currency.code.c_str(),
+        currency.name.c_str(),
+        currency.symbol.c_str(),
+        now.c_str(),
+        now.c_str());
+
+    error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to create currency %s: %s", 
+                currency.name.c_str(),
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszInsertStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return sqlite3_last_insert_rowid(dbHandle);
+}
+
+sqlite3_int64 PFM_DB::createConfig(DBConfig & config) {
+    char *          pszErrorMsg;
+    char *          pszInsertStatement;
+    int             error;
+
+    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
+    pszInsertStatement = (char *)sqlite3_malloc(SQL_STATEMENT_BUFFER_LEN);
+
+    string now = StrDate::now();
+
+    snprintf(
+        pszInsertStatement, 
+        SQL_STATEMENT_BUFFER_LEN,
+        "INSERT INTO config (key, value, description, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s');",
+        config.key.c_str(),
+        config.value.c_str(),
+        config.description.c_str(),
+        now.c_str(),
+        now.c_str());
+
+    error = sqlite3_exec(dbHandle, pszInsertStatement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to create config %s: %s", 
+                config.key.c_str(),
+                sqlite3_errmsg(dbHandle)), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    sqlite3_free(pszInsertStatement);
+    sqlite3_free(pszErrorMsg);
+
+    return sqlite3_last_insert_rowid(dbHandle);
 }
 
 sqlite3_int64 PFM_DB::createAccount(DBAccount & account) {
@@ -1123,7 +1181,7 @@ int PFM_DB::getRecurringChargesForAccount(sqlite3_int64 accountId, DBRecurringCh
             result->results[i].payee.set(rp.results[0]);
         }
 
-        setNextPaymentDate(&result->results[i]);
+        result->results[i].setNextPaymentDate();
 
         result->results[i].sequence = seq++;
     }
@@ -1163,7 +1221,7 @@ int PFM_DB::getRecurringCharge(sqlite3_int64 id, DBRecurringChargeResult * resul
             __LINE__);
     }
 
-    setNextPaymentDate(&result->results[0]);
+    result->results[0].setNextPaymentDate();
     // result->results[0].print();
 
     return result->numRows;
