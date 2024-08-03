@@ -95,19 +95,31 @@ class DBRecurringCharge : public DBBase {
             else {
                 switch (frequencyUnit) {
                     case 'y':
-                        chargeDate.addYears(frequencyValue * (dateToday.year() - chargeDate.year() + 1));
+                        chargeDate.addYears(frequencyValue * (dateToday.year() - chargeDate.year()));
+
+                        if (chargeDate.month() <= dateToday.month() && 
+                            chargeDate.day() <= dateToday.day())
+                        {
+                            chargeDate.addYears(1);
+                        }
                         break;
 
                     case 'm':
-                        chargeDate.addMonths(frequencyValue * (dateToday.month() - chargeDate.month() + 1));
+                        chargeDate.addMonths(frequencyValue * (dateToday.month() - chargeDate.month()));
+
+                        if (chargeDate.day() <= dateToday.day()) {
+                            chargeDate.addMonths(1);
+                        }
                         break;
 
                     case 'w':
-                        chargeDate.addWeeks(frequencyValue * ((dateToday.day() - chargeDate.day() + 1) / 7));
+                        chargeDate.addWeeks(frequencyValue * ((dateToday.day() - chargeDate.day()) / 7));
                         break;
 
                     case 'd':
-                        chargeDate.addDays(frequencyValue);
+                        while (chargeDate.year() < dateToday.year() || chargeDate.month() < dateToday.month()) {
+                            chargeDate.addDays(frequencyValue);
+                        }
                         break;
 
                     default:

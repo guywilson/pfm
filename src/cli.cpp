@@ -20,6 +20,24 @@
 
 using namespace std;
 
+#if defined(__APPLE__) || defined(__unix__)
+std::ostream& bold_on(std::ostream& os) {
+    return os << "\e[1m";
+}
+
+std::ostream& bold_off(std::ostream& os) {
+    return os << "\e[0m";
+}
+#else
+std::ostream& bold_on(std::ostream& os) {
+    return os << "";
+}
+
+std::ostream& bold_off(std::ostream& os) {
+    return os << "";
+}
+#endif
+
 void add_account(void) {
     char *          accountName;
     char *          accountCode;
@@ -480,6 +498,8 @@ void list_recurring_charges(DBAccount & account) {
 
     numCharges = db.getRecurringChargesForAccount(account.id, &result);
 
+    clear_history();
+
     cout << "*** Recurring charges for account: '" << account.code << "' (" << numCharges << ") ***" << endl << endl;
 
     cout << "| Seq | Start Date | Nxt Pmnt   | Description               | Cat.  | Payee | Frq. | Amount       |" << endl;
@@ -487,10 +507,14 @@ void list_recurring_charges(DBAccount & account) {
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
+    double total = 0.0;
+
     for (i = 0;i < numCharges;i++) {
         DBRecurringCharge charge = result.results[i];
 
         cacheMgr.addRecurringCharge(charge.sequence, charge);
+
+        total += charge.amount;
 
         snprintf(seq, 4, "%03d", charge.sequence);
 
@@ -514,6 +538,9 @@ void list_recurring_charges(DBAccount & account) {
             " |" <<
             endl;
     }
+
+    cout << "---------------------------------------------------------------------------------------------------" << endl;
+    cout << "                                                                    Total charges: | " << bold_on << right << setw(13) << formatCurrency(total) << bold_off << " |" << endl;
 
     cout << endl;
 }

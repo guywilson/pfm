@@ -198,14 +198,22 @@ class StrDate {
             int             year = StrDate::year(date);
             int             i;
             
-            value += ((StrDate::year(date) - 1970) * secsPerDay * 365);
+            for (i = 1970;i < year;i++) {
+                value += (secsPerDay * (StrDate::isLeapYear(i) ? 366 : 365));
+            }
 
-            for (i = 0;i < month;i++) {
+            for (i = 1;i < month;i++) {
                 value += (secsPerDay * StrDate::daysInMonth(year, i));
             }
 
-            value += (day(date) * secsPerDay);
+            /*
+            ** Months start at day 1, not day 0 so subtract
+            ** 1 from the day...
+            */
+            value += ((day(date) - 1) * secsPerDay);
             
+            cout << "Epoch (" << date << "): " << value << endl;
+
             return value;
         }
 
@@ -239,13 +247,16 @@ class StrDate {
             else if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
                 return 31;
             }
-            else {
+            else if (month == 2) {
                 if (isLeapYear(year)) {
                     return 29;
                 }
                 else {
                     return 28;
                 }
+            }
+            else {
+                return -1;
             }
         }
 
