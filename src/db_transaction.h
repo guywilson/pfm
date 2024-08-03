@@ -80,8 +80,8 @@ class DBTransaction : public DBBase {
         sqlite3_int64           categoryId;
         sqlite3_int64           payeeId;
 
-        DBCategory                category;
-        DBPayee                   payee;
+        DBCategory              category;
+        DBPayee                 payee;
 
         string                  date;
         string                  description;
