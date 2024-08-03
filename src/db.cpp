@@ -1151,7 +1151,7 @@ int PFM_DB::getRecurringChargesForAccount(sqlite3_int64 accountId, DBRecurringCh
                 "FROM recurring_charge " \
                 "WHERE account_id = %lld;";
 
-    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN - 1, pszTemplate, accountId);
+    snprintf(szStatement, SQL_STATEMENT_BUFFER_LEN, pszTemplate, accountId);
 
     error = sqlite3_exec(dbHandle, szStatement, recurringChargeCallback, result, &pszErrorMsg);
 
@@ -1394,6 +1394,79 @@ int PFM_DB::getTransactionsForAccount(sqlite3_int64 accountId, DBTransactionResu
     }
 
     return result->numRows;
+}
+
+int PFM_DB::getRecurringTransactionsForNextPaymentDate(
+                DBRecurringCharge & charge,
+                DBTransactionResult * result)
+{
+    char *          pszErrorMsg;
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT " \
+                "id " \
+                "FROM account_transaction " \
+                "WHERE account_id = %lld " \
+                "AND recurring_charge_id = %lld " \
+                "AND date = '%s';";
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        pszTemplate, 
+        charge.accountId, 
+        charge.id,
+        charge.nextPaymentDate.c_str());
+
+    cout << "getTransactionIDForRecurringChargeDate: SQL: " << szStatement << endl;
+
+    error = sqlite3_exec(dbHandle, szStatement, transactionCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get transaction: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    // result->results[0].print();
+
+    return result->numRows;
+}
+
+int PFM_DB::createDueRecurringTransactionsForAccount(sqlite3_int64 accountId) {
+    DBTransaction           transaction;
+    DBTransactionResult     trResult;
+    DBRecurringChargeResult rcResult;
+    int                     i;
+    int                     numRecurringCharges;
+    int                     numTransactionsCreated = 0;
+
+    numRecurringCharges = getRecurringChargesForAccount(accountId, &rcResult);
+
+    for (i = 0;i < numRecurringCharges;i++) {
+        DBRecurringCharge charge = rcResult.results[i];
+
+        /*
+        ** If the charge is due, but doesn't have a 
+        ** corresponding transaction yet, create it...
+        */
+        if (charge.isDue()) {
+            if (getRecurringTransactionsForNextPaymentDate(charge, &trResult) == 0) {
+                transaction.setFromRecurringCharge(charge);
+
+                createTransaction(transaction);
+
+                numTransactionsCreated++;
+            }
+        }
+    }
+
+    return numTransactionsCreated;
 }
 
 int PFM_DB::findTransactionsForAccount(sqlite3_int64 accountId, DBCriteria * criteria, int numCriteria, DBTransactionResult * result) {

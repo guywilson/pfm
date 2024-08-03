@@ -112,7 +112,7 @@ void list_accounts(void) {
 
 DBAccount choose_account(const char * szAccountCode) {
     char *          accountCode;
-    DBAccountResult   result;
+    DBAccountResult result;
 
     if (szAccountCode == NULL || strlen(szAccountCode) == 0) {
         cout << "*** Use account ***" << endl;
@@ -127,6 +127,10 @@ DBAccount choose_account(const char * szAccountCode) {
     db.getAccount(accountCode, &result);
 
     free(accountCode);
+
+    if (result.numRows) {
+        db.createDueRecurringTransactionsForAccount(result.results[0].id);
+    }
 
     return result.results[0];
 }

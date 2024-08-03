@@ -40,6 +40,7 @@ class DBRecurringCharge : public DBPayment {
             DBPayment::print();
 
             cout << "Frequency: '" << frequency << "'" << endl;
+            cout << "NextPaymentDate: '" << nextPaymentDate << "'" << endl;
         }
 
         int getFrequencyValue(void) {
@@ -48,6 +49,18 @@ class DBRecurringCharge : public DBPayment {
 
         char getFrequencyUnit(void) {
             return frequency.substr(frequency.length() - 1, 1).c_str()[0];
+        }
+
+        bool isDue(void) {
+            StrDate     chargeDate(date);
+            StrDate     today;
+
+            if (chargeDate > today || chargeDate == today) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         void setNextPaymentDate(void) {
@@ -59,7 +72,7 @@ class DBRecurringCharge : public DBPayment {
             frequencyValue = getFrequencyValue();
             frequencyUnit = getFrequencyUnit();
 
-            if (chargeDate > dateToday || chargeDate == dateToday) {
+            if (isDue()) {
                 nextPaymentDate.assign(date);
             }
             else {

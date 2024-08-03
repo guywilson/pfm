@@ -8,6 +8,7 @@
 
 #include "db_category.h"
 #include "db_payee.h"
+#include "db_recurring_charge.h"
 #include "db_payment.h"
 
 using namespace std;
@@ -33,6 +34,14 @@ class DBTransaction : public DBPayment {
 
             this->isCredit = src.isCredit;
             this->isReconciled = src.isReconciled;
+        }
+
+        void setFromRecurringCharge(const DBRecurringCharge & src) {
+            DBPayment::set(src);
+
+            this->date = src.nextPaymentDate;
+            this->isCredit = false;
+            this->isReconciled = false;
         }
 
         void print(void) {

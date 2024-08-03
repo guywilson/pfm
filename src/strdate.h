@@ -212,8 +212,6 @@ class StrDate {
             */
             value += ((day(date) - 1) * secsPerDay);
             
-            cout << "Epoch (" << date << "): " << value << endl;
-
             return value;
         }
 
