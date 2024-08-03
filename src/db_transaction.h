@@ -8,86 +8,42 @@
 
 #include "db_category.h"
 #include "db_payee.h"
-#include "db_base.h"
+#include "db_payment.h"
 
 using namespace std;
 
 #ifndef __INCL_TRANSACTION
 #define __INCL_TRANSACTION
 
-class DBTransaction : public DBBase {
+class DBTransaction : public DBPayment {
     public:
-        DBTransaction() : DBBase() {
+        DBTransaction() : DBPayment() {
             clear();
         }
 
         void clear(void) {
-            DBBase::clear();
+            DBPayment::clear();
 
-            this->accountId = 0;
-            this->categoryId = 0;
-            this->payeeId = 0;
-
-            this->category.clear();
-            this->payee.clear();
-
-            this->date = "";
-            this->description = "";
             this->isCredit = false;
             this->isReconciled = false;
-            this->amount = 0.0;
         }
 
         void set(const DBTransaction & src) {
-            DBBase::set(src);
+            DBPayment::set(src);
 
-            this->sequence = src.sequence;
-
-            this->accountId = src.accountId;
-            this->categoryId = src.categoryId;
-            this->payeeId = src.payeeId;
-
-            this->date = src.date;
-            this->description = src.description;
             this->isCredit = src.isCredit;
             this->isReconciled = src.isReconciled;
-            this->amount = src.amount;
         }
 
         void print(void) {
-            DBBase::print();
+            DBPayment::print();
 
-            cout << "AccountID: " << accountId << endl;
-            cout << "CategoryID: " << categoryId << endl;
-            cout << "PayeeID: " << payeeId << endl;
-
-            cout << "Date: '" << date << "'" << endl;
-            cout << "Description: '" << description << "'" << endl;
             cout << "Debit/Credit: '" << (isCredit ? "CR" : "DB") << "'" << endl;
             cout << "isReconciled: " << isReconciled << endl;
-
-            cout << fixed << setprecision(2);
-            cout << "Amount: " << amount << endl;
-
-            cout << "DBCategory (encapsulated object):" << endl;
-            category.print();
-
-            cout << "DBPayee (encapsulated object):" << endl;
-            payee.print();
         }
 
-        sqlite3_int64           accountId;
-        sqlite3_int64           categoryId;
-        sqlite3_int64           payeeId;
-
-        DBCategory              category;
-        DBPayee                 payee;
-
-        string                  date;
-        string                  description;
         bool                    isCredit;
         bool                    isReconciled;
-        double                  amount;
 };
 
 class DBTransactionResult {
