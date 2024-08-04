@@ -1420,7 +1420,50 @@ int PFM_DB::getRecurringTransactionsForNextPaymentDate(
         charge.id,
         charge.nextPaymentDate.c_str());
 
-    cout << "getTransactionIDForRecurringChargeDate: SQL: " << szStatement << endl;
+    error = sqlite3_exec(dbHandle, szStatement, transactionCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to get transaction: %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    // result->results[0].print();
+
+    return result->numRows;
+}
+
+/*
+** 1) Get the latest transaction for the recurring charge.
+** 2) If no transaction exists, create one for the RC start date
+** 3) Else If the latest transaction.date < today, add to date as per frequency
+** 4) Create the new transaction
+** 5) Goto 1
+*/
+int PFM_DB::getLatestTransactionForRecurringCharge(DBRecurringCharge & charge, DBTransactionResult * result) {
+    char *          pszErrorMsg;
+    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int             error;
+
+    const char * pszTemplate = 
+                "SELECT " \
+                "id " \
+                "FROM account_transaction " \
+                "WHERE account_id = %lld " \
+                "AND recurring_charge_id = %lld " \
+                "ORDER BY date DESC " \
+                "LIMIT 1;";
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        pszTemplate, 
+        charge.accountId, 
+        charge.id,
+        charge.nextPaymentDate.c_str());
 
     error = sqlite3_exec(dbHandle, szStatement, transactionCallback, result, &pszErrorMsg);
 

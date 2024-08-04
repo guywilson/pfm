@@ -69,6 +69,7 @@ class PFM_DB {
         sqlite3_int64   createTransaction(DBTransaction & transaction);
         int             getTransactionsForAccount(sqlite3_int64 accountId, DBTransactionResult * result);
         int             getRecurringTransactionsForNextPaymentDate(DBRecurringCharge & charge, DBTransactionResult * result);
+        int             getLatestTransactionForRecurringCharge(DBRecurringCharge & charge, DBTransactionResult * result);
         int             createDueRecurringTransactionsForAccount(sqlite3_int64 accountId);
         int             findTransactionsForAccount(sqlite3_int64 accountId, DBCriteria * criteria, int numCriteria, DBTransactionResult * result);
         int             getTransaction(sqlite3_int64 id, DBTransactionResult * result);

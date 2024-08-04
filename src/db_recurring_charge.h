@@ -52,10 +52,10 @@ class DBRecurringCharge : public DBPayment {
         }
 
         bool isDue(void) {
-            StrDate     chargeDate(date);
+            StrDate     paymentDate(nextPaymentDate);
             StrDate     today;
 
-            if (chargeDate > today || chargeDate == today) {
+            if (paymentDate > today || paymentDate == today) {
                 return true;
             }
             else {
@@ -72,7 +72,7 @@ class DBRecurringCharge : public DBPayment {
             frequencyValue = getFrequencyValue();
             frequencyUnit = getFrequencyUnit();
 
-            if (isDue()) {
+            if (chargeDate > dateToday || chargeDate == dateToday) {
                 nextPaymentDate.assign(date);
             }
             else {
