@@ -16,8 +16,86 @@ using namespace std;
 #ifndef __INCL_RECURRING_CHARGE
 #define __INCL_RECURRING_CHARGE
 
+class DBRecurringChargeResult;
+
 class DBRecurringCharge : public DBPayment {
+    private:
+        const char * sqlSelectByID = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "description," \
+                        "amount," \
+                        "frequency," \
+                        "created," \
+                        "updated " \
+                        "FROM recurring_charge " \
+                        "WHERE id = %lld;";
+
+        const char * sqlSelectByAccountID = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "description," \
+                        "amount," \
+                        "frequency," \
+                        "created," \
+                        "updated " \
+                        "FROM recurring_charge " \
+                        "WHERE account_id = %lld;";
+
+        const char * sqlSelectAll = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "description," \
+                        "amount," \
+                        "frequency," \
+                        "created," \
+                        "updated " \
+                        "FROM recurring_charge;";
+
+        const char * sqlInsert = 
+                        "INSERT INTO recurring_charge (" \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "description," \
+                        "amount," \
+                        "frequency," \
+                        "created," \
+                        "updated) " \
+                        "VALUES (%lld, %lld, %lld, '%s'," \
+                        "'%s', %.2f, '%s', '%s', '%s');";
+
+        const char * sqlUpdate = 
+                        "UPDATE recurring_charge " \
+                        "SET category_id = %lld," \
+                        "payee_id = %lld," \
+                        "date = '%s'," \
+                        "description = '%s'," \
+                        "amount = %.2f," \
+                        "frequency = '%s'," \
+                        "updated = '%s' " \
+                        "WHERE id = %lld;";
+
+        const char * sqlDelete = 
+                        "DELETE FROM recurring_charge WHERE id = %lld;";
+
     public:
+        string                  nextPaymentDate;    // Not persistent
+        string                  frequency;
+
         DBRecurringCharge() : DBPayment() {
             clear();
         }
@@ -119,24 +197,134 @@ class DBRecurringCharge : public DBPayment {
             }
         }
 
-        string                  nextPaymentDate;    // Not persistent
-        string                  frequency;
-};
+        const char * getInsertStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
-class DBRecurringChargeResult {
-    public:
-        DBRecurringChargeResult() {
-            numRows = 0;
+            string now = StrDate::now();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlInsert,
+                accountId,
+                categoryId,
+                payeeId,
+                date.c_str(),
+                description.c_str(),
+                amount,
+                frequency.c_str(),
+                now.c_str(),
+                now.c_str());
+
+            return szStatement;
         }
 
+        const char * getUpdateStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            string now = StrDate::now();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlUpdate,
+                categoryId,
+                payeeId,
+                date.c_str(),
+                description.c_str(),
+                amount,
+                frequency.c_str(),
+                now.c_str(),
+                id);
+
+            return szStatement;
+        }
+
+        const char * getDeleteStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            string now = StrDate::now();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlDelete,
+                id);
+
+            return szStatement;
+        }
+
+        void                    retrieveByID(sqlite3_int64 id);
+        void                    retrieveByAccountID(sqlite3_int64 id);
+        DBRecurringChargeResult retrieveAll(void);
+};
+
+class DBRecurringChargeResult : DBResult {
+    private:
+        vector<DBRecurringCharge> results;
+
+    public:
+        DBRecurringChargeResult() : DBResult() {}
+
         void clear() {
-            numRows = 0;
+            DBResult::clear();
             results.clear();
         }
 
-        int                     numRows;
+        DBRecurringCharge getResultAt(int i) {
+            if (getNumRows() > i) {
+                return results[i];
+            }
+            else {
+                throw pfm_error(
+                        pfm_error::buildMsg(
+                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
+                        __FILE__, 
+                        __LINE__);
+            }
+        }
 
-        vector<DBRecurringCharge> results;
+        void processRow(DBRow & row) {
+            DBRecurringCharge charge;
+
+            for (size_t i = 0;i < row.getNumColumns();i++) {
+                DBColumn column = row.getColumnAt(i);
+
+                if (column.getName() == "id") {
+                    charge.id = column.getIDValue();
+                }
+                else if (column.getName() == "account_id") {
+                    charge.accountId = column.getIDValue();
+                }
+                else if (column.getName() == "category_id") {
+                    charge.categoryId = column.getIDValue();
+                }
+                else if (column.getName() == "payee_id") {
+                    charge.payeeId = column.getIDValue();
+                }
+                else if (column.getName() == "date") {
+                    charge.date = column.getValue();
+                }
+                else if (column.getName() == "description") {
+                    charge.description = column.getValue();
+                }
+                else if (column.getName() == "amount") {
+                    charge.amount = column.getDoubleValue();
+                }
+                else if (column.getName() == "frequency") {
+                    charge.frequency = column.getValue();
+                }
+                else if (column.getName() == "created") {
+                    charge.createdDate = column.getValue();
+                }
+                else if (column.getName() == "updated") {
+                    charge.updatedDate = column.getValue();
+                }
+            }
+            
+            results.push_back(charge);
+            incrementNumRows();
+        }
 };
 
 #endif

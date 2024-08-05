@@ -7,16 +7,16 @@
 
 #include "pfm_error.h"
 #include "db_base.h"
-#include "db_account.h"
+#include "db_recurring_charge.h"
 #include "db.h"
 #include "strdate.h"
 
 using namespace std;
 
-void DBAccount::retrieveByID(sqlite3_int64 id) {
-    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int             rowsRetrievedCount;
-    DBAccountResult result;
+void DBRecurringCharge::retrieveByID(sqlite3_int64 id) {
+    char                    szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int                     rowsRetrievedCount;
+    DBRecurringChargeResult result;
 
     snprintf(
         szStatement, 
@@ -37,16 +37,16 @@ void DBAccount::retrieveByID(sqlite3_int64 id) {
     set(result.getResultAt(0));
 }
 
-void DBAccount::retrieveByCode(string & code) {
-    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int             rowsRetrievedCount;
-    DBAccountResult result;
+void DBRecurringCharge::retrieveByAccountID(sqlite3_int64 accountId) {
+    char                    szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int                     rowsRetrievedCount;
+    DBRecurringChargeResult result;
 
     snprintf(
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByCode, 
-        code.c_str());
+        sqlSelectByAccountID, 
+        accountId);
 
     PFM_DB & db = PFM_DB::getInstance();
     rowsRetrievedCount = db.executeSelect(szStatement, &result);
@@ -61,8 +61,8 @@ void DBAccount::retrieveByCode(string & code) {
     set(result.getResultAt(0));
 }
 
-DBAccountResult DBAccount::retrieveAll() {
-    DBAccountResult result;
+DBRecurringChargeResult DBRecurringCharge::retrieveAll() {
+    DBRecurringChargeResult result;
 
     PFM_DB & db = PFM_DB::getInstance();
     db.executeSelect(sqlSelectAll, &result);

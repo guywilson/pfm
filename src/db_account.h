@@ -7,7 +7,7 @@
 
 #include "pfm_error.h"
 #include "db_base.h"
-#include "db_new.h"
+#include "db.h"
 #include "strdate.h"
 
 using namespace std;
@@ -77,7 +77,38 @@ class DBAccount : public DBEntity {
         double                  openingBalance;
         double                  currentBalance;
 
-        DBAccount();
+        DBAccount() : DBEntity() {
+            clear();
+        }
+
+        void clear(void) {
+            DBEntity::clear();
+
+            this->name = "";
+            this->code = "";
+            this->openingBalance = 0.0;
+            this->currentBalance = 0.0;
+        }
+
+        void set(const DBAccount & src) {
+            DBEntity::set(src);
+
+            this->name =            src.name;
+            this->code =            src.code;
+            this->openingBalance =  src.openingBalance;
+            this->currentBalance =  src.currentBalance;
+        }
+
+        void print(void) {
+            DBEntity::print();
+
+            cout << "Name: '" << name << "'" << endl;
+            cout << "Code: '" << code << "'" << endl;
+
+            cout << fixed << setprecision(2);
+            cout << "Opening balance: " << openingBalance << endl;
+            cout << "Current balance: " << currentBalance << endl;
+        }
 
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
@@ -131,10 +162,6 @@ class DBAccount : public DBEntity {
             return szStatement;
         }
 
-        void clear(void);
-        void set(const DBAccount & src);
-        void print(void);
-
         void            retrieveByID(sqlite3_int64 id);
         void            retrieveByCode(string & code);
         DBAccountResult retrieveAll(void);
@@ -147,9 +174,56 @@ class DBAccountResult : public DBResult {
     public:
         DBAccountResult() : DBResult() {}
 
-        void clear(void);
-        DBAccount getAccountAt(int i);
-        void processRow(DBRow & row) override;
+        void clear() {
+            DBResult::clear();
+            results.clear();
+        }
+
+        DBAccount getResultAt(int i) {
+            if (getNumRows() > i) {
+                return results[i];
+            }
+            else {
+                throw pfm_error(
+                        pfm_error::buildMsg(
+                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
+                        __FILE__, 
+                        __LINE__);
+            }
+        }
+
+        void processRow(DBRow & row) {
+            DBAccount account;
+
+            for (size_t i = 0;i < row.getNumColumns();i++) {
+                DBColumn column = row.getColumnAt(i);
+
+                if (column.getName() == "id") {
+                    account.id = column.getIDValue();
+                }
+                else if (column.getName() == "name") {
+                    account.name = column.getValue();
+                }
+                else if (column.getName() == "code") {
+                    account.code = column.getValue();
+                }
+                else if (column.getName() == "opening_balance") {
+                    account.openingBalance = column.getDoubleValue();
+                }
+                else if (column.getName() == "current_balance") {
+                    account.currentBalance = column.getDoubleValue();
+                }
+                else if (column.getName() == "created") {
+                    account.createdDate = column.getValue();
+                }
+                else if (column.getName() == "updated") {
+                    account.updatedDate = column.getValue();
+                }
+            }
+            
+            results.push_back(account);
+            incrementNumRows();
+        }
 };
 
 #endif

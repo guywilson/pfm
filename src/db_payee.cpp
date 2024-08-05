@@ -7,16 +7,16 @@
 
 #include "pfm_error.h"
 #include "db_base.h"
-#include "db_account.h"
+#include "db_payee.h"
 #include "db.h"
 #include "strdate.h"
 
 using namespace std;
 
-void DBAccount::retrieveByID(sqlite3_int64 id) {
-    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int             rowsRetrievedCount;
-    DBAccountResult result;
+void DBPayee::retrieveByID(sqlite3_int64 id) {
+    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int                 rowsRetrievedCount;
+    DBPayeeResult       result;
 
     snprintf(
         szStatement, 
@@ -37,10 +37,10 @@ void DBAccount::retrieveByID(sqlite3_int64 id) {
     set(result.getResultAt(0));
 }
 
-void DBAccount::retrieveByCode(string & code) {
-    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int             rowsRetrievedCount;
-    DBAccountResult result;
+void DBPayee::retrieveByCode(string & code) {
+    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int                 rowsRetrievedCount;
+    DBPayeeResult       result;
 
     snprintf(
         szStatement, 
@@ -61,8 +61,8 @@ void DBAccount::retrieveByCode(string & code) {
     set(result.getResultAt(0));
 }
 
-DBAccountResult DBAccount::retrieveAll() {
-    DBAccountResult result;
+DBPayeeResult DBPayee::retrieveAll() {
+    DBPayeeResult result;
 
     PFM_DB & db = PFM_DB::getInstance();
     db.executeSelect(sqlSelectAll, &result);

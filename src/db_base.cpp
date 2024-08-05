@@ -6,23 +6,23 @@
 
 #include <sqlite3.h>
 
-#include "db_new.h"
+#include "db.h"
 #include "db_base.h"
 
 using namespace std;
 
 sqlite3_int64 DBEntity::insert() {
-    PFM_DB_NEW & db = PFM_DB_NEW::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
     return db.executeInsert(getInsertStatement());
 }
 
 void DBEntity::update() {
-    PFM_DB_NEW & db = PFM_DB_NEW::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
     return db.executeUpdate(getUpdateStatement());
 }
 
 void DBEntity::remove() {
-    PFM_DB_NEW & db = PFM_DB_NEW::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
     return db.executeDelete(getDeleteStatement());
 }
 

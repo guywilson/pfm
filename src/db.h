@@ -5,18 +5,15 @@
 
 #include "db_criteria.h"
 #include "db_base.h"
-#include "db_config.h"
-#include "db_currency.h"
-#include "db_account.h"
-#include "db_category.h"
-#include "db_payee.h"
-#include "db_transaction.h"
-#include "db_recurring_charge.h"
 
 using namespace std;
 
-#ifndef __INCL_DB
-#define __INCL_DB
+#ifndef __INCL_DB_NEW
+#define __INCL_DB_NEW
+
+#define SQLITE_ERROR_BUFFER_LEN                     512
+#define SQL_STATEMENT_BUFFER_LEN                    512
+#define SQL_ROW_LIMIT                                50
 
 class PFM_DB {
     public:
@@ -31,56 +28,16 @@ class PFM_DB {
         sqlite3 *       dbHandle;
 
         void            createSchema();
-        sqlite3_int64   createCurrency(DBCurrency & currency);
-        sqlite3_int64   createConfig(DBConfig & config);
 
     public:
         ~PFM_DB();
 
         bool            open(string dbName);
 
-        sqlite3_int64   executeInsert(string & sqlStatement);
-        int             executeSelect(string & sqlStatement, DBResult * result);
-        void            executeUpdate(string & sqlStatement);
-        void            executeDelete(string & sqlStatement);
-
-        sqlite3_int64   createAccount(DBAccount & account);
-        int             getAccounts(DBAccountResult * result);
-        int             getAccount(string code, DBAccountResult * result);
-        int             updateAccount(DBAccount & account);
-        int             deleteAccount(DBAccount & account);
-
-        sqlite3_int64   createCategory(DBCategory & category);
-        int             getCategories(DBCategoryResult * result);
-        int             getCategory(sqlite3_int64 id, DBCategoryResult * result);
-        int             getCategory(string code, DBCategoryResult * result);
-        int             updateCategory(DBCategory & category);
-        int             deleteCategory(DBCategory & category);
-        void            translateCategoryCriteria(DBCriteria * c);
-
-        sqlite3_int64   createPayee(DBPayee & payee);
-        int             getPayees(DBPayeeResult * result);
-        int             getPayee(sqlite3_int64 id, DBPayeeResult * result);
-        int             getPayee(string code, DBPayeeResult * result);
-        int             updatePayee(DBPayee & payee);
-        int             deletePayee(DBPayee & payee);
-        void            translatePayeeCriteria(DBCriteria * c);
-
-        sqlite3_int64   createRecurringCharge(DBRecurringCharge & charge);
-        int             getRecurringChargesForAccount(sqlite3_int64 accountId, DBRecurringChargeResult * result);
-        int             getRecurringCharge(sqlite3_int64 id, DBRecurringChargeResult * result);
-        int             updateRecurringCharge(DBRecurringCharge & charge);
-        int             deleteRecurringCharge(DBRecurringCharge & charge);
-
-        sqlite3_int64   createTransaction(DBTransaction & transaction);
-        int             getTransactionsForAccount(sqlite3_int64 accountId, DBTransactionResult * result);
-        int             getRecurringTransactionsForNextPaymentDate(DBRecurringCharge & charge, DBTransactionResult * result);
-        int             getLatestTransactionForRecurringCharge(DBRecurringCharge & charge, DBTransactionResult * result);
-        int             createDueRecurringTransactionsForAccount(sqlite3_int64 accountId);
-        int             findTransactionsForAccount(sqlite3_int64 accountId, DBCriteria * criteria, int numCriteria, DBTransactionResult * result);
-        int             getTransaction(sqlite3_int64 id, DBTransactionResult * result);
-        int             updateTransaction(DBTransaction & transaction);
-        int             deleteTransaction(DBTransaction & transaction);
+        sqlite3_int64   executeInsert(const char * sqlStatement);
+        int             executeSelect(const char * sqlStatement, DBResult * result);
+        void            executeUpdate(const char * sqlStatement);
+        void            executeDelete(const char * sqlStatement);
 };
 
 #endif

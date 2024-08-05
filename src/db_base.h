@@ -88,6 +88,10 @@ class DBColumn {
             return strtoul(value.c_str(), NULL, 10);
         }
 
+        bool getBoolValue() {
+            return ((value[0] == 'Y' || value[0] == 'y') ? true : false);
+        }
+
         sqlite3_int64 getIDValue() {
             return strtoll(value.c_str(), NULL, 10);
         }

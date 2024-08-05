@@ -16,8 +16,76 @@ using namespace std;
 #ifndef __INCL_TRANSACTION
 #define __INCL_TRANSACTION
 
+class DBTransactionResult;
+
 class DBTransaction : public DBPayment {
+    private:
+        const char * sqlSelectByID = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM account_transaction " \
+                        "WHERE id = %lld;";
+
+        const char * sqlSelectByAccountID = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM account_transaction " \
+                        "WHERE account_id = %lld;";
+
+        const char * sqlInsert = 
+                        "INSERT INTO account_transaction (" \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated) " \
+                        "VALUES (%lld, %lld, %lld, '%s', '%s', " \
+                        "'%s', %.2f, '%s', '%s', '%s');";
+
+        const char * sqlUpdate = 
+                        "UPDATE account_transaction " \
+                        "SET category_id = %lld," \
+                        "payee_id = %lld," \
+                        "date = '%s'," \
+                        "description = '%s'," \
+                        "credit_debit = '%s'," \
+                        "amount = %.2f," \
+                        "is_reconciled = '%s'," \
+                        "updated = '%s' " \
+                        "WHERE id = %lld;";
+
+        const char * sqlDelete = 
+                        "DELETE FROM account_transaction WHERE id = %lld;";
+
     public:
+        bool                    isCredit;
+        bool                    isReconciled;
+
         DBTransaction() : DBPayment() {
             clear();
         }
@@ -51,24 +119,140 @@ class DBTransaction : public DBPayment {
             cout << "isReconciled: " << isReconciled << endl;
         }
 
-        bool                    isCredit;
-        bool                    isReconciled;
-};
+        const char * getInsertStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
-class DBTransactionResult {
-    public:
-        DBTransactionResult() {
-            numRows = 0;
+            string now = StrDate::now();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlInsert,
+                accountId,
+                categoryId,
+                payeeId,
+                date.c_str(),
+                description.c_str(),
+                amount,
+                frequency.c_str(),
+                now.c_str(),
+                now.c_str());
+
+            return szStatement;
         }
 
+        const char * getUpdateStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            string now = StrDate::now();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlUpdate,
+                categoryId,
+                payeeId,
+                date.c_str(),
+                description.c_str(),
+                amount,
+                frequency.c_str(),
+                now.c_str(),
+                id);
+
+            return szStatement;
+        }
+
+        const char * getDeleteStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            string now = StrDate::now();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlDelete,
+                id);
+
+            return szStatement;
+        }
+
+        void                retrieveByID(sqlite3_int64 id);
+        DBTransactionResult retrieveByAccountID(sqlite3_int64 accountId);
+        DBTransactionResult findTransactionsForAccountID(
+                                    sqlite3_int64 accountId, 
+                                    DBCriteria * criteria, 
+                                    int numCriteria);
+};
+
+class DBTransactionResult : public DBResult {
+    private:
+        vector<DBTransaction> results;
+
+    public:
+        DBTransactionResult() : DBResult() {}
+
         void clear() {
-            numRows = 0;
+            DBResult::clear();
             results.clear();
         }
 
-        int                     numRows;
+        DBTransaction getResultAt(int i) {
+            if (getNumRows() > i) {
+                return results[i];
+            }
+            else {
+                throw pfm_error(
+                        pfm_error::buildMsg(
+                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
+                        __FILE__, 
+                        __LINE__);
+            }
+        }
 
-        vector<DBTransaction> results;
+        void processRow(DBRow & row) {
+            DBTransaction transaction;
+
+            for (size_t i = 0;i < row.getNumColumns();i++) {
+                DBColumn column = row.getColumnAt(i);
+
+                if (column.getName() == "id") {
+                    transaction.id = column.getIDValue();
+                }
+                else if (column.getName() == "account_id") {
+                    transaction.accountId = column.getIDValue();
+                }
+                else if (column.getName() == "category_id") {
+                    transaction.categoryId = column.getIDValue();
+                }
+                else if (column.getName() == "payee_id") {
+                    transaction.payeeId = column.getIDValue();
+                }
+                else if (column.getName() == "date") {
+                    transaction.date = column.getValue();
+                }
+                else if (column.getName() == "description") {
+                    transaction.description = column.getValue();
+                }
+                else if (column.getName() == "amount") {
+                    transaction.amount = column.getDoubleValue();
+                }
+                else if (column.getName() == "credit_debit") {
+                    transaction.isCredit = column.getBoolValue();
+                }
+                else if (column.getName() == "is_reconciled") {
+                    transaction.isReconciled = column.getBoolValue();
+                }
+                else if (column.getName() == "created") {
+                    transaction.createdDate = column.getValue();
+                }
+                else if (column.getName() == "updated") {
+                    transaction.updatedDate = column.getValue();
+                }
+            }
+            
+            results.push_back(transaction);
+            incrementNumRows();
+        }
 };
 
 #endif

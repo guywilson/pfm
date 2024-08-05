@@ -7,16 +7,16 @@
 
 #include "pfm_error.h"
 #include "db_base.h"
-#include "db_account.h"
+#include "db_config.h"
 #include "db.h"
 #include "strdate.h"
 
 using namespace std;
 
-void DBAccount::retrieveByID(sqlite3_int64 id) {
-    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int             rowsRetrievedCount;
-    DBAccountResult result;
+void DBConfig::retrieveByID(sqlite3_int64 id) {
+    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int                 rowsRetrievedCount;
+    DBConfigResult      result;
 
     snprintf(
         szStatement, 
@@ -37,16 +37,16 @@ void DBAccount::retrieveByID(sqlite3_int64 id) {
     set(result.getResultAt(0));
 }
 
-void DBAccount::retrieveByCode(string & code) {
-    char            szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int             rowsRetrievedCount;
-    DBAccountResult result;
+void DBConfig::retrieveByKey(string & key) {
+    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int                 rowsRetrievedCount;
+    DBConfigResult      result;
 
     snprintf(
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByCode, 
-        code.c_str());
+        sqlSelectByKey, 
+        key.c_str());
 
     PFM_DB & db = PFM_DB::getInstance();
     rowsRetrievedCount = db.executeSelect(szStatement, &result);
@@ -61,8 +61,8 @@ void DBAccount::retrieveByCode(string & code) {
     set(result.getResultAt(0));
 }
 
-DBAccountResult DBAccount::retrieveAll() {
-    DBAccountResult result;
+DBConfigResult DBConfig::retrieveAll() {
+    DBConfigResult result;
 
     PFM_DB & db = PFM_DB::getInstance();
     db.executeSelect(sqlSelectAll, &result);

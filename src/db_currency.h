@@ -11,8 +11,33 @@ using namespace std;
 #ifndef __INCL_CURRENCY
 #define __INCL_CURRENCY
 
+class DBCurrencyResult;
+
 class DBCurrency : public DBEntity {
+    private:
+        const char * sqlSelectByID = 
+                        "SELECT id, code, name, symbol, created, updated FROM currency where id= %lld;";
+
+        const char * sqlSelectByCode = 
+                        "SELECT id, code, name, symbol, created, updated FROM currency where code = '%s';";
+
+        const char * sqlSelectAll = 
+                        "SELECT id, code, name, symbol, created, updated FROM currency;";
+
+        const char * sqlInsert = 
+                        "INSERT INTO currency (code, name, symbol, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s');";
+
+        const char * sqlUpdate = 
+                        "UPDATE currency SET code = '%s', name = '%s', symbol = '%s', updated = '%s' WHERE id = %lld;";
+
+        const char * sqlDelete = 
+                        "DELETE FROM currency WHERE id = %lld;";
+
     public:
+        string                  code;
+        string                  name;
+        string                  symbol;
+
         DBCurrency() : DBEntity() {
             clear();
         }
@@ -41,25 +66,115 @@ class DBCurrency : public DBEntity {
             cout << "Symbol: '" << symbol << "'" << endl;
         }
 
-        string                  code;
-        string                  name;
-        string                  symbol;
-};
+        const char * getInsertStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
-class DBCurrencyResult {
-    public:
-        DBCurrencyResult() {
-            numRows = 0;
+            string now = StrDate::now();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlInsert,
+                code.c_str(),
+                name.c_str(),
+                symbol.c_str(),
+                now.c_str(),
+                now.c_str());
+
+            return szStatement;
         }
 
+        const char * getUpdateStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            string now = StrDate::now();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlUpdate,
+                code.c_str(),
+                name.c_str(),
+                symbol.c_str(),
+                now.c_str(),
+                id);
+
+            return szStatement;
+        }
+
+        const char * getDeleteStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            string now = StrDate::now();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlDelete,
+                id);
+
+            return szStatement;
+        }
+
+        void                retrieveByID(sqlite3_int64 id);
+        void                retrieveByCode(string & code);
+        DBCurrencyResult    retrieveAll(void);
+};
+
+class DBCurrencyResult : public DBResult {
+    private:
+        vector<DBCurrency>      results;
+
+    public:
+        DBCurrencyResult() : DBResult() {}
+
         void clear() {
-            numRows = 0;
+            DBResult::clear();
             results.clear();
         }
 
-        int                     numRows;
+        DBCurrency getResultAt(int i) {
+            if (getNumRows() > i) {
+                return results[i];
+            }
+            else {
+                throw pfm_error(
+                        pfm_error::buildMsg(
+                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
+                        __FILE__, 
+                        __LINE__);
+            }
+        }
 
-        vector<DBCurrency>      results;
+        void processRow(DBRow & row) {
+            DBCurrency currency;
+
+            for (size_t i = 0;i < row.getNumColumns();i++) {
+                DBColumn column = row.getColumnAt(i);
+
+                if (column.getName() == "id") {
+                    currency.id = column.getIDValue();
+                }
+                else if (column.getName() == "code") {
+                    currency.code = column.getValue();
+                }
+                else if (column.getName() == "name") {
+                    currency.name = column.getValue();
+                }
+                else if (column.getName() == "symbol") {
+                    currency.symbol = column.getValue();
+                }
+                else if (column.getName() == "created") {
+                    currency.createdDate = column.getValue();
+                }
+                else if (column.getName() == "updated") {
+                    currency.updatedDate = column.getValue();
+                }
+            }
+            
+            results.push_back(currency);
+            incrementNumRows();
+        }
 };
 
 #endif
