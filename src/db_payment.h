@@ -15,14 +15,14 @@ using namespace std;
 #ifndef __INCL_PAYMENT
 #define __INCL_PAYMENT
 
-class DBPayment : public DBBase {
+class DBPayment : public DBEntity {
     public:
-        DBPayment() : DBBase() {
+        DBPayment() : DBEntity() {
             clear();
         }
 
         void clear(void) {
-            DBBase::clear();
+            DBEntity::clear();
 
             this->accountId = 0;
             this->categoryId = 0;
@@ -37,7 +37,7 @@ class DBPayment : public DBBase {
         }
 
         void set(const DBPayment & src) {
-            DBBase::set(src);
+            DBEntity::set(src);
 
             this->accountId = src.accountId;
             this->categoryId = src.categoryId;
@@ -49,7 +49,7 @@ class DBPayment : public DBBase {
         }
 
         void print(void) {
-            DBBase::print();
+            DBEntity::print();
 
             cout << "AccountID: " << accountId << endl;
             cout << "CategoryID: " << categoryId << endl;

@@ -11,18 +11,30 @@ using namespace std;
 #ifndef __INCL_DB_BASE
 #define __INCL_DB_BASE
 
-class DBBase {
+class DBEntity {
+    private:
+        sqlite3_int64   insert(void);
+        void            update(void);
+
     public:
         sqlite3_int64           id;
 
         string                  createdDate;
         string                  updatedDate;
-
         uint32_t                sequence;           // Not persistent
 
-        DBBase() {
+        DBEntity() {
             clear();
         }
+
+        virtual ~DBEntity() {}
+
+        virtual const char *    getInsertStatement(void);
+        virtual const char *    getUpdateStatement(void);
+        virtual const char *    getDeleteStatement(void);
+
+        void remove(void);
+        void save(void);
 
         void clear(void) {
             this->id = 0;
@@ -31,7 +43,7 @@ class DBBase {
             this->updatedDate = "";
         }
 
-        void set(const DBBase & src) {
+        void set(const DBEntity & src) {
             this->id = src.id;
             this->sequence = src.sequence;
         }
@@ -122,12 +134,11 @@ class DBResult {
             numRows++;
         }
 
-        void addRow(DBBase & entity) {
+        void addRow(DBEntity & entity) {
             return;
         }
 
         virtual void processRow(DBRow & row) {
-            cout << "Called base class processRow()!!" << endl;
             return;
         }
 };

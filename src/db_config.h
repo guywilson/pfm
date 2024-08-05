@@ -11,14 +11,14 @@ using namespace std;
 #ifndef __INCL_CONFIG
 #define __INCL_CONFIG
 
-class DBConfig : public DBBase {
+class DBConfig : public DBEntity {
     public:
-        DBConfig() : DBBase() {
+        DBConfig() : DBEntity() {
             clear();
         }
 
         void clear(void) {
-            DBBase::clear();
+            DBEntity::clear();
 
             this->key = "";
             this->value = "";
@@ -26,7 +26,7 @@ class DBConfig : public DBBase {
         }
 
         void set(const DBConfig & src) {
-            DBBase::set(src);
+            DBEntity::set(src);
 
             this->key.assign(src.key);
             this->value.assign(src.value);
@@ -34,7 +34,7 @@ class DBConfig : public DBBase {
         }
 
         void print(void) {
-            DBBase::print();
+            DBEntity::print();
 
             cout << "Key: '" << key << "'" << endl;
             cout << "Value: '" << value << "'" << endl;

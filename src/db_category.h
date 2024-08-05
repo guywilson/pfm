@@ -11,28 +11,28 @@ using namespace std;
 #ifndef __INCL_CATEGORY
 #define __INCL_CATEGORY
 
-class DBCategory : public DBBase {
+class DBCategory : public DBEntity {
     public:
-        DBCategory() : DBBase() {
+        DBCategory() : DBEntity() {
             clear();
         }
 
         void clear(void) {
-            DBBase::clear();
+            DBEntity::clear();
 
             this->description = "";
             this->code = "";
         }
 
         void set(const DBCategory & src) {
-            DBBase::set(src);
+            DBEntity::set(src);
 
             this->description.assign(src.description);
             this->code.assign(src.code);
         }
 
         void print(void) {
-            DBBase::print();
+            DBEntity::print();
 
             cout << "Description: '" << description << "'" << endl;
             cout << "Code: '" << code << "'" << endl;

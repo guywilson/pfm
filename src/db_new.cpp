@@ -35,13 +35,13 @@ static int _retrieveCallback(void * p, int numColumns, char ** columns, char ** 
     return SQLITE_OK;
 }
 
-int PFM_DB_NEW::executeSelect(string & sqlStatement, DBResult * result) {
+int PFM_DB_NEW::executeSelect(const char * sqlStatement, DBResult * result) {
     char *          pszErrorMsg;
     int             error;
 
     error = sqlite3_exec(
                 dbHandle, 
-                sqlStatement.c_str(), 
+                sqlStatement, 
                 _retrieveCallback, 
                 result, 
                 &pszErrorMsg);
@@ -50,7 +50,7 @@ int PFM_DB_NEW::executeSelect(string & sqlStatement, DBResult * result) {
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Failed to execute statement '%s': %s",
-                    sqlStatement.c_str(), 
+                    sqlStatement, 
                     pszErrorMsg), 
                 __FILE__, 
                 __LINE__);
@@ -59,17 +59,17 @@ int PFM_DB_NEW::executeSelect(string & sqlStatement, DBResult * result) {
     return result->getNumRows();
 }
 
-sqlite3_int64 PFM_DB_NEW::executeInsert(string & sqlStatement) {
+sqlite3_int64 PFM_DB_NEW::executeInsert(const char * sqlStatement) {
     char *          pszErrorMsg;
     int             error;
 
-    error = sqlite3_exec(dbHandle, sqlStatement.c_str(), NULL, NULL, &pszErrorMsg);
+    error = sqlite3_exec(dbHandle, sqlStatement, NULL, NULL, &pszErrorMsg);
 
     if (error) {
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Failed to execute statement '%s': %s",
-                    sqlStatement.c_str(), 
+                    sqlStatement, 
                     pszErrorMsg), 
                 __FILE__, 
                 __LINE__);
@@ -78,34 +78,34 @@ sqlite3_int64 PFM_DB_NEW::executeInsert(string & sqlStatement) {
     return sqlite3_last_insert_rowid(dbHandle);
 }
 
-void PFM_DB_NEW::executeUpdate(string & sqlStatement) {
+void PFM_DB_NEW::executeUpdate(const char * sqlStatement) {
     char *          pszErrorMsg;
     int             error;
 
-    error = sqlite3_exec(dbHandle, sqlStatement.c_str(), NULL, NULL, &pszErrorMsg);
+    error = sqlite3_exec(dbHandle, sqlStatement, NULL, NULL, &pszErrorMsg);
 
     if (error) {
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Failed to execute statement '%s': %s",
-                    sqlStatement.c_str(), 
+                    sqlStatement, 
                     pszErrorMsg), 
                 __FILE__, 
                 __LINE__);
     }
 }
 
-void PFM_DB_NEW::executeDelete(string & sqlStatement) {
+void PFM_DB_NEW::executeDelete(const char * sqlStatement) {
     char *          pszErrorMsg;
     int             error;
 
-    error = sqlite3_exec(dbHandle, sqlStatement.c_str(), NULL, NULL, &pszErrorMsg);
+    error = sqlite3_exec(dbHandle, sqlStatement, NULL, NULL, &pszErrorMsg);
 
     if (error) {
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Failed to execute statement '%s': %s",
-                    sqlStatement.c_str(), 
+                    sqlStatement, 
                     pszErrorMsg), 
                 __FILE__, 
                 __LINE__);

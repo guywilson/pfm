@@ -11,14 +11,14 @@ using namespace std;
 #ifndef __INCL_CURRENCY
 #define __INCL_CURRENCY
 
-class DBCurrency : public DBBase {
+class DBCurrency : public DBEntity {
     public:
-        DBCurrency() : DBBase() {
+        DBCurrency() : DBEntity() {
             clear();
         }
 
         void clear(void) {
-            DBBase::clear();
+            DBEntity::clear();
 
             this->code = "";
             this->name = "";
@@ -26,7 +26,7 @@ class DBCurrency : public DBBase {
         }
 
         void set(const DBCurrency & src) {
-            DBBase::set(src);
+            DBEntity::set(src);
 
             this->code.assign(src.code);
             this->name.assign(src.name);
@@ -34,7 +34,7 @@ class DBCurrency : public DBBase {
         }
 
         void print(void) {
-            DBBase::print();
+            DBEntity::print();
 
             cout << "Code: '" << code << "'" << endl;
             cout << "Name: '" << name << "'" << endl;

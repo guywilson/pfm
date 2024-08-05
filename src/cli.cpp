@@ -121,15 +121,15 @@ DBAccount choose_account(const char * szAccountCode) {
 
     string code = szAccountCode;
 
-    DBAccount accountInstance;
+    DBAccount account;
 
-    DBAccount retrievedAccount = accountInstance.retrieveByCode(code);
+    account.retrieveByCode(code);
 
     free(accountCode);
 
-    //db.createDueRecurringTransactionsForAccount(result.getAccountAt(0).id);
+    //db.createDueRecurringTransactionsForAccount(account.id);
 
-    return retrievedAccount;
+    return account;
 }
 
 void update_account(DBAccount & account) {

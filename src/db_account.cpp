@@ -13,57 +13,17 @@
 
 using namespace std;
 
-sqlite3_int64 DBAccount::insert() {
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-    string now = StrDate::now();
-
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN,
-        sqlInsert,
-        name.c_str(),
-        code.c_str(),
-        openingBalance,
-        currentBalance,
-        now.c_str(),
-        now.c_str());
-
-    string statement = szStatement;
-
-    return db.executeInsert(statement);
-}
-
-void DBAccount::update() {
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-    string now = StrDate::now();
-
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN,
-        sqlUpdate,
-        code.c_str(),
-        name.c_str(),
-        openingBalance,
-        currentBalance,
-        now.c_str(),
-        id);
-
-    string statement = szStatement;
-
-    db.executeUpdate(statement);
-}
-
-DBAccount::DBAccount() : DBBase() {
+DBAccount::DBAccount() : DBEntity() {
     clear();
 
     string dbName = "test.db";
+
+    PFM_DB_NEW & db = PFM_DB_NEW::getInstance();
     db.open(dbName);
 }
 
 void DBAccount::clear(void) {
-    DBBase::clear();
+    DBEntity::clear();
 
     this->name = "";
     this->code = "";
@@ -72,7 +32,7 @@ void DBAccount::clear(void) {
 }
 
 void DBAccount::set(const DBAccount & src) {
-    DBBase::set(src);
+    DBEntity::set(src);
 
     this->name =            src.name;
     this->code =            src.code;
@@ -81,7 +41,7 @@ void DBAccount::set(const DBAccount & src) {
 }
 
 void DBAccount::print(void) {
-    DBBase::print();
+    DBEntity::print();
 
     cout << "Name: '" << name << "'" << endl;
     cout << "Code: '" << code << "'" << endl;
@@ -91,19 +51,10 @@ void DBAccount::print(void) {
     cout << "Current balance: " << currentBalance << endl;
 }
 
-void DBAccount::save() {
-    if (id == 0) {
-        id = insert();
-    }
-    else {
-        update();
-    }
-}
-
-DBAccount DBAccount::retrieveByID(sqlite3_int64 id) {
-    DBAccount       account;
-    DBAccountResult result;
+void DBAccount::retrieveByID(sqlite3_int64 id) {
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int             rowsRetrievedCount;
+    DBAccountResult result;
 
     snprintf(
         szStatement, 
@@ -111,14 +62,20 @@ DBAccount DBAccount::retrieveByID(sqlite3_int64 id) {
         sqlSelectByID, 
         id);
 
-    string statement = szStatement;
+    PFM_DB_NEW & db = PFM_DB_NEW::getInstance();
+    rowsRetrievedCount = db.executeSelect(szStatement, &result);
 
-    db.executeSelect(statement, &result);
+    if (rowsRetrievedCount != 1) {
+        throw pfm_error(
+                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
+                __FILE__, 
+                __LINE__);
+    }
 
-    return result.getAccountAt(0);
+    set(result.getAccountAt(0));
 }
 
-DBAccount DBAccount::retrieveByCode(string & code) {
+void DBAccount::retrieveByCode(string & code) {
     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
     int             rowsRetrievedCount;
     DBAccountResult result;
@@ -129,9 +86,8 @@ DBAccount DBAccount::retrieveByCode(string & code) {
         sqlSelectByCode, 
         code.c_str());
 
-    string statement = szStatement;
-
-    rowsRetrievedCount = db.executeSelect(statement, &result);
+    PFM_DB_NEW & db = PFM_DB_NEW::getInstance();
+    rowsRetrievedCount = db.executeSelect(szStatement, &result);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
@@ -140,32 +96,18 @@ DBAccount DBAccount::retrieveByCode(string & code) {
                 __LINE__);
     }
 
-    return result.getAccountAt(0);
+    set(result.getAccountAt(0));
 }
 
 DBAccountResult DBAccount::retrieveAll() {
     DBAccountResult result;
 
-    string statement = sqlSelectAll;
-
-    db.executeSelect(statement, &result);
+    PFM_DB_NEW & db = PFM_DB_NEW::getInstance();
+    db.executeSelect(sqlSelectAll, &result);
 
     return result;
 }
 
-void DBAccount::remove() {
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN,
-        sqlDelete,
-        id);
-
-    string statement = szStatement;
-
-    db.executeDelete(statement);
-}
 
 void DBAccountResult::clear() {
     DBResult::clear();

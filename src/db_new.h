@@ -34,10 +34,10 @@ class PFM_DB_NEW {
 
         bool            open(string dbName);
 
-        sqlite3_int64   executeInsert(string & sqlStatement);
-        int             executeSelect(string & sqlStatement, DBResult * result);
-        void            executeUpdate(string & sqlStatement);
-        void            executeDelete(string & sqlStatement);
+        sqlite3_int64   executeInsert(const char * sqlStatement);
+        int             executeSelect(const char * sqlStatement, DBResult * result);
+        void            executeUpdate(const char * sqlStatement);
+        void            executeDelete(const char * sqlStatement);
 };
 
 #endif

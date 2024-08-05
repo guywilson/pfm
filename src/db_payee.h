@@ -11,28 +11,28 @@ using namespace std;
 #ifndef __INCL_PAYEE
 #define __INCL_PAYEE
 
-class DBPayee : public DBBase {
+class DBPayee : public DBEntity {
     public:
-        DBPayee() : DBBase() {
+        DBPayee() : DBEntity() {
             clear();
         }
 
         void clear(void) {
-            DBBase::clear();
+            DBEntity::clear();
 
             this->name = "";
             this->code = "";
         }
 
         void set(const DBPayee & src) {
-            DBBase::set(src);
+            DBEntity::set(src);
 
             this->name =            src.name;
             this->code =            src.code;
         }
 
         void print(void) {
-            DBBase::print();
+            DBEntity::print();
 
             cout << "Description: '" << name << "'" << endl;
             cout << "Code: '" << code << "'" << endl;
