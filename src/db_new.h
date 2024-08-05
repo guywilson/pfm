@@ -1,0 +1,43 @@
+#include <string>
+#include <stdint.h>
+
+#include <sqlite3.h>
+
+#include "db_criteria.h"
+#include "db_base.h"
+
+using namespace std;
+
+#ifndef __INCL_DB_NEW
+#define __INCL_DB_NEW
+
+#define SQLITE_ERROR_BUFFER_LEN                     512
+#define SQL_STATEMENT_BUFFER_LEN                    512
+#define SQL_ROW_LIMIT                                50
+
+class PFM_DB_NEW {
+    public:
+        static PFM_DB_NEW & getInstance() {
+            static PFM_DB_NEW instance;
+            return instance;
+        }
+
+    private:
+        PFM_DB_NEW() {}
+
+        sqlite3 *       dbHandle;
+
+        void            createSchema();
+
+    public:
+        ~PFM_DB_NEW();
+
+        bool            open(string dbName);
+
+        sqlite3_int64   executeInsert(string & sqlStatement);
+        int             executeSelect(string & sqlStatement, DBResult * result);
+        void            executeUpdate(string & sqlStatement);
+        void            executeDelete(string & sqlStatement);
+};
+
+#endif

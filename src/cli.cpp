@@ -43,7 +43,6 @@ void add_account(void) {
     char *          accountCode;
     char *          openingBalance;
     double          balance;
-    sqlite3_int64   accountId;
 
     cout << "*** Add account ***" << endl;
 
@@ -69,11 +68,9 @@ void add_account(void) {
     account.openingBalance = balance;
     account.currentBalance = balance;
 
-    PFM_DB & db = PFM_DB::getInstance();
+    account.save();
 
-    accountId = db.createAccount(account);
-
-    cout << "Created account with ID " << accountId << endl;
+    cout << "Created account with ID " << account.id << endl;
 
     free(openingBalance);
     free(accountCode);
@@ -81,20 +78,21 @@ void add_account(void) {
 }
 
 void list_accounts(void) {
-    DBAccountResult           result;
+    DBAccountResult         result;
     int                     numAccounts;
     int                     i;
 
-    PFM_DB & db = PFM_DB::getInstance();
+    DBAccount accountInstance;
+    result = accountInstance.retrieveAll();
 
-    numAccounts = db.getAccounts(&result);
+    numAccounts = result.getNumRows();
 
     cout << "*** Accounts (" << numAccounts << ") ***" << endl << endl;
     cout << "| Code  | Name                      | Balance      |" << endl;
     cout << "----------------------------------------------------" << endl;
 
     for (i = 0;i < numAccounts;i++) {
-        DBAccount account = result.results[i];
+        DBAccount account = result.getAccountAt(i);
 
         cout << 
             "| " << 
@@ -112,7 +110,6 @@ void list_accounts(void) {
 
 DBAccount choose_account(const char * szAccountCode) {
     char *          accountCode;
-    DBAccountResult result;
 
     if (szAccountCode == NULL || strlen(szAccountCode) == 0) {
         cout << "*** Use account ***" << endl;
@@ -122,17 +119,17 @@ DBAccount choose_account(const char * szAccountCode) {
         accountCode = strdup(szAccountCode);
     }
 
-    PFM_DB & db = PFM_DB::getInstance();
+    string code = szAccountCode;
 
-    db.getAccount(accountCode, &result);
+    DBAccount accountInstance;
+
+    DBAccount retrievedAccount = accountInstance.retrieveByCode(code);
 
     free(accountCode);
 
-    if (result.numRows) {
-        db.createDueRecurringTransactionsForAccount(result.results[0].id);
-    }
+    //db.createDueRecurringTransactionsForAccount(result.getAccountAt(0).id);
 
-    return result.results[0];
+    return retrievedAccount;
 }
 
 void update_account(DBAccount & account) {
@@ -163,17 +160,13 @@ void update_account(DBAccount & account) {
         return;
     }
 
-    PFM_DB & db = PFM_DB::getInstance();
-
-    db.updateAccount(account);
+    account.save();
 
     free(pszBalance);
 }
 
 void delete_account(DBAccount & account) {
-    PFM_DB & db = PFM_DB::getInstance();
-
-    db.deleteAccount(account);
+    account.remove();
 }
 
 void add_category(void) {

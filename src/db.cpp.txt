@@ -13,9 +13,9 @@
 #include "db_base.h"
 #include "db_config.h"
 #include "db_currency.h"
+#include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
-#include "db_account.h"
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
 #include "db.h"
@@ -29,6 +29,20 @@
 #define SQL_ROW_LIMIT                                50
 
 using namespace std;
+
+static int _retrieveCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
+    DBResult * result = (DBResult *)p;
+    vector<DBColumn> columnVector;
+
+    for (int i = 0;i < numColumns;i++) {
+        DBColumn column(columnNames[i], columns[i]);
+        columnVector.push_back(column);
+    }
+
+    DBRow row(numColumns, columnVector);
+
+    result->processRow(row);
+}
 
 static int accountCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
     int                 columnIndex = 0;
@@ -222,6 +236,25 @@ static int transactionCallback(void * p, int numColumns, char ** columns, char *
     result->numRows++;
 
     return SQLITE_OK;
+}
+
+int PFM_DB::executeSelect(string & sqlStatement, DBResult * result) {
+    char *          pszErrorMsg;
+    int             error;
+
+    error = sqlite3_exec(dbHandle, sqlStatement.c_str(), _retrieveCallback, result, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to execute statement '%s': %s",
+                    sqlStatement.c_str(), 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    return result->getNumRows();
 }
 
 bool PFM_DB::open(string dbName) {

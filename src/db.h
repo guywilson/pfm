@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 
 #include "db_criteria.h"
+#include "db_base.h"
 #include "db_config.h"
 #include "db_currency.h"
 #include "db_account.h"
@@ -37,6 +38,11 @@ class PFM_DB {
         ~PFM_DB();
 
         bool            open(string dbName);
+
+        sqlite3_int64   executeInsert(string & sqlStatement);
+        int             executeSelect(string & sqlStatement, DBResult * result);
+        void            executeUpdate(string & sqlStatement);
+        void            executeDelete(string & sqlStatement);
 
         sqlite3_int64   createAccount(DBAccount & account);
         int             getAccounts(DBAccountResult * result);
