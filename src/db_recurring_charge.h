@@ -335,6 +335,8 @@ class DBRecurringChargeResult : public DBResult {
 
             charge.sequence = sequenceCounter++;
             
+            charge.setNextPaymentDate();
+            
             results.push_back(charge);
             incrementNumRows();
         }

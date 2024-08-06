@@ -29,15 +29,15 @@ class DBEntity {
 
         virtual ~DBEntity() {}
 
-        virtual const char *    getInsertStatement(void) {
+        virtual const char * getInsertStatement(void) {
             return "";
         }
 
-        virtual const char *    getUpdateStatement(void) {
+        virtual const char * getUpdateStatement(void) {
             return "";
         }
 
-        virtual const char *    getDeleteStatement(void) {
+        virtual const char * getDeleteStatement(void) {
             return "";
         }
 
