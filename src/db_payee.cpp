@@ -13,6 +13,29 @@
 
 using namespace std;
 
+// void PFM_DB::translatePayeeCriteria(DBCriteria * c) {
+//     DBPayeeResult   r;
+//     char            szID[32];
+
+//     getPayee(c->value, &r);
+
+//     if (r.numRows) {
+//         snprintf(szID, 32, "%lld", r.results[0].id);
+
+//         c->columnName = "payee_id";
+//         c->value = szID;
+//         c->columnType = db_column_type::numeric;
+//     }
+//     else {
+//         throw pfm_error(
+//             pfm_error::buildMsg(
+//                 "Payee '%s' does not exist", 
+//                 c->value.c_str()), 
+//             __FILE__, 
+//             __LINE__);
+//     }
+// }
+
 void DBPayee::retrieveByID(sqlite3_int64 id) {
     char                szStatement[SQL_STATEMENT_BUFFER_LEN];
     int                 rowsRetrievedCount;

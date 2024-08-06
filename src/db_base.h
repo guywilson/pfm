@@ -29,9 +29,17 @@ class DBEntity {
 
         virtual ~DBEntity() {}
 
-        virtual const char *    getInsertStatement(void);
-        virtual const char *    getUpdateStatement(void);
-        virtual const char *    getDeleteStatement(void);
+        virtual const char *    getInsertStatement(void) {
+            return "";
+        }
+
+        virtual const char *    getUpdateStatement(void) {
+            return "";
+        }
+
+        virtual const char *    getDeleteStatement(void) {
+            return "";
+        }
 
         void remove(void);
         void save(void);
@@ -54,6 +62,14 @@ class DBEntity {
 
             cout << "Created: " << createdDate << endl;
             cout << "Updated: " << updatedDate << endl;
+        }
+
+        static bool isYesNoBooleanValid(string & ynValue) {
+            if (ynValue == "Y" || ynValue == "N") {
+                return true;
+            }
+            
+            return false;
         }
 };
 
@@ -120,14 +136,16 @@ class DBRow {
 class DBResult {
     protected:
         int numRows;
+        int sequenceCounter;
 
     public:
         DBResult() {
-            numRows = 0;
+            clear();
         }
 
         void clear() {
             numRows = 0;
+            sequenceCounter = 1;
         }
 
         int getNumRows() {

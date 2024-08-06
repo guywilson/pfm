@@ -10,6 +10,9 @@
 #include "db_payee.h"
 #include "db_payment.h"
 #include "strdate.h"
+#include "db.h"
+#include "db_base.h"
+#include "strdate.h"
 
 using namespace std;
 
@@ -255,11 +258,11 @@ class DBRecurringCharge : public DBPayment {
         }
 
         void                    retrieveByID(sqlite3_int64 id);
-        void                    retrieveByAccountID(sqlite3_int64 id);
+        DBRecurringChargeResult retrieveByAccountID(sqlite3_int64 accountId);
         DBRecurringChargeResult retrieveAll(void);
 };
 
-class DBRecurringChargeResult : DBResult {
+class DBRecurringChargeResult : public DBResult {
     private:
         vector<DBRecurringCharge> results;
 
@@ -321,6 +324,16 @@ class DBRecurringChargeResult : DBResult {
                     charge.updatedDate = column.getValue();
                 }
             }
+            
+            DBCategory category;
+            category.retrieveByID(charge.categoryId);
+            charge.category.set(category);
+
+            DBPayee payee;
+            payee.retrieveByID(charge.payeeId);
+            charge.payee.set(payee);
+
+            charge.sequence = sequenceCounter++;
             
             results.push_back(charge);
             incrementNumRows();

@@ -10,6 +10,9 @@
 #include "db_payee.h"
 #include "db_recurring_charge.h"
 #include "db_payment.h"
+#include "db.h"
+#include "db_base.h"
+#include "strdate.h"
 
 using namespace std;
 
@@ -119,6 +122,26 @@ class DBTransaction : public DBPayment {
             cout << "isReconciled: " << isReconciled << endl;
         }
 
+        const char * getCreditDebitValue(void) {
+            return (isCredit ? "CR" : "DB");
+        }
+
+        bool getIsCredit(const char * value) {
+            if (strncmp(value, "CR", 2) == 0) {
+                return true;
+            }
+            else if (strncmp(value, "DB", 2) == 0) {
+                return false;
+            }
+            else {
+                return false;
+            }
+        }
+
+        const char * getIsReconciledValue(void) {
+            return (isReconciled ? "Y" : "N");
+        }
+
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
@@ -133,8 +156,9 @@ class DBTransaction : public DBPayment {
                 payeeId,
                 date.c_str(),
                 description.c_str(),
+                getCreditDebitValue(),
                 amount,
-                frequency.c_str(),
+                getIsReconciledValue(),
                 now.c_str(),
                 now.c_str());
 
@@ -154,8 +178,9 @@ class DBTransaction : public DBPayment {
                 payeeId,
                 date.c_str(),
                 description.c_str(),
+                getCreditDebitValue(),
                 amount,
-                frequency.c_str(),
+                getIsReconciledValue(),
                 now.c_str(),
                 id);
 
@@ -250,6 +275,16 @@ class DBTransactionResult : public DBResult {
                 }
             }
             
+            DBCategory category;
+            category.retrieveByID(transaction.categoryId);
+            transaction.category.set(category);
+
+            DBPayee payee;
+            payee.retrieveByID(transaction.payeeId);
+            transaction.payee.set(payee);
+
+            transaction.sequence = sequenceCounter++;
+
             results.push_back(transaction);
             incrementNumRows();
         }

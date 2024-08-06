@@ -13,6 +13,33 @@
 
 using namespace std;
 
+// void PFM_DB::translateCategoryCriteria(DBCriteria * c) {
+//     DBCategoryResult    r;
+//     char                szID[32];
+
+//     getCategory(c->value, &r);
+
+//     cout << "Category id: " << r.results[0].id << endl;
+
+//     if (r.numRows) {
+//         snprintf(szID, 32, "%lld", r.results[0].id);
+
+//         c->columnName = "category_id";
+//         c->value = szID;
+//         c->columnType = db_column_type::numeric;
+
+//         cout << "column: " << c->columnName << ", value: " << c->value << endl;
+//     }
+//     else {
+//         throw pfm_error(
+//             pfm_error::buildMsg(
+//                 "Category '%s' does not exist", 
+//                 c->value.c_str()), 
+//             __FILE__, 
+//             __LINE__);
+//     }
+// }
+
 void DBCategory::retrieveByID(sqlite3_int64 id) {
     char                szStatement[SQL_STATEMENT_BUFFER_LEN];
     int                 rowsRetrievedCount;

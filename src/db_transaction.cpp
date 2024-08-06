@@ -15,6 +15,122 @@
 
 using namespace std;
 
+// int PFM_DB::getRecurringTransactionsForNextPaymentDate(
+//                 DBRecurringCharge & charge,
+//                 DBTransactionResult * result)
+// {
+//     char *          pszErrorMsg;
+//     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+//     int             error;
+
+//     const char * pszTemplate = 
+//                 "SELECT " \
+//                 "id " \
+//                 "FROM account_transaction " \
+//                 "WHERE account_id = %lld " \
+//                 "AND recurring_charge_id = %lld " \
+//                 "AND date = '%s';";
+
+//     snprintf(
+//         szStatement, 
+//         SQL_STATEMENT_BUFFER_LEN, 
+//         pszTemplate, 
+//         charge.accountId, 
+//         charge.id,
+//         charge.nextPaymentDate.c_str());
+
+//     error = sqlite3_exec(dbHandle, szStatement, transactionCallback, result, &pszErrorMsg);
+
+//     if (error) {
+//         throw pfm_error(
+//                 pfm_error::buildMsg(
+//                     "Failed to get transaction: %s", 
+//                     pszErrorMsg), 
+//                 __FILE__, 
+//                 __LINE__);
+//     }
+
+//     // result->results[0].print();
+
+//     return result->numRows;
+// }
+
+// /*
+// ** 1) Get the latest transaction for the recurring charge.
+// ** 2) If no transaction exists, create one for the RC start date
+// ** 3) Else If the latest transaction.date < today, add to date as per frequency
+// ** 4) Create the new transaction
+// ** 5) Goto 1
+// */
+// int PFM_DB::getLatestTransactionForRecurringCharge(DBRecurringCharge & charge, DBTransactionResult * result) {
+//     char *          pszErrorMsg;
+//     char            szStatement[SQL_STATEMENT_BUFFER_LEN];
+//     int             error;
+
+//     const char * pszTemplate = 
+//                 "SELECT " \
+//                 "id " \
+//                 "FROM account_transaction " \
+//                 "WHERE account_id = %lld " \
+//                 "AND recurring_charge_id = %lld " \
+//                 "ORDER BY date DESC " \
+//                 "LIMIT 1;";
+
+//     snprintf(
+//         szStatement, 
+//         SQL_STATEMENT_BUFFER_LEN, 
+//         pszTemplate, 
+//         charge.accountId, 
+//         charge.id,
+//         charge.nextPaymentDate.c_str());
+
+//     error = sqlite3_exec(dbHandle, szStatement, transactionCallback, result, &pszErrorMsg);
+
+//     if (error) {
+//         throw pfm_error(
+//                 pfm_error::buildMsg(
+//                     "Failed to get transaction: %s", 
+//                     pszErrorMsg), 
+//                 __FILE__, 
+//                 __LINE__);
+//     }
+
+//     // result->results[0].print();
+
+//     return result->numRows;
+// }
+
+// int PFM_DB::createDueRecurringTransactionsForAccount(sqlite3_int64 accountId) {
+//     DBTransaction           transaction;
+//     DBTransactionResult     trResult;
+//     DBRecurringChargeResult rcResult;
+//     int                     i;
+//     int                     numRecurringCharges;
+//     int                     numTransactionsCreated = 0;
+
+//     numRecurringCharges = getRecurringChargesForAccount(accountId, &rcResult);
+
+//     for (i = 0;i < numRecurringCharges;i++) {
+//         DBRecurringCharge charge = rcResult.results[i];
+
+//         /*
+//         ** If the charge is due, but doesn't have a 
+//         ** corresponding transaction yet, create it...
+//         */
+//         if (charge.isDue()) {
+//             if (getRecurringTransactionsForNextPaymentDate(charge, &trResult) == 0) {
+//                 transaction.setFromRecurringCharge(charge);
+
+//                 createTransaction(transaction);
+
+//                 numTransactionsCreated++;
+//             }
+//         }
+//     }
+
+//     return numTransactionsCreated;
+// }
+
 void DBTransaction::retrieveByID(sqlite3_int64 id) {
     char                szStatement[SQL_STATEMENT_BUFFER_LEN];
     int                 rowsRetrievedCount;
@@ -137,23 +253,6 @@ DBTransactionResult DBTransaction::findTransactionsForAccountID(
 
     PFM_DB & db = PFM_DB::getInstance();
     db.executeSelect(szStatement, &result);
-
-    uint32_t seq = 1;
-
-    for (int i = 0;i < result.getNumRows();i++) {
-        DBCategoryResult  rc;
-        DBPayeeResult     rp;
-
-        DBCategory category;
-        category.retrieveByID(result.getResultAt(i).categoryId);
-        result.getResultAt(i).category.set(category);
-
-        DBPayee payee;
-        payee.retrieveByID(result.getResultAt(i).payeeId);
-        result.getResultAt(i).payee.set(payee);
-
-        result.getResultAt(i).sequence = seq++;
-    }
 
     return result;
 }

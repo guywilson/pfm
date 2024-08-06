@@ -37,9 +37,8 @@ void DBRecurringCharge::retrieveByID(sqlite3_int64 id) {
     set(result.getResultAt(0));
 }
 
-void DBRecurringCharge::retrieveByAccountID(sqlite3_int64 accountId) {
+DBRecurringChargeResult DBRecurringCharge::retrieveByAccountID(sqlite3_int64 accountId) {
     char                    szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int                     rowsRetrievedCount;
     DBRecurringChargeResult result;
 
     snprintf(
@@ -49,16 +48,9 @@ void DBRecurringCharge::retrieveByAccountID(sqlite3_int64 accountId) {
         accountId);
 
     PFM_DB & db = PFM_DB::getInstance();
-    rowsRetrievedCount = db.executeSelect(szStatement, &result);
+    db.executeSelect(szStatement, &result);
 
-    if (rowsRetrievedCount != 1) {
-        throw pfm_error(
-                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
-                __FILE__, 
-                __LINE__);
-    }
-
-    set(result.getResultAt(0));
+    return result;
 }
 
 DBRecurringChargeResult DBRecurringCharge::retrieveAll() {

@@ -8,7 +8,9 @@
 
 #include "db_category.h"
 #include "db_payee.h"
+#include "db.h"
 #include "db_base.h"
+#include "strdate.h"
 
 using namespace std;
 

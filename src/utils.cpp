@@ -51,7 +51,7 @@ string formatCurrency(double src) {
     return string(szAmount);
 }
 
-char * readString(const char * pszPrompt, const char * pszDefault, const size_t maxLength) {
+string readString(const char * pszPrompt, const char * pszDefault, const size_t maxLength) {
     char *      pszAnswer;
 
     pszAnswer = readline(pszPrompt);

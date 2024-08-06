@@ -4,7 +4,9 @@
 
 #include <sqlite3.h>
 
+#include "db.h"
 #include "db_base.h"
+#include "strdate.h"
 
 using namespace std;
 
