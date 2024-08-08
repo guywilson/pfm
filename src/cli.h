@@ -21,7 +21,6 @@ void                add_account(void);
 void                list_accounts(void);
 DBAccount           choose_account(const char * szAccountCode);
 void                update_account(DBAccount & account);
-void                delete_account(DBAccount & account);
 
 void                add_category(void);
 void                list_categories(void);

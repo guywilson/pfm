@@ -6,24 +6,30 @@
 
 #include <sqlite3.h>
 
+#include "strdate.h"
 #include "db.h"
 #include "db_base.h"
 
 using namespace std;
 
 sqlite3_int64 DBEntity::insert() {
+    createdDate = StrDate::today();
+    updatedDate = StrDate::today();
+
     PFM_DB & db = PFM_DB::getInstance();
     return db.executeInsert(getInsertStatement());
 }
 
 void DBEntity::update() {
+    updatedDate = StrDate::today();
+
     PFM_DB & db = PFM_DB::getInstance();
-    return db.executeUpdate(getUpdateStatement());
+    db.executeUpdate(getUpdateStatement());
 }
 
 void DBEntity::remove() {
     PFM_DB & db = PFM_DB::getInstance();
-    return db.executeDelete(getDeleteStatement());
+    db.executeDelete(getDeleteStatement());
 }
 
 void DBEntity::save() {

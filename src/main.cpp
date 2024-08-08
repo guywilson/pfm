@@ -108,7 +108,7 @@ int main(int argc, char ** argv) {
                 update_account(selectedAccount);
             }
             else if (strncmp(pszCommand, "delete account", 15) == 0 || strncmp(pszCommand, "da", 2) == 0) {
-                delete_account(selectedAccount);
+                selectedAccount.remove();
                 selectedAccount.clear();
             }
             else if (strncmp(pszCommand, "add category", 13) == 0 || strncmp(pszCommand, "ac", 2) == 0) {
@@ -154,7 +154,7 @@ int main(int argc, char ** argv) {
                 c.set(get_category(categoryCode));
                 c.print();
 
-                delete_category(c);
+                c.remove();
             }
             else if (strncmp(pszCommand, "add payee", 9) == 0 || strncmp(pszCommand, "ap", 2) == 0) {
                 add_payee();

@@ -13,6 +13,8 @@
 #include "cache.h"
 #include "cli.h"
 #include "strdate.h"
+#include "account_views.h"
+#include "category_views.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_recurring_charge.h"
@@ -39,42 +41,13 @@ std::ostream& bold_off(std::ostream& os) {
 #endif
 
 void add_account(void) {
-    char *          accountName;
-    char *          accountCode;
-    char *          openingBalance;
-    double          balance;
+    AddAccountView view;
+    view.show();
 
-    cout << "*** Add account ***" << endl;
-
-    accountName = readString("Account name: ", NULL, 32);
-    accountCode = readString("Account code (max. 5 chars): ", NULL, 4);
-    openingBalance = readString("Opening balance [0.00]: ", "0.00", 32);
-
-    if (strlen(openingBalance) > 0) {
-        balance = strtod(openingBalance, NULL);
-    }
-    else {
-        balance = 0.0;
-    }
-
-    if (strlen(accountCode) == 0) {
-        fprintf(stderr, "\nAccount code must have a value.\n");
-        return;
-    }
-
-    DBAccount account;
-    account.name = accountName;
-    account.code = accountCode;
-    account.openingBalance = balance;
-    account.currentBalance = balance;
-
+    DBAccount account = view.getAccount();
     account.save();
 
     cout << "Created account with ID " << account.id << endl;
-
-    free(openingBalance);
-    free(accountCode);
-    free(accountName);
 }
 
 void list_accounts(void) {
@@ -109,23 +82,20 @@ void list_accounts(void) {
 }
 
 DBAccount choose_account(const char * szAccountCode) {
-    char *          accountCode;
+    string accountCode;
 
     if (szAccountCode == NULL || strlen(szAccountCode) == 0) {
-        cout << "*** Use account ***" << endl;
-        accountCode = readString("Account code (max. 4 chars): ", NULL, 4);
+        ChooseAccountView view;
+        view.show();
+
+        accountCode = view.getCode();
     }
     else {
-        accountCode = strdup(szAccountCode);
+        accountCode = szAccountCode;
     }
 
-    string code = szAccountCode;
-
     DBAccount account;
-
-    account.retrieveByCode(code);
-
-    free(accountCode);
+    account.retrieveByCode(accountCode);
 
     //db.createDueRecurringTransactionsForAccount(account.id);
 
@@ -133,64 +103,22 @@ DBAccount choose_account(const char * szAccountCode) {
 }
 
 void update_account(DBAccount & account) {
-    char            szPrompt[MAX_PROMPT_LENGTH];
-    char            szBalance[AMOUNT_FIELD_STRING_LEN];
-    char *          pszBalance;
+    UpdateAccountView view;
+    view.setAccount(account);
+    view.show();
 
-    cout << "*** Update account ***" << endl;
+    DBAccount updatedAccount = view.getAccount();
 
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Account name ['%s']: ", account.name.c_str());
-    account.name = readString(szPrompt, account.name.c_str(), FIELD_STRING_LEN);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Account code ['%s']: ", account.code.c_str());
-    account.code = readString(szPrompt, account.code.c_str(), FIELD_STRING_LEN);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%.2f]: ", account.openingBalance);
-    snprintf(szBalance, AMOUNT_FIELD_STRING_LEN, "%.2f", account.openingBalance);
-    pszBalance = readString(szPrompt, szBalance, AMOUNT_FIELD_STRING_LEN);
-    account.openingBalance = strtod(pszBalance, NULL);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Current balance [%.2f]: ", account.currentBalance);
-    snprintf(szBalance, AMOUNT_FIELD_STRING_LEN, "%.2f", account.currentBalance);
-    pszBalance = readString(szPrompt, szBalance, AMOUNT_FIELD_STRING_LEN);
-    account.currentBalance = strtod(pszBalance, NULL);
-
-    if (account.code.length() == 0) {
-        fprintf(stderr, "\nAccount code must have a value.\n");
-        return;
-    }
-
-    account.save();
-
-    free(pszBalance);
-}
-
-void delete_account(DBAccount & account) {
-    account.remove();
+    updatedAccount.save();
 }
 
 void add_category(void) {
-    char *          categoryDescription;
-    char *          categoryCode;
+    AddCategoryView view;
+    view.show();
 
-    cout << "*** Add category ***" << endl;
-
-    categoryDescription = readString("Category description: ", NULL, 32);
-    categoryCode = readString("Category code (max. 5 chars): ", NULL, 5);
-
-    if (strlen(categoryCode) == 0) {
-        fprintf(stderr, "\nCategory code must have a value.\n");
-        return;
-    }
-
-    DBCategory category;
-    category.code = categoryCode;
-    category.description = categoryDescription;
+    DBCategory category = view.getCategory();
 
     category.save();
-
-    free(categoryCode);
-    free(categoryDescription);
 }
 
 void list_categories(void) {
@@ -220,11 +148,13 @@ DBCategory get_category(const char * pszCategoryCode) {
     string categoryCode;
 
     if (pszCategoryCode == NULL || strlen(pszCategoryCode) == 0) {
-        cout << "*** Get category ***" << endl;
-        categoryCode = readString("Category code (max. 5 chars): ", NULL, 5);
+        ChooseCategoryView view;
+        view.show();
+
+        categoryCode = view.getCode();
     }
     else {
-        categoryCode = strdup(pszCategoryCode);
+        categoryCode = pszCategoryCode;
     }
 
     DBCategory category;
@@ -234,26 +164,13 @@ DBCategory get_category(const char * pszCategoryCode) {
 }
 
 void update_category(DBCategory & category) {
-    char            szPrompt[MAX_PROMPT_LENGTH];
+    UpdateCategoryView view;
+    view.setCategory(category);
+    view.show();
 
-    cout << "*** Update category ***" << endl;
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category description ['%s']: ", category.description.c_str());
-    category.description = readString(szPrompt, category.description.c_str(), FIELD_STRING_LEN);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']: ", category.code.c_str());
-    category.code = readString(szPrompt, category.code.c_str(), FIELD_STRING_LEN);
-
-    if (category.code.length() == 0) {
-        fprintf(stderr, "\nCategory code must have a value.\n");
-        return;
-    }
-
+    DBCategory updatedCategory = view.getCategory();
+    
     category.save();
-}
-
-void delete_category(DBCategory & category) {
-    category.remove();
 }
 
 void add_payee(void) {
