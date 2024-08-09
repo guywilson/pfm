@@ -122,15 +122,15 @@ class DBTransaction : public DBPayment {
             cout << "isReconciled: " << isReconciled << endl;
         }
 
-        const char * getCreditDebitValue(void) {
+        string getCreditDebitValue(void) {
             return (isCredit ? "CR" : "DB");
         }
 
-        bool getIsCredit(const char * value) {
-            if (strncmp(value, "CR", 2) == 0) {
+        bool getIsCredit(string & value) {
+            if (value == "CR") {
                 return true;
             }
-            else if (strncmp(value, "DB", 2) == 0) {
+            else if (value == "DB") {
                 return false;
             }
             else {
@@ -156,7 +156,7 @@ class DBTransaction : public DBPayment {
                 payeeId,
                 date.c_str(),
                 description.c_str(),
-                getCreditDebitValue(),
+                getCreditDebitValue().c_str(),
                 amount,
                 getIsReconciledValue(),
                 now.c_str(),
@@ -178,7 +178,7 @@ class DBTransaction : public DBPayment {
                 payeeId,
                 date.c_str(),
                 description.c_str(),
-                getCreditDebitValue(),
+                getCreditDebitValue().c_str(),
                 amount,
                 getIsReconciledValue(),
                 now.c_str(),

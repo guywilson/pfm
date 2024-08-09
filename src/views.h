@@ -1,0 +1,5 @@
+#include "account_views.h"
+#include "category_views.h"
+#include "payee_views.h"
+#include "recurring_charge_views.h"
+#include "transaction_views.h"

@@ -13,10 +13,7 @@
 #include "cache.h"
 #include "cli.h"
 #include "strdate.h"
-#include "account_views.h"
-#include "category_views.h"
-#include "payee_views.h"
-#include "recurring_charge_views.h"
+#include "views.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_recurring_charge.h"
@@ -239,6 +236,7 @@ void add_recurring_charge(DBAccount & account) {
     view.show();
 
     DBRecurringCharge charge = view.getRecurringCharge();
+    charge.accountId = account.id;
 
     charge.save();
 }
@@ -296,15 +294,20 @@ void list_recurring_charges(DBAccount & account) {
 }
 
 DBRecurringCharge get_recurring_charge(int sequence) {
+    int selectedSequence;
+
     if (sequence == 0) {
         ChooseRecurringChargeView view;
         view.show();
 
-        sequence = view.getSequence();
+        selectedSequence = view.getSequence();
+    }
+    else {
+        selectedSequence = sequence;
     }
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
-    DBRecurringCharge charge = cacheMgr.getRecurringCharge(sequence);
+    DBRecurringCharge charge = cacheMgr.getRecurringCharge(selectedSequence);
 
     return charge;
 }
@@ -321,115 +324,13 @@ void update_recurring_charge(DBRecurringCharge & charge) {
 }
 
 void add_transaction(DBAccount & account) {
-    char *          payeeName;
-    char *          date;
-    char *          description;
-    char *          credit_debit;
-    char *          amount;
-    bool            isDateValid = false;
-    bool            isCreditDebitValid = false;
+    AddTransactionView view;
+    view.show();
 
-    cout << "*** Add transaction ***" << endl;
-
-    using_history();
-    clear_history();
-
-    DBCategory category;
-    DBCategoryResult catResult = category.retrieveAll();
-
-    for (int i = 0;i < catResult.getNumRows();i++) {
-        add_history(catResult.getResultAt(i).code.c_str());
-    }
-
-    string categoryCode = readString("Category code (max. 5 chars)^ ", NULL, 4);
-
-    using_history();
-    clear_history();
-
-    DBPayee payee;
-    DBPayeeResult payResult = payee.retrieveAll();
-
-    for (int i = 0;i < payResult.getNumRows();i++) {
-        add_history(payResult.getResultAt(i).code.c_str());
-    }
-
-    string payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
-
-    /*
-    ** If the payee does not exist, add it here for convenience...
-    */
-    try {
-        payee.retrieveByCode(payeeCode);
-    }
-    catch (pfm_error & e) {
-        payeeName = readString("Payee name: ", NULL, 32);
-
-        DBPayee payee;
-        payee.code = payeeCode;
-        payee.name = payeeName;
-
-        payee.save();
-
-        free(payeeName);
-    }
-
-    string today = StrDate::today();
-
-    while (!isDateValid) {
-        date = readString("Transaction date (yyyy-mm-dd)[today]: ", today.c_str(), 10);
-        isDateValid = StrDate::validateDate(date);
-    }
-
-    description = readString("Description: ", NULL, 32);
-
-    while (!isCreditDebitValid) {
-        credit_debit = readString("Credit/Debit [DB]: ", "DB", 2);
-        isCreditDebitValid = validateCreditDebit(credit_debit);
-    }
-
-    amount = readString("Amount: ", NULL, 32);
-
-    bool isReconciledValid = false;
-    string is_reconciled;
-
-    while (!isReconciledValid) {
-        is_reconciled = readString("Is reconciled [N]: ", "N", 1);
-        isReconciledValid = DBEntity::isYesNoBooleanValid(is_reconciled);
-    }
-
-    if (categoryCode.length() == 0) {
-        fprintf(stderr, "\nCategory code must have a value.\n");
-        return;
-    }
-
-    if (payeeCode.length() == 0) {
-        fprintf(stderr, "\nPayee code must have a value.\n");
-        return;
-    }
-
-    category.retrieveByCode(categoryCode);
-    payee.retrieveByCode(payeeCode);
-
-    DBTransaction transaction;
-
+    DBTransaction transaction = view.getTransaction();
     transaction.accountId = account.id;
-    transaction.categoryId = category.id;
-    transaction.payeeId = payee.id;
-
-    transaction.date = date;
-    transaction.description = description;
-    transaction.isCredit = decodeCreditDebit(credit_debit);
-    transaction.amount = strtod(amount, NULL);
-    transaction.isReconciled = strtobool(is_reconciled.c_str());
-    transaction.createdDate = StrDate::today();
-    transaction.updatedDate = StrDate::today();
 
     transaction.save();
-
-    free(date);
-    free(description);
-    free(credit_debit);
-    free(amount);
 }
 
 void list_transactions(DBAccount & account) {
@@ -644,132 +545,31 @@ void find_transactions(DBAccount & account) {
 }
 
 DBTransaction get_transaction(int sequence) {
-    char * pszSequence;
+    int selectedSequence;
 
     if (sequence == 0) {
-        cout << "*** Get transaction ***" << endl;
-        pszSequence = readString("Sequence no.: ", NULL, 3);
+        ChooseTransactionView view;
+        view.show();
 
-        sequence = atoi(pszSequence);
-
-        free(pszSequence);
+        selectedSequence = view.getSequence();
+    }
+    else {
+        selectedSequence = sequence;
     }
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
-    DBTransaction transaction = cacheMgr.getTransaction(sequence);
+    DBTransaction transaction = cacheMgr.getTransaction(selectedSequence);
 
     return transaction;
 }
 
 void update_transaction(DBTransaction & transaction) {
-    char            szPrompt[MAX_PROMPT_LENGTH];
-    char            amountStr[AMOUNT_FIELD_STRING_LEN];
-    char *          payeeName;
-    char *          date;
-    char *          description;
-    char *          credit_debit;
-    char *          amount;
-    char *          is_reconciled = NULL;
-    bool            isDateValid = false;
-    bool            isCreditDebitValid = false;
-    bool            isReconciledValid = false;
+    UpdateTransactionView view;
+    view.setTransaction(transaction);
+    view.show();
 
-    cout << "*** Update transaction ***" << endl;
+    DBTransaction updatedTransaction = view.getTransaction();
 
-    using_history();
-    clear_history();
-
-    DBCategory category;
-    DBCategoryResult catResult = category.retrieveAll();
-
-    for (int i = 0;i < catResult.getNumRows();i++) {
-        add_history(catResult.getResultAt(i).code.c_str());
-    }
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']^ ", transaction.category.code.c_str());
-    string categoryCode = readString(szPrompt, transaction.category.code.c_str(), FIELD_STRING_LEN);
-
-    using_history();
-    clear_history();
-
-    DBPayee payee;
-    DBPayeeResult payResult = payee.retrieveAll();
-
-    for (int i = 0;i < payResult.getNumRows();i++) {
-        add_history(payResult.getResultAt(i).code.c_str());
-    }
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", transaction.payee.code.c_str());
-    string payeeCode = readString(szPrompt, transaction.payee.code.c_str(), FIELD_STRING_LEN);
-
-    /*
-    ** If the payee does not exist, add it here for convenience...
-    */
-    try {
-        payee.retrieveByCode(payeeCode);
-    }
-    catch (pfm_error & e) {
-        payeeName = readString("Payee name: ", NULL, 32);
-
-        DBPayee payee;
-        payee.code = payeeCode;
-        payee.name = payeeName;
-
-        payee.save();
-
-        free(payeeName);
-    }
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Transaction date ['%s']: ", transaction.date.c_str());
-
-    while (!isDateValid) {
-        date = readString(szPrompt, transaction.date.c_str(), FIELD_STRING_LEN);
-        isDateValid = StrDate::validateDate(date);
-    }
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", transaction.description.c_str());
-    description = readString(szPrompt, transaction.description.c_str(), FIELD_STRING_LEN);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Credit/Debit ['%s']: ", (transaction.isCredit ? "CR" : "DB"));
-
-    while (!isCreditDebitValid) {
-        credit_debit = readString(szPrompt, (transaction.isCredit ? "CR" : "DB"), 2);
-        isCreditDebitValid = validateCreditDebit(credit_debit);
-    }
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%.2f]: ", transaction.amount);
-    snprintf(amountStr, AMOUNT_FIELD_STRING_LEN, "%.2f", transaction.amount);
-    amount = readString(szPrompt, amountStr, AMOUNT_FIELD_STRING_LEN);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Is reconciled ['%s']: ", (transaction.isReconciled ? "Y" : "N"));
-
-    while (!isReconciledValid) {
-        is_reconciled = readString(szPrompt, (transaction.isReconciled ? "Y" : "N"), 1);
-        isReconciledValid = (is_reconciled[0] == 'Y' || is_reconciled[0] == 'N');
-    }
-
-    if (categoryCode.length() == 0) {
-        fprintf(stderr, "\nCategory code must have a value.\n");
-        return;
-    }
-
-    if (payeeCode.length() == 0) {
-        fprintf(stderr, "\nPayee code must have a value.\n");
-        return;
-    }
-
-    category.retrieveByCode(categoryCode);
-    payee.retrieveByCode(payeeCode);
-
-    transaction.categoryId = category.id;
-    transaction.payeeId = payee.id;
-
-    transaction.date = date;
-    transaction.description = description;
-    transaction.isCredit = decodeCreditDebit(credit_debit);
-    transaction.amount = strtod(amount, NULL);
-    transaction.isReconciled = strtobool(is_reconciled);
-
-    transaction.save();
+    updatedTransaction.save();
 }

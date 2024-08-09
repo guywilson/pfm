@@ -19,6 +19,7 @@ using namespace std;
 
 class CategorySpinField : public CLISpinTextField {
     public:
+        CategorySpinField() : CLISpinTextField() {}
         CategorySpinField(string & label) : CLISpinTextField(label) {}
         CategorySpinField(const char * label) : CLISpinTextField(label) {}
 
@@ -35,9 +36,10 @@ class CategorySpinField : public CLISpinTextField {
         }
 
         DBCategory getCategory() {
-            DBCategory category;
+            string code = getValue();
 
-            category.retrieveByCode(getValue());
+            DBCategory category;
+            category.retrieveByCode(code);
 
             return category;
         }
@@ -45,6 +47,7 @@ class CategorySpinField : public CLISpinTextField {
 
 class PayeeSpinField : public CLISpinTextField {
     public:
+        PayeeSpinField() : CLISpinTextField() {}
         PayeeSpinField(string & label) : CLISpinTextField(label) {}
         PayeeSpinField(const char * label) : CLISpinTextField(label) {}
 
@@ -61,9 +64,10 @@ class PayeeSpinField : public CLISpinTextField {
         }
 
         DBPayee getPayee() {
-            DBPayee payee;
+            string code = getValue();
 
-            payee.retrieveByCode(getValue());
+            DBPayee payee;
+            payee.retrieveByCode(code);
 
             return payee;
         }
@@ -74,12 +78,13 @@ class DateField : public CLITextField {
         const int maxAttemps = 5;
 
     public:
+        DateField() : CLITextField() {}
         DateField(string & label) : CLITextField(label) {}
         DateField(const char * label) : CLITextField(label) {}
 
         void show() override {
             setLengthLimit(DATE_FIELD_LENGTH);
-            
+
             bool isDateValid = false;
             int attempts = 0;
 
@@ -140,6 +145,7 @@ class FrequencyField : public CLITextField {
         }
 
     public:
+        FrequencyField() : CLITextField() {}
         FrequencyField(string & label) : CLITextField(label) {}
         FrequencyField(const char * label) : CLITextField(label) {}
 
