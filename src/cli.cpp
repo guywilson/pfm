@@ -15,6 +15,7 @@
 #include "strdate.h"
 #include "account_views.h"
 #include "category_views.h"
+#include "payee_views.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_recurring_charge.h"
@@ -169,32 +170,16 @@ void update_category(DBCategory & category) {
     view.show();
 
     DBCategory updatedCategory = view.getCategory();
-    
-    category.save();
+    updatedCategory.save();
 }
 
 void add_payee(void) {
-    char *          payeeName;
-    char *          payeeCode;
+    AddPayeeView view;
+    view.show();
 
-    cout << "*** Add payee ***" << endl;
-
-    payeeName = readString("Payee name: ", NULL, 32);
-    payeeCode = readString("Payee code (max. 5 chars): ", NULL, 5);
-
-    if (strlen(payeeCode) == 0) {
-        fprintf(stderr, "\nPayee code must have a value.\n");
-        return;
-    }
-
-    DBPayee payee;
-    payee.code = payeeCode;
-    payee.name = payeeName;
+    DBPayee payee = view.getPayee();
 
     payee.save();
-
-    free(payeeCode);
-    free(payeeName);
 }
 
 void list_payees(void) {
@@ -224,11 +209,13 @@ DBPayee get_payee(const char * pszPayeeCode) {
     string payeeCode;
 
     if (pszPayeeCode == NULL || strlen(pszPayeeCode) == 0) {
-        cout << "*** Get payee ***" << endl;
-        payeeCode = readString("Payee code (max. 5 chars): ", NULL, 5);
+        ChoosePayeeView view;
+        view.show();
+
+        payeeCode = view.getCode();
     }
     else {
-        payeeCode = strdup(pszPayeeCode);
+        payeeCode = pszPayeeCode;
     }
 
     DBPayee payee;
@@ -238,26 +225,12 @@ DBPayee get_payee(const char * pszPayeeCode) {
 }
 
 void update_payee(DBPayee & payee) {
-    char            szPrompt[MAX_PROMPT_LENGTH];
+    UpdatePayeeView view;
+    view.setPayee(payee);
+    view.show();
 
-    cout << "*** Update payee ***" << endl;
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee name ['%s']: ", payee.name.c_str());
-    payee.name = readString(szPrompt, payee.name.c_str(), FIELD_STRING_LEN);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']: ", payee.code.c_str());
-    payee.code = readString(szPrompt, payee.code.c_str(), FIELD_STRING_LEN);
-
-    if (payee.code.length() == 0) {
-        fprintf(stderr, "\nPayee code must have a value.\n");
-        return;
-    }
-
-    payee.save();
-}
-
-void delete_payee(DBPayee & payee) {
-    payee.remove();
+    DBPayee updatedPayee = view.getPayee();
+    updatedPayee.save();
 }
 
 void add_recurring_charge(DBAccount & account) {
@@ -533,10 +506,6 @@ void update_recurring_charge(DBRecurringCharge & charge) {
     charge.amount = strtod(amount, NULL);
 
     charge.save();
-}
-
-void delete_recurring_charge(DBRecurringCharge & charge) {
-    charge.remove();
 }
 
 void add_transaction(DBAccount & account) {
@@ -991,8 +960,4 @@ void update_transaction(DBTransaction & transaction) {
     transaction.isReconciled = strtobool(is_reconciled);
 
     transaction.save();
-}
-
-void delete_transaction(DBTransaction & transaction) {
-    transaction.remove();
 }

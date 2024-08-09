@@ -147,7 +147,9 @@ void DBTransaction::retrieveByID(sqlite3_int64 id) {
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
-                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
+                pfm_error::buildMsg(
+                    "Expected exactly 1 row, got %d", 
+                    rowsRetrievedCount), 
                 __FILE__, 
                 __LINE__);
     }

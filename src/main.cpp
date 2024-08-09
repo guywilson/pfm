@@ -199,7 +199,7 @@ int main(int argc, char ** argv) {
                 p.set(get_payee(payeeCode));
                 p.print();
 
-                delete_payee(p);
+                p.remove();
             }
             else if (strncmp(pszCommand, "add recurring charge", 20) == 0 || strncmp(pszCommand, "arc", 3) == 0) {
                 add_recurring_charge(selectedAccount);
@@ -243,7 +243,7 @@ int main(int argc, char ** argv) {
                 DBRecurringCharge rc;
                 rc.set(get_recurring_charge(sequence));
 
-                delete_recurring_charge(rc);
+                rc.remove();
             }
             else if (strncmp(pszCommand, "add transaction", 15) == 0 || strncmp(pszCommand, "at", 2) == 0) {
                 add_transaction(selectedAccount);
@@ -290,7 +290,7 @@ int main(int argc, char ** argv) {
                 DBTransaction t;
                 t.set(get_transaction(sequence));
 
-                delete_transaction(t);
+                t.remove();
             }
         }
     }
