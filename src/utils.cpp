@@ -22,51 +22,12 @@ using namespace std;
 #define CURRENCY_BUFFER_LEN                 16
 #define MAX_PROMPT_LENGTH                   64
 
-string fixStrWidth(string & src, int requiredLen) {
-    string          target;
-
-    if (src.length() > requiredLen) {
-        target = src.substr(0, requiredLen - 2);
-        target.append("..");
-    }
-    else if (src.length() < requiredLen) {
-        target = src;
-        
-        for (int i = 0;i < requiredLen - src.length();i++) {
-            target.append(" ");
-        }
-    }
-    else {
-        target = src;
-    }
-
-    return target;
-}
-
 string formatCurrency(double src) {
     static char szAmount[CURRENCY_BUFFER_LEN];
 
     snprintf(szAmount, CURRENCY_BUFFER_LEN, "£%.2f", (float)src);
 
     return string(szAmount);
-}
-
-string readString(const char * pszPrompt, const char * pszDefault, const size_t maxLength) {
-    char *      pszAnswer;
-
-    pszAnswer = readline(pszPrompt);
-
-    if (strlen(pszAnswer) == 0) {
-        if (pszDefault != NULL) {
-            pszAnswer = strndup(pszDefault, maxLength);
-        }
-        else {
-            free(pszAnswer);
-            pszAnswer = NULL;
-        }
-    }
-
-    return pszAnswer;
 }
 
 int readCriteria(
@@ -164,18 +125,6 @@ int readCriteria(
     return 1;
 }
 
-char readChar(const char * pszPrompt) {
-    char        answer;
-
-    printf("%s", pszPrompt);
-    fflush(stdout);
-
-    answer = getchar();
-    fflush(stdin);
-
-    return answer;
-}
-
 bool validatePaymentFrequency(char * pszFrequency) {
     uint32_t            frequencyLen;
 
@@ -196,14 +145,6 @@ bool validatePaymentFrequency(char * pszFrequency) {
     }
 
     return true;
-}
-
-int getFrequencyValue(string & frequency) {
-    return atoi(frequency.substr(0, frequency.length() - 1).c_str());
-}
-
-char getFrequencyUnit(string & frequency) {
-    return frequency.substr(frequency.length() - 1, 1).c_str()[0];
 }
 
 bool validateCreditDebit(const char * pszCD) {

@@ -79,7 +79,6 @@ class UpdateCategoryView : public CLIView {
 
         void setCategory(DBCategory & category) {
             char szPrompt[MAX_PROMPT_LENGTH];
-            char szBalance[AMOUNT_FIELD_STRING_LEN];
 
             categoryId = category.id;
 

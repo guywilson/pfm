@@ -2,6 +2,7 @@
 #include <string>
 #include <string.h>
 #include <vector>
+#include <unordered_map>
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -142,6 +143,10 @@ class CLISpinTextField : public CLITextField {
             CLITextField::show();
 
             clear_history();
+        }
+
+        string getValue() override {
+            return CLITextField::getValue();
         }
 };
 

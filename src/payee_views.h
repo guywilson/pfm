@@ -79,7 +79,6 @@ class UpdatePayeeView : public CLIView {
 
         void setPayee(DBPayee & payee) {
             char szPrompt[MAX_PROMPT_LENGTH];
-            char szBalance[AMOUNT_FIELD_STRING_LEN];
 
             categoryId = payee.id;
 

@@ -16,6 +16,7 @@
 #include "account_views.h"
 #include "category_views.h"
 #include "payee_views.h"
+#include "recurring_charge_views.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_recurring_charge.h"
@@ -234,106 +235,12 @@ void update_payee(DBPayee & payee) {
 }
 
 void add_recurring_charge(DBAccount & account) {
-    char *          payeeName;
-    char *          date;
-    char *          description;
-    char *          frequency;
-    char *          amount;
-    bool            isDateValid = false;
-    bool            isFrequencyValid = false;
+    AddRecurringChargeView view;
+    view.show();
 
-    cout << "*** Add recurring charge ***" << endl;
-
-    using_history();
-    clear_history();
-
-    DBCategory category;
-    DBCategoryResult catResult = category.retrieveAll();
-
-    for (int i = 0;i < catResult.getNumRows();i++) {
-        add_history(catResult.getResultAt(i).code.c_str());
-    }
-
-    string categoryCode = readString("Category code (max. 5 chars)^ ", NULL, 4);
-
-    using_history();
-    clear_history();
-
-    DBPayee payee;
-    DBPayeeResult payResult = payee.retrieveAll();
-
-    for (int i = 0;i < payResult.getNumRows();i++) {
-        add_history(payResult.getResultAt(i).code.c_str());
-    }
-
-    string payeeCode = readString("Payee code (max. 5 chars)^ ", NULL, 5);
-
-    /*
-    ** If the payee does not exist, add it here for convenience...
-    */
-    try {
-        payee.retrieveByCode(payeeCode);
-    }
-    catch (pfm_error & e) {
-        payeeName = readString("Payee name: ", NULL, 32);
-
-        DBPayee payee;
-        payee.code = payeeCode;
-        payee.name = payeeName;
-
-        payee.save();
-
-        free(payeeName);
-    }
-
-    string today = StrDate::today();
-
-    while (!isDateValid) {
-        date = readString("Start date (yyyy-mm-dd)[today]: ", today.c_str(), 10);
-        isDateValid = StrDate::validateDate(date);
-    }
-
-    description = readString("Charge description: ", description, 32);
-
-    while (!isFrequencyValid) {
-        frequency = readString("Frequency (N[wmy]): ", "1m", 3);
-        isFrequencyValid = validatePaymentFrequency(frequency);
-    }
-
-    amount = readString("Amount: ", NULL, 32);
-
-    if (categoryCode.length() == 0) {
-        fprintf(stderr, "\nCategory code must have a value.\n");
-        return;
-    }
-
-    if (payeeCode.length() == 0) {
-        fprintf(stderr, "\nPayee code must have a value.\n");
-        return;
-    }
-
-    category.retrieveByCode(categoryCode);
-    payee.retrieveByCode(payeeCode);
-
-    DBRecurringCharge charge;
-
-    charge.accountId = account.id;
-    charge.categoryId = category.id;
-    charge.payeeId = payee.id;
-
-    charge.date = date;
-    charge.description = description;
-    charge.frequency = frequency;
-    charge.amount = strtod(amount, NULL);
-    charge.createdDate = StrDate::today();
-    charge.updatedDate = StrDate::today();
+    DBRecurringCharge charge = view.getRecurringCharge();
 
     charge.save();
-
-    free(date);
-    free(description);
-    free(frequency);
-    free(amount);
 }
 
 void list_recurring_charges(DBAccount & account) {
@@ -389,15 +296,11 @@ void list_recurring_charges(DBAccount & account) {
 }
 
 DBRecurringCharge get_recurring_charge(int sequence) {
-    char * pszSequence;
-
     if (sequence == 0) {
-        cout << "*** Get recurring charge ***" << endl;
-        pszSequence = readString("Sequence no.: ", NULL, 3);
+        ChooseRecurringChargeView view;
+        view.show();
 
-        sequence = atoi(pszSequence);
-
-        free(pszSequence);
+        sequence = view.getSequence();
     }
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
@@ -407,105 +310,14 @@ DBRecurringCharge get_recurring_charge(int sequence) {
 }
 
 void update_recurring_charge(DBRecurringCharge & charge) {
-    char            szPrompt[MAX_PROMPT_LENGTH];
-    char            amountStr[AMOUNT_FIELD_STRING_LEN];
-    char *          payeeName;
-    char *          date;
-    char *          description;
-    char *          frequency;
-    char *          amount;
-    bool            isDateValid = false;
-    bool            isFrequencyValid = false;
+    UpdateRecurringChargeView view;
+    
+    view.setRecurringCharge(charge);
+    view.show();
 
-    cout << "*** Update recurring charge ***" << endl;
+    DBRecurringCharge updatedCharge = view.getRecurringCharge();
 
-    using_history();
-    clear_history();
-
-    DBCategory category;
-    DBCategoryResult catResult = category.retrieveAll();
-
-    for (int i = 0;i < catResult.getNumRows();i++) {
-        add_history(catResult.getResultAt(i).code.c_str());
-    }
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category code ['%s']^ ", charge.category.code.c_str());
-    string categoryCode = readString(szPrompt, charge.category.code.c_str(), FIELD_STRING_LEN);
-
-    using_history();
-    clear_history();
-
-    DBPayee payee;
-    DBPayeeResult payResult = payee.retrieveAll();
-
-    for (int i = 0;i < payResult.getNumRows();i++) {
-        add_history(payResult.getResultAt(i).code.c_str());
-    }
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee code ['%s']^ ", charge.payee.code.c_str());
-    string payeeCode = readString(szPrompt, charge.payee.code.c_str(), FIELD_STRING_LEN);
-
-    /*
-    ** If the payee does not exist, add it here for convenience...
-    */
-    try {
-        payee.retrieveByCode(payeeCode);
-    }
-    catch (pfm_error & e) {
-        payeeName = readString("Payee name: ", NULL, 32);
-
-        DBPayee payee;
-        payee.code = payeeCode;
-        payee.name = payeeName;
-
-        payee.save();
-
-        free(payeeName);
-    }
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", charge.date.c_str());
-
-    while (!isDateValid) {
-        date = readString(szPrompt, charge.date.c_str(), FIELD_STRING_LEN);
-        isDateValid = StrDate::validateDate(date);
-    }
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", charge.description.c_str());
-    description = readString(szPrompt, charge.description.c_str(), FIELD_STRING_LEN);
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Frequency (N[wmy])['%s']: ", charge.frequency.c_str());
-
-    while (!isFrequencyValid) {
-        frequency = readString(szPrompt, charge.frequency.c_str(), FIELD_STRING_LEN);
-        isFrequencyValid = validatePaymentFrequency(frequency);
-    }
-
-    snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%.2f]: ", charge.amount);
-    snprintf(amountStr, AMOUNT_FIELD_STRING_LEN, "%.2f", charge.amount);
-    amount = readString(szPrompt, amountStr, AMOUNT_FIELD_STRING_LEN);
-
-    if (categoryCode.length() == 0) {
-        fprintf(stderr, "\nCategory code must have a value.\n");
-        return;
-    }
-
-    if (payeeCode.length() == 0) {
-        fprintf(stderr, "\nPayee code must have a value.\n");
-        return;
-    }
-
-    category.retrieveByCode(categoryCode);
-    payee.retrieveByCode(payeeCode);
-
-    charge.categoryId = category.id;
-    charge.payeeId = payee.id;
-
-    charge.date = date;
-    charge.description = description;
-    charge.frequency = frequency;
-    charge.amount = strtod(amount, NULL);
-
-    charge.save();
+    updatedCharge.save();
 }
 
 void add_transaction(DBAccount & account) {

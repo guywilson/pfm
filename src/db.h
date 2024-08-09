@@ -8,8 +8,8 @@
 
 using namespace std;
 
-#ifndef __INCL_DB_NEW
-#define __INCL_DB_NEW
+#ifndef __INCL_DB
+#define __INCL_DB
 
 #define SQLITE_ERROR_BUFFER_LEN                     512
 #define SQL_STATEMENT_BUFFER_LEN                    512
