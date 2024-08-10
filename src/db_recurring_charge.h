@@ -325,13 +325,8 @@ class DBRecurringChargeResult : public DBResult {
                 }
             }
             
-            DBCategory category;
-            category.retrieveByID(charge.categoryId);
-            charge.category.set(category);
-
-            DBPayee payee;
-            payee.retrieveByID(charge.payeeId);
-            charge.payee.set(payee);
+            charge.category.retrieveByID(charge.categoryId);
+            charge.payee.retrieveByID(charge.payeeId);
 
             charge.sequence = sequenceCounter++;
             

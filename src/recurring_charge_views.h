@@ -67,7 +67,7 @@ class AddRecurringChargeView : public CLIView {
 
 class ChooseRecurringChargeView : public CLIView {
     private:
-        CLITextField sequenceField = CLITextField("Code (max. 5 chars): ");
+        CLITextField sequenceField = CLITextField("Sequence: ");
 
     public:
         ChooseRecurringChargeView() : ChooseRecurringChargeView("Use recurring charge") {}
@@ -120,9 +120,9 @@ class UpdateRecurringChargeView : public CLIView {
             dateField.setDefaultValue(charge.date);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", charge.description.c_str());
-            payeeField.setLabel(szPrompt);
-            payeeField.setDefaultValue(charge.description);
-            payeeField.setLengthLimit(FIELD_STRING_LEN);
+            descriptionField.setLabel(szPrompt);
+            descriptionField.setDefaultValue(charge.description);
+            descriptionField.setLengthLimit(FIELD_STRING_LEN);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Frequency (x[d|w|m|y]) ['%s']: ", charge.frequency.c_str());
             frequencyField.setLabel(szPrompt);
@@ -137,7 +137,7 @@ class UpdateRecurringChargeView : public CLIView {
         }
 
         void show() override {
-            CLIView::show();
+            printTitle();
 
             categoryField.show();
             payeeField.show();

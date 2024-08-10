@@ -53,8 +53,8 @@ class DBPayee : public DBEntity {
         void set(const DBPayee & src) {
             DBEntity::set(src);
 
-            this->name =            src.name;
-            this->code =            src.code;
+            this->name = src.name;
+            this->code = src.code;
         }
 
         void print(void) {

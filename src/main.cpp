@@ -171,7 +171,7 @@ int main(int argc, char ** argv) {
                     }
                 }
                 else if (strncmp(pszCommand, "up", 2) == 0) {
-                    if (strlen(pszCommand) >= 6) {
+                    if (strlen(pszCommand) >= 5) {
                         payeeCode = &pszCommand[3];
                     }
                 }
@@ -190,7 +190,7 @@ int main(int argc, char ** argv) {
                     }
                 }
                 else if (strncmp(pszCommand, "dc", 2) == 0) {
-                    if (strlen(pszCommand) >= 6) {
+                    if (strlen(pszCommand) >= 5) {
                         payeeCode = &pszCommand[3];
                     }
                 }

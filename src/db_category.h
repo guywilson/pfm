@@ -53,8 +53,8 @@ class DBCategory : public DBEntity {
         void set(const DBCategory & src) {
             DBEntity::set(src);
 
-            this->description.assign(src.description);
-            this->code.assign(src.code);
+            this->description = src.description;
+            this->code = src.code;
         }
 
         void print(void) {

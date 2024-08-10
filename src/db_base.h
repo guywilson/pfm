@@ -53,6 +53,8 @@ class DBEntity {
 
         void set(const DBEntity & src) {
             this->id = src.id;
+            this->createdDate = src.createdDate;
+            this->updatedDate = src.updatedDate;
             this->sequence = src.sequence;
         }
 

@@ -48,6 +48,9 @@ class DBPayment : public DBEntity {
             this->date = src.date;
             this->description = src.description;
             this->amount = src.amount;
+
+            this->category.set(src.category);
+            this->payee.set(src.payee);
         }
 
         void print(void) {

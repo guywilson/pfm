@@ -21,6 +21,21 @@ class CLIField : public CLIWidget {
         string value;
         string label;
 
+    protected:
+        void readLine() {
+            char * line = NULL;
+
+            line = readline(label.c_str());
+
+            if (line != NULL && line[0] != 0) {
+                value = line;
+                free(line);
+            }
+            else {
+                value = "";
+            }
+        }
+
     public:
         CLIField() : CLIWidget() {}
 
@@ -69,17 +84,7 @@ class CLIField : public CLIWidget {
         }
 
         void show() {
-            char * line = NULL;
-
-            line = readline(label.c_str());
-
-            if (line != NULL && line[0] != 0) {
-                value = line;
-                free(line);
-            }
-            else {
-                value = "";
-            }
+            readLine();
         }
 };
 
@@ -122,6 +127,21 @@ class CLISpinTextField : public CLITextField {
     private:
         vector<string> items;
 
+    protected:
+        void populate() {
+            clear();
+
+            if (items.size() > 0) {
+                for (int i = 0;i < items.size();i++) {
+                    add_history(items[i].c_str());
+                }
+            }
+        }
+
+        void clear() {
+            clear_history();
+        }
+
     public:
         CLISpinTextField() : CLITextField() {}
         CLISpinTextField(string & label) : CLITextField(label) {}
@@ -132,17 +152,9 @@ class CLISpinTextField : public CLITextField {
         }
 
         void show() override {
-            clear_history();
-
-            if (items.size() > 0) {
-                for (int i = 0;i < items.size();i++) {
-                    add_history(items[i].c_str());
-                }
-            }
-
-            CLITextField::show();
-
-            clear_history();
+            populate();
+            readLine();
+            clear();
         }
 
         string getValue() override {
@@ -153,6 +165,11 @@ class CLISpinTextField : public CLITextField {
 class CLIView : public CLIWidget {
     private:
         string title;
+
+    protected:
+        void printTitle() {
+            cout << "*** " << title << " ***" << endl;
+        }
 
     public:
         CLIView() : CLIWidget() {}
@@ -179,7 +196,7 @@ class CLIView : public CLIWidget {
         }
 
         void show(string & title) {
-            cout << "*** " << title << " ***" << endl;
+            printTitle();
         }
 
         void show() override {

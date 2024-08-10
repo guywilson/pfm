@@ -32,7 +32,9 @@ class CategorySpinField : public CLISpinTextField {
                 addItem(c.code);
             }
 
-            CLISpinTextField::show();
+            populate();
+            readLine();
+            clear();
         }
 
         DBCategory getCategory() {
@@ -60,7 +62,9 @@ class PayeeSpinField : public CLISpinTextField {
                 addItem(p.code);
             }
 
-            CLISpinTextField::show();
+            populate();
+            readLine();
+            clear();
         }
 
         DBPayee getPayee() {
@@ -89,7 +93,7 @@ class DateField : public CLITextField {
             int attempts = 0;
 
             while (!isDateValid && attempts < maxAttemps) {
-                CLITextField::show();
+                readLine();
                 isDateValid = StrDate::validateDate(getValue());
 
                 attempts++;
@@ -154,7 +158,7 @@ class FrequencyField : public CLITextField {
             int attempts = 0;
 
             while (!isFrequencyValid && attempts < maxAttemps) {
-                CLITextField::show();
+                readLine();
                 isFrequencyValid = validate();
 
                 attempts++;
