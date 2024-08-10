@@ -21,22 +21,15 @@ class AddTransactionView : public CLIView {
         DateField dateField = DateField("Date (yyyy-mm-dd)[today]: ");
         CLITextField descriptionField = CLITextField("Description: ");
         CLITextField creditDebitField = CLITextField("Credit/Debit [DB]: ");
-        CLITextField amountField = CLITextField("Amount: ");
+        CLICurrencyField amountField = CLICurrencyField("Amount: ");
         CLITextField isReconciledField = CLITextField("Is reconciled [N]: ");
 
     public:
         AddTransactionView() : AddTransactionView("Add transaction") {}
 
         AddTransactionView(const char * title) : CLIView(title) {
-            categoryField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
-            payeeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
-            dateField.setLengthLimit(10);
-            descriptionField.setLengthLimit(FIELD_STRING_LEN);
-
             creditDebitField.setLengthLimit(2);
             creditDebitField.setDefaultValue("DB");
-
-            amountField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
 
             isReconciledField.setLengthLimit(1);
             isReconciledField.setDefaultValue("N");
@@ -106,7 +99,7 @@ class UpdateTransactionView : public CLIView {
         DateField dateField;
         CLITextField descriptionField;
         CLITextField creditDebitField;
-        CLITextField amountField;
+        CLICurrencyField amountField;
         CLITextField isReconciledField;
 
     public:
@@ -115,28 +108,24 @@ class UpdateTransactionView : public CLIView {
 
         void setTransaction(DBTransaction & transaction) {
             char szPrompt[MAX_PROMPT_LENGTH];
-            char szBalance[AMOUNT_FIELD_STRING_LEN];
 
             transactionId = transaction.id;
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category ['%s']: ", transaction.category.code.c_str());
             categoryField.setLabel(szPrompt);
             categoryField.setDefaultValue(transaction.category.code);
-            categoryField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee ['%s']: ", transaction.payee.code.c_str());
             payeeField.setLabel(szPrompt);
             payeeField.setDefaultValue(transaction.payee.code);
-            payeeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Date ['%s']: ", transaction.date.c_str());
             dateField.setLabel(szPrompt);
             dateField.setDefaultValue(transaction.date);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", transaction.description.c_str());
-            payeeField.setLabel(szPrompt);
-            payeeField.setDefaultValue(transaction.description);
-            payeeField.setLengthLimit(FIELD_STRING_LEN);
+            descriptionField.setLabel(szPrompt);
+            descriptionField.setDefaultValue(transaction.description);
 
             string creditDebit = transaction.getCreditDebitValue();
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Credit/debit ['%s']: ", creditDebit.c_str());
@@ -145,10 +134,8 @@ class UpdateTransactionView : public CLIView {
             creditDebitField.setLengthLimit(2);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%.2f]: ", transaction.amount);
-            snprintf(szBalance, AMOUNT_FIELD_STRING_LEN, "%.2f", transaction.amount);
             amountField.setLabel(szPrompt);
-            amountField.setDefaultValue(szBalance);
-            amountField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+            amountField.setDefaultValue(transaction.amount);
         }
 
         void show() override {

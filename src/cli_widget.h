@@ -11,6 +11,10 @@ using namespace std;
 #ifndef __CLI_WIDGET
 #define __CLI_WIDGET
 
+#define FIELD_STRING_LEN                        64
+#define MAX_PROMPT_LENGTH                      128
+#define AMOUNT_FIELD_STRING_LEN                 16
+
 class CLIWidget {
     public:
         virtual void show() = 0;
@@ -36,6 +40,10 @@ class CLIField : public CLIWidget {
             }
         }
 
+        string _getValue() {
+            return value;
+        }
+
     public:
         CLIField() : CLIWidget() {}
 
@@ -56,7 +64,7 @@ class CLIField : public CLIWidget {
         }
 
         virtual string getValue() {
-            return value;
+            return _getValue();
         }
 
         double getDoubleValue() {
@@ -90,7 +98,7 @@ class CLIField : public CLIWidget {
 
 class CLITextField : public CLIField {
     private:
-        int maxLength;
+        int maxLength = FIELD_STRING_LEN;
         string defaultValue;
 
     public:
@@ -111,7 +119,7 @@ class CLITextField : public CLIField {
         }
 
         string getValue() override {
-            string value = CLIField::getValue();
+            string value = _getValue();
 
             if (value.length() == 0) {
                 if (defaultValue.length() > 0) {
@@ -120,6 +128,26 @@ class CLITextField : public CLIField {
             }
 
             return value;
+        }
+};
+
+class CLICurrencyField : public CLITextField {
+    public:
+        CLICurrencyField() : CLITextField() {}
+        CLICurrencyField(string & label) : CLITextField(label) {}
+        CLICurrencyField(const char * label) : CLITextField(label) {}
+
+        void setDefaultValue(double value) {
+            char szValue[AMOUNT_FIELD_STRING_LEN];
+
+            snprintf(szValue, AMOUNT_FIELD_STRING_LEN, "%.2f", value);
+            CLITextField::setDefaultValue(szValue);
+        }
+
+        void show() override {
+            setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+
+            readLine();
         }
 };
 
@@ -155,10 +183,6 @@ class CLISpinTextField : public CLITextField {
             populate();
             readLine();
             clear();
-        }
-
-        string getValue() override {
-            return CLITextField::getValue();
         }
 };
 

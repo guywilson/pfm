@@ -20,18 +20,12 @@ class AddRecurringChargeView : public CLIView {
         DateField dateField = DateField("Start date (yyyy-mm-dd)[today]: ");
         CLITextField descriptionField = CLITextField("Description: ");
         FrequencyField frequencyField = FrequencyField("Frequency (N[wmy]): ");
-        CLITextField amountField = CLITextField("Amount: ");
+        CLICurrencyField amountField = CLICurrencyField("Amount: ");
 
     public:
         AddRecurringChargeView() : AddRecurringChargeView("Add recurring charge") {}
 
         AddRecurringChargeView(const char * title) : CLIView(title) {
-            categoryField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
-            payeeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
-            dateField.setLengthLimit(10);
-            descriptionField.setLengthLimit(FIELD_STRING_LEN);
-            amountField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
-
             string today = StrDate::today();
             dateField.setDefaultValue(today);
         }
@@ -93,7 +87,7 @@ class UpdateRecurringChargeView : public CLIView {
         DateField dateField;
         CLITextField descriptionField;
         FrequencyField frequencyField;
-        CLITextField amountField;
+        CLICurrencyField amountField;
 
     public:
         UpdateRecurringChargeView() : UpdateRecurringChargeView("Update recurring charge") {}
@@ -101,19 +95,16 @@ class UpdateRecurringChargeView : public CLIView {
 
         void setRecurringCharge(DBRecurringCharge & charge) {
             char szPrompt[MAX_PROMPT_LENGTH];
-            char szBalance[AMOUNT_FIELD_STRING_LEN];
 
             chargeId = charge.id;
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category ['%s']: ", charge.category.code.c_str());
             categoryField.setLabel(szPrompt);
             categoryField.setDefaultValue(charge.category.code);
-            categoryField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee ['%s']: ", charge.payee.code.c_str());
             payeeField.setLabel(szPrompt);
             payeeField.setDefaultValue(charge.payee.code);
-            payeeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Date ['%s']: ", charge.date.c_str());
             dateField.setLabel(szPrompt);
@@ -122,18 +113,14 @@ class UpdateRecurringChargeView : public CLIView {
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", charge.description.c_str());
             descriptionField.setLabel(szPrompt);
             descriptionField.setDefaultValue(charge.description);
-            descriptionField.setLengthLimit(FIELD_STRING_LEN);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Frequency (x[d|w|m|y]) ['%s']: ", charge.frequency.c_str());
             frequencyField.setLabel(szPrompt);
             frequencyField.setDefaultValue(charge.frequency);
-            frequencyField.setLengthLimit(FIELD_STRING_LEN);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%.2f]: ", charge.amount);
-            snprintf(szBalance, AMOUNT_FIELD_STRING_LEN, "%.2f", charge.amount);
             amountField.setLabel(szPrompt);
-            amountField.setDefaultValue(szBalance);
-            amountField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+            amountField.setDefaultValue(charge.amount);
         }
 
         void show() override {

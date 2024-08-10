@@ -11,9 +11,6 @@ using namespace std;
 #ifndef __INCL_CUSTOM_WIDGETS
 #define __INCL_CUSTOM_WIDGETS
 
-#define FIELD_STRING_LEN                        64
-#define MAX_PROMPT_LENGTH                      128
-#define AMOUNT_FIELD_STRING_LEN                 16
 #define CODE_FIELD_MAX_LENGTH                    5
 #define DATE_FIELD_LENGTH                       10
 
@@ -24,6 +21,8 @@ class CategorySpinField : public CLISpinTextField {
         CategorySpinField(const char * label) : CLISpinTextField(label) {}
 
         void show() override {
+            setLengthLimit(CODE_FIELD_MAX_LENGTH);
+
             DBCategory category;
             DBCategoryResult result = category.retrieveAll();
 
@@ -154,6 +153,8 @@ class FrequencyField : public CLITextField {
         FrequencyField(const char * label) : CLITextField(label) {}
 
         void show() override {
+            setLengthLimit(4);
+
             bool isFrequencyValid = false;
             int attempts = 0;
 
