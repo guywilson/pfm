@@ -204,7 +204,7 @@ class CLIView : public CLIWidget {
 
     protected:
         void printTitle() {
-            cout << "*** " << title << " ***" << endl;
+            cout << "*** " << title << " ***" << endl << endl;
         }
 
     public:
@@ -294,7 +294,7 @@ class CLIListRow : public CLIWidget {
         vector<string> columnValues;
 
         int getNumPaddingChars(CLIListColumn & column, string & value) {
-            return column.getWidth() - (value.length() + 2);
+            return column.getWidth() - value.length();
         }
 
     public:
@@ -309,13 +309,41 @@ class CLIListRow : public CLIWidget {
         }
 
         void showHeaderRow() {
+            int tableWidth = 0;
+
             cout << "| ";
 
             for (int i = 0;i < columnDefintions.size();i++) {
+                tableWidth += 2;
+
                 CLIListColumn column = columnDefintions[i];
 
-                cout << column.getName() << " | ";
+                string columnName = column.getName();
+                cout << columnName;
+
+                tableWidth += columnName.length();
+
+                int numPaddingChars = getNumPaddingChars(column, columnName);;
+
+                for (int j = 0;j < numPaddingChars;j++) {
+                    cout << " ";
+                    tableWidth++;
+                }
+
+                cout << " | ";
+
+                tableWidth += 2;
             }
+
+            cout << endl;
+
+            tableWidth -= 2;
+
+            for (int i = 0;i < tableWidth;i++) {
+                cout << "-";
+            }
+
+            cout << endl;
         }
 
         void show() override {
@@ -334,7 +362,7 @@ class CLIListRow : public CLIWidget {
                         break;
                 }
 
-                int numPaddingChars = getNumPaddingChars(column, columnValues[i]);;
+                int numPaddingChars = getNumPaddingChars(column, columnValues[i]);
 
                 for (int j = 0;j < numPaddingChars;j++) {
                     cout << " ";
@@ -342,6 +370,8 @@ class CLIListRow : public CLIWidget {
 
                 cout << " | ";
             }
+
+            cout << endl;
         }
 };
 
