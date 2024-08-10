@@ -72,6 +72,44 @@ class ChooseAccountView : public CLIView {
         }
 };
 
+class AccountListView : public CLIListView {
+    public:
+        AccountListView() : CLIListView() {}
+
+        void addResults(DBAccountResult & result) {
+            char szTitle[16];
+
+            snprintf(szTitle, 16, "Accounts (%d)", result.getNumRows());
+            setTitle(szTitle);
+
+            CLIListRow headerRow;
+
+            CLIListColumn column1 = CLIListColumn("Code", 5, CLIListColumn::leftAligned);
+            headerRow.addColumn(column1);
+
+            CLIListColumn column2 = CLIListColumn("Name", 25, CLIListColumn::leftAligned);
+            headerRow.addColumn(column2);
+
+            CLIListColumn column3 = CLIListColumn("Balance", 13, CLIListColumn::rightAligned);
+            headerRow.addColumn(column3);
+
+            addHeaderRow(headerRow);
+
+            for (int i = 0;i < result.getNumRows();i++) {
+                DBAccount account = result.getResultAt(i);
+
+                CLIListRow row;
+                string balance = formatCurrency(account.currentBalance);
+
+                row.addCellValue(account.code);
+                row.addCellValue(account.name);
+                row.addCellValue(balance);
+
+                addRow(row);
+            }
+        }
+};
+
 class UpdateAccountView : public CLIView {
     private:
         sqlite3_int64 accountId;

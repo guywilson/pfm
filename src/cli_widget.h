@@ -254,11 +254,20 @@ class CLIListColumn : public CLIField {
 
     public:
         CLIListColumn() : CLIField() {}
+        CLIListColumn(const char * name, int width, CLIListColumn::alignment align) : CLIField(name) {
+            this->width = width;
+            this->align = align;
+
+            if ((width + 2) < strlen(name)) {
+                throw pfm_error("Column name is too long for specified width");
+            }
+        }
+
         CLIListColumn(string & name, int width, CLIListColumn::alignment align) : CLIField(name) {
             this->width = width;
             this->align = align;
 
-            if (width < (name.length() + 2)) {
+            if ((width + 2) < name.length()) {
                 throw pfm_error("Column name is too long for specified width");
             }
         }
@@ -338,25 +347,31 @@ class CLIListRow : public CLIWidget {
 
 class CLIListView : public CLIView {
     private:
-        vector<CLIListRow> rows;
+        CLIListRow headerRow;
+        vector<CLIListRow> dataRows;
     
     public:
         CLIListView() : CLIView() {}
         CLIListView(string & title) : CLIView(title) {}
         CLIListView(const char * szTitle) : CLIView(szTitle) {}
 
+        void addHeaderRow(CLIListRow & header) {
+            headerRow = header;
+        }
         void addRow(CLIListRow & row) {
-            rows.push_back(row);
+            dataRows.push_back(row);
         }
 
         void show() override {
             printTitle();
 
-            rows[0].showHeaderRow();
+            headerRow.showHeaderRow();
 
-            for (int i = 1;i < rows.size();i++) {
-                rows[i].show();
+            for (int i = 0;i < dataRows.size();i++) {
+                dataRows[i].show();
             }
+
+            cout << endl;
         }
 };
 

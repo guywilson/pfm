@@ -57,27 +57,32 @@ void list_accounts(void) {
     DBAccount accountInstance;
     result = accountInstance.retrieveAll();
 
-    numAccounts = result.getNumRows();
+    AccountListView view;
 
-    cout << "*** Accounts (" << numAccounts << ") ***" << endl << endl;
-    cout << "| Code  | Name                      | Balance      |" << endl;
-    cout << "----------------------------------------------------" << endl;
+    view.addResults(result);
 
-    for (i = 0;i < numAccounts;i++) {
-        DBAccount account = result.getResultAt(i);
+    view.show();
+    // numAccounts = result.getNumRows();
 
-        cout << 
-            "| " << 
-            left << setw(5) << account.code << 
-            " | " << 
-            left << setw(25) << account.name << 
-            " | " << 
-            right << setw(13) << formatCurrency(account.currentBalance) << 
-            " |" <<
-            endl;
-    }
+    // cout << "*** Accounts (" << numAccounts << ") ***" << endl << endl;
+    // cout << "| Code  | Name                      | Balance      |" << endl;
+    // cout << "----------------------------------------------------" << endl;
 
-    cout << endl;
+    // for (i = 0;i < numAccounts;i++) {
+    //     DBAccount account = result.getResultAt(i);
+
+    //     cout << 
+    //         "| " << 
+    //         left << setw(5) << account.code << 
+    //         " | " << 
+    //         left << setw(25) << account.name << 
+    //         " | " << 
+    //         right << setw(13) << formatCurrency(account.currentBalance) << 
+    //         " |" <<
+    //         endl;
+    // }
+
+    // cout << endl;
 }
 
 DBAccount choose_account(const char * szAccountCode) {
@@ -308,7 +313,6 @@ DBRecurringCharge get_recurring_charge(int sequence) {
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
     DBRecurringCharge charge = cacheMgr.getRecurringCharge(selectedSequence);
-    
     charge.retrieveByID(charge.id);
 
     return charge;
