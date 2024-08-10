@@ -6,6 +6,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include "pfm_error.h"
+
 using namespace std;
 
 #ifndef __CLI_WIDGET
@@ -17,6 +19,9 @@ using namespace std;
 
 class CLIWidget {
     public:
+        CLIWidget() {}
+        virtual ~CLIWidget() {};
+
         virtual void show() = 0;
 };
 
@@ -26,23 +31,17 @@ class CLIField : public CLIWidget {
         string label;
 
     protected:
-        void readLine() {
-            char * line = NULL;
-
-            line = readline(label.c_str());
-
-            if (line != NULL && line[0] != 0) {
-                value = line;
-                free(line);
-            }
-            else {
-                value = "";
-            }
+        string _getLabel() {
+            return label;
         }
 
         string _getValue() {
             return value;
         }
+
+        void _setValue(string value) {
+            this->value = value;
+        } 
 
     public:
         CLIField() : CLIWidget() {}
@@ -91,15 +90,28 @@ class CLIField : public CLIWidget {
             return (int64_t)strtoll(getValue().c_str(), NULL, 10);
         }
 
-        void show() {
-            readLine();
-        }
+        void show() override {}
 };
 
 class CLITextField : public CLIField {
     private:
         int maxLength = FIELD_STRING_LEN;
         string defaultValue;
+
+    protected:
+        void readLine() {
+            char * line = NULL;
+
+            line = readline(_getLabel().c_str());
+
+            if (line != NULL && line[0] != 0) {
+                _setValue(line);
+                free(line);
+            }
+            else {
+                _setValue("");
+            }
+        }
 
     public:
         CLITextField() : CLIField() {}
@@ -225,6 +237,126 @@ class CLIView : public CLIWidget {
 
         void show() override {
             show(this->title);
+        }
+};
+
+class CLIListColumn : public CLIField {
+    public:
+        typedef enum {
+            leftAligned,
+            rightAligned
+        }
+        alignment;
+
+    private:
+        int width;
+        alignment align;
+
+    public:
+        CLIListColumn() : CLIField() {}
+        CLIListColumn(string & name, int width, CLIListColumn::alignment align) : CLIField(name) {
+            this->width = width;
+            this->align = align;
+
+            if (width < (name.length() + 2)) {
+                throw pfm_error("Column name is too long for specified width");
+            }
+        }
+
+
+        string getName() {
+            return _getLabel();
+        }
+
+        alignment getAlignment() {
+            return align;
+        }
+
+        int getWidth() {
+            return width;
+        }
+
+        void show() override {}
+};
+
+class CLIListRow : public CLIWidget {
+    private:
+        vector<CLIListColumn> columnDefintions;
+        vector<string> columnValues;
+
+        int getNumPaddingChars(CLIListColumn & column, string & value) {
+            return column.getWidth() - (value.length() + 2);
+        }
+
+    public:
+        CLIListRow() : CLIWidget() {}
+
+        void addColumn(CLIListColumn & column) {
+            columnDefintions.push_back(column);
+        }
+
+        void addCellValue(string & value) {
+            columnValues.push_back(value);
+        }
+
+        void showHeaderRow() {
+            cout << "| ";
+
+            for (int i = 0;i < columnDefintions.size();i++) {
+                CLIListColumn column = columnDefintions[i];
+
+                cout << column.getName() << " | ";
+            }
+        }
+
+        void show() override {
+            cout << "| ";
+
+            for (int i = 0;i < columnDefintions.size();i++) {
+                CLIListColumn column = columnDefintions[i];
+
+                switch (column.getAlignment()) {
+                    case CLIListColumn::leftAligned:
+                        cout << left << setw(column.getWidth()) << columnValues[i];
+                        break;
+
+                    case CLIListColumn::rightAligned:
+                        cout << right << setw(column.getWidth()) << columnValues[i];
+                        break;
+                }
+
+                int numPaddingChars = getNumPaddingChars(column, columnValues[i]);;
+
+                for (int j = 0;j < numPaddingChars;j++) {
+                    cout << " ";
+                }
+
+                cout << " | ";
+            }
+        }
+};
+
+class CLIListView : public CLIView {
+    private:
+        vector<CLIListRow> rows;
+    
+    public:
+        CLIListView() : CLIView() {}
+        CLIListView(string & title) : CLIView(title) {}
+        CLIListView(const char * szTitle) : CLIView(szTitle) {}
+
+        void addRow(CLIListRow & row) {
+            rows.push_back(row);
+        }
+
+        void show() override {
+            printTitle();
+
+            rows[0].showHeaderRow();
+
+            for (int i = 1;i < rows.size();i++) {
+                rows[i].show();
+            }
         }
 };
 
