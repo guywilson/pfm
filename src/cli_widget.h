@@ -294,7 +294,53 @@ class CLIListRow : public CLIWidget {
         vector<string> columnValues;
 
         int getNumPaddingChars(CLIListColumn & column, string & value) {
-            return column.getWidth() - value.length();
+            return (column.getWidth() - value.length());
+        }
+
+        int printPadding(CLIListColumn & column, string & value) {
+            int numPaddingChars = getNumPaddingChars(column, value);
+
+            for (int i = 0;i < numPaddingChars;i++) {
+                cout << " ";
+            }
+
+            return numPaddingChars;
+        }
+
+        void printTopBorder(int tableWidth) {
+            for (int i = 0;i < tableWidth;i++) {
+                cout << "-";
+            }
+
+            cout << endl;
+        }
+
+        int getColumnWidth(CLIListColumn & column) {
+            string columnName = column.getName();
+
+            return (columnName.length() + getNumPaddingChars(column, columnName) + 4);
+        }
+
+        void printColumnHeader(CLIListColumn & column) {
+            string name = column.getName();
+
+            cout << name;
+            printPadding(column, name);
+            cout << " | ";
+        }
+
+        void printCell(CLIListColumn & column, string value) {
+            switch (column.getAlignment()) {
+                case CLIListColumn::leftAligned:
+                    cout << left << setw(column.getWidth()) << value;
+                    break;
+
+                case CLIListColumn::rightAligned:
+                    cout << " " << right << setw(column.getWidth()) << value;
+                    break;
+            }
+
+            cout << " | ";
         }
 
     public:
@@ -349,37 +395,19 @@ class CLIListRow : public CLIWidget {
 
             cout << "| ";
 
-            for (int i = 0;i < columnDefintions.size();i++) {
-                tableWidth += 2;
+            for (int i = 0;i < getNumColumns();i++) {
+                CLIListColumn column = getColumnAt(i);
 
-                CLIListColumn column = columnDefintions[i];
+                printColumnHeader(column);
 
-                string columnName = column.getName();
-                cout << columnName;
-
-                tableWidth += columnName.length();
-
-                int numPaddingChars = getNumPaddingChars(column, columnName);;
-
-                for (int j = 0;j < numPaddingChars;j++) {
-                    cout << " ";
-                    tableWidth++;
-                }
-
-                cout << " | ";
-
-                tableWidth += 2;
+                tableWidth += getColumnWidth(column);
             }
 
             cout << endl;
 
             tableWidth -= 2;
 
-            for (int i = 0;i < tableWidth;i++) {
-                cout << "-";
-            }
-
-            cout << endl;
+            printTopBorder(tableWidth);
         }
 
         void show() override {
@@ -389,23 +417,7 @@ class CLIListRow : public CLIWidget {
                 CLIListColumn column = getColumnAt(i);
                 string value = getValueAt(i);
 
-                switch (column.getAlignment()) {
-                    case CLIListColumn::leftAligned:
-                        cout << left << setw(column.getWidth()) << value;
-                        break;
-
-                    case CLIListColumn::rightAligned:
-                        cout << right << setw(column.getWidth()) << value;
-                        break;
-                }
-
-                int numPaddingChars = getNumPaddingChars(column, columnValues[i]);
-
-                for (int j = 0;j < numPaddingChars;j++) {
-                    cout << " ";
-                }
-
-                cout << " | ";
+                printCell(column, value);
             }
 
             cout << endl;
