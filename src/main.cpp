@@ -67,6 +67,9 @@ int main(int argc, char ** argv) {
 
     db.open(pszDatabase);
 
+    // list_accounts();
+    // exit(0);
+
     while (loop) {
         pszCommand = readline("pfm > ");
 

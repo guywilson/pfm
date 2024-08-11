@@ -60,7 +60,6 @@ void list_accounts(void) {
     AccountListView view;
 
     view.addResults(result);
-
     view.show();
     // numAccounts = result.getNumRows();
 

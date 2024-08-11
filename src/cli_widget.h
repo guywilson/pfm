@@ -300,11 +300,47 @@ class CLIListRow : public CLIWidget {
     public:
         CLIListRow() : CLIWidget() {}
 
-        void addColumn(CLIListColumn & column) {
+        CLIListRow(const CLIListRow & row) {
+            for (int i = 0;i < row.getNumColumns();i++) {
+                addColumn(row.getColumnAt(i));
+            }
+
+            for (int i = 0;i < row.getNumValues();i++) {
+                addCellValue(row.getValueAt(i));
+            }
+        }
+
+        int getNumColumns() const {
+            return columnDefintions.size();
+        }
+
+        int getNumValues() const {
+            return columnValues.size();
+        }
+
+        CLIListColumn getColumnAt(int i) const {
+            if (i < getNumColumns()) {
+                return columnDefintions[i];
+            }
+            else {
+                throw pfm_error("CLIListRow::getColumnAt() - Index out of range");
+            }
+        }
+
+        string getValueAt(int i) const {
+            if (i < getNumValues()) {
+                return columnValues[i];
+            }
+            else {
+                throw pfm_error("CLIListRow::getValueAt() - Index out of range");
+            }
+        }
+
+        void addColumn(const CLIListColumn & column) {
             columnDefintions.push_back(column);
         }
 
-        void addCellValue(string & value) {
+        void addCellValue(const string & value) {
             columnValues.push_back(value);
         }
 
@@ -349,16 +385,17 @@ class CLIListRow : public CLIWidget {
         void show() override {
             cout << "| ";
 
-            for (int i = 0;i < columnDefintions.size();i++) {
-                CLIListColumn column = columnDefintions[i];
+            for (int i = 0;i < getNumColumns();i++) {
+                CLIListColumn column = getColumnAt(i);
+                string value = getValueAt(i);
 
                 switch (column.getAlignment()) {
                     case CLIListColumn::leftAligned:
-                        cout << left << setw(column.getWidth()) << columnValues[i];
+                        cout << left << setw(column.getWidth()) << value;
                         break;
 
                     case CLIListColumn::rightAligned:
-                        cout << right << setw(column.getWidth()) << columnValues[i];
+                        cout << right << setw(column.getWidth()) << value;
                         break;
                 }
 
@@ -388,6 +425,7 @@ class CLIListView : public CLIView {
         void addHeaderRow(CLIListRow & header) {
             headerRow = header;
         }
+
         void addRow(CLIListRow & row) {
             dataRows.push_back(row);
         }

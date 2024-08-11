@@ -98,7 +98,8 @@ class AccountListView : public CLIListView {
             for (int i = 0;i < result.getNumRows();i++) {
                 DBAccount account = result.getResultAt(i);
 
-                CLIListRow row;
+                CLIListRow row(headerRow);
+
                 string balance = formatCurrency(account.currentBalance);
 
                 row.addCellValue(account.code);
