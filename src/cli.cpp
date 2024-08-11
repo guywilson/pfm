@@ -21,24 +21,6 @@
 
 using namespace std;
 
-#if defined(__APPLE__) || defined(__unix__)
-std::ostream& bold_on(std::ostream& os) {
-    return os << "\e[1m";
-}
-
-std::ostream& bold_off(std::ostream& os) {
-    return os << "\e[0m";
-}
-#else
-std::ostream& bold_on(std::ostream& os) {
-    return os << "";
-}
-
-std::ostream& bold_off(std::ostream& os) {
-    return os << "";
-}
-#endif
-
 void add_account(void) {
     AddAccountView view;
     view.show();
@@ -224,52 +206,16 @@ void list_recurring_charges(DBAccount & account) {
     DBRecurringCharge chargeInstance;
     DBRecurringChargeResult result = chargeInstance.retrieveByAccountID(account.id);
 
-    clear_history();
-
-    cout << "*** Recurring charges for account: '" << account.code << "' (" << result.getNumRows() << ") ***" << endl << endl;
-
-    cout << "| Seq | Start Date | Nxt Pmnt   | Description               | Cat.  | Payee | Frq. | Amount       |" << endl;
-    cout << "---------------------------------------------------------------------------------------------------" << endl;
+    RecurringChargeListView view;
+    view.addResults(result, account.code);
+    view.show();
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
-    double total = 0.0;
-    char seq[4];
-
     for (int i = 0;i < result.getNumRows();i++) {
         DBRecurringCharge charge = result.getResultAt(i);
-
         cacheMgr.addRecurringCharge(charge.sequence, charge);
-
-        total += charge.amount;
-
-        snprintf(seq, 4, "%03d", charge.sequence);
-
-        cout << 
-            "| " << 
-            seq <<
-            " | " <<
-            charge.date <<
-            " | " <<
-            charge.nextPaymentDate <<
-            " | " <<
-            left << setw(25) << charge.description << 
-            " | " << 
-            left << setw(5) << charge.category.code << 
-            " | " <<
-            left << setw(5) << charge.payee.code <<
-            " | " <<
-            right << setw(4) << charge.frequency <<
-            " | " <<
-            right << setw(13) << formatCurrency(charge.amount) <<
-            " |" <<
-            endl;
     }
-
-    cout << "---------------------------------------------------------------------------------------------------" << endl;
-    cout << "                                                                    Total charges: | " << bold_on << right << setw(13) << formatCurrency(total) << bold_off << " |" << endl;
-
-    cout << endl;
 }
 
 DBRecurringCharge get_recurring_charge(int sequence) {

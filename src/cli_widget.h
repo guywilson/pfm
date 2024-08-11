@@ -16,6 +16,25 @@ using namespace std;
 #define FIELD_STRING_LEN                        64
 #define MAX_PROMPT_LENGTH                      128
 #define AMOUNT_FIELD_STRING_LEN                 16
+#define TITLE_BUFFER_LEN                       128
+
+#if defined(__APPLE__) || defined(__unix__)
+std::ostream& bold_on(std::ostream& os) {
+    return os << "\e[1m";
+}
+
+std::ostream& bold_off(std::ostream& os) {
+    return os << "\e[0m";
+}
+#else
+std::ostream& bold_on(std::ostream& os) {
+    return os << "";
+}
+
+std::ostream& bold_off(std::ostream& os) {
+    return os << "";
+}
+#endif
 
 class CLIWidget {
     public:
@@ -292,6 +311,7 @@ class CLIListRow : public CLIWidget {
     private:
         vector<CLIListColumn> columnDefintions;
         vector<string> columnValues;
+        int tableWidth;
 
         int getNumPaddingChars(CLIListColumn & column, string & value) {
             return (column.getWidth() - value.length());
@@ -306,15 +326,7 @@ class CLIListRow : public CLIWidget {
 
             return numPaddingChars;
         }
-
-        void printTopBorder(int tableWidth) {
-            for (int i = 0;i < tableWidth;i++) {
-                cout << "-";
-            }
-
-            cout << endl;
-        }
-
+        
         int getColumnWidth(CLIListColumn & column) {
             string columnName = column.getName();
 
@@ -336,7 +348,7 @@ class CLIListRow : public CLIWidget {
                     break;
 
                 case CLIListColumn::rightAligned:
-                    cout << " " << right << setw(column.getWidth()) << value;
+                    cout << right << setw(column.getWidth()) << value;
                     break;
             }
 
@@ -354,6 +366,22 @@ class CLIListRow : public CLIWidget {
             for (int i = 0;i < row.getNumValues();i++) {
                 addCellValue(row.getValueAt(i));
             }
+        }
+
+        void printTopBorder() {
+            for (int i = 0;i < tableWidth;i++) {
+                cout << "-";
+            }
+
+            cout << endl;
+        }
+
+        void printBottomBorder() {
+            for (int i = 0;i < tableWidth;i++) {
+                cout << "-";
+            }
+
+            cout << endl;
         }
 
         int getNumColumns() const {
@@ -390,8 +418,53 @@ class CLIListRow : public CLIWidget {
             columnValues.push_back(value);
         }
 
+        void addCellValue(const char * szValue) {
+            string value = szValue;
+            columnValues.push_back(value);
+        }
+
+        void addCellValue(double val) {
+            char buffer[32];
+
+            snprintf(buffer, 32, "%.2f", val);
+            string value = buffer;
+            columnValues.push_back(value);
+        }
+
+        void addCellValue(int32_t val) {
+            char buffer[32];
+
+            snprintf(buffer, 32, "%d", val);
+            string value = buffer;
+            columnValues.push_back(value);
+        }
+
+        void addCellValue(uint32_t val) {
+            char buffer[32];
+
+            snprintf(buffer, 32, "%u", val);
+            string value = buffer;
+            columnValues.push_back(value);
+        }
+
+        void addCellValue(int64_t val) {
+            char buffer[32];
+
+            snprintf(buffer, 32, "%lld", val);
+            string value = buffer;
+            columnValues.push_back(value);
+        }
+
+        void addCellValue(uint64_t val) {
+            char buffer[32];
+
+            snprintf(buffer, 32, "%llu", val);
+            string value = buffer;
+            columnValues.push_back(value);
+        }
+
         void showHeaderRow() {
-            int tableWidth = 0;
+            tableWidth = 0;
 
             cout << "| ";
 
@@ -407,7 +480,7 @@ class CLIListRow : public CLIWidget {
 
             tableWidth -= 2;
 
-            printTopBorder(tableWidth);
+            printTopBorder();
         }
 
         void show() override {
@@ -440,6 +513,10 @@ class CLIListView : public CLIView {
 
         void addRow(CLIListRow & row) {
             dataRows.push_back(row);
+        }
+
+        void showBottomBorder() {
+            headerRow.printBottomBorder();
         }
 
         void show() override {

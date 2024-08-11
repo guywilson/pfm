@@ -65,6 +65,39 @@ class ChooseCategoryView : public CLIView {
         }
 };
 
+class CategoryListView : public CLIListView {
+    public:
+        CategoryListView() : CLIListView() {}
+
+        void addResults(DBCategoryResult & result) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Categories (%d)", result.getNumRows());
+            setTitle(szTitle);
+
+            CLIListRow headerRow;
+
+            CLIListColumn column1 = CLIListColumn("Code", 5, CLIListColumn::leftAligned);
+            headerRow.addColumn(column1);
+
+            CLIListColumn column2 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
+            headerRow.addColumn(column2);
+
+            addHeaderRow(headerRow);
+
+            for (int i = 0;i < result.getNumRows();i++) {
+                DBCategory category = result.getResultAt(i);
+
+                CLIListRow row(headerRow);
+
+                row.addCellValue(category.code);
+                row.addCellValue(category.description);
+
+                addRow(row);
+            }
+        }
+};
+
 class UpdateCategoryView : public CLIView {
     private:
         sqlite3_int64 categoryId;

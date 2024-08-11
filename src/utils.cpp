@@ -25,7 +25,7 @@ using namespace std;
 string formatCurrency(double src) {
     static char szAmount[CURRENCY_BUFFER_LEN];
 
-    snprintf(szAmount, CURRENCY_BUFFER_LEN, "£%.2f", (float)src);
+    snprintf(szAmount, CURRENCY_BUFFER_LEN, " £%.2f", (float)src);
 
     return string(szAmount);
 }

@@ -77,9 +77,9 @@ class AccountListView : public CLIListView {
         AccountListView() : CLIListView() {}
 
         void addResults(DBAccountResult & result) {
-            char szTitle[16];
+            char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, 16, "Accounts (%d)", result.getNumRows());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Accounts (%d)", result.getNumRows());
             setTitle(szTitle);
 
             CLIListRow headerRow;
