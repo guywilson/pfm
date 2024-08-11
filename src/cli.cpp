@@ -50,38 +50,13 @@ void add_account(void) {
 }
 
 void list_accounts(void) {
-    DBAccountResult         result;
-    int                     numAccounts;
-    int                     i;
-
     DBAccount accountInstance;
-    result = accountInstance.retrieveAll();
+    DBAccountResult result = accountInstance.retrieveAll();
 
     AccountListView view;
 
     view.addResults(result);
     view.show();
-    // numAccounts = result.getNumRows();
-
-    // cout << "*** Accounts (" << numAccounts << ") ***" << endl << endl;
-    // cout << "| Code  | Name                      | Balance      |" << endl;
-    // cout << "----------------------------------------------------" << endl;
-
-    // for (i = 0;i < numAccounts;i++) {
-    //     DBAccount account = result.getResultAt(i);
-
-    //     cout << 
-    //         "| " << 
-    //         left << setw(5) << account.code << 
-    //         " | " << 
-    //         left << setw(25) << account.name << 
-    //         " | " << 
-    //         right << setw(13) << formatCurrency(account.currentBalance) << 
-    //         " |" <<
-    //         endl;
-    // }
-
-    // cout << endl;
 }
 
 DBAccount choose_account(const char * szAccountCode) {
