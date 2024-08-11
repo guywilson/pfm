@@ -263,44 +263,16 @@ void list_transactions(DBAccount & account) {
     DBTransaction transactionInstance;
     DBTransactionResult result = transactionInstance.retrieveByAccountID(account.id);
 
-    cout << "*** Transactions for account: '" << account.code << "' (" << result.getNumRows() << ") ***" << endl << endl;
-
-    cout << "| Seq | Date       | Description               | Cat.  | Payee | CR/DB | Amount       | Rec |" << endl;
-    cout << "---------------------------------------------------------------------------------------------" << endl;
+    TransactionListView view;
+    view.addResults(result, account.code);
+    view.show();
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
-    char seq[4];
-
     for (int i = 0;i < result.getNumRows();i++) {
         DBTransaction transaction = result.getResultAt(i);
-
         cacheMgr.addTransaction(transaction.sequence, transaction);
-
-        snprintf(seq, 4, "%03d", transaction.sequence);
-
-        cout << 
-            "| " << 
-            seq <<
-            " | " <<
-            transaction.date <<
-            " | " <<
-            left << setw(25) << transaction.description << 
-            " | " << 
-            left << setw(5) << transaction.category.code << 
-            " | " <<
-            left << setw(5) << transaction.payee.code <<
-            " | " <<
-            left << setw(5) << (transaction.isCredit ? "CR" : "DB") <<
-            " | " <<
-            right << setw(13) << formatCurrency(transaction.amount) <<
-            " | " <<
-            left << setw(3) << (transaction.isReconciled ? " Y " : " N ") <<
-            " |" <<
-            endl;
     }
-
-    cout << endl;
 }
 
 void find_transactions(DBAccount & account) {

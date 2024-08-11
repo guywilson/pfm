@@ -71,6 +71,75 @@ class AddTransactionView : public CLIView {
         }
 };
 
+class TransactionListView : public CLIListView {
+    private:
+        double total;
+
+    public:
+        TransactionListView() : CLIListView() {
+            total = 0.0;
+        }
+
+        void addResults(DBTransactionResult & result, string & accountCode) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%d)", accountCode.c_str(), result.getNumRows());
+            setTitle(szTitle);
+
+            CLIListRow headerRow;
+
+            CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
+            headerRow.addColumn(column1);
+
+            CLIListColumn column2 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
+            headerRow.addColumn(column2);
+
+            CLIListColumn column3 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
+            headerRow.addColumn(column3);
+
+            CLIListColumn column4 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
+            headerRow.addColumn(column4);
+
+            CLIListColumn column5 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
+            headerRow.addColumn(column5);
+
+            CLIListColumn column6 = CLIListColumn("CR/DB", 5, CLIListColumn::leftAligned);
+            headerRow.addColumn(column6);
+
+            CLIListColumn column7 = CLIListColumn("Amount", 13, CLIListColumn::rightAligned);
+            headerRow.addColumn(column7);
+
+            CLIListColumn column8 = CLIListColumn("Rec", 3, CLIListColumn::leftAligned);
+            headerRow.addColumn(column8);
+
+            addHeaderRow(headerRow);
+
+            for (int i = 0;i < result.getNumRows();i++) {
+                DBTransaction transaction = result.getResultAt(i);
+
+                CLIListRow row(headerRow);
+
+                row.addCellValue(transaction.sequence);
+                row.addCellValue(transaction.date);
+                row.addCellValue(transaction.description);
+                row.addCellValue(transaction.category.code);
+                row.addCellValue(transaction.payee.code);
+                row.addCellValue(transaction.getCreditDebitValue());
+                row.addCellValue(formatCurrency(transaction.amount));
+                row.addCellValue(transaction.getIsReconciledValue());
+
+                total += transaction.amount;
+                addRow(row);
+            }
+        }
+
+        void show() override {
+            CLIListView::show();
+            showBottomBorder();
+            cout << "                                                                    Total amount: | " << bold_on << right << setw(13) << formatCurrency(total) << bold_off << " |" << endl << endl;
+        }
+};
+
 class ChooseTransactionView : public CLIView {
     private:
         CLITextField sequenceField = CLITextField("Sequence: ");
