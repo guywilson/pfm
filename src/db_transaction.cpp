@@ -189,6 +189,11 @@ DBTransactionResult DBTransaction::findTransactionsForAccountID(
         accountId);
 
     if (numCriteria > 0 && criteria != NULL) {
+        /*
+        ** Remove the trailing ';' from the statement...
+        */
+        szStatement[strlen(szStatement) - 1] = 0;
+
         for (int i = 0;i < numCriteria;i++) {
             strcat(szStatement, " AND ");
             strcat(szStatement, criteria[i].columnName.c_str());

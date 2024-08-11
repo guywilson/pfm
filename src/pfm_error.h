@@ -49,7 +49,7 @@ class pfm_error : public exception
 
             va_start(args, fmt);
             
-            length = strlen(fmt) + 80;
+            length = strlen(fmt) + 512;
 
             buffer = (char *)malloc(length);
             

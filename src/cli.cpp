@@ -281,7 +281,6 @@ void find_transactions(DBAccount & account) {
     bool                    isCreditDebitValid = false;
     bool                    isReconciledValid = false;
     DBCriteria              criterion[8];
-    char                    seq[4];
 
     cout << "*** Find transactions ***" << endl;
 
@@ -301,12 +300,14 @@ void find_transactions(DBAccount & account) {
     if (hasCategory) {
         DBCriteria * criteria = &criterion[numCriteria++];
 
-        DBCategory category;
         category.retrieveByCode(criteria->value);
+
+        char buffer[32];
+        snprintf(buffer, 32, "%lld", category.id);
 
         criteria->columnName = "category_id";
         criteria->columnType = db_column_type::numeric;
-        criteria->value = category.id;
+        criteria->value = buffer;
     }
 
     using_history();
@@ -404,42 +405,16 @@ void find_transactions(DBAccount & account) {
         result = tr.findTransactionsForAccountID(account.id, criterion, numCriteria);
     }
 
-    cout << "*** Transactions for account: '" << account.code << "' (" << result.getNumRows() << ") ***" << endl << endl;
-
-    cout << "| Seq | Date       | Description               | Cat.  | Payee | CR/DB | Amount       | Rec |" << endl;
-    cout << "---------------------------------------------------------------------------------------------" << endl;
+    TransactionListView view;
+    view.addResults(result, account.code);
+    view.show();
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
     for (int i = 0;i < result.getNumRows();i++) {
         DBTransaction transaction = result.getResultAt(i);
-
         cacheMgr.addTransaction(transaction.sequence, transaction);
-
-        snprintf(seq, 4, "%03d", transaction.sequence);
-
-        cout << 
-            "| " << 
-            seq <<
-            " | " <<
-            transaction.date <<
-            " | " <<
-            left << setw(25) << transaction.description << 
-            " | " << 
-            left << setw(5) << transaction.category.code << 
-            " | " <<
-            left << setw(5) << transaction.payee.code <<
-            " | " <<
-            left << setw(5) << (transaction.isCredit ? "CR" : "DB") <<
-            " | " <<
-            right << setw(13) << formatCurrency(transaction.amount) <<
-            " | " <<
-            left << setw(3) << (transaction.isReconciled ? " Y " : " N ") <<
-            " |" <<
-            endl;
     }
-
-    cout << endl;
 }
 
 DBTransaction get_transaction(int sequence) {

@@ -34,7 +34,7 @@ int main(int argc, char ** argv) {
     char *          pszCommand;
     char *          pszDatabase = NULL;
     bool            loop = true;
-    DBAccount         selectedAccount;
+    DBAccount       selectedAccount;
 
     rl_bind_key('\t', rl_complete);
 
@@ -68,6 +68,14 @@ int main(int argc, char ** argv) {
     db.open(pszDatabase);
 
     // list_accounts();
+    // exit(0);
+    // string code = "HHOLD";
+    // DBCategory category;
+    // category.retrieveByCode(code);
+
+    // cout << "Got category with id: " << category.id << ", code: " << category.code << endl;
+    // selectedAccount.set(choose_account("HSBC"));
+    // find_transactions(selectedAccount);
     // exit(0);
 
     while (loop) {
