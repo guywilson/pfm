@@ -121,8 +121,7 @@ class CLITextField : public CLIField {
         string readLine() {
             string text;
 
-            char * line = NULL;
-            line = readline(_getLabel().c_str());
+            char * line = readline(_getLabel().c_str());
 
             if (line != NULL && line[0] != 0) {
                 text = line;
