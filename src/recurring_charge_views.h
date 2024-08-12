@@ -17,7 +17,8 @@ class AddRecurringChargeView : public CLIView {
     private:
         CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
         PayeeSpinField payeeField = PayeeSpinField("Category code (max. 5 chars): ");
-        DateField dateField = DateField("Start date (yyyy-mm-dd)[today]: ");
+        DateField startDateField = DateField("Start date (yyyy-mm-dd)[today]: ");
+        DateField endDateField = DateField("End date (yyyy-mm-dd): ");
         CLITextField descriptionField = CLITextField("Description: ");
         FrequencyField frequencyField = FrequencyField("Frequency (N[wmy]): ");
         CLICurrencyField amountField = CLICurrencyField("Amount: ");
@@ -27,7 +28,7 @@ class AddRecurringChargeView : public CLIView {
 
         AddRecurringChargeView(const char * title) : CLIView(title) {
             string today = StrDate::today();
-            dateField.setDefaultValue(today);
+            startDateField.setDefaultValue(today);
         }
 
         void show() override {
@@ -35,7 +36,8 @@ class AddRecurringChargeView : public CLIView {
 
             categoryField.show();
             payeeField.show();
-            dateField.show();
+            startDateField.show();
+            endDateField.show();
             descriptionField.show();
             frequencyField.show();
             amountField.show();
@@ -50,7 +52,8 @@ class AddRecurringChargeView : public CLIView {
             charge.payee = payeeField.getPayee();
             charge.payeeId = charge.payee.id;
 
-            charge.date = dateField.getValue();
+            charge.date = startDateField.getValue();
+            charge.endDate = endDateField.getValue();
             charge.description = descriptionField.getValue();
             charge.frequency = frequencyField.getValue();
             charge.amount = amountField.getDoubleValue();
@@ -153,7 +156,8 @@ class UpdateRecurringChargeView : public CLIView {
 
         CategorySpinField categoryField;
         PayeeSpinField payeeField;
-        DateField dateField;
+        DateField startDateField;
+        DateField endDateField;
         CLITextField descriptionField;
         FrequencyField frequencyField;
         CLICurrencyField amountField;
@@ -175,9 +179,13 @@ class UpdateRecurringChargeView : public CLIView {
             payeeField.setLabel(szPrompt);
             payeeField.setDefaultValue(charge.payee.code);
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Date ['%s']: ", charge.date.c_str());
-            dateField.setLabel(szPrompt);
-            dateField.setDefaultValue(charge.date);
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", charge.date.c_str());
+            startDateField.setLabel(szPrompt);
+            startDateField.setDefaultValue(charge.date);
+
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "End date ['%s']: ", charge.endDate.c_str());
+            endDateField.setLabel(szPrompt);
+            endDateField.setDefaultValue(charge.endDate);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", charge.description.c_str());
             descriptionField.setLabel(szPrompt);
@@ -197,7 +205,8 @@ class UpdateRecurringChargeView : public CLIView {
 
             categoryField.show();
             payeeField.show();
-            dateField.show();
+            startDateField.show();
+            endDateField.show();
             descriptionField.show();
             frequencyField.show();
             amountField.show();
@@ -214,7 +223,8 @@ class UpdateRecurringChargeView : public CLIView {
             charge.payee = payeeField.getPayee();
             charge.payeeId = charge.payee.id;
 
-            charge.date = dateField.getValue();
+            charge.date = startDateField.getValue();
+            charge.endDate = endDateField.getValue();
             charge.description = descriptionField.getValue();
             charge.frequency = frequencyField.getValue();
             charge.amount = amountField.getDoubleValue();

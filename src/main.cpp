@@ -67,6 +67,8 @@ int main(int argc, char ** argv) {
 
     db.open(pszDatabase);
 
+    // add_account();
+    // exit(0);
     // list_accounts();
     // exit(0);
     // string code = "HHOLD";

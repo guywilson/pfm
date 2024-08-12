@@ -118,18 +118,18 @@ class CLITextField : public CLIField {
         string defaultValue;
 
     protected:
-        void readLine() {
-            char * line = NULL;
+        string readLine() {
+            string text;
 
+            char * line = NULL;
             line = readline(_getLabel().c_str());
 
             if (line != NULL && line[0] != 0) {
-                _setValue(line);
+                text = line;
                 free(line);
             }
-            else {
-                _setValue("");
-            }
+
+            return text;
         }
 
     public:
@@ -160,6 +160,11 @@ class CLITextField : public CLIField {
 
             return value;
         }
+
+        void show() override {
+            string line = readLine();
+            _setValue(line);
+        }
 };
 
 class CLICurrencyField : public CLITextField {
@@ -178,7 +183,8 @@ class CLICurrencyField : public CLITextField {
         void show() override {
             setLengthLimit(AMOUNT_FIELD_STRING_LEN);
 
-            readLine();
+            string line = readLine();
+            _setValue(line);
         }
 };
 
@@ -212,7 +218,10 @@ class CLISpinTextField : public CLITextField {
 
         void show() override {
             populate();
-            readLine();
+
+            string line = readLine();
+            _setValue(line);
+
             clear();
         }
 };

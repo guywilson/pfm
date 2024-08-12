@@ -32,7 +32,10 @@ class CategorySpinField : public CLISpinTextField {
             }
 
             populate();
-            readLine();
+
+            string line = readLine();
+            _setValue(line);
+
             clear();
         }
 
@@ -62,7 +65,10 @@ class PayeeSpinField : public CLISpinTextField {
             }
 
             populate();
-            readLine();
+
+            string line = readLine();
+            _setValue(line);
+
             clear();
         }
 
@@ -90,19 +96,23 @@ class DateField : public CLITextField {
 
             bool isDateValid = false;
             int attempts = 0;
+            string line;
 
             while (!isDateValid && attempts < maxAttemps) {
-                readLine();
-                isDateValid = StrDate::validateDate(getValue());
+                line = readLine();
+                isDateValid = StrDate::validateDate(line);
 
                 attempts++;
             }
 
-            if (!isDateValid) {
+            if (isDateValid) {
+                _setValue(line);
+            }
+            else {
                 throw pfm_validation_error(
                                 pfm_error::buildMsg(
                                     "Invalid date '%s', must be of the form 'yyyy-mm-dd'",
-                                    getValue().c_str()
+                                    line.c_str()
                                 ),
                                 __FILE__,
                                 __LINE__);
@@ -114,27 +124,23 @@ class FrequencyField : public CLITextField {
     private:
         const int maxAttemps = 5;
 
-        bool validate() {
-            string frequency = getValue();
-
-            if (!isLengthValid() || !isFirstCharValid() || !isLastCharValid()) {
+        bool validate(string & frequency) {
+            if (!isLengthValid(frequency) || !isFirstCharValid(frequency) || !isLastCharValid(frequency)) {
                 return false;
             }
 
             return true;
         }
 
-        bool isLengthValid() {
-            return (getValue().length() >= 2);
+        bool isLengthValid(string & frequency) {
+            return (frequency.length() >= 2);
         }
 
-        bool isFirstCharValid() {
-            return (isdigit(getValue().at(0)));
+        bool isFirstCharValid(string & frequency) {
+            return (isdigit(frequency.at(0)));
         }
 
-        bool isLastCharValid() {
-            string frequency = getValue();
-
+        bool isLastCharValid(string & frequency) {
             if (frequency.back() != 'w' && 
                 frequency.back() != 'm' && 
                 frequency.back() != 'y' &&
@@ -157,19 +163,23 @@ class FrequencyField : public CLITextField {
 
             bool isFrequencyValid = false;
             int attempts = 0;
+            string line;
 
             while (!isFrequencyValid && attempts < maxAttemps) {
-                readLine();
-                isFrequencyValid = validate();
+                line = readLine();
+                isFrequencyValid = validate(line);
 
                 attempts++;
             }
 
-            if (!isFrequencyValid) {
+            if (isFrequencyValid) {
+                _setValue(line);
+            }
+            else {
                 throw pfm_validation_error(
                                 pfm_error::buildMsg(
                                     "Invalid frequency '%s', must be of the form 'x[d|w|m|y]'",
-                                    getValue().c_str()
+                                    line.c_str()
                                 ),
                                 __FILE__,
                                 __LINE__);

@@ -291,6 +291,7 @@ const char * pszCreateRCTable =
     "category_id INTEGER," \
     "payee_id INTEGER," \
     "date TEXT," \
+    "end_date TEXT," \
     "description TEXT NOT NULL," \
     "amount NUMERIC NOT NULL," \
     "frequency TEXT NOT NULL," \

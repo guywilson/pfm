@@ -30,6 +30,7 @@ class DBRecurringCharge : public DBPayment {
                         "category_id," \
                         "payee_id," \
                         "date," \
+                        "end_date," \
                         "description," \
                         "amount," \
                         "frequency," \
@@ -45,6 +46,7 @@ class DBRecurringCharge : public DBPayment {
                         "category_id," \
                         "payee_id," \
                         "date," \
+                        "end_date," \
                         "description," \
                         "amount," \
                         "frequency," \
@@ -60,6 +62,7 @@ class DBRecurringCharge : public DBPayment {
                         "category_id," \
                         "payee_id," \
                         "date," \
+                        "end_date," \
                         "description," \
                         "amount," \
                         "frequency," \
@@ -73,12 +76,13 @@ class DBRecurringCharge : public DBPayment {
                         "category_id," \
                         "payee_id," \
                         "date," \
+                        "end_date," \
                         "description," \
                         "amount," \
                         "frequency," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, %lld, %lld, '%s'," \
+                        "VALUES (%lld, %lld, %lld, '%s', '%s'," \
                         "'%s', %.2f, '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
@@ -86,6 +90,7 @@ class DBRecurringCharge : public DBPayment {
                         "SET category_id = %lld," \
                         "payee_id = %lld," \
                         "date = '%s'," \
+                        "end_date = '%s'," \
                         "description = '%s'," \
                         "amount = %.2f," \
                         "frequency = '%s'," \
@@ -98,6 +103,7 @@ class DBRecurringCharge : public DBPayment {
     public:
         string                  nextPaymentDate;    // Not persistent
         string                  frequency;
+        string                  endDate;
 
         DBRecurringCharge() : DBPayment() {
             clear();
@@ -108,6 +114,7 @@ class DBRecurringCharge : public DBPayment {
 
             this->nextPaymentDate = "";
             this->frequency = "";
+            this->endDate = "";
         }
 
         void set(const DBRecurringCharge & src) {
@@ -115,12 +122,14 @@ class DBRecurringCharge : public DBPayment {
 
             this->nextPaymentDate = src.nextPaymentDate;
             this->frequency = src.frequency;
+            this->endDate = src.endDate;
         }
 
         void print(void) {
             DBPayment::print();
 
             cout << "Frequency: '" << frequency << "'" << endl;
+            cout << "EndDate: '" << endDate << "'" << endl;
             cout << "NextPaymentDate: '" << nextPaymentDate << "'" << endl;
         }
 
@@ -213,6 +222,7 @@ class DBRecurringCharge : public DBPayment {
                 categoryId,
                 payeeId,
                 date.c_str(),
+                endDate.c_str(),
                 description.c_str(),
                 amount,
                 frequency.c_str(),
@@ -234,6 +244,7 @@ class DBRecurringCharge : public DBPayment {
                 categoryId,
                 payeeId,
                 date.c_str(),
+                endDate.c_str(),
                 description.c_str(),
                 amount,
                 frequency.c_str(),
@@ -307,6 +318,9 @@ class DBRecurringChargeResult : public DBResult {
                 }
                 else if (column.getName() == "date") {
                     charge.date = column.getValue();
+                }
+                else if (column.getName() == "end_date") {
+                    charge.endDate = column.getValue();
                 }
                 else if (column.getName() == "description") {
                     charge.description = column.getValue();
