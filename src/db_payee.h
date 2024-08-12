@@ -164,7 +164,7 @@ class DBPayeeResult : public DBResult {
                     payee.updatedDate = column.getValue();
                 }
             }
-            
+
             results.push_back(payee);
             incrementNumRows();
         }

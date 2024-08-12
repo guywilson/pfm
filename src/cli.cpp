@@ -85,23 +85,9 @@ void list_categories(void) {
     DBCategory category;
     DBCategoryResult result =  category.retrieveAll();
 
-    cout << "*** Categories (" << result.getNumRows() << ") ***" << endl << endl;
-    cout << "| Code  | Description               |" << endl;
-    cout << "-------------------------------------" << endl;
-
-    for (int i = 0;i < result.getNumRows();i++) {
-        DBCategory category = result.getResultAt(i);
-
-        cout << 
-            "| " << 
-            left << setw(5) << category.code << 
-            " | " << 
-            left << setw(25) << category.description << 
-            " |" <<
-            endl;
-    }
-
-    cout << endl;
+    CategoryListView view;
+    view.addResults(result);
+    view.show();
 }
 
 DBCategory get_category(const char * pszCategoryCode) {
@@ -145,23 +131,9 @@ void list_payees(void) {
     DBPayee payee;
     DBPayeeResult result =  payee.retrieveAll();
 
-    cout << "*** Payees (" << result.getNumRows() << ") ***" << endl << endl;
-    cout << "| Code  | Name                      |" << endl;
-    cout << "-------------------------------------" << endl;
-
-    for (int i = 0;i < result.getNumRows();i++) {
-        DBPayee payee = result.getResultAt(i);
-
-        cout << 
-            "| " << 
-            left << setw(5) << payee.code << 
-            " | " << 
-            left << setw(25) << payee.name << 
-            " |" <<
-            endl;
-    }
-
-    cout << endl;
+    PayeeListView view;
+    view.addResults(result);
+    view.show();
 }
 
 DBPayee get_payee(const char * pszPayeeCode) {
