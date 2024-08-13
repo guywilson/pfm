@@ -83,7 +83,13 @@ class DBColumn {
     public:
         DBColumn(const char * name, const char * value) {
             this->name = name;
-            this->value = value;
+            
+            /*
+            ** value will be NULL for blank NULLable columns...
+            */
+            if (value != NULL) {
+                this->value = value;
+            }
         }
 
         string getName() {

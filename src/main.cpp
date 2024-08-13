@@ -67,19 +67,6 @@ int main(int argc, char ** argv) {
 
     db.open(pszDatabase);
 
-    // add_account();
-    // exit(0);
-    // list_accounts();
-    // exit(0);
-    // string code = "HHOLD";
-    // DBCategory category;
-    // category.retrieveByCode(code);
-
-    // cout << "Got category with id: " << category.id << ", code: " << category.code << endl;
-    // selectedAccount.set(choose_account("HSBC"));
-    // find_transactions(selectedAccount);
-    // exit(0);
-
     while (loop) {
         pszCommand = readline("pfm > ");
 
