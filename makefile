@@ -29,11 +29,13 @@ PRECOMPILE = @ mkdir -p $(BUILD) $(DEP)
 # postcompile step
 POSTCOMPILE = @ mv -f $(DEP)/$*.Td $(DEP)/$*.d
 
-CFLAGS_BASE=-c -Wall -pedantic
+GLOBAL_DEF=-DPFM_TEST_SUITE_ENABLED
+
+CFLAGS_BASE=-c -Wall -pedantic $(GLOBAL_DEF)
 CFLAGS_REL=$(CFLAGS_BASE) -O2
 CFLAGS_DBG=$(CFLAGS_BASE) -g
 
-CPPFLAGS_BASE = -c -Wall -pedantic -std=c++17
+CPPFLAGS_BASE = -c -Wall -pedantic -std=c++17 $(GLOBAL_DEF)
 CPPFLAGS_REL=$(CPPFLAGS_BASE) -O2
 CPPFLAGS_DBG=$(CPPFLAGS_BASE) -g
 
