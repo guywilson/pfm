@@ -16,6 +16,7 @@
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
 #include "cli.h"
+#include "money.h"
 
 using namespace std;
 
@@ -67,6 +68,9 @@ int main(int argc, char ** argv) {
 
     db.open(pszDatabase);
 
+    MoneyTest::run();
+    exit(0);
+    
     while (loop) {
         pszCommand = readline("pfm > ");
 

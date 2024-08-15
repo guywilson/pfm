@@ -153,7 +153,7 @@ class MoneyTest {
             Money m = Money(amount);
 
             if (m.getDoubleValue() != 137.47f) {
-                throw pfm_error("testGetDoubleValue1: Test failed");
+                throw pfm_error("testGetDoubleValue1(): Test failed");
             }
             else {
                 cout << "testGetDoubleValue1(): Test passed" << endl;
@@ -165,16 +165,572 @@ class MoneyTest {
             Money m = Money(amount);
 
             if (m.getDoubleValue() != 137.0f) {
-                throw pfm_error("testGetDoubleValue2: Test failed");
+                throw pfm_error("testGetDoubleValue2(): Test failed");
             }
             else {
                 cout << "testGetDoubleValue2(): Test passed" << endl;
             }
         }
 
-    public:
-        void run() {
+        static void testGetRawStringValue1() {
+            const char * amount = "137.47";
+            Money m = Money(amount);
 
+            if (m.getRawStringValue() != amount) {
+                throw pfm_error("testGetRawStringValue1(): Test failed");
+            }
+            else {
+                cout << "testGetRawStringValue1(): Test passed" << endl;
+            }
+        }
+
+        static void testGetRawStringValue2() {
+            const char * amount = "137.00";
+            Money m = Money(amount);
+
+            if (m.getRawStringValue() != amount) {
+                throw pfm_error("testGetRawStringValue2(): Test failed");
+            }
+            else {
+                cout << "testGetRawStringValue2(): Test passed" << endl;
+            }
+        }
+
+        static void testGetRawStringValue3() {
+            const char * amount = "-25.25";
+            Money m = Money(amount);
+
+            if (m.getRawStringValue() != amount) {
+                throw pfm_error("testGetRawStringValue3(): Test failed");
+            }
+            else {
+                cout << "testGetRawStringValue3(): Test passed" << endl;
+            }
+        }
+
+        static void testAssignment1() {
+            const char * amount = "137.47";
+            Money m = Money(amount);
+
+            Money m2 = m;
+
+            if (m2._getValue() != 13747L) {
+                throw pfm_error("testAssignment1(): Test failed");
+            }
+            else {
+                cout << "testAssignment1(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorPlus() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("27.30");
+            Money m3 = m1 + m2;
+
+            if (m3._getValue() != 13516L) {
+                throw pfm_error("testOperatorPlus(): Test failed");
+            }
+            else {
+                cout << "testOperatorPlus(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorPlusEquals() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("27.30");
+            m2 += m1;
+
+            if (m2._getValue() != 13516L) {
+                throw pfm_error("testOperatorPlusEquals(): Test failed");
+            }
+            else {
+                cout << "testOperatorPlusEquals(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorMinus() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("27.30");
+            Money m3 = m1 - m2;
+
+            if (m3._getValue() != 8056L) {
+                throw pfm_error("testOperatorMinus(): Test failed");
+            }
+            else {
+                cout << "testOperatorMinus(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorMinusEquals() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("27.30");
+            m2 -= m1;
+
+            if (m2._getValue() != 8056L) {
+                throw pfm_error("testOperatorMinusEquals(): Test failed");
+            }
+            else {
+                cout << "testOperatorMinusEquals(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorTimes() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("27.30");
+            Money m3 = m1 * m2;
+
+            if (m3._getValue() != 294458L) {
+                throw pfm_error("testOperatorTimes(): Test failed");
+            }
+            else {
+                cout << "testOperatorTimes(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorTimesEquals() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("27.30");
+            m2 *= m1;
+
+            if (m2._getValue() != 294458L) {
+                throw pfm_error("testOperatorTimesEquals(): Test failed");
+            }
+            else {
+                cout << "testOperatorTimesEquals(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorDivide() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("27.30");
+            Money m3 = m1 / m2;
+
+            if (m3._getValue() != 395L) {
+                throw pfm_error("testOperatorDivide(): Test failed");
+            }
+            else {
+                cout << "testOperatorDivide(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorDivideEquals() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("27.30");
+            m2 /= m1;
+
+            if (m2._getValue() != 395L) {
+                throw pfm_error("testOperatorDivideEquals(): Test failed");
+            }
+            else {
+                cout << "testOperatorDivideEquals(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorEquality1() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("107.86");
+
+            if (m1 != m2) {
+                throw pfm_error("testOperatorEquality1(): Test failed");
+            }
+            else {
+                cout << "testOperatorEquality1(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorEquality2() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("107.85");
+
+            if (m1 == m2) {
+                throw pfm_error("testOperatorEquality2(): Test failed");
+            }
+            else {
+                cout << "testOperatorEquality2(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorInequality1() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("107.85");
+
+            if (m1 == m2) {
+                throw pfm_error("testOperatorInequality1(): Test failed");
+            }
+            else {
+                cout << "testOperatorInequality1(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorInequality2() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("107.86");
+
+            if (m1 != m2) {
+                throw pfm_error("testOperatorInequality2(): Test failed");
+            }
+            else {
+                cout << "testOperatorInequality2(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorLessThan1() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("105.86");
+
+            if (!(m2 < m1)) {
+                throw pfm_error("testOperatorLessThan1(): Test failed");
+            }
+            else {
+                cout << "testOperatorLessThan1(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorLessThan2() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("109.81");
+
+            if ((m2 < m1)) {
+                throw pfm_error("testOperatorLessThan2(): Test failed");
+            }
+            else {
+                cout << "testOperatorLessThan2(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorLessThanOrEquals() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("107.86");
+
+            if (!(m2 <= m1)) {
+                throw pfm_error("testOperatorLessThanOrEquals(): Test failed");
+            }
+            else {
+                cout << "testOperatorLessThanOrEquals(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorGreaterThan1() {
+            Money m1 = Money("105.86");
+            Money m2 = Money("107.86");
+
+            if (!(m2 > m1)) {
+                throw pfm_error("testOperatorGreaterThan1(): Test failed");
+            }
+            else {
+                cout << "testOperatorGreaterThan1(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorGreaterThan2() {
+            Money m1 = Money("109.81");
+            Money m2 = Money("107.86");
+
+            if ((m2 > m1)) {
+                throw pfm_error("testOperatorGreaterThan2(): Test failed");
+            }
+            else {
+                cout << "testOperatorGreaterThan2(): Test passed" << endl;
+            }
+        }
+
+        static void testOperatorGreaterThanOrEquals() {
+            Money m1 = Money("107.86");
+            Money m2 = Money("107.86");
+
+            if (!(m2 >= m1)) {
+                throw pfm_error("testOperatorGreaterThanOrEquals(): Test failed");
+            }
+            else {
+                cout << "testOperatorGreaterThanOrEquals(): Test passed" << endl;
+            }
+        }
+
+    public:
+        static void run() {
+            int numTestsPassed = 0;
+            int numTestsFailed = 0;
+
+            try {
+                testCreateString();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testCreateChar1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testCreateChar2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testCreateChar3();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testCreateDouble1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testCreateDouble2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testCreateDouble3();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testGetDoubleValue1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testGetDoubleValue2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testGetRawStringValue1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testGetRawStringValue2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testGetRawStringValue3();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testAssignment1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorPlus();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorPlusEquals();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorMinus();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorMinusEquals();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorTimes();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorTimesEquals();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorDivide();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorDivideEquals();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorEquality1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorEquality2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorInequality1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorInequality2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorLessThan1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorLessThan2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorLessThanOrEquals();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorGreaterThan1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorGreaterThan2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorGreaterThanOrEquals();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            cout << "Tests passed: " << numTestsPassed << ", tests failed: " << numTestsFailed << endl;
         }
 };
 #endif
