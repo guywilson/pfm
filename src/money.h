@@ -10,6 +10,7 @@ using namespace std;
 #define __INCL_MONEY
 
 #define DECIMAL_POINT_NOT_FOUND_VALUE               -1
+#define AMOUNT_BUFFER_LENGTH                        16
 
 typedef int32_t money_t;
 
@@ -23,6 +24,10 @@ class Money {
         money_t representedValue;
 
         int findDecimalPointPos(const char * amount);
+        void copyToDecimalPoint(char * targetBuffer, const char * amount, int targetBufferLen);
+        void copyAfterDecimalPoint(char * targetBuffer, const char * amount, int tragetBufferLen);
+        money_t getWholeValueFromString(const char * amount);
+        money_t getDecimalValueFromString(const char * amount);
         money_t makeRepresentedValue(money_t whole, money_t decimal);
 
         void _setValue(const char * amount);

@@ -39,6 +39,28 @@ int Money::findDecimalPointPos(const char * amount) {
     return decimalPointPos;
 }
 
+void Money::copyToDecimalPoint(char * targetBuffer, const char * amount, int targetBufferLen) {
+    int decimalPointPos = findDecimalPointPos(amount);
+
+    int i;
+    for (i = 0;i < decimalPointPos && i < (targetBufferLen - 1);i++) {
+        targetBuffer[i] = amount[i];
+    }
+
+    targetBuffer[i + 1] = 0;
+}
+
+void Money::copyAfterDecimalPoint(char * targetBuffer, const char * amount, int targetBufferLen) {
+    int decimalPointPos = findDecimalPointPos(amount);
+
+    int j = 0;
+    for (int i = decimalPointPos + 1;i < strlen(amount) && j < (targetBufferLen - 1);i++) {
+        targetBuffer[j++] = amount[i];
+    }
+
+    targetBuffer[j] = 0;
+}
+
 money_t Money::makeRepresentedValue(money_t whole, money_t decimal) {
     int signMultiplier;
 
@@ -64,27 +86,49 @@ money_t Money::_getValue() const {
     return representedValue;
 }
 
-void Money::_setValue(const char * amount) {
+money_t Money::getWholeValueFromString(const char * amount) {
     int decimalPointPos = findDecimalPointPos(amount);
 
     money_t whole;
-    money_t decimal = 0L;
 
     if (decimalPointPos == DECIMAL_POINT_NOT_FOUND_VALUE) {
         whole = (money_t)strtol(amount, NULL, 10);
     }
     else {
-        char buffer[16];
-        for (int i = 0;i < decimalPointPos;i++) {
-            buffer[i] = amount[i];
-        }
-        buffer[decimalPointPos] = 0;
+        char buffer[AMOUNT_BUFFER_LENGTH];
 
+        copyToDecimalPoint(buffer, amount, AMOUNT_BUFFER_LENGTH);
         whole = (money_t)strtol(buffer, NULL, 10);
-        decimal = (money_t)strtol(&amount[decimalPointPos + 1], NULL, 10);
     }
 
-    _setValue(makeRepresentedValue(whole, decimal));
+    return whole;
+}
+
+money_t Money::getDecimalValueFromString(const char * amount) {
+    int decimalPointPos = findDecimalPointPos(amount);
+
+    money_t decimal;
+
+    if (decimalPointPos == DECIMAL_POINT_NOT_FOUND_VALUE) {
+        decimal = 0L;
+    }
+    else {
+        char buffer[AMOUNT_BUFFER_LENGTH];
+
+        copyAfterDecimalPoint(buffer, amount, AMOUNT_BUFFER_LENGTH);
+        decimal = (money_t)strtol(buffer, NULL, 10);
+    }
+
+    return decimal;
+}
+
+void Money::_setValue(const char * amount) {
+    money_t whole = getWholeValueFromString(amount);
+    money_t decimal = getDecimalValueFromString(amount);
+
+    money_t result = makeRepresentedValue(whole, decimal);
+    
+    _setValue(result);
 }
 
 void Money::_setValue(double amount) {
