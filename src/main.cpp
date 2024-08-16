@@ -68,9 +68,11 @@ int main(int argc, char ** argv) {
 
     db.open(pszDatabase);
 
+#ifdef PFM_TEST_SUITE_ENABLED
     MoneyTest::run();
     exit(0);
-    
+#endif
+
     while (loop) {
         pszCommand = readline("pfm > ");
 
