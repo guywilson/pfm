@@ -179,6 +179,10 @@ class CLICurrencyField : public CLITextField {
             CLITextField::setDefaultValue(szValue);
         }
 
+        void setDefaultValue(string value) {
+            CLITextField::setDefaultValue(value);
+        }
+
         void show() override {
             setLengthLimit(AMOUNT_FIELD_STRING_LEN);
 

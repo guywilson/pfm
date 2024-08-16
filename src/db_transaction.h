@@ -68,7 +68,7 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated) " \
                         "VALUES (%lld, %lld, %lld, '%s', '%s', " \
-                        "'%s', %.2f, '%s', '%s', '%s');";
+                        "'%s', %s, '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE account_transaction " \
@@ -77,7 +77,7 @@ class DBTransaction : public DBPayment {
                         "date = '%s'," \
                         "description = '%s'," \
                         "credit_debit = '%s'," \
-                        "amount = %.2f," \
+                        "amount = %s," \
                         "is_reconciled = '%s'," \
                         "updated = '%s' " \
                         "WHERE id = %lld;";
@@ -157,7 +157,7 @@ class DBTransaction : public DBPayment {
                 date.c_str(),
                 description.c_str(),
                 getCreditDebitValue().c_str(),
-                amount,
+                amount.getRawStringValue().c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
                 now.c_str());
@@ -179,7 +179,7 @@ class DBTransaction : public DBPayment {
                 date.c_str(),
                 description.c_str(),
                 getCreditDebitValue().c_str(),
-                amount,
+                amount.getRawStringValue().c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
                 id);

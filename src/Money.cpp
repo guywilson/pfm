@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 #include <sstream>
 #include <locale>
 #include <iomanip>
@@ -127,7 +128,7 @@ void Money::_setValue(const char * amount) {
     money_t decimal = getDecimalValueFromString(amount);
 
     money_t result = makeRepresentedValue(whole, decimal);
-    
+
     _setValue(result);
 }
 
@@ -145,7 +146,7 @@ double Money::getDoubleValue() {
 }
 
 string Money::getRawStringValue() const {
-    char buffer[16];
+    char buffer[AMOUNT_BUFFER_LENGTH];
     money_t whole = this->representedValue / 100;
     money_t decimal = this->representedValue - (whole * 100);
 
@@ -153,16 +154,22 @@ string Money::getRawStringValue() const {
         decimal = decimal * -1;
     }
 
-    snprintf(buffer, 16, "%d.%02d", whole, decimal);
+    snprintf(buffer, AMOUNT_BUFFER_LENGTH, "%d.%02d", whole, decimal);
 
     string value = buffer;
     return value;
 }
 
-string Money::getFormattedStringValue() const {
+string Money::getFormattedStringValue() const {    
+    char buffer[AMOUNT_BUFFER_LENGTH];
+    snprintf(buffer, AMOUNT_BUFFER_LENGTH, "%d", this->representedValue);
+
+    string raw = buffer;
+
     stringstream s;
 
-    s << showbase << put_money(getRawStringValue());
+    s.imbue(locale(""));
+    s << showbase << put_money(raw);
 
     return s.str();
 }

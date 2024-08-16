@@ -11,6 +11,7 @@
 #include "db.h"
 #include "db_base.h"
 #include "strdate.h"
+#include "money.h"
 
 using namespace std;
 
@@ -64,7 +65,7 @@ class DBPayment : public DBEntity {
             cout << "Description: '" << description << "'" << endl;
 
             cout << fixed << setprecision(2);
-            cout << "Amount: " << amount << endl;
+            cout << "Amount: " << amount.getFormattedStringValue() << endl;
 
             cout << "DBCategory (encapsulated object):" << endl;
             category.print();
@@ -82,7 +83,7 @@ class DBPayment : public DBEntity {
 
         string                  date;
         string                  description;
-        double                  amount;
+        Money                   amount;
 };
 
 #endif

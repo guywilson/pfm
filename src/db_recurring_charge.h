@@ -83,7 +83,7 @@ class DBRecurringCharge : public DBPayment {
                         "created," \
                         "updated) " \
                         "VALUES (%lld, %lld, %lld, '%s', '%s'," \
-                        "'%s', %.2f, '%s', '%s', '%s');";
+                        "'%s', %s, '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE recurring_charge " \
@@ -92,7 +92,7 @@ class DBRecurringCharge : public DBPayment {
                         "date = '%s'," \
                         "end_date = '%s'," \
                         "description = '%s'," \
-                        "amount = %.2f," \
+                        "amount = %s," \
                         "frequency = '%s'," \
                         "updated = '%s' " \
                         "WHERE id = %lld;";
@@ -224,7 +224,7 @@ class DBRecurringCharge : public DBPayment {
                 date.c_str(),
                 endDate.c_str(),
                 description.c_str(),
-                amount,
+                amount.getRawStringValue().c_str(),
                 frequency.c_str(),
                 now.c_str(),
                 now.c_str());
@@ -246,7 +246,7 @@ class DBRecurringCharge : public DBPayment {
                 date.c_str(),
                 endDate.c_str(),
                 description.c_str(),
-                amount,
+                amount.getRawStringValue().c_str(),
                 frequency.c_str(),
                 now.c_str(),
                 id);

@@ -73,7 +73,7 @@ class AddTransactionView : public CLIView {
 
 class TransactionListView : public CLIListView {
     private:
-        double total;
+        Money total;
 
     public:
         TransactionListView() : CLIListView() {
@@ -125,7 +125,7 @@ class TransactionListView : public CLIListView {
                 row.addCellValue(transaction.category.code);
                 row.addCellValue(transaction.payee.code);
                 row.addCellValue(transaction.getCreditDebitValue());
-                row.addCellValue(formatCurrency(transaction.amount));
+                row.addCellValue(transaction.amount.getFormattedStringValue());
                 row.addCellValue(transaction.getIsReconciledValue());
 
                 total += transaction.amount;
@@ -136,7 +136,7 @@ class TransactionListView : public CLIListView {
         void show() override {
             CLIListView::show();
             showBottomBorder();
-            cout << "                                                                    Total amount: | " << bold_on << right << setw(13) << formatCurrency(total) << bold_off << " |" << endl << endl;
+            cout << "                                                                    Total amount: | " << bold_on << right << setw(13) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
         }
 };
 
@@ -202,9 +202,9 @@ class UpdateTransactionView : public CLIView {
             creditDebitField.setDefaultValue(creditDebit);
             creditDebitField.setLengthLimit(2);
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%.2f]: ", transaction.amount);
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%s]: ", transaction.amount.getRawStringValue().c_str());
             amountField.setLabel(szPrompt);
-            amountField.setDefaultValue(transaction.amount);
+            amountField.setDefaultValue(transaction.amount.getRawStringValue());
         }
 
         void show() override {

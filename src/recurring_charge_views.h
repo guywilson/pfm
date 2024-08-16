@@ -7,6 +7,7 @@
 #include "cli_widget.h"
 #include "custom_widgets.h"
 #include "db_recurring_charge.h"
+#include "money.h"
 
 using namespace std;
 
@@ -83,7 +84,7 @@ class ChooseRecurringChargeView : public CLIView {
 
 class RecurringChargeListView : public CLIListView {
     private:
-        double total;
+        Money total;
 
     public:
         RecurringChargeListView() : CLIListView() {
@@ -136,7 +137,7 @@ class RecurringChargeListView : public CLIListView {
                 row.addCellValue(charge.category.code);
                 row.addCellValue(charge.payee.code);
                 row.addCellValue(charge.frequency);
-                row.addCellValue(formatCurrency(charge.amount));
+                row.addCellValue(charge.amount.getFormattedStringValue());
 
                 total += charge.amount;
                 addRow(row);
@@ -146,7 +147,7 @@ class RecurringChargeListView : public CLIListView {
         void show() override {
             CLIListView::show();
             showBottomBorder();
-            cout << "                                                                    Total charges: | " << bold_on << right << setw(13) << formatCurrency(total) << bold_off << " |" << endl << endl;
+            cout << "                                                                    Total charges: | " << bold_on << right << setw(13) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
         }
 };
 
@@ -195,9 +196,9 @@ class UpdateRecurringChargeView : public CLIView {
             frequencyField.setLabel(szPrompt);
             frequencyField.setDefaultValue(charge.frequency);
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%.2f]: ", charge.amount);
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%s]: ", charge.amount.getRawStringValue().c_str());
             amountField.setLabel(szPrompt);
-            amountField.setDefaultValue(charge.amount);
+            amountField.setDefaultValue(charge.amount.getRawStringValue());
         }
 
         void show() override {
