@@ -234,7 +234,7 @@ class UpdateTransactionView : public CLIView {
 
             string creditDebit = creditDebitField.getValue();
             transaction.isCredit = decodeCreditDebit(creditDebit.c_str());
-            transaction.amount = amountField.getDoubleValue();
+            transaction.amount = amountField.getValue();
 
             return transaction;
         }

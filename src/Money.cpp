@@ -132,6 +132,10 @@ void Money::_setValue(const char * amount) {
     _setValue(result);
 }
 
+void Money::_setValue(const string & amount) {
+    _setValue(amount.c_str());
+}
+
 void Money::_setValue(double amount) {
     _setValue((money_t)round(amount * (double)100.0));
 }
@@ -181,6 +185,11 @@ Money & Money::operator=(const Money & rhs) {
 
     this->_setValue(rhs._getValue());
 
+    return *this;
+}
+
+Money & Money::operator=(const string & rhs) {
+    this->_setValue(rhs);
     return *this;
 }
 

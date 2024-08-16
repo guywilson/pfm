@@ -9,6 +9,7 @@
 #include "db_base.h"
 #include "db.h"
 #include "strdate.h"
+#include "money.h"
 
 using namespace std;
 
@@ -57,14 +58,14 @@ class DBAccount : public DBEntity {
                         "current_balance," \
                         "created," \
                         "updated) " \
-                        "VALUES ('%s', '%s', %.2f, %.2f, '%s', '%s');";
+                        "VALUES ('%s', '%s', %s, %s, '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE account SET " \
                         "code = '%s'," \
                         "name = '%s'," \
-                        "opening_balance = %.2f," \
-                        "current_balance = %.2f," \
+                        "opening_balance = %s," \
+                        "current_balance = %s," \
                         "updated = '%s' " \
                         "WHERE id = %lld;";
 
@@ -74,8 +75,8 @@ class DBAccount : public DBEntity {
     public:
         string                  name;
         string                  code;
-        double                  openingBalance;
-        double                  currentBalance;
+        Money                   openingBalance;
+        Money                   currentBalance;
 
         DBAccount() : DBEntity() {
             clear();
@@ -106,8 +107,8 @@ class DBAccount : public DBEntity {
             cout << "Code: '" << code << "'" << endl;
 
             cout << fixed << setprecision(2);
-            cout << "Opening balance: " << openingBalance << endl;
-            cout << "Current balance: " << currentBalance << endl;
+            cout << "Opening balance: " << openingBalance.getFormattedStringValue() << endl;
+            cout << "Current balance: " << currentBalance.getFormattedStringValue() << endl;
         }
 
         const char * getInsertStatement() override {
@@ -121,8 +122,8 @@ class DBAccount : public DBEntity {
                 sqlInsert,
                 name.c_str(),
                 code.c_str(),
-                openingBalance,
-                currentBalance,
+                openingBalance.getRawStringValue().c_str(),
+                currentBalance.getRawStringValue().c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -140,8 +141,8 @@ class DBAccount : public DBEntity {
                 sqlUpdate,
                 code.c_str(),
                 name.c_str(),
-                openingBalance,
-                currentBalance,
+                openingBalance.getRawStringValue().c_str(),
+                currentBalance.getRawStringValue().c_str(),
                 now.c_str(),
                 id);
 

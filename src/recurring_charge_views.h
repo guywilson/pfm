@@ -228,7 +228,7 @@ class UpdateRecurringChargeView : public CLIView {
             charge.endDate = endDateField.getValue();
             charge.description = descriptionField.getValue();
             charge.frequency = frequencyField.getValue();
-            charge.amount = amountField.getDoubleValue();
+            charge.amount = amountField.getValue();
 
             return charge;
         }

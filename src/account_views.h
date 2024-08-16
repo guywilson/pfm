@@ -43,8 +43,8 @@ class AddAccountView : public CLIView {
 
             account.name = nameField.getValue();
             account.code = codeField.getValue();
-            account.openingBalance = openingBalanceField.getDoubleValue();
-            account.currentBalance = openingBalanceField.getDoubleValue();
+            account.openingBalance = openingBalanceField.getValue();
+            account.currentBalance = openingBalanceField.getValue();
 
             return account;
         }
@@ -100,11 +100,9 @@ class AccountListView : public CLIListView {
 
                 CLIListRow row(headerRow);
 
-                string balance = formatCurrency(account.currentBalance);
-
                 row.addCellValue(account.code);
                 row.addCellValue(account.name);
-                row.addCellValue(balance);
+                row.addCellValue(account.currentBalance.getFormattedStringValue());
 
                 addRow(row);
             }
@@ -117,8 +115,8 @@ class UpdateAccountView : public CLIView {
 
         CLITextField nameField;
         CLITextField codeField;
-        CLITextField openingBalanceField;
-        CLITextField currentBalanceField;
+        CLICurrencyField openingBalanceField;
+        CLICurrencyField currentBalanceField;
 
     public:
         UpdateAccountView() : UpdateAccountView("Update account") {}
@@ -127,7 +125,6 @@ class UpdateAccountView : public CLIView {
 
         void setAccount(DBAccount & account) {
             char szPrompt[MAX_PROMPT_LENGTH];
-            char szBalance[AMOUNT_FIELD_STRING_LEN];
 
             accountId = account.id;
 
@@ -141,17 +138,13 @@ class UpdateAccountView : public CLIView {
             codeField.setDefaultValue(account.code);
             codeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%.2f]: ", account.openingBalance);
-            snprintf(szBalance, AMOUNT_FIELD_STRING_LEN, "%.2f", account.openingBalance);
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%s]: ", account.openingBalance.getRawStringValue().c_str());
             openingBalanceField.setLabel(szPrompt);
-            openingBalanceField.setDefaultValue(szBalance);
-            openingBalanceField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+            openingBalanceField.setDefaultValue(account.openingBalance.getRawStringValue());
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Current balance [%.2f]: ", account.currentBalance);
-            snprintf(szBalance, AMOUNT_FIELD_STRING_LEN, "%.2f", account.currentBalance);
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Current balance [%s]: ", account.currentBalance.getRawStringValue().c_str());
             currentBalanceField.setLabel(szPrompt);
-            currentBalanceField.setDefaultValue(szBalance);
-            currentBalanceField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+            currentBalanceField.setDefaultValue(account.currentBalance.getRawStringValue());
         }
 
         void show() override {
@@ -170,8 +163,8 @@ class UpdateAccountView : public CLIView {
 
             account.name = nameField.getValue();
             account.code = codeField.getValue();
-            account.openingBalance = openingBalanceField.getDoubleValue();
-            account.currentBalance = openingBalanceField.getDoubleValue();
+            account.openingBalance = openingBalanceField.getValue();
+            account.currentBalance = openingBalanceField.getValue();
 
             if (account.code.length() == 0) {
                 throw pfm_error("Account code must have a value");

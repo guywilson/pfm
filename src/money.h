@@ -31,6 +31,7 @@ class Money {
         money_t makeRepresentedValue(money_t whole, money_t decimal);
 
         void _setValue(const char * amount);
+        void _setValue(const string & amount);
         void _setValue(double amount);
         void _setValue(money_t amount);
 
@@ -52,6 +53,7 @@ class Money {
         string getFormattedStringValue() const;
 
         Money & operator=(const Money & rhs);
+        Money & operator=(const string & rhs);
 
         const Money operator+(const Money & rhs);
         Money & operator+=(const Money & rhs);
