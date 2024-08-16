@@ -278,6 +278,20 @@ class MoneyTest {
             }
         }
 
+        static void testAssignment2() {
+            string amount = "137.47";
+            Money m2;
+
+            m2 = amount;
+
+            if (m2._getValue() != 13747L) {
+                throw pfm_error("testAssignment2(): Test failed");
+            }
+            else {
+                cout << "testAssignment2(): Test passed" << endl;
+            }
+        }
+
         static void testOperatorPlus() {
             Money m1("107.86");
             Money m2("27.30");
@@ -644,6 +658,15 @@ class MoneyTest {
 
             try {
                 testAssignment1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testAssignment2();
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
