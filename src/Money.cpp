@@ -15,30 +15,15 @@ Money::Money() {
 }
 
 Money::Money(money_t amount) {
-    this->representedValue = amount;
+    _setValue(amount);
 }
 
 Money::Money(string & amount) {
-    Money(amount.c_str());
+    _setValue(amount.c_str());
 }
 
 Money::Money(const char * amount) {
-    int decimalPointPos = findDecimalPointPos(amount);
-
-    money_t whole;
-    money_t decimal = 0L;
-
-    if (decimalPointPos == DECIMAL_POINT_NOT_FOUND_VALUE) {
-        whole = (money_t)strtol(amount, NULL, 10);
-    }
-    else {
-        char buffer[16];
-        strncpy(buffer, amount, decimalPointPos);
-        whole = (money_t)strtol(buffer, NULL, 10);
-        decimal = (money_t)strtol(&amount[decimalPointPos + 1], NULL, 10);
-    }
-
-    Money((whole * 100) + decimal);
+    _setValue(amount);
 }
 
 int Money::findDecimalPointPos(const char * amount) {
@@ -54,30 +39,75 @@ int Money::findDecimalPointPos(const char * amount) {
     return decimalPointPos;
 }
 
+money_t Money::makeRepresentedValue(money_t whole, money_t decimal) {
+    int signMultiplier;
+
+    if (whole < 0) {
+        signMultiplier = -1;
+    }
+    else {
+        signMultiplier = 1;
+    }
+
+    return (whole * 100) + (decimal * signMultiplier);
+}
+
 Money::Money(double amount) {
-    this->representedValue = (money_t)round(amount * (double)100.0);
+    _setValue(amount);
 }
 
 Money::Money(const Money & src) {
-    Money(src._getValue());
+    _setValue(src._getValue());
 }
 
 money_t Money::_getValue() const {
     return representedValue;
 }
 
-void Money::_setValue(money_t m) {
-    this->representedValue = m;
+void Money::_setValue(const char * amount) {
+    int decimalPointPos = findDecimalPointPos(amount);
+
+    money_t whole;
+    money_t decimal = 0L;
+
+    if (decimalPointPos == DECIMAL_POINT_NOT_FOUND_VALUE) {
+        whole = (money_t)strtol(amount, NULL, 10);
+    }
+    else {
+        char buffer[16];
+        for (int i = 0;i < decimalPointPos;i++) {
+            buffer[i] = amount[i];
+        }
+        buffer[decimalPointPos] = 0;
+
+        whole = (money_t)strtol(buffer, NULL, 10);
+        decimal = (money_t)strtol(&amount[decimalPointPos + 1], NULL, 10);
+    }
+
+    _setValue(makeRepresentedValue(whole, decimal));
+}
+
+void Money::_setValue(double amount) {
+    _setValue((money_t)round(amount * (double)100.0));
+}
+
+void Money::_setValue(money_t amount) {
+    this->representedValue = amount;
 }
 
 double Money::getDoubleValue() {
-    return ((double)this->representedValue / (double)100.0);
+    double value = (double)this->representedValue / (double)100.0;
+    return value;
 }
 
 string Money::getRawStringValue() const {
     char buffer[16];
     money_t whole = this->representedValue / 100;
     money_t decimal = this->representedValue - (whole * 100);
+
+    if (decimal < 0) {
+        decimal = decimal * -1;
+    }
 
     snprintf(buffer, 16, "%d.%02d", whole, decimal);
 
@@ -98,48 +128,53 @@ Money & Money::operator=(const Money & rhs) {
         return *this;
     }
 
-    this->representedValue = rhs._getValue();
+    this->_setValue(rhs._getValue());
 
     return *this;
 }
 
-Money Money::operator+(const Money & rhs) {
-    Money money = Money(this->_getValue() + rhs._getValue());
-    return money;
+const Money Money::operator+(const Money & rhs) {
+    Money result = *this;
+    result += rhs;
+    return result;
 }
 
-Money Money::operator+=(const Money & rhs) {
-    *this = *this + rhs;
+Money & Money::operator+=(const Money & rhs) {
+    this->representedValue += rhs.representedValue;
     return *this;
 }
 
-Money Money::operator-(const Money & rhs) {
-    Money money = Money(this->_getValue() - rhs._getValue());
-    return money;
+const Money Money::operator-(const Money & rhs) {
+    Money result = *this;
+    result -= rhs;
+    return result;
 }
 
-Money Money::operator-=(const Money & rhs) {
-    *this = *this - rhs;
+Money & Money::operator-=(const Money & rhs) {
+    this->representedValue -= rhs.representedValue;
     return *this;
 }
 
-Money Money::operator*(const Money & rhs) {
-    Money money = Money(this->_getValue() * rhs._getValue());
-    return money;
+const Money Money::operator*(const Money & rhs) {
+    Money result = *this;
+    result *= rhs;
+    return result;
 }
 
-Money Money::operator*=(const Money & rhs) {
-    *this = *this * rhs;
+Money & Money::operator*=(const Money & rhs) {
+    this->representedValue *= rhs.representedValue;
+    this->representedValue /= 100;
     return *this;
 }
 
-Money Money::operator/(const Money & rhs) {
-    Money money = Money(this->_getValue() / rhs._getValue());
-    return money;
+const Money Money::operator/(const Money & rhs) {
+    Money result = *this;
+    result /= rhs;
+    return result;
 }
 
-Money Money::operator/=(const Money & rhs) {
-    *this = *this / rhs;
+Money & Money::operator/=(const Money & rhs) {
+    this->representedValue /= rhs.representedValue;
     return *this;
 }
 

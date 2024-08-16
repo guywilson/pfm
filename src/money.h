@@ -23,7 +23,11 @@ class Money {
         money_t representedValue;
 
         int findDecimalPointPos(const char * amount);
-        void _setValue(money_t m);
+        money_t makeRepresentedValue(money_t whole, money_t decimal);
+
+        void _setValue(const char * amount);
+        void _setValue(double amount);
+        void _setValue(money_t amount);
 
     protected:
         Money(money_t amount);
@@ -44,14 +48,14 @@ class Money {
 
         Money & operator=(const Money & rhs);
 
-        Money operator+(const Money & rhs);
-        Money operator+=(const Money & rhs);
-        Money operator-(const Money & rhs);
-        Money operator-=(const Money & rhs);
-        Money operator*(const Money & rhs);
-        Money operator*=(const Money & rhs);
-        Money operator/(const Money & rhs);
-        Money operator/=(const Money & rhs);
+        const Money operator+(const Money & rhs);
+        Money & operator+=(const Money & rhs);
+        const Money operator-(const Money & rhs);
+        Money & operator-=(const Money & rhs);
+        const Money operator*(const Money & rhs);
+        Money & operator*=(const Money & rhs);
+        const Money operator/(const Money & rhs);
+        Money & operator/=(const Money & rhs);
 
         bool operator==(const Money & rhs);
         bool operator!=(const Money & rhs);
@@ -66,7 +70,7 @@ class MoneyTest {
     private:
         static void testCreateString() {
             string amount = "137.47";
-            Money m = Money(amount);
+            Money m(amount);
 
             if (m._getValue() != 13747L) {
                 throw pfm_error("testCreateString(): Test failed");
@@ -78,7 +82,7 @@ class MoneyTest {
 
         static void testCreateChar1() {
             const char * amount = "137.47";
-            Money m = Money(amount);
+            Money m(amount);
 
             if (m._getValue() != 13747L) {
                 throw pfm_error("testCreateChar1(): Test failed");
@@ -90,7 +94,7 @@ class MoneyTest {
 
         static void testCreateChar2() {
             const char * amount = "137";
-            Money m = Money(amount);
+            Money m(amount);
 
             if (m._getValue() != 13700L) {
                 throw pfm_error("testCreateChar2(): Test failed");
@@ -102,7 +106,7 @@ class MoneyTest {
 
         static void testCreateChar3() {
             const char * amount = "-25.25";
-            Money m = Money(amount);
+            Money m(amount);
 
             if (m._getValue() != -2525L) {
                 throw pfm_error("testCreateChar3(): Test failed");
@@ -112,9 +116,21 @@ class MoneyTest {
             }
         }
 
+        static void testCreateChar4() {
+            const char * amount = "27.30";
+            Money m(amount);
+
+            if (m._getValue() != 2730L) {
+                throw pfm_error("testCreateChar4(): Test failed");
+            }
+            else {
+                cout << "testCreateChar4(): Test passed" << endl;
+            }
+        }
+
         static void testCreateDouble1() {
             double amount = 137.47f;
-            Money m = Money(amount);
+            Money m(amount);
 
             if (m._getValue() != 13747L) {
                 throw pfm_error("testCreateDouble1(): Test failed");
@@ -126,7 +142,7 @@ class MoneyTest {
 
         static void testCreateDouble2() {
             double amount = 137.0f;
-            Money m = Money(amount);
+            Money m(amount);
 
             if (m._getValue() != 13700L) {
                 throw pfm_error("testCreateDouble2(): Test failed");
@@ -138,7 +154,7 @@ class MoneyTest {
 
         static void testCreateDouble3() {
             double amount = -25.25f;
-            Money m = Money(amount);
+            Money m(amount);
 
             if (m._getValue() != -2525L) {
                 throw pfm_error("testCreateDouble3(): Test failed");
@@ -148,11 +164,26 @@ class MoneyTest {
             }
         }
 
+        static void testCopyConstructor() {
+            const char * amount = "107.86";
+            Money m1(amount);
+            Money m2(m1);
+
+            if (m2._getValue() != 10786L) {
+                throw pfm_error("testCopyConstructor(): Test failed");
+            }
+            else {
+                cout << "testCopyConstructor(): Test passed" << endl;
+            }
+        }
+
         static void testGetDoubleValue1() {
             const char * amount = "137.47";
-            Money m = Money(amount);
+            Money m(amount);
 
-            if (m.getDoubleValue() != 137.47f) {
+            double value = m.getDoubleValue();
+
+            if (value != (double)137.47) {
                 throw pfm_error("testGetDoubleValue1(): Test failed");
             }
             else {
@@ -162,9 +193,11 @@ class MoneyTest {
 
         static void testGetDoubleValue2() {
             const char * amount = "137.00";
-            Money m = Money(amount);
+            Money m(amount);
 
-            if (m.getDoubleValue() != 137.0f) {
+            double value = m.getDoubleValue();
+
+            if (value != (double)137.0) {
                 throw pfm_error("testGetDoubleValue2(): Test failed");
             }
             else {
@@ -174,7 +207,7 @@ class MoneyTest {
 
         static void testGetRawStringValue1() {
             const char * amount = "137.47";
-            Money m = Money(amount);
+            Money m(amount);
 
             if (m.getRawStringValue() != amount) {
                 throw pfm_error("testGetRawStringValue1(): Test failed");
@@ -186,7 +219,7 @@ class MoneyTest {
 
         static void testGetRawStringValue2() {
             const char * amount = "137.00";
-            Money m = Money(amount);
+            Money m(amount);
 
             if (m.getRawStringValue() != amount) {
                 throw pfm_error("testGetRawStringValue2(): Test failed");
@@ -198,7 +231,7 @@ class MoneyTest {
 
         static void testGetRawStringValue3() {
             const char * amount = "-25.25";
-            Money m = Money(amount);
+            Money m(amount);
 
             if (m.getRawStringValue() != amount) {
                 throw pfm_error("testGetRawStringValue3(): Test failed");
@@ -208,11 +241,24 @@ class MoneyTest {
             }
         }
 
+        static void testGetRawStringValue4() {
+            const char * amount = "-137.47";
+            Money m(amount);
+
+            if (m.getRawStringValue() != amount) {
+                throw pfm_error("testGetRawStringValue4(): Test failed");
+            }
+            else {
+                cout << "testGetRawStringValue4(): Test passed" << endl;
+            }
+        }
+
         static void testAssignment1() {
             const char * amount = "137.47";
-            Money m = Money(amount);
+            Money m1(amount);
+            Money m2;
 
-            Money m2 = m;
+            m2 = m1;
 
             if (m2._getValue() != 13747L) {
                 throw pfm_error("testAssignment1(): Test failed");
@@ -223,8 +269,8 @@ class MoneyTest {
         }
 
         static void testOperatorPlus() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("27.30");
+            Money m1("107.86");
+            Money m2("27.30");
             Money m3 = m1 + m2;
 
             if (m3._getValue() != 13516L) {
@@ -236,8 +282,8 @@ class MoneyTest {
         }
 
         static void testOperatorPlusEquals() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("27.30");
+            Money m1("107.86");
+            Money m2("27.30");
             m2 += m1;
 
             if (m2._getValue() != 13516L) {
@@ -249,8 +295,8 @@ class MoneyTest {
         }
 
         static void testOperatorMinus() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("27.30");
+            Money m1("107.86");
+            Money m2("27.30");
             Money m3 = m1 - m2;
 
             if (m3._getValue() != 8056L) {
@@ -262,11 +308,11 @@ class MoneyTest {
         }
 
         static void testOperatorMinusEquals() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("27.30");
-            m2 -= m1;
+            Money m1("107.86");
+            Money m2("27.30");
+            m1 -= m2;
 
-            if (m2._getValue() != 8056L) {
+            if (m1._getValue() != 8056L) {
                 throw pfm_error("testOperatorMinusEquals(): Test failed");
             }
             else {
@@ -275,8 +321,8 @@ class MoneyTest {
         }
 
         static void testOperatorTimes() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("27.30");
+            Money m1("107.86");
+            Money m2("27.30");
             Money m3 = m1 * m2;
 
             if (m3._getValue() != 294458L) {
@@ -288,11 +334,11 @@ class MoneyTest {
         }
 
         static void testOperatorTimesEquals() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("27.30");
-            m2 *= m1;
+            Money m1("107.86");
+            Money m2("27.30");
+            m1 *= m2;
 
-            if (m2._getValue() != 294458L) {
+            if (m1._getValue() != 294458L) {
                 throw pfm_error("testOperatorTimesEquals(): Test failed");
             }
             else {
@@ -301,8 +347,8 @@ class MoneyTest {
         }
 
         static void testOperatorDivide() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("27.30");
+            Money m1("107.86");
+            Money m2("27.30");
             Money m3 = m1 / m2;
 
             if (m3._getValue() != 395L) {
@@ -314,11 +360,11 @@ class MoneyTest {
         }
 
         static void testOperatorDivideEquals() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("27.30");
-            m2 /= m1;
+            Money m1("107.86");
+            Money m2("27.30");
+            m1 /= m2;
 
-            if (m2._getValue() != 395L) {
+            if (m1._getValue() != 395L) {
                 throw pfm_error("testOperatorDivideEquals(): Test failed");
             }
             else {
@@ -327,8 +373,8 @@ class MoneyTest {
         }
 
         static void testOperatorEquality1() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("107.86");
+            Money m1("107.86");
+            Money m2("107.86");
 
             if (m1 != m2) {
                 throw pfm_error("testOperatorEquality1(): Test failed");
@@ -339,8 +385,8 @@ class MoneyTest {
         }
 
         static void testOperatorEquality2() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("107.85");
+            Money m1("107.86");
+            Money m2("107.85");
 
             if (m1 == m2) {
                 throw pfm_error("testOperatorEquality2(): Test failed");
@@ -351,8 +397,8 @@ class MoneyTest {
         }
 
         static void testOperatorInequality1() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("107.85");
+            Money m1("107.86");
+            Money m2("107.85");
 
             if (m1 == m2) {
                 throw pfm_error("testOperatorInequality1(): Test failed");
@@ -363,8 +409,8 @@ class MoneyTest {
         }
 
         static void testOperatorInequality2() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("107.86");
+            Money m1("107.86");
+            Money m2("107.86");
 
             if (m1 != m2) {
                 throw pfm_error("testOperatorInequality2(): Test failed");
@@ -375,8 +421,8 @@ class MoneyTest {
         }
 
         static void testOperatorLessThan1() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("105.86");
+            Money m1("107.86");
+            Money m2("105.86");
 
             if (!(m2 < m1)) {
                 throw pfm_error("testOperatorLessThan1(): Test failed");
@@ -387,8 +433,8 @@ class MoneyTest {
         }
 
         static void testOperatorLessThan2() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("109.81");
+            Money m1("107.86");
+            Money m2("109.81");
 
             if ((m2 < m1)) {
                 throw pfm_error("testOperatorLessThan2(): Test failed");
@@ -399,8 +445,8 @@ class MoneyTest {
         }
 
         static void testOperatorLessThanOrEquals() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("107.86");
+            Money m1("107.86");
+            Money m2("107.86");
 
             if (!(m2 <= m1)) {
                 throw pfm_error("testOperatorLessThanOrEquals(): Test failed");
@@ -411,8 +457,8 @@ class MoneyTest {
         }
 
         static void testOperatorGreaterThan1() {
-            Money m1 = Money("105.86");
-            Money m2 = Money("107.86");
+            Money m1("105.86");
+            Money m2("107.86");
 
             if (!(m2 > m1)) {
                 throw pfm_error("testOperatorGreaterThan1(): Test failed");
@@ -423,8 +469,8 @@ class MoneyTest {
         }
 
         static void testOperatorGreaterThan2() {
-            Money m1 = Money("109.81");
-            Money m2 = Money("107.86");
+            Money m1("109.81");
+            Money m2("107.86");
 
             if ((m2 > m1)) {
                 throw pfm_error("testOperatorGreaterThan2(): Test failed");
@@ -435,8 +481,8 @@ class MoneyTest {
         }
 
         static void testOperatorGreaterThanOrEquals() {
-            Money m1 = Money("107.86");
-            Money m2 = Money("107.86");
+            Money m1("107.86");
+            Money m2("107.86");
 
             if (!(m2 >= m1)) {
                 throw pfm_error("testOperatorGreaterThanOrEquals(): Test failed");
@@ -488,6 +534,15 @@ class MoneyTest {
             }
 
             try {
+                testCreateChar4();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
                 testCreateDouble1();
                 numTestsPassed++;
             }
@@ -507,6 +562,15 @@ class MoneyTest {
 
             try {
                 testCreateDouble3();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testCopyConstructor();
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
@@ -552,6 +616,15 @@ class MoneyTest {
 
             try {
                 testGetRawStringValue3();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testGetRawStringValue4();
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
