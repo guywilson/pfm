@@ -7,7 +7,6 @@ using namespace std;
 #ifndef __INCL_UTILS
 #define __INCL_UTILS
 
-string      formatCurrency(double src);
 int         readCriteria(
                 const char * pszField, 
                 const db_column_type & type, 

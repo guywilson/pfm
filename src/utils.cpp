@@ -19,16 +19,7 @@
 
 using namespace std;
 
-#define CURRENCY_BUFFER_LEN                 16
 #define MAX_PROMPT_LENGTH                   64
-
-string formatCurrency(double src) {
-    static char szAmount[CURRENCY_BUFFER_LEN];
-
-    snprintf(szAmount, CURRENCY_BUFFER_LEN, " £%.2f", (float)src);
-
-    return string(szAmount);
-}
 
 int readCriteria(
         const char * pszField, 

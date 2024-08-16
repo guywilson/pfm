@@ -108,7 +108,13 @@ class StrDate {
             int                 month;
             int                 year;
 
-            if (date.length() < 10) {
+            if (date.length() == 0) {
+                /*
+                ** Allow blank date for nullable fields...
+                */
+                return true;
+            }
+            else if (date.length() < 10) {
                 return false;
             }
 

@@ -127,6 +127,9 @@ class CLITextField : public CLIField {
                 text = line;
                 free(line);
             }
+            else if (defaultValue.length() > 0) {
+                text = defaultValue;
+            }
 
             return text;
         }
