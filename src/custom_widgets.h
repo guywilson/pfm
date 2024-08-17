@@ -100,7 +100,7 @@ class DateField : public CLITextField {
 
             while (!isDateValid && attempts < maxAttemps) {
                 line = readLine();
-                isDateValid = StrDate::validateDate(line);
+                isDateValid = StrDate::isDateValid(line);
 
                 attempts++;
             }

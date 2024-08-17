@@ -16,6 +16,19 @@ class StrDate {
     private:
         string _date;
 
+        /*
+        ** Calculates the number of seconds since Jan 1, 1970
+        */
+        time_t epoch();
+        bool isLeapYear();
+
+        int daysInMonth(int month);
+        int daysInMonth();
+
+        void validateDateString(const string & date);
+
+        static bool isLeapYear(int year);
+
     public:
         StrDate();
         StrDate(StrDate & sd);
@@ -23,34 +36,19 @@ class StrDate {
         StrDate(const char * pszDate);
         StrDate(int year, int month, int day);
 
-        static string today();
-        static string getTimestamp();
-        static bool validateDate(const string & date);
-        string shortDate() const;
-
         void set(const string & date);
         void set(const char * date);
         void set(int year, int month, int day);
 
-        /*
-        ** Calculates the number of seconds since Jan 1, 1970
-        */
-        time_t epoch();
-        static time_t epoch(string & date);
-
-        static bool isLeapYear(int year);
-        static bool isLeapYear(string & date);
-
-        static int daysInMonth(int year, int month);
-        static int daysInMonth(string & date);
+        static string today();
+        static string getTimestamp();
+        static bool isDateValid(const string & date);
+        
+        string shortDate() const;
     
         int year();
         int month();
         int day();
-
-        static int year(string & date);
-        static int month(string & date);
-        static int day(string & date);
 
         void addYears(int years);
         void addMonths(int months);

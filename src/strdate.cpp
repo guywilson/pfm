@@ -93,19 +93,30 @@ string StrDate::getTimestamp() {
     return string(now);
 }
 
-bool StrDate::validateDate(const string & date) {
+bool StrDate::isDateValid(const string & date) {
+    try {
+        StrDate d(date);
+        d.validateDateString(d.shortDate());
+    }
+    catch (pfm_validation_error & e) {
+        return false;
+    }
+
+    return true;
+}
+
+void StrDate::validateDateString(const string & date) {
     int                 day;
     int                 month;
     int                 year;
 
-    if (date.length() == 0) {
-        /*
-        ** Allow blank date for nullable fields...
-        */
-        return true;
-    }
-    else if (date.length() < 10) {
-        return false;
+    if (date.length() < 10) {
+        throw pfm_validation_error(
+                pfm_error::buildMsg(
+                    "Invalid date '%s': Invalid date length, date must be in the format 'yyyy-mm-dd'",
+                    date.c_str()),
+                __FILE__,
+                __LINE__);
     }
 
     /*
@@ -117,31 +128,59 @@ bool StrDate::validateDate(const string & date) {
     day = atoi(date.substr(8, 2).c_str());
 
     if (year < 1900) {
-        return false;
+        throw pfm_validation_error(
+                pfm_error::buildMsg(
+                    "Invalid date '%s': Date must be greater than '1900-01-01'",
+                    date.c_str()),
+                __FILE__,
+                __LINE__);
     }
     if (month < 1 || month > 12) {
-        return false;
+        throw pfm_validation_error(
+                pfm_error::buildMsg(
+                    "Invalid date '%s': Invalid month, must be between 1 and 12",
+                    date.c_str()),
+                __FILE__,
+                __LINE__);
     }
     if (day < 0 || day > 31) {
-        return false;
+        throw pfm_validation_error(
+                pfm_error::buildMsg(
+                    "Invalid date '%s': Invalid day, must be between 1 and 31",
+                    date.c_str()),
+                __FILE__,
+                __LINE__);
     }
     if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
-        return false;
+        throw pfm_validation_error(
+                pfm_error::buildMsg(
+                    "Invalid date '%s': Supplied month has 30 days",
+                    date.c_str()),
+                __FILE__,
+                __LINE__);
     }
     if (month == 2) {
-        if (StrDate::isLeapYear(year)) {
+        if (isLeapYear(year)) {
             if (day > 29) {
-                return false;
+                throw pfm_validation_error(
+                        pfm_error::buildMsg(
+                            "Invalid date '%s': February has max 29 days in a leap year",
+                            date.c_str()),
+                        __FILE__,
+                        __LINE__);
             }
         }
         else {
             if (day > 28) {
-                return false;
+                throw pfm_validation_error(
+                        pfm_error::buildMsg(
+                            "Invalid date '%s': February has max 28 days in a non-leap year",
+                            date.c_str()),
+                        __FILE__,
+                        __LINE__);
             }
         }
     }
-
-    return true;
 }
 
 string StrDate::shortDate() const {
@@ -149,21 +188,13 @@ string StrDate::shortDate() const {
 }
 
 void StrDate::set(const string & date) {
-    if (StrDate::validateDate(date)) {
-        this->_date.assign(date);
-    }
-    else {
-        throw pfm_validation_error(pfm_error::buildMsg("Invalid date string: %s", date.c_str()));
-    }
+    set(date.c_str());
 }
 
 void StrDate::set(const char * date) {
-    if (StrDate::validateDate(date)) {
-        this->_date.assign(date);
-    }
-    else {
-        throw pfm_validation_error(pfm_error::buildMsg("Invalid date string: %s", date));
-    }
+    validateDateString(date);
+
+    this->_date = date;
 }
 
 void StrDate::set(int year, int month, int day) {
@@ -181,29 +212,22 @@ void StrDate::set(int year, int month, int day) {
 }
 
 time_t StrDate::epoch() {
-    return StrDate::epoch(_date);
-}
-
-time_t StrDate::epoch(string & date) {
     const time_t    secsPerDay = 3600 * 24;
     time_t          value = 0;
-    int             month = StrDate::month(date);
-    int             year = StrDate::year(date);
-    int             i;
     
-    for (i = 1970;i < year;i++) {
+    for (int i = 1970;i < year();i++) {
         value += (secsPerDay * (StrDate::isLeapYear(i) ? 366 : 365));
     }
 
-    for (i = 1;i < month;i++) {
-        value += (secsPerDay * StrDate::daysInMonth(year, i));
+    for (int i = 1;i < month();i++) {
+        value += (secsPerDay * daysInMonth(i));
     }
 
     /*
     ** Months start at day 1, not day 0 so subtract
     ** 1 from the day...
     */
-    value += ((day(date) - 1) * secsPerDay);
+    value += ((day() - 1) * secsPerDay);
     
     return value;
 }
@@ -227,11 +251,11 @@ bool StrDate::isLeapYear(int year) {
     }
 }
 
-bool StrDate::isLeapYear(string & date) {
-    return(StrDate::isLeapYear(StrDate::year(date)));
+bool StrDate::isLeapYear() {
+    return(StrDate::isLeapYear(year()));
 }
 
-int StrDate::daysInMonth(int year, int month) {
+int StrDate::daysInMonth(int month) {
     if (month == 4 || month == 6 || month == 9 || month == 11) {
         return 30;
     }
@@ -239,7 +263,7 @@ int StrDate::daysInMonth(int year, int month) {
         return 31;
     }
     else if (month == 2) {
-        if (isLeapYear(year)) {
+        if (isLeapYear()) {
             return 29;
         }
         else {
@@ -251,32 +275,20 @@ int StrDate::daysInMonth(int year, int month) {
     }
 }
 
-int StrDate::daysInMonth(string & date) {
-    return StrDate::daysInMonth(StrDate::year(date), StrDate::month(date));
+int StrDate::daysInMonth() {
+    return daysInMonth(month());
 }
 
 int StrDate::year() {
-    return StrDate::year(_date);
+    return atoi(_date.substr(0, 4).c_str());
 }
 
 int StrDate::month() {
-    return StrDate::month(_date);
+    return atoi(_date.substr(5, 2).c_str());
 }
 
 int StrDate::day() {
-    return StrDate::day(_date);
-}
-
-int StrDate::year(string & date) {
-    return atoi(date.substr(0, 4).c_str());
-}
-
-int StrDate::month(string & date) {
-    return atoi(date.substr(5, 2).c_str());
-}
-
-int StrDate::day(string & date) {
-    return atoi(date.substr(8, 2).c_str());
+    return atoi(_date.substr(8, 2).c_str());
 }
 
 void StrDate::addYears(int years) {
@@ -286,7 +298,7 @@ void StrDate::addYears(int years) {
     
     int newYear = y + years;
     
-    if (m == 2 && d == 29 && !isLeapYear(_date)) {
+    if (m == 2 && d == 29 && !isLeapYear()) {
         d = 28;
     }
     
@@ -301,8 +313,8 @@ void StrDate::addMonths(int months) {
     int totalMonths = m + months;
     int newYear = y + (totalMonths - 1) / 12;
     
-    if (d > StrDate::daysInMonth(_date)) {
-        d = StrDate::daysInMonth(_date);
+    if (d > daysInMonth()) {
+        d = daysInMonth();
     }
     
     set(newYear, totalMonths, d);
@@ -323,7 +335,7 @@ void StrDate::addDays(int days) {
         d++;
         dayCounter--;
 
-        if (d > StrDate::daysInMonth(y, m)) {
+        if (d > daysInMonth()) {
             d = 1;
             m++;
         }
@@ -351,42 +363,47 @@ StrDate & StrDate::operator=(const string & rhs) {
     return *this;
 }
 
-bool StrDate::operator==(StrDate & rh) {
-    return (epoch() == rh.epoch());
+bool StrDate::operator==(StrDate & rhs) {
+    return (this->epoch() == rhs.epoch());
 }
 
-bool StrDate::operator==(string & rh) {
-    return (epoch() == StrDate::epoch(rh));
+bool StrDate::operator==(string & rhs) {
+    StrDate d1(rhs);
+    return (this->epoch() == d1.epoch());
 }
 
-bool StrDate::operator<(StrDate & rh) {
-    return (epoch() < rh.epoch());
+bool StrDate::operator<(StrDate & rhs) {
+    return (this->epoch() < rhs.epoch());
 }
 
-bool StrDate::operator<(string & rh) {
-    return (epoch() < StrDate::epoch(rh));
+bool StrDate::operator<(string & rhs) {
+    StrDate d1(rhs);
+    return (this->epoch() < d1.epoch());
 }
 
-bool StrDate::operator<=(StrDate & rh) {
-    return (epoch() <= rh.epoch());
+bool StrDate::operator<=(StrDate & rhs) {
+    return (this->epoch() <= rhs.epoch());
 }
 
-bool StrDate::operator<=(string & rh) {
-    return (epoch() <= StrDate::epoch(rh));
+bool StrDate::operator<=(string & rhs) {
+    StrDate d1(rhs);
+    return (this->epoch() <= d1.epoch());
 }
 
-bool StrDate::operator>(StrDate & rh) {
-    return (epoch() > rh.epoch());
+bool StrDate::operator>(StrDate & rhs) {
+    return (this->epoch() > rhs.epoch());
 }
 
-bool StrDate::operator>(string & rh) {
-    return (epoch() > StrDate::epoch(rh));
+bool StrDate::operator>(string & rhs) {
+    StrDate d1(rhs);
+    return (this->epoch() > d1.epoch());
 }
 
-bool StrDate::operator>=(StrDate & rh) {
-    return (epoch() >= rh.epoch());
+bool StrDate::operator>=(StrDate & rhs) {
+    return (this->epoch() >= rhs.epoch());
 }
 
-bool StrDate::operator>=(string & rh) {
-    return (epoch() >= StrDate::epoch(rh));
+bool StrDate::operator>=(string & rhs) {
+    StrDate d1(rhs);
+    return (this->epoch() >= d1.epoch());
 }

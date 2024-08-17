@@ -316,7 +316,7 @@ void find_transactions(DBAccount & account) {
         int hasDate = readCriteria("date", db_column_type::text, false, ops3, 5, &criterion[numCriteria]);
 
         if (hasDate) {
-            isDateValid = StrDate::validateDate(criterion[numCriteria].value);
+            isDateValid = StrDate::isDateValid(criterion[numCriteria].value);
 
             if (isDateValid) {
                 numCriteria++;
