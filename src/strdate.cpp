@@ -310,14 +310,31 @@ void StrDate::addMonths(int months) {
     int m = month();
     int d = day();
     
-    int totalMonths = m + months;
-    int newYear = y + (totalMonths - 1) / 12;
-    
+    int monthCounter = months;
+
+    if (monthCounter < 0) {
+        monthCounter *= -1;
+    }
+
+    while (monthCounter > 0) {
+        months >= 0 ? m++ : m--;
+        monthCounter--;
+
+        if (m > 12) {
+            m = 1;
+            y++;
+        }
+        else if (m < 1) {
+            m = 12;
+            y--;
+        }
+    }
+
     if (d > daysInMonth()) {
         d = daysInMonth();
     }
     
-    set(newYear, totalMonths, d);
+    set(y, m, d);
 }
 
 void StrDate::addWeeks(int weeks) {
@@ -343,7 +360,11 @@ void StrDate::addDays(int days) {
             y++;
             m = 1;
         }
+
+        cout << "[y: " << y << ", m: " << m << ", d: " << d << "], ";
     }
+    
+    cout << endl;
     
     set(y, m, d);
 }

@@ -18,6 +18,7 @@
 #include "db_transaction.h"
 #include "cli.h"
 #include "money.h"
+#include "strdate.h"
 
 using namespace std;
 
@@ -71,6 +72,8 @@ int main(int argc, char ** argv) {
 
 #ifdef PFM_TEST_SUITE_ENABLED
     MoneyTest::run();
+    cout << endl << endl;
+    StrDateTest::run();
     exit(0);
 #endif
 
