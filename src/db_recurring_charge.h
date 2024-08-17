@@ -217,7 +217,7 @@ class DBRecurringCharge : public DBPayment {
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
-            string now = StrDate::now();
+            string now = StrDate::getTimestamp();
 
             snprintf(
                 szStatement, 
@@ -240,7 +240,7 @@ class DBRecurringCharge : public DBPayment {
         const char * getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
-            string now = StrDate::now();
+            string now = StrDate::getTimestamp();
 
             snprintf(
                 szStatement, 
@@ -262,7 +262,7 @@ class DBRecurringCharge : public DBPayment {
         const char * getDeleteStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
-            string now = StrDate::now();
+            string now = StrDate::getTimestamp();
 
             snprintf(
                 szStatement, 

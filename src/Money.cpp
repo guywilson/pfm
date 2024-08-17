@@ -193,6 +193,11 @@ Money & Money::operator=(const string & rhs) {
     return *this;
 }
 
+Money & Money::operator=(const double rhs) {
+    this->_setValue(rhs);
+    return *this;
+}
+
 const Money Money::operator+(const Money & rhs) {
     Money result = *this;
     result += rhs;
@@ -215,28 +220,27 @@ Money & Money::operator-=(const Money & rhs) {
     return *this;
 }
 
-const Money Money::operator*(const Money & rhs) {
+const Money Money::operator*(const int rhs) {
     Money result = *this;
     result *= rhs;
     return result;
 }
 
-Money & Money::operator*=(const Money & rhs) {
-    this->representedValue *= rhs.representedValue;
-    this->representedValue = (money_t)round((double)this->representedValue / (double)100.0);
+Money & Money::operator*=(const int rhs) {
+    this->representedValue *= rhs;
     return *this;
 }
 
-const Money Money::operator/(const Money & rhs) {
+const Money Money::operator/(const int rhs) {
     Money result = *this;
     result /= rhs;
     return result;
 }
 
-Money & Money::operator/=(const Money & rhs) {
+Money & Money::operator/=(const int rhs) {
     double result = (double)this->representedValue;
-    result /= (double)rhs.representedValue;
-    this->representedValue = (money_t)round(result * (double)100.0);
+    result /= (double)rhs;
+    this->representedValue = (money_t)round(result);
     return *this;
 }
 

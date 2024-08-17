@@ -54,6 +54,7 @@ class Money {
 
         Money & operator=(const Money & rhs);
         Money & operator=(const string & rhs);
+        Money & operator=(const double rhs);
 
         const Money operator+(const Money & rhs);
         Money & operator+=(const Money & rhs);
@@ -61,11 +62,11 @@ class Money {
         const Money operator-(const Money & rhs);
         Money & operator-=(const Money & rhs);
 
-        const Money operator*(const Money & rhs);
-        Money & operator*=(const Money & rhs);
+        const Money operator*(const int rhs);
+        Money & operator*=(const int rhs);
         
-        const Money operator/(const Money & rhs);
-        Money & operator/=(const Money & rhs);
+        const Money operator/(const int rhs);
+        Money & operator/=(const int rhs);
 
         bool operator==(const Money & rhs);
         bool operator!=(const Money & rhs);
@@ -292,6 +293,20 @@ class MoneyTest {
             }
         }
 
+        static void testAssignment3() {
+            double amount = 137.47f;
+            Money m2;
+
+            m2 = amount;
+
+            if (m2._getValue() != 13747L) {
+                throw pfm_error("testAssignment3(): Test failed");
+            }
+            else {
+                cout << "testAssignment3(): Test passed" << endl;
+            }
+        }
+
         static void testOperatorPlus() {
             Money m1("107.86");
             Money m2("27.30");
@@ -346,10 +361,9 @@ class MoneyTest {
 
         static void testOperatorTimes() {
             Money m1("107.86");
-            Money m2("27.30");
-            Money m3 = m1 * m2;
+            Money m3 = m1 * 3;
 
-            if (m3._getValue() != 294458L) {
+            if (m3._getValue() != 32358L) {
                 throw pfm_error("testOperatorTimes(): Test failed");
             }
             else {
@@ -359,10 +373,9 @@ class MoneyTest {
 
         static void testOperatorTimesEquals() {
             Money m1("107.86");
-            Money m2("27.30");
-            m1 *= m2;
+            m1 *= 3;
 
-            if (m1._getValue() != 294458L) {
+            if (m1._getValue() != 32358L) {
                 throw pfm_error("testOperatorTimesEquals(): Test failed");
             }
             else {
@@ -372,10 +385,9 @@ class MoneyTest {
 
         static void testOperatorDivide() {
             Money m1("107.86");
-            Money m2("27.30");
-            Money m3 = m1 / m2;
+            Money m3 = m1 / 2;
 
-            if (m3._getValue() != 395L) {
+            if (m3._getValue() != 5393L) {
                 throw pfm_error("testOperatorDivide(): Test failed");
             }
             else {
@@ -385,10 +397,9 @@ class MoneyTest {
 
         static void testOperatorDivideEquals() {
             Money m1("107.86");
-            Money m2("27.30");
-            m1 /= m2;
+            m1 /= 2;
 
-            if (m1._getValue() != 395L) {
+            if (m1._getValue() != 5393L) {
                 throw pfm_error("testOperatorDivideEquals(): Test failed");
             }
             else {
@@ -667,6 +678,15 @@ class MoneyTest {
 
             try {
                 testAssignment2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testAssignment3();
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
