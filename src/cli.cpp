@@ -21,7 +21,7 @@
 
 using namespace std;
 
-void add_account(void) {
+void add_account() {
     AddAccountView view;
     view.show();
 
@@ -31,7 +31,7 @@ void add_account(void) {
     cout << "Created account with ID " << account.id << endl;
 }
 
-void list_accounts(void) {
+void list_accounts() {
     DBAccount accountInstance;
     DBAccountResult result = accountInstance.retrieveAll();
 
@@ -72,7 +72,7 @@ void update_account(DBAccount & account) {
     updatedAccount.save();
 }
 
-void add_category(void) {
+void add_category() {
     AddCategoryView view;
     view.show();
 
@@ -81,7 +81,7 @@ void add_category(void) {
     category.save();
 }
 
-void list_categories(void) {
+void list_categories() {
     DBCategory category;
     DBCategoryResult result =  category.retrieveAll();
 
@@ -118,7 +118,7 @@ void update_category(DBCategory & category) {
     updatedCategory.save();
 }
 
-void add_payee(void) {
+void add_payee() {
     AddPayeeView view;
     view.show();
 
@@ -127,7 +127,7 @@ void add_payee(void) {
     payee.save();
 }
 
-void list_payees(void) {
+void list_payees() {
     DBPayee payee;
     DBPayeeResult result =  payee.retrieveAll();
 

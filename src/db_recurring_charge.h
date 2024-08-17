@@ -109,7 +109,7 @@ class DBRecurringCharge : public DBPayment {
             clear();
         }
 
-        void clear(void) {
+        void clear() {
             DBPayment::clear();
 
             this->nextPaymentDate = "";
@@ -125,7 +125,7 @@ class DBRecurringCharge : public DBPayment {
             this->endDate = src.endDate;
         }
 
-        void print(void) {
+        void print() {
             DBPayment::print();
 
             cout << "Frequency: '" << frequency << "'" << endl;
@@ -133,15 +133,15 @@ class DBRecurringCharge : public DBPayment {
             cout << "NextPaymentDate: '" << nextPaymentDate << "'" << endl;
         }
 
-        int getFrequencyValue(void) {
+        int getFrequencyValue() {
             return atoi(frequency.substr(0, frequency.length() - 1).c_str());
         }
 
-        char getFrequencyUnit(void) {
+        char getFrequencyUnit() {
             return frequency.substr(frequency.length() - 1, 1).c_str()[0];
         }
 
-        bool isDue(void) {
+        bool isDue() {
             StrDate     paymentDate(nextPaymentDate);
             StrDate     today;
 
@@ -153,8 +153,8 @@ class DBRecurringCharge : public DBPayment {
             }
         }
 
-        void setNextPaymentDate(void) {
-            StrDate     chargeDate(date);
+        StrDate calculateNextPaymentDate() {
+            StrDate     chargeStartDate(date);
             StrDate     dateToday;
             char        frequencyUnit;
             int         frequencyValue;
@@ -162,36 +162,37 @@ class DBRecurringCharge : public DBPayment {
             frequencyValue = getFrequencyValue();
             frequencyUnit = getFrequencyUnit();
 
-            if (chargeDate > dateToday || chargeDate == dateToday) {
-                nextPaymentDate.assign(date);
-            }
-            else {
+            StrDate nextPaymentDate;
+
+            if (chargeStartDate <= dateToday) {
+                nextPaymentDate = chargeStartDate;
+
                 switch (frequencyUnit) {
                     case 'y':
-                        chargeDate.addYears(frequencyValue * (dateToday.year() - chargeDate.year()));
+                        nextPaymentDate.addYears(frequencyValue * (dateToday.year() - nextPaymentDate.year()));
 
-                        if (chargeDate.month() <= dateToday.month() && 
-                            chargeDate.day() <= dateToday.day())
+                        if (nextPaymentDate.month() <= dateToday.month() && 
+                            nextPaymentDate.day() <= dateToday.day())
                         {
-                            chargeDate.addYears(1);
+                            nextPaymentDate.addYears(1);
                         }
                         break;
 
                     case 'm':
-                        chargeDate.addMonths(frequencyValue * (dateToday.month() - chargeDate.month()));
+                        nextPaymentDate.addMonths(frequencyValue * (dateToday.month() - nextPaymentDate.month()));
 
-                        if (chargeDate.day() <= dateToday.day()) {
-                            chargeDate.addMonths(1);
+                        if (nextPaymentDate.day() <= dateToday.day()) {
+                            nextPaymentDate.addMonths(1);
                         }
                         break;
 
                     case 'w':
-                        chargeDate.addWeeks(frequencyValue * ((dateToday.day() - chargeDate.day()) / 7));
+                        nextPaymentDate.addWeeks(frequencyValue * ((dateToday.day() - nextPaymentDate.day()) / 7));
                         break;
 
                     case 'd':
-                        while (chargeDate.year() < dateToday.year() || chargeDate.month() < dateToday.month()) {
-                            chargeDate.addDays(frequencyValue);
+                        while (nextPaymentDate.year() < dateToday.year() || nextPaymentDate.month() < dateToday.month()) {
+                            nextPaymentDate.addDays(frequencyValue);
                         }
                         break;
 
@@ -204,9 +205,13 @@ class DBRecurringCharge : public DBPayment {
                                     __LINE__);
                         break;
                 }
-
-                nextPaymentDate.assign(chargeDate.shortDate());
             }
+
+            return nextPaymentDate;
+        }
+        
+        void setNextPaymentDate() {
+            nextPaymentDate.assign(calculateNextPaymentDate().shortDate());
         }
 
         const char * getInsertStatement() override {
@@ -270,7 +275,7 @@ class DBRecurringCharge : public DBPayment {
 
         void                    retrieveByID(sqlite3_int64 id);
         DBRecurringChargeResult retrieveByAccountID(sqlite3_int64 accountId);
-        DBRecurringChargeResult retrieveAll(void);
+        DBRecurringChargeResult retrieveAll();
 };
 
 class DBRecurringChargeResult : public DBResult {

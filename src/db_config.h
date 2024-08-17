@@ -44,7 +44,7 @@ class DBConfig : public DBEntity {
             clear();
         }
 
-        void clear(void) {
+        void clear() {
             DBEntity::clear();
 
             this->key = "";
@@ -60,7 +60,7 @@ class DBConfig : public DBEntity {
             this->description.assign(src.description);
         }
 
-        void print(void) {
+        void print() {
             DBEntity::print();
 
             cout << "Key: '" << key << "'" << endl;
@@ -120,7 +120,7 @@ class DBConfig : public DBEntity {
 
         void                retrieveByID(sqlite3_int64 id);
         void                retrieveByKey(string & key);
-        DBConfigResult      retrieveAll(void);
+        DBConfigResult      retrieveAll();
 };
 
 class DBConfigResult : public DBResult {

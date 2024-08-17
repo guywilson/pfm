@@ -43,7 +43,7 @@ class DBPayee : public DBEntity {
             clear();
         }
 
-        void clear(void) {
+        void clear() {
             DBEntity::clear();
 
             this->name = "";
@@ -57,7 +57,7 @@ class DBPayee : public DBEntity {
             this->code = src.code;
         }
 
-        void print(void) {
+        void print() {
             DBEntity::print();
 
             cout << "Description: '" << name << "'" << endl;
@@ -114,7 +114,7 @@ class DBPayee : public DBEntity {
 
         void                retrieveByID(sqlite3_int64 id);
         void                retrieveByCode(string & code);
-        DBPayeeResult       retrieveAll(void);
+        DBPayeeResult       retrieveAll();
 };
 
 class DBPayeeResult : public DBResult {

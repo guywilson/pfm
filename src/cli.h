@@ -17,19 +17,19 @@ using namespace std;
 #define MAX_PROMPT_LENGTH                      128
 #define AMOUNT_FIELD_STRING_LEN                 16
 
-void                add_account(void);
-void                list_accounts(void);
+void                add_account();
+void                list_accounts();
 DBAccount           choose_account(const char * szAccountCode);
 void                update_account(DBAccount & account);
 
-void                add_category(void);
-void                list_categories(void);
+void                add_category();
+void                list_categories();
 DBCategory          get_category(const char * pszCategoryCode);
 void                update_category(DBCategory & category);
 void                delete_category(DBCategory & category);
 
-void                add_payee(void);
-void                list_payees(void);
+void                add_payee();
+void                list_payees();
 DBPayee             get_payee(const char * pszPayeeCode);
 void                update_payee(DBPayee & payee);
 void                delete_payee(DBPayee & payee);

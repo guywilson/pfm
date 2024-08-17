@@ -24,7 +24,7 @@ class DBPayment : public DBEntity {
             clear();
         }
 
-        void clear(void) {
+        void clear() {
             DBEntity::clear();
 
             this->accountId = 0;
@@ -54,7 +54,7 @@ class DBPayment : public DBEntity {
             this->payee.set(src.payee);
         }
 
-        void print(void) {
+        void print() {
             DBEntity::print();
 
             cout << "AccountID: " << accountId << endl;

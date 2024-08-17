@@ -82,7 +82,7 @@ class DBAccount : public DBEntity {
             clear();
         }
 
-        void clear(void) {
+        void clear() {
             DBEntity::clear();
 
             this->name = "";
@@ -100,7 +100,7 @@ class DBAccount : public DBEntity {
             this->currentBalance =  src.currentBalance;
         }
 
-        void print(void) {
+        void print() {
             DBEntity::print();
 
             cout << "Name: '" << name << "'" << endl;
@@ -165,7 +165,7 @@ class DBAccount : public DBEntity {
 
         void            retrieveByID(sqlite3_int64 id);
         void            retrieveByCode(string & code);
-        DBAccountResult retrieveAll(void);
+        DBAccountResult retrieveAll();
 };
 
 class DBAccountResult : public DBResult {

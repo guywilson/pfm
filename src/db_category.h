@@ -43,7 +43,7 @@ class DBCategory : public DBEntity {
             clear();
         }
 
-        void clear(void) {
+        void clear() {
             DBEntity::clear();
 
             this->description = "";
@@ -57,7 +57,7 @@ class DBCategory : public DBEntity {
             this->code = src.code;
         }
 
-        void print(void) {
+        void print() {
             DBEntity::print();
 
             cout << "Description: '" << description << "'" << endl;
@@ -114,7 +114,7 @@ class DBCategory : public DBEntity {
 
         void                retrieveByID(sqlite3_int64 id);
         void                retrieveByCode(string & code);
-        DBCategoryResult    retrieveAll(void);
+        DBCategoryResult    retrieveAll();
 };
 
 class DBCategoryResult : public DBResult {

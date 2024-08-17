@@ -154,7 +154,7 @@ class StrDate {
             return true;
         }
 
-        string shortDate() {
+        string shortDate() const {
             return _date;
         }
 
@@ -349,6 +349,21 @@ class StrDate {
             set(y, m, d);
         }
 
+        StrDate & operator=(const StrDate & rhs) {
+            if (this == &rhs) {
+                return *this;
+            }
+
+            this->set(rhs.shortDate());
+
+            return *this;
+        }
+
+        StrDate & operator=(const string & rhs) {
+            this->set(rhs);
+            return *this;
+        }
+
         bool operator==(StrDate & rh) {
             return (epoch() == rh.epoch());
         }
@@ -365,12 +380,28 @@ class StrDate {
             return (epoch() < StrDate::epoch(rh));
         }
 
+        bool operator<=(StrDate & rh) {
+            return (epoch() <= rh.epoch());
+        }
+
+        bool operator<=(string & rh) {
+            return (epoch() <= StrDate::epoch(rh));
+        }
+
         bool operator>(StrDate & rh) {
             return (epoch() > rh.epoch());
         }
         
         bool operator>(string & rh) {
             return (epoch() > StrDate::epoch(rh));
+        }
+
+        bool operator>=(StrDate & rh) {
+            return (epoch() >= rh.epoch());
+        }
+        
+        bool operator>=(string & rh) {
+            return (epoch() >= StrDate::epoch(rh));
         }
 };
 

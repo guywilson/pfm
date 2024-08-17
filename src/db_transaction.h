@@ -55,6 +55,24 @@ class DBTransaction : public DBPayment {
                         "FROM account_transaction " \
                         "WHERE account_id = %lld;";
 
+        const char * sqlSelectLatestByChargeID = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM account_transaction " \
+                        "WHERE recurring_charge_id = %lld " \
+                        "ORDER BY date DESC " \
+                        "LIMIT 1;";
+
         const char * sqlInsert = 
                         "INSERT INTO account_transaction (" \
                         "account_id," \
@@ -85,6 +103,8 @@ class DBTransaction : public DBPayment {
         const char * sqlDelete = 
                         "DELETE FROM account_transaction WHERE id = %lld;";
 
+        DBTransactionResult retrieveByStatementAndID(const char * statement, sqlite3_int64 id);
+
     public:
         bool                    isCredit;
         bool                    isReconciled;
@@ -93,7 +113,7 @@ class DBTransaction : public DBPayment {
             clear();
         }
 
-        void clear(void) {
+        void clear() {
             DBPayment::clear();
 
             this->isCredit = false;
@@ -115,14 +135,14 @@ class DBTransaction : public DBPayment {
             this->isReconciled = false;
         }
 
-        void print(void) {
+        void print() {
             DBPayment::print();
 
             cout << "Debit/Credit: '" << (isCredit ? "CR" : "DB") << "'" << endl;
             cout << "isReconciled: " << isReconciled << endl;
         }
 
-        string getCreditDebitValue(void) {
+        string getCreditDebitValue() {
             return (isCredit ? "CR" : "DB");
         }
 
@@ -138,7 +158,7 @@ class DBTransaction : public DBPayment {
             }
         }
 
-        const char * getIsReconciledValue(void) {
+        const char * getIsReconciledValue() {
             return (isReconciled ? "Y" : "N");
         }
 
@@ -201,7 +221,9 @@ class DBTransaction : public DBPayment {
             return szStatement;
         }
 
-        void                retrieveByID(sqlite3_int64 id);
+        void retrieveByID(sqlite3_int64 id);
+        int findLatestByRecurringChargeID(sqlite3_int64 chargeId);
+
         DBTransactionResult retrieveByAccountID(sqlite3_int64 accountId);
         DBTransactionResult findTransactionsForAccountID(
                                     sqlite3_int64 accountId, 

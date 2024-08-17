@@ -131,25 +131,30 @@ using namespace std;
 //     return numTransactionsCreated;
 // }
 
-void DBTransaction::retrieveByID(sqlite3_int64 id) {
+DBTransactionResult DBTransaction::retrieveByStatementAndID(const char * sqlSelect, sqlite3_int64 id) {
     char                szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int                 rowsRetrievedCount;
     DBTransactionResult result;
 
     snprintf(
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByID, 
+        sqlSelect, 
         id);
 
     PFM_DB & db = PFM_DB::getInstance();
-    rowsRetrievedCount = db.executeSelect(szStatement, &result);
+    db.executeSelect(szStatement, &result);
 
-    if (rowsRetrievedCount != 1) {
+    return result;
+}
+
+void DBTransaction::retrieveByID(sqlite3_int64 id) {
+    DBTransactionResult result = retrieveByStatementAndID(sqlSelectByID, id);
+
+    if (result.getNumRows() != 1) {
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Expected exactly 1 row, got %d", 
-                    rowsRetrievedCount), 
+                    result.getNumRows()), 
                 __FILE__, 
                 __LINE__);
     }
@@ -158,19 +163,27 @@ void DBTransaction::retrieveByID(sqlite3_int64 id) {
 }
 
 DBTransactionResult DBTransaction::retrieveByAccountID(sqlite3_int64 accountId) {
-    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBTransactionResult result;
-
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountID, 
-        accountId);
-
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(szStatement, &result);
+    DBTransactionResult result = retrieveByStatementAndID(sqlSelectByAccountID, accountId);
 
     return result;
+}
+
+int DBTransaction::findLatestByRecurringChargeID(sqlite3_int64 chargeId) {
+    DBTransactionResult result = retrieveByStatementAndID(sqlSelectLatestByChargeID, chargeId);
+
+    if (result.getNumRows() == 1) {
+        set(result.getResultAt(0));
+    }
+    else if (result.getNumRows() > 1) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Expected no more than 1 row, got %d", 
+                    result.getNumRows()), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    return result.getNumRows();
 }
 
 DBTransactionResult DBTransaction::findTransactionsForAccountID(

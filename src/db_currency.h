@@ -44,7 +44,7 @@ class DBCurrency : public DBEntity {
             clear();
         }
 
-        void clear(void) {
+        void clear() {
             DBEntity::clear();
 
             this->code = "";
@@ -60,7 +60,7 @@ class DBCurrency : public DBEntity {
             this->symbol.assign(src.symbol);
         }
 
-        void print(void) {
+        void print() {
             DBEntity::print();
 
             cout << "Code: '" << code << "'" << endl;
@@ -120,7 +120,7 @@ class DBCurrency : public DBEntity {
 
         void                retrieveByID(sqlite3_int64 id);
         void                retrieveByCode(string & code);
-        DBCurrencyResult    retrieveAll(void);
+        DBCurrencyResult    retrieveAll();
 };
 
 class DBCurrencyResult : public DBResult {

@@ -13,8 +13,8 @@ using namespace std;
 
 class DBEntity {
     private:
-        sqlite3_int64   insert(void);
-        void            update(void);
+        sqlite3_int64   insert();
+        void            update();
 
     public:
         sqlite3_int64           id;
@@ -29,22 +29,22 @@ class DBEntity {
 
         virtual ~DBEntity() {}
 
-        virtual const char * getInsertStatement(void) {
+        virtual const char * getInsertStatement() {
             return "";
         }
 
-        virtual const char * getUpdateStatement(void) {
+        virtual const char * getUpdateStatement() {
             return "";
         }
 
-        virtual const char * getDeleteStatement(void) {
+        virtual const char * getDeleteStatement() {
             return "";
         }
 
-        void remove(void);
-        void save(void);
+        void remove();
+        void save();
 
-        void clear(void) {
+        void clear() {
             this->id = 0;
             this->sequence = 0;
             this->createdDate = "";
@@ -58,7 +58,7 @@ class DBEntity {
             this->sequence = src.sequence;
         }
 
-        void print(void) {
+        void print() {
             cout << "ID: " << id << endl;
             cout << "Sequence: " << sequence << endl;
 
