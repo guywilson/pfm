@@ -74,9 +74,9 @@ class DBPayment : public DBEntity {
             payee.print();
         }
 
-        sqlite3_int64           accountId;
-        sqlite3_int64           categoryId;
-        sqlite3_int64           payeeId;
+        pfm_id_t           accountId;
+        pfm_id_t           categoryId;
+        pfm_id_t           payeeId;
 
         DBCategory              category;
         DBPayee                 payee;

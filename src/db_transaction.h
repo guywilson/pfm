@@ -103,7 +103,7 @@ class DBTransaction : public DBPayment {
         const char * sqlDelete = 
                         "DELETE FROM account_transaction WHERE id = %lld;";
 
-        DBTransactionResult retrieveByStatementAndID(const char * statement, sqlite3_int64 id);
+        DBTransactionResult retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
     public:
         bool                    isCredit;
@@ -221,12 +221,12 @@ class DBTransaction : public DBPayment {
             return szStatement;
         }
 
-        void retrieveByID(sqlite3_int64 id);
-        int findLatestByRecurringChargeID(sqlite3_int64 chargeId);
+        void retrieveByID(pfm_id_t id);
+        int findLatestByRecurringChargeID(pfm_id_t chargeId);
 
-        DBTransactionResult retrieveByAccountID(sqlite3_int64 accountId);
+        DBTransactionResult retrieveByAccountID(pfm_id_t accountId);
         DBTransactionResult findTransactionsForAccountID(
-                                    sqlite3_int64 accountId, 
+                                    pfm_id_t accountId, 
                                     DBCriteria * criteria, 
                                     int numCriteria);
 };

@@ -100,7 +100,7 @@ class CategoryListView : public CLIListView {
 
 class UpdateCategoryView : public CLIView {
     private:
-        sqlite3_int64 categoryId;
+        pfm_id_t categoryId;
 
         CLITextField descriptionField;
         CLITextField codeField;

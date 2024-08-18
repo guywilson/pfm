@@ -273,8 +273,8 @@ class DBRecurringCharge : public DBPayment {
             return szStatement;
         }
 
-        void                    retrieveByID(sqlite3_int64 id);
-        DBRecurringChargeResult retrieveByAccountID(sqlite3_int64 accountId);
+        void                    retrieveByID(pfm_id_t id);
+        DBRecurringChargeResult retrieveByAccountID(pfm_id_t accountId);
         DBRecurringChargeResult retrieveAll();
 };
 

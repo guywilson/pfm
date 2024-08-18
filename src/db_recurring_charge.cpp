@@ -13,7 +13,7 @@
 
 using namespace std;
 
-void DBRecurringCharge::retrieveByID(sqlite3_int64 id) {
+void DBRecurringCharge::retrieveByID(pfm_id_t id) {
     char                    szStatement[SQL_STATEMENT_BUFFER_LEN];
     int                     rowsRetrievedCount;
     DBRecurringChargeResult result;
@@ -37,7 +37,7 @@ void DBRecurringCharge::retrieveByID(sqlite3_int64 id) {
     set(result.getResultAt(0));
 }
 
-DBRecurringChargeResult DBRecurringCharge::retrieveByAccountID(sqlite3_int64 accountId) {
+DBRecurringChargeResult DBRecurringCharge::retrieveByAccountID(pfm_id_t accountId) {
     char                    szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBRecurringChargeResult result;
 

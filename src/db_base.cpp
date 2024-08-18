@@ -12,7 +12,7 @@
 
 using namespace std;
 
-sqlite3_int64 DBEntity::insert() {
+pfm_id_t DBEntity::insert() {
     createdDate = StrDate::today();
     updatedDate = StrDate::today();
 

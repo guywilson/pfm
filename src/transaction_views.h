@@ -161,7 +161,7 @@ class ChooseTransactionView : public CLIView {
 
 class UpdateTransactionView : public CLIView {
     private:
-        sqlite3_int64 transactionId;
+        pfm_id_t transactionId;
 
         CategorySpinField categoryField;
         PayeeSpinField payeeField;

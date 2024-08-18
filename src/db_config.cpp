@@ -13,7 +13,7 @@
 
 using namespace std;
 
-void DBConfig::retrieveByID(sqlite3_int64 id) {
+void DBConfig::retrieveByID(pfm_id_t id) {
     char                szStatement[SQL_STATEMENT_BUFFER_LEN];
     int                 rowsRetrievedCount;
     DBConfigResult      result;

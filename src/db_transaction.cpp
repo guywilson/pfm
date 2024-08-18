@@ -100,7 +100,7 @@ using namespace std;
 //     return result->numRows;
 // }
 
-// int PFM_DB::createDueRecurringTransactionsForAccount(sqlite3_int64 accountId) {
+// int PFM_DB::createDueRecurringTransactionsForAccount(pfm_id_t accountId) {
 //     DBTransaction           transaction;
 //     DBTransactionResult     trResult;
 //     DBRecurringChargeResult rcResult;
@@ -131,7 +131,7 @@ using namespace std;
 //     return numTransactionsCreated;
 // }
 
-DBTransactionResult DBTransaction::retrieveByStatementAndID(const char * sqlSelect, sqlite3_int64 id) {
+DBTransactionResult DBTransaction::retrieveByStatementAndID(const char * sqlSelect, pfm_id_t id) {
     char                szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBTransactionResult result;
 
@@ -147,7 +147,7 @@ DBTransactionResult DBTransaction::retrieveByStatementAndID(const char * sqlSele
     return result;
 }
 
-void DBTransaction::retrieveByID(sqlite3_int64 id) {
+void DBTransaction::retrieveByID(pfm_id_t id) {
     DBTransactionResult result = retrieveByStatementAndID(sqlSelectByID, id);
 
     if (result.getNumRows() != 1) {
@@ -162,13 +162,13 @@ void DBTransaction::retrieveByID(sqlite3_int64 id) {
     set(result.getResultAt(0));
 }
 
-DBTransactionResult DBTransaction::retrieveByAccountID(sqlite3_int64 accountId) {
+DBTransactionResult DBTransaction::retrieveByAccountID(pfm_id_t accountId) {
     DBTransactionResult result = retrieveByStatementAndID(sqlSelectByAccountID, accountId);
 
     return result;
 }
 
-int DBTransaction::findLatestByRecurringChargeID(sqlite3_int64 chargeId) {
+int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
     DBTransactionResult result = retrieveByStatementAndID(sqlSelectLatestByChargeID, chargeId);
 
     if (result.getNumRows() == 1) {
@@ -187,7 +187,7 @@ int DBTransaction::findLatestByRecurringChargeID(sqlite3_int64 chargeId) {
 }
 
 DBTransactionResult DBTransaction::findTransactionsForAccountID(
-                                            sqlite3_int64 accountId, 
+                                            pfm_id_t accountId, 
                                             DBCriteria * criteria, 
                                             int numCriteria)
 {

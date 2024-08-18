@@ -11,17 +11,19 @@ using namespace std;
 #ifndef __INCL_DB_BASE
 #define __INCL_DB_BASE
 
+typedef sqlite3_int64       pfm_id_t;
+
 class DBEntity {
     private:
-        sqlite3_int64   insert();
-        void            update();
+        pfm_id_t insert();
+        void update();
 
     public:
-        sqlite3_int64           id;
+        pfm_id_t id;
 
-        string                  createdDate;
-        string                  updatedDate;
-        uint32_t                sequence;           // Not persistent
+        string createdDate;
+        string updatedDate;
+        uint32_t sequence;           // Not persistent
 
         DBEntity() {
             clear();
@@ -116,7 +118,7 @@ class DBColumn {
             return ((value[0] == 'Y' || value[0] == 'y') ? true : false);
         }
 
-        sqlite3_int64 getIDValue() {
+        pfm_id_t getIDValue() {
             return strtoll(value.c_str(), NULL, 10);
         }
 };

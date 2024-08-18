@@ -36,7 +36,7 @@ using namespace std;
 //     }
 // }
 
-void DBPayee::retrieveByID(sqlite3_int64 id) {
+void DBPayee::retrieveByID(pfm_id_t id) {
     char                szStatement[SQL_STATEMENT_BUFFER_LEN];
     int                 rowsRetrievedCount;
     DBPayeeResult       result;

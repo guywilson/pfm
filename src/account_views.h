@@ -111,7 +111,7 @@ class AccountListView : public CLIListView {
 
 class UpdateAccountView : public CLIView {
     private:
-        sqlite3_int64 accountId;
+        pfm_id_t accountId;
 
         CLITextField nameField;
         CLITextField codeField;

@@ -100,7 +100,7 @@ class PayeeListView : public CLIListView {
 
 class UpdatePayeeView : public CLIView {
     private:
-        sqlite3_int64 categoryId;
+        pfm_id_t categoryId;
 
         CLITextField nameField;
         CLITextField codeField;

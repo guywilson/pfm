@@ -118,7 +118,7 @@ class DBConfig : public DBEntity {
             return szStatement;
         }
 
-        void                retrieveByID(sqlite3_int64 id);
+        void                retrieveByID(pfm_id_t id);
         void                retrieveByKey(string & key);
         DBConfigResult      retrieveAll();
 };

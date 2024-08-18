@@ -34,7 +34,7 @@ class PFM_DB {
 
         bool            open(string dbName);
 
-        sqlite3_int64   executeInsert(const char * sqlStatement);
+        pfm_id_t   executeInsert(const char * sqlStatement);
         int             executeSelect(const char * sqlStatement, DBResult * result);
         void            executeUpdate(const char * sqlStatement);
         void            executeDelete(const char * sqlStatement);

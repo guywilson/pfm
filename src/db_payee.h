@@ -112,7 +112,7 @@ class DBPayee : public DBEntity {
             return szStatement;
         }
 
-        void                retrieveByID(sqlite3_int64 id);
+        void                retrieveByID(pfm_id_t id);
         void                retrieveByCode(string & code);
         DBPayeeResult       retrieveAll();
 };

@@ -153,7 +153,7 @@ class RecurringChargeListView : public CLIListView {
 
 class UpdateRecurringChargeView : public CLIView {
     private:
-        sqlite3_int64 chargeId;
+        pfm_id_t chargeId;
 
         CategorySpinField categoryField;
         PayeeSpinField payeeField;

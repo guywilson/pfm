@@ -62,7 +62,7 @@ int PFM_DB::executeSelect(const char * sqlStatement, DBResult * result) {
     return result->getNumRows();
 }
 
-sqlite3_int64 PFM_DB::executeInsert(const char * sqlStatement) {
+pfm_id_t PFM_DB::executeInsert(const char * sqlStatement) {
     char *          pszErrorMsg;
     int             error;
 
