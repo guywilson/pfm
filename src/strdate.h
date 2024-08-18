@@ -336,6 +336,42 @@ class StrDateTest {
             }
         }
 
+        static void testAddWeeks1() {
+            StrDate date("2020-01-28");
+            date.addWeeks(2);
+
+            if (date.shortDate() != "2020-02-11") {
+                throw pfm_error("testAddWeeks1: Test failed");
+            }
+            else {
+                cout << "testAddWeeks1: Test passed" << endl;
+            }
+        }
+
+        static void testAddWeeks2() {
+            StrDate date("1970-03-24");
+            date.addWeeks(27);
+
+            if (date.shortDate() != "1970-09-29") {
+                throw pfm_error("testAddWeeks2: Test failed");
+            }
+            else {
+                cout << "testAddWeeks2: Test passed" << endl;
+            }
+        }
+
+        static void testAddWeeks3() {
+            StrDate date("1985-06-11");
+            date.addWeeks(-3);
+
+            if (date.shortDate() != "1985-05-21") {
+                throw pfm_error("testAddWeeks3: Test failed");
+            }
+            else {
+                cout << "testAddWeeks3: Test passed" << endl;
+            }
+        }
+
         static void testAddDays1() {
             StrDate date("2020-01-28");
             date.addDays(5);
@@ -715,6 +751,33 @@ class StrDateTest {
 
             try {
                 testAddMonths4();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testAddWeeks1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testAddWeeks2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testAddWeeks3();
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
