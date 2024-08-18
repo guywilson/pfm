@@ -101,20 +101,25 @@ class DBRecurringCharge : public DBPayment {
                         "DELETE FROM recurring_charge WHERE id = %lld;";
 
     public:
-        string                  nextPaymentDate;    // Not persistent
-        string                  frequency;
-        string                  endDate;
+        StrDate nextPaymentDate;    // Not persistent
+
+        string frequency;
+        StrDate endDate;
 
         DBRecurringCharge() : DBPayment() {
             clear();
         }
 
+        DBRecurringCharge(const DBRecurringCharge & src) : DBPayment(src) {
+            set(src);
+        }
+
         void clear() {
             DBPayment::clear();
 
-            this->nextPaymentDate = "";
             this->frequency = "";
-            this->endDate = "";
+            this->nextPaymentDate.clear();
+            this->endDate.clear();
         }
 
         void set(const DBRecurringCharge & src) {
@@ -129,8 +134,8 @@ class DBRecurringCharge : public DBPayment {
             DBPayment::print();
 
             cout << "Frequency: '" << frequency << "'" << endl;
-            cout << "EndDate: '" << endDate << "'" << endl;
-            cout << "NextPaymentDate: '" << nextPaymentDate << "'" << endl;
+            cout << "EndDate: '" << endDate.shortDate() << "'" << endl;
+            cout << "NextPaymentDate: '" << nextPaymentDate.shortDate() << "'" << endl;
         }
 
         int getFrequencyValue() {
@@ -142,10 +147,9 @@ class DBRecurringCharge : public DBPayment {
         }
 
         bool isDue() {
-            StrDate     paymentDate(nextPaymentDate);
-            StrDate     today;
+            StrDate today;
 
-            if (paymentDate > today || paymentDate == today) {
+            if (nextPaymentDate >= today) {
                 return true;
             }
             else {
@@ -211,7 +215,7 @@ class DBRecurringCharge : public DBPayment {
         }
         
         void setNextPaymentDate() {
-            nextPaymentDate.assign(calculateNextPaymentDate().shortDate());
+            this->nextPaymentDate = calculateNextPaymentDate();
         }
 
         const char * getInsertStatement() override {
@@ -226,8 +230,8 @@ class DBRecurringCharge : public DBPayment {
                 accountId,
                 categoryId,
                 payeeId,
-                date.c_str(),
-                endDate.c_str(),
+                date.shortDate().c_str(),
+                endDate.shortDate().c_str(),
                 description.c_str(),
                 amount.getRawStringValue().c_str(),
                 frequency.c_str(),
@@ -248,8 +252,8 @@ class DBRecurringCharge : public DBPayment {
                 sqlUpdate,
                 categoryId,
                 payeeId,
-                date.c_str(),
-                endDate.c_str(),
+                date.shortDate().c_str(),
+                endDate.shortDate().c_str(),
                 description.c_str(),
                 amount.getRawStringValue().c_str(),
                 frequency.c_str(),

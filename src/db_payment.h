@@ -20,8 +20,23 @@ using namespace std;
 
 class DBPayment : public DBEntity {
     public:
+        pfm_id_t accountId;
+        pfm_id_t categoryId;
+        pfm_id_t payeeId;
+
+        StrDate date;
+        string description;
+        Money amount;
+
+        DBCategory category;
+        DBPayee payee;
+
         DBPayment() : DBEntity() {
             clear();
+        }
+
+        DBPayment(const DBPayment & src) : DBEntity(src) {
+            set(src);
         }
 
         void clear() {
@@ -34,7 +49,8 @@ class DBPayment : public DBEntity {
             this->category.clear();
             this->payee.clear();
 
-            this->date = "";
+            this->date.clear();
+
             this->description = "";
             this->amount = 0.0;
         }
@@ -61,7 +77,7 @@ class DBPayment : public DBEntity {
             cout << "CategoryID: " << categoryId << endl;
             cout << "PayeeID: " << payeeId << endl;
 
-            cout << "Date: '" << date << "'" << endl;
+            cout << "Date: '" << date.shortDate() << "'" << endl;
             cout << "Description: '" << description << "'" << endl;
 
             cout << fixed << setprecision(2);
@@ -73,17 +89,6 @@ class DBPayment : public DBEntity {
             cout << "DBPayee (encapsulated object):" << endl;
             payee.print();
         }
-
-        pfm_id_t           accountId;
-        pfm_id_t           categoryId;
-        pfm_id_t           payeeId;
-
-        DBCategory              category;
-        DBPayee                 payee;
-
-        string                  date;
-        string                  description;
-        Money                   amount;
 };
 
 #endif

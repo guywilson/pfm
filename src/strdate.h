@@ -32,7 +32,7 @@ class StrDate {
 
     public:
         StrDate();
-        StrDate(StrDate & sd);
+        StrDate(const StrDate & sd);
         StrDate(const string & sd);
         StrDate(const char * pszDate);
         StrDate(int year, int month, int day);
@@ -40,6 +40,8 @@ class StrDate {
         void set(const string & date);
         void set(const char * date);
         void set(int year, int month, int day);
+
+        void clear();
 
         static string today();
         static string getTimestamp();
@@ -58,6 +60,7 @@ class StrDate {
 
         StrDate & operator=(const StrDate & rhs);
         StrDate & operator=(const string & rhs);
+        StrDate & operator=(const char * rhs);
 
         bool operator==(StrDate & rh);
         bool operator==(string & rh);

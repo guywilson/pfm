@@ -120,7 +120,7 @@ class TransactionListView : public CLIListView {
                 CLIListRow row(headerRow);
 
                 row.addCellValue(transaction.sequence);
-                row.addCellValue(transaction.date);
+                row.addCellValue(transaction.date.shortDate());
                 row.addCellValue(transaction.description);
                 row.addCellValue(transaction.category.code);
                 row.addCellValue(transaction.payee.code);
@@ -188,9 +188,9 @@ class UpdateTransactionView : public CLIView {
             payeeField.setLabel(szPrompt);
             payeeField.setDefaultValue(transaction.payee.code);
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Date ['%s']: ", transaction.date.c_str());
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Date ['%s']: ", transaction.date.shortDate().c_str());
             dateField.setLabel(szPrompt);
-            dateField.setDefaultValue(transaction.date);
+            dateField.setDefaultValue(transaction.date.shortDate());
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", transaction.description.c_str());
             descriptionField.setLabel(szPrompt);

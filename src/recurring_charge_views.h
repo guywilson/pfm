@@ -131,8 +131,8 @@ class RecurringChargeListView : public CLIListView {
                 CLIListRow row(headerRow);
 
                 row.addCellValue(charge.sequence);
-                row.addCellValue(charge.date);
-                row.addCellValue(charge.nextPaymentDate);
+                row.addCellValue(charge.date.shortDate());
+                row.addCellValue(charge.nextPaymentDate.shortDate());
                 row.addCellValue(charge.description);
                 row.addCellValue(charge.category.code);
                 row.addCellValue(charge.payee.code);
@@ -180,13 +180,13 @@ class UpdateRecurringChargeView : public CLIView {
             payeeField.setLabel(szPrompt);
             payeeField.setDefaultValue(charge.payee.code);
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", charge.date.c_str());
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", charge.date.shortDate().c_str());
             startDateField.setLabel(szPrompt);
-            startDateField.setDefaultValue(charge.date);
+            startDateField.setDefaultValue(charge.date.shortDate());
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "End date ['%s']: ", charge.endDate.c_str());
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "End date ['%s']: ", charge.endDate.shortDate().c_str());
             endDateField.setLabel(szPrompt);
-            endDateField.setDefaultValue(charge.endDate);
+            endDateField.setDefaultValue(charge.endDate.shortDate());
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", charge.description.c_str());
             descriptionField.setLabel(szPrompt);

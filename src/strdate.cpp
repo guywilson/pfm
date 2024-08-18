@@ -10,11 +10,16 @@
 
 using namespace std;
 
+#define EPOCH_YEAR                  1970
+#define EPOCH_MONTH                    1
+#define EPOCH_DAY                      1
+
+
 StrDate::StrDate() {
     this->_date = StrDate::today();
 }
 
-StrDate::StrDate(StrDate & sd) {
+StrDate::StrDate(const StrDate & sd) {
     this->set(sd.shortDate());
 }
 
@@ -211,15 +216,19 @@ void StrDate::set(int year, int month, int day) {
     this->set(dateStr);
 }
 
+void StrDate::clear() {
+    set(EPOCH_YEAR, EPOCH_MONTH, EPOCH_DAY);
+}
+
 time_t StrDate::epoch() {
     const time_t    secsPerDay = 3600 * 24;
     time_t          value = 0;
     
-    for (int i = 1970;i < year();i++) {
+    for (int i = EPOCH_YEAR;i < year();i++) {
         value += (secsPerDay * (StrDate::isLeapYear(i) ? 366 : 365));
     }
 
-    for (int i = 1;i < month();i++) {
+    for (int i = EPOCH_MONTH;i < month();i++) {
         value += (secsPerDay * daysInMonth(year(), i));
     }
 
@@ -392,6 +401,11 @@ StrDate & StrDate::operator=(const StrDate & rhs) {
 }
 
 StrDate & StrDate::operator=(const string & rhs) {
+    this->set(rhs);
+    return *this;
+}
+
+StrDate & StrDate::operator=(const char * rhs) {
     this->set(rhs);
     return *this;
 }

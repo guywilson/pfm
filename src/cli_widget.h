@@ -143,7 +143,7 @@ class CLITextField : public CLIField {
             maxLength = numChars;
         }
 
-        void setDefaultValue(string & text) {
+        void setDefaultValue(const string & text) {
             defaultValue = text;
         }
 

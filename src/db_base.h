@@ -29,6 +29,10 @@ class DBEntity {
             clear();
         }
 
+        DBEntity(const DBEntity & src) {
+            set(src);
+        }
+        
         virtual ~DBEntity() {}
 
         virtual const char * getInsertStatement() {
