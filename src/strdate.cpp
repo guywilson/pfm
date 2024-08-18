@@ -220,7 +220,7 @@ time_t StrDate::epoch() {
     }
 
     for (int i = 1;i < month();i++) {
-        value += (secsPerDay * daysInMonth(i));
+        value += (secsPerDay * daysInMonth(year(), i));
     }
 
     /*
@@ -255,7 +255,7 @@ bool StrDate::isLeapYear() {
     return(StrDate::isLeapYear(year()));
 }
 
-int StrDate::daysInMonth(int month) {
+int StrDate::daysInMonth(int year, int month) {
     if (month == 4 || month == 6 || month == 9 || month == 11) {
         return 30;
     }
@@ -263,7 +263,7 @@ int StrDate::daysInMonth(int month) {
         return 31;
     }
     else if (month == 2) {
-        if (isLeapYear()) {
+        if (StrDate::isLeapYear(year)) {
             return 29;
         }
         else {
@@ -276,7 +276,7 @@ int StrDate::daysInMonth(int month) {
 }
 
 int StrDate::daysInMonth() {
-    return daysInMonth(month());
+    return daysInMonth(year(), month());
 }
 
 int StrDate::year() {
@@ -348,23 +348,35 @@ void StrDate::addDays(int days) {
     
     int dayCounter = days;
 
+    if (dayCounter < 0) {
+        dayCounter *= -1;
+    }
+
     while (dayCounter > 0) {
-        d++;
+        days >= 0 ? d++ : d--;
         dayCounter--;
 
-        if (d > daysInMonth()) {
-            d = 1;
+        if (d > daysInMonth(y, m)) {
             m++;
+            d = 1;
+        }
+        else if (d < 1) {
+            m--;
+            d = daysInMonth(y, m);
         }
         if (m > 12) {
             y++;
             m = 1;
+            d = 1;
+        }
+        else if (m < 1) {
+            y--;
+            m = 12;
+            d = daysInMonth(y, m);
         }
 
-        cout << "[y: " << y << ", m: " << m << ", d: " << d << "], ";
+        // cout << "[" << y << ", " << m << ", " << d << "] (" << dayCounter << ")" << endl;
     }
-    
-    cout << endl;
     
     set(y, m, d);
 }
