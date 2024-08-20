@@ -163,8 +163,11 @@ class DBAccount : public DBEntity {
             return szStatement;
         }
 
-        void            retrieveByID(pfm_id_t id);
-        void            retrieveByCode(string & code);
+        void createRecurringTransactions();
+        void createCarriedOverLogs();
+        Money calculateBalanceAfterBills();
+        void retrieveByID(pfm_id_t id);
+        void retrieveByCode(string & code);
         DBAccountResult retrieveAll();
 };
 

@@ -57,7 +57,9 @@ DBAccount choose_account(const char * szAccountCode) {
     DBAccount account;
     account.retrieveByCode(accountCode);
 
-    //db.createDueRecurringTransactionsForAccount(account.id);
+    account.createRecurringTransactions();
+    account.createCarriedOverLogs();
+    account.calculateBalanceAfterBills();
 
     return account;
 }

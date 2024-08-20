@@ -276,3 +276,21 @@ DBTransactionResult DBTransaction::findTransactionsForAccountID(
 
     return result;
 }
+
+DBTransactionResult DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBTransactionResult result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlSelectByAccountIDBetweenDates, 
+        id,
+        firstDate.shortDate().c_str(),
+        secondDate.shortDate().c_str());
+
+    PFM_DB & db = PFM_DB::getInstance();
+    db.executeSelect(szStatement, &result);
+
+    return result;
+}

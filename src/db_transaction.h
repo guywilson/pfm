@@ -30,6 +30,7 @@ class DBTransaction : public DBPayment {
                         "category_id," \
                         "payee_id," \
                         "date," \
+                        "reference," \
                         "description," \
                         "credit_debit," \
                         "amount," \
@@ -46,6 +47,7 @@ class DBTransaction : public DBPayment {
                         "category_id," \
                         "payee_id," \
                         "date," \
+                        "reference," \
                         "description," \
                         "credit_debit," \
                         "amount," \
@@ -55,6 +57,25 @@ class DBTransaction : public DBPayment {
                         "FROM account_transaction " \
                         "WHERE account_id = %lld;";
 
+        const char * sqlSelectByAccountIDBetweenDates = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "reference," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM account_transaction " \
+                        "WHERE account_id = %lld " \
+                        "AND date >= '%s' " \
+                        "AND date <= '%s';";
+
         const char * sqlSelectLatestByChargeID = 
                         "SELECT " \
                         "id," \
@@ -62,6 +83,7 @@ class DBTransaction : public DBPayment {
                         "category_id," \
                         "payee_id," \
                         "date," \
+                        "reference," \
                         "description," \
                         "credit_debit," \
                         "amount," \
@@ -79,13 +101,14 @@ class DBTransaction : public DBPayment {
                         "category_id," \
                         "payee_id," \
                         "date," \
+                        "reference," \
                         "description," \
                         "credit_debit," \
                         "amount," \
                         "is_reconciled," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, %lld, %lld, '%s', '%s', " \
+                        "VALUES (%lld, %lld, %lld, '%s', '%s', '%s', " \
                         "'%s', %s, '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
@@ -93,6 +116,7 @@ class DBTransaction : public DBPayment {
                         "SET category_id = %lld," \
                         "payee_id = %lld," \
                         "date = '%s'," \
+                        "reference = '%s'," \
                         "description = '%s'," \
                         "credit_debit = '%s'," \
                         "amount = %s," \
@@ -106,8 +130,9 @@ class DBTransaction : public DBPayment {
         DBTransactionResult retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
     public:
-        bool                    isCredit;
-        bool                    isReconciled;
+        string reference;
+        bool isCredit;
+        bool isReconciled;
 
         DBTransaction() : DBPayment() {
             clear();
@@ -116,6 +141,7 @@ class DBTransaction : public DBPayment {
         void clear() {
             DBPayment::clear();
 
+            this->reference = "";
             this->isCredit = false;
             this->isReconciled = false;
         }
@@ -123,6 +149,7 @@ class DBTransaction : public DBPayment {
         void set(const DBTransaction & src) {
             DBPayment::set(src);
 
+            this->reference = src.reference;
             this->isCredit = src.isCredit;
             this->isReconciled = src.isReconciled;
         }
@@ -143,6 +170,7 @@ class DBTransaction : public DBPayment {
         void print() {
             DBPayment::print();
 
+            cout << "Reference: '" << reference << "'" << endl;
             cout << "Debit/Credit: '" << (isCredit ? "CR" : "DB") << "'" << endl;
             cout << "isReconciled: " << isReconciled << endl;
         }
@@ -180,6 +208,7 @@ class DBTransaction : public DBPayment {
                 categoryId,
                 payeeId,
                 date.shortDate().c_str(),
+                reference.c_str(),
                 description.c_str(),
                 getCreditDebitValue().c_str(),
                 amount.getRawStringValue().c_str(),
@@ -202,6 +231,7 @@ class DBTransaction : public DBPayment {
                 categoryId,
                 payeeId,
                 date.shortDate().c_str(),
+                reference.c_str(),
                 description.c_str(),
                 getCreditDebitValue().c_str(),
                 amount.getRawStringValue().c_str(),
@@ -230,6 +260,7 @@ class DBTransaction : public DBPayment {
         int findLatestByRecurringChargeID(pfm_id_t chargeId);
 
         DBTransactionResult retrieveByAccountID(pfm_id_t accountId);
+        DBTransactionResult retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBTransactionResult findTransactionsForAccountID(
                                     pfm_id_t accountId, 
                                     DBCriteria * criteria, 
@@ -281,6 +312,9 @@ class DBTransactionResult : public DBResult {
                 }
                 else if (column.getName() == "date") {
                     transaction.date = column.getValue();
+                }
+                else if (column.getName() == "reference") {
+                    transaction.reference = column.getValue();
                 }
                 else if (column.getName() == "description") {
                     transaction.description = column.getValue();

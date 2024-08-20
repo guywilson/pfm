@@ -259,7 +259,7 @@ const char * pszCreateAccountTable =
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
     "UNIQUE(code) ON CONFLICT ROLLBACK," \
-    "FOREIGN KEY(currency_id) REFERENCES currency(id));"
+    "FOREIGN KEY(currency_id) REFERENCES currency(id));";
 
 const char * pszCreateCategoryTable = 
     "CREATE TABLE category (" \
