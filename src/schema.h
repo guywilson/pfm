@@ -236,8 +236,7 @@ const char * pszCreateConfigTable =
     "description TEXT NULL," \
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
-    "UNIQUE(key) ON CONFLICT ROLLBACK" \
-    ");";
+    "UNIQUE(key) ON CONFLICT ROLLBACK);";
 
 const char * pszCreateCurrencyTable =
     "CREATE TABLE currency (" \
@@ -247,8 +246,7 @@ const char * pszCreateCurrencyTable =
     "symbol TEXT NULL," \
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
-    "UNIQUE(code) ON CONFLICT ROLLBACK" \
-    ");";
+    "UNIQUE(code) ON CONFLICT ROLLBACK);";
 
 const char * pszCreateAccountTable = 
     "CREATE TABLE account (" \
@@ -261,8 +259,7 @@ const char * pszCreateAccountTable =
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
     "UNIQUE(code) ON CONFLICT ROLLBACK," \
-    "FOREIGN KEY(currency_id) REFERENCES currency(id)" \
-    ");";
+    "FOREIGN KEY(currency_id) REFERENCES currency(id));"
 
 const char * pszCreateCategoryTable = 
     "CREATE TABLE category (" \
@@ -271,8 +268,7 @@ const char * pszCreateCategoryTable =
     "description TEXT NOT NULL," \
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
-    "UNIQUE(code) ON CONFLICT ROLLBACK" \
-    ");";
+    "UNIQUE(code) ON CONFLICT ROLLBACK);";
 
 const char * pszCreatePayeeTable = 
     "CREATE TABLE payee (" \
@@ -281,8 +277,7 @@ const char * pszCreatePayeeTable =
     "name TEXT NULL," \
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
-    "UNIQUE(code) ON CONFLICT ROLLBACK" \
-    ");";
+    "UNIQUE(code) ON CONFLICT ROLLBACK);";
 
 const char * pszCreateRCTable = 
     "CREATE TABLE recurring_charge (" \
@@ -299,8 +294,7 @@ const char * pszCreateRCTable =
     "updated TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id)," \
     "FOREIGN KEY(category_id) REFERENCES category(id)," \
-    "FOREIGN KEY(payee_id) REFERENCES payee(id)" \
-    ");";
+    "FOREIGN KEY(payee_id) REFERENCES payee(id));";
 
 static const char * pszCreateTransationTable = 
     "CREATE TABLE account_transaction (" \
@@ -310,6 +304,7 @@ static const char * pszCreateTransationTable =
     "payee_id INTEGER," \
     "recurring_charge_id INTEGER,"
     "date TEXT NOT NULL," \
+    "reference TEXT," \
     "description TEXT NOT NULL," \
     "credit_debit TEXT NOT NULL," \
     "amount NUMERIC NOT NULL," \
@@ -319,7 +314,17 @@ static const char * pszCreateTransationTable =
     "FOREIGN KEY(account_id) REFERENCES account(id)," \
     "FOREIGN KEY(category_id) REFERENCES category(id)," \
     "FOREIGN KEY(payee_id) REFERENCES payee(id)," \
-    "FOREIGN KEY(recurring_charge_id) REFERENCES recurring_charge(id)" \
-    ");";
+    "FOREIGN KEY(recurring_charge_id) REFERENCES recurring_charge(id));";
+
+static const char * pszCreateCarriedOverTable = 
+    "CREATE TABLE carried_over_log (" \
+    "id INTEGER PRIMARY KEY," \
+    "account_id INTEGER," \
+    "date TEXT NOT NULL," \
+    "description TEXT NOT NULL," \
+    "balance NUMERIC NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
+    "FOREIGN KEY(account_id) REFERENCES account(id));";
 
 #endif

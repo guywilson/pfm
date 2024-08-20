@@ -127,12 +127,17 @@ class DBTransaction : public DBPayment {
             this->isReconciled = src.isReconciled;
         }
 
-        void setFromRecurringCharge(const DBRecurringCharge & src) {
+        void createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {
             DBPayment::set(src);
 
-            this->date = src.nextPaymentDate;
+            // We want to create (insert) a record, so clear the ID...
+            this->id = 0;
+
+            this->date = transactionDate;
             this->isCredit = false;
             this->isReconciled = false;
+
+            this->save();
         }
 
         void print() {

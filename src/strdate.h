@@ -24,7 +24,6 @@ class StrDate {
         bool isLeapYear();
 
         int daysInMonth(int year, int month);
-        int daysInMonth();
 
         void validateDateString(const string & date);
 
@@ -52,6 +51,8 @@ class StrDate {
         int year();
         int month();
         int day();
+
+        int daysInMonth();
 
         void addYears(int years);
         void addMonths(int months);

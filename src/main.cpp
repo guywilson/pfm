@@ -16,6 +16,7 @@
 #include "db_payee.h"
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
+#include "balance_service.h"
 #include "cli.h"
 #include "money.h"
 #include "strdate.h"

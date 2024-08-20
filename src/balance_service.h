@@ -4,6 +4,8 @@
 
 #include <sqlite3.h>
 
+#include "strdate.h"
+#include "money.h"
 #include "db_account.h"
 #include "db_transaction.h"
 #include "db_recurring_charge.h"
@@ -23,10 +25,27 @@ class BalanceService {
     private:
         BalanceService() {}
 
+        /*
+        ** Balance after Bills
+        **
+        **      Return true if this charge is due this month
+        **
+        ** Create Outstanding Transactions
+        **
+        **      From the latest transaction for the charge, if the next charge is
+        **      prior to today, create it
+        */
+
     public:
         ~BalanceService();
 
+        Money calculateBalanceAfterBills(DBAccount & account) {
+            
+        }
+
         void createRecurringTransactions(DBAccount & account) {
+            StrDate dateToday;
+
             DBRecurringCharge ch;
             DBRecurringChargeResult chargeResult = ch.retrieveByAccountID(account.id);
 
@@ -34,8 +53,15 @@ class BalanceService {
                 DBRecurringCharge charge = chargeResult.getResultAt(i);
 
                 DBTransaction transaction;
-                int hasFoundTransaction = transaction.findLatestByRecurringChargeID(charge.id);
+                transaction.date = charge.date;
 
+                while (transaction.date <= dateToday) {
+                    int hasFoundTransaction = transaction.findLatestByRecurringChargeID(charge.id);
+
+                    if (hasFoundTransaction) {
+                        charge.createNextTransactionForCharge(transaction.date);
+                    }
+                }
             }
         }
 };

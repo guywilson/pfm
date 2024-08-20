@@ -100,6 +100,8 @@ class DBRecurringCharge : public DBPayment {
         const char * sqlDelete = 
                         "DELETE FROM recurring_charge WHERE id = %lld;";
 
+        bool isDateWithinCurrentPeriod(StrDate & date);
+
     public:
         StrDate nextPaymentDate;    // Not persistent
 
@@ -138,86 +140,14 @@ class DBRecurringCharge : public DBPayment {
             cout << "NextPaymentDate: '" << nextPaymentDate.shortDate() << "'" << endl;
         }
 
-        int getFrequencyValue() {
-            return atoi(frequency.substr(0, frequency.length() - 1).c_str());
-        }
+        int getFrequencyValue();
+        char getFrequencyUnit();
 
-        char getFrequencyUnit() {
-            return frequency.substr(frequency.length() - 1, 1).c_str()[0];
-        }
-
-        bool isDue() {
-            StrDate today;
-
-            if (nextPaymentDate >= today) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-
-        StrDate calculateNextPaymentDate() {
-            StrDate     chargeStartDate(date);
-            StrDate     dateToday;
-            char        frequencyUnit;
-            int         frequencyValue;
-
-            frequencyValue = getFrequencyValue();
-            frequencyUnit = getFrequencyUnit();
-
-            StrDate nextPaymentDate;
-
-            if (chargeStartDate <= dateToday) {
-                nextPaymentDate = chargeStartDate;
-
-                switch (frequencyUnit) {
-                    case 'y':
-                        nextPaymentDate.addYears(frequencyValue * (dateToday.year() - nextPaymentDate.year()));
-
-                        if (nextPaymentDate.month() <= dateToday.month() && 
-                            nextPaymentDate.day() <= dateToday.day())
-                        {
-                            nextPaymentDate.addYears(1);
-                        }
-                        break;
-
-                    case 'm':
-                        nextPaymentDate.addMonths(frequencyValue * (dateToday.month() - nextPaymentDate.month()));
-
-                        if (nextPaymentDate.day() <= dateToday.day()) {
-                            nextPaymentDate.addMonths(1);
-                        }
-                        break;
-
-                    case 'w':
-                        nextPaymentDate.addWeeks(frequencyValue * ((dateToday.day() - nextPaymentDate.day()) / 7));
-                        break;
-
-                    case 'd':
-                        while (nextPaymentDate.year() < dateToday.year() || nextPaymentDate.month() < dateToday.month()) {
-                            nextPaymentDate.addDays(frequencyValue);
-                        }
-                        break;
-
-                    default:
-                        throw pfm_validation_error(
-                                    pfm_error::buildMsg(
-                                        "Invalid frequency unit '%c'", 
-                                        frequencyUnit), 
-                                    __FILE__, 
-                                    __LINE__);
-                        break;
-                }
-            }
-
-            return nextPaymentDate;
-        }
+        bool isChargeDueThisPeriod();
+        StrDate calculateNextPaymentDate();
+        void setNextPaymentDate();
+        void createNextTransactionForCharge(StrDate & latestDate);
         
-        void setNextPaymentDate() {
-            this->nextPaymentDate = calculateNextPaymentDate();
-        }
-
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
