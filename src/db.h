@@ -25,19 +25,19 @@ class PFM_DB {
     private:
         PFM_DB() {}
 
-        sqlite3 *       dbHandle;
+        sqlite3 * dbHandle;
 
-        void            createSchema();
+        void createSchema();
 
     public:
         ~PFM_DB();
 
-        bool            open(string dbName);
+        bool open(string dbName);
 
-        pfm_id_t   executeInsert(const char * sqlStatement);
-        int             executeSelect(const char * sqlStatement, DBResult * result);
-        void            executeUpdate(const char * sqlStatement);
-        void            executeDelete(const char * sqlStatement);
+        pfm_id_t executeInsert(const char * sqlStatement);
+        int executeSelect(const char * sqlStatement, DBResult * result);
+        void executeUpdate(const char * sqlStatement);
+        void executeDelete(const char * sqlStatement);
 };
 
 #endif

@@ -271,6 +271,22 @@ void PFM_DB::createSchema() {
                 __LINE__);
         }
 
+        error = sqlite3_exec(
+                        dbHandle, 
+                        pszCreateCarriedOverTable,
+                        NULL,
+                        NULL,
+                        &pszErrorMsg);
+
+        if (error) {
+            throw pfm_error(
+                pfm_error::buildMsg(
+                    "Execute failed in createSchema(): %s", 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+        }
+
         DBCategory category;
 
         for (int i = 0;i < NUM_DEFAULT_CATEGORIES;i++) {
@@ -279,7 +295,7 @@ void PFM_DB::createSchema() {
             category.code = defaultCategories[i][0];
             category.description = defaultCategories[i][1];
 
-            // createCategory(category);
+            category.save();
         }
 
         DBCurrency currency;
@@ -291,7 +307,7 @@ void PFM_DB::createSchema() {
             currency.name = currencies[i][1];
             currency.symbol = currencies[i][2];
 
-            // createCurrency(currency);
+            currency.save();
         }
 
         DBConfig config;
@@ -303,7 +319,7 @@ void PFM_DB::createSchema() {
             config.value = defaultConfig[i][1];
             config.description = defaultConfig[i][2];
 
-            // createConfig(config);
+            config.save();
         }
     }
     catch (pfm_error & e) {
