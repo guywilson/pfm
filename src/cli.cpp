@@ -56,14 +56,12 @@ DBAccount choose_account(const char * szAccountCode) {
 
     DBAccount account;
     account.retrieveByCode(accountCode);
-
-    account.createRecurringTransactions();
-    account.createCarriedOverLogs();
+    account.onUseAccountTrigger();
     
     Money balanceAfterBills = account.calculateBalanceAfterBills();
 
     cout << "Balance after bills: " << balanceAfterBills.getFormattedStringValue() << endl;
-    
+
     return account;
 }
 

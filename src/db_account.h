@@ -72,6 +72,9 @@ class DBAccount : public DBEntity {
         const char * sqlDelete = 
                         "DELETE FROM account WHERE id = %lld;";
 
+        void createRecurringTransactions();
+        void createCarriedOverLogs();
+
     public:
         string                  name;
         string                  code;
@@ -163,9 +166,13 @@ class DBAccount : public DBEntity {
             return szStatement;
         }
 
-        void createRecurringTransactions();
-        void createCarriedOverLogs();
+        void onUseAccountTrigger() {
+            createRecurringTransactions();
+            createCarriedOverLogs();
+        }
+        
         Money calculateBalanceAfterBills();
+
         void retrieveByID(pfm_id_t id);
         void retrieveByCode(string & code);
         DBAccountResult retrieveAll();
