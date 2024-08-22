@@ -59,8 +59,11 @@ DBAccount choose_account(const char * szAccountCode) {
 
     account.createRecurringTransactions();
     account.createCarriedOverLogs();
-    account.calculateBalanceAfterBills();
+    
+    Money balanceAfterBills = account.calculateBalanceAfterBills();
 
+    cout << "Balance after bills: " << balanceAfterBills.getFormattedStringValue() << endl;
+    
     return account;
 }
 

@@ -42,6 +42,8 @@ int PFM_DB::executeSelect(const char * sqlStatement, DBResult * result) {
     char *          pszErrorMsg;
     int             error;
 
+    cout << "Executing statement '" << sqlStatement << "'" << endl;
+
     error = sqlite3_exec(
                 dbHandle, 
                 sqlStatement, 

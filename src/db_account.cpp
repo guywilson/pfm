@@ -126,7 +126,10 @@ void DBAccount::createCarriedOverLogs() {
         int hasCO = co.retrieveLatestByAccountId(this->id);
 
         if (!hasCO) {
-            co.date.clear();
+            DBTransaction transaction;
+            DBTransactionResult result = transaction.retrieveByAccountID(this->id, sort_ascending, 1);
+
+            co.date = result.getResultAt(0).date;
         }
 
         while (co.date < periodStartDate) {
@@ -148,9 +151,11 @@ void DBAccount::createCarriedOverLogs() {
 
             newCO.accountId = this->id;
             newCO.date.set(co.date.year(), co.date.month() + 1, co.date.day());
-            newCO.description = "Carried over";
+            newCO.description = "Carried over (" + newCO.date.shortDate() + ")";
             newCO.balance = balance;
 
+            co.date = newCO.date;
+            
             newCO.save();
         }
 

@@ -15,6 +15,12 @@ using namespace std;
 #define SQL_STATEMENT_BUFFER_LEN                    512
 #define SQL_ROW_LIMIT                                50
 
+typedef enum {
+    sort_descending,
+    sort_ascending
+}
+db_sort_t;
+
 class PFM_DB {
     public:
         static PFM_DB & getInstance() {
@@ -37,7 +43,7 @@ class PFM_DB {
         void begin();
         void commit();
         void rollback();
-        
+
         pfm_id_t executeInsert(const char * sqlStatement);
         int executeSelect(const char * sqlStatement, DBResult * result);
         void executeUpdate(const char * sqlStatement);

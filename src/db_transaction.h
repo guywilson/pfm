@@ -59,6 +59,26 @@ class DBTransaction : public DBPayment {
                         "FROM account_transaction " \
                         "WHERE account_id = %lld;";
 
+        const char * sqlSelectByAccountIDSortedByDate = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "recurring_charge_id," \
+                        "date," \
+                        "reference," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM account_transaction " \
+                        "WHERE account_id = %lld " \
+                        "ORDER BY date %s " \
+                        "LIMIT %d;"; 
+
         const char * sqlSelectByAccountIDBetweenDates = 
                         "SELECT " \
                         "id," \
@@ -271,6 +291,7 @@ class DBTransaction : public DBPayment {
         int findLatestByRecurringChargeID(pfm_id_t chargeId);
 
         DBTransactionResult retrieveByAccountID(pfm_id_t accountId);
+        DBTransactionResult retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
         DBTransactionResult retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBTransactionResult findTransactionsForAccountID(
                                     pfm_id_t accountId, 

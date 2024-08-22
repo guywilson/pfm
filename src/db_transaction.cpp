@@ -52,6 +52,24 @@ DBTransactionResult DBTransaction::retrieveByAccountID(pfm_id_t accountId) {
     return result;
 }
 
+DBTransactionResult DBTransaction::retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
+    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBTransactionResult result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlSelectByAccountIDSortedByDate, 
+        accountId,
+        (dateSortDirection == sort_ascending ? "ASC" : "DESC"),
+        rowLimit);
+
+    PFM_DB & db = PFM_DB::getInstance();
+    db.executeSelect(szStatement, &result);
+
+    return result;
+}
+
 int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
     DBTransactionResult result = retrieveByStatementAndID(sqlSelectLatestByChargeID, chargeId);
 
@@ -169,7 +187,7 @@ DBTransactionResult DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t acco
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIDBetweenDates, 
-        id,
+        accountId,
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());
 
