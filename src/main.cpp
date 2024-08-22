@@ -70,6 +70,9 @@ int main(int argc, char ** argv) {
 
     db.open(pszDatabase);
 
+    selectedAccount.set(choose_account("HSBC"));
+    exit(0);
+
 #ifdef PFM_TEST_SUITE_ENABLED
     MoneyTest::run();
     cout << endl << endl;

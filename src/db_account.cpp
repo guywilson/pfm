@@ -1,6 +1,8 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <string.h>
+#include <stdio.h>
 #include <vector>
 
 #include <sqlite3.h>
@@ -75,23 +77,39 @@ DBAccountResult DBAccount::retrieveAll() {
 
 void DBAccount::createRecurringTransactions() {
     StrDate dateToday;
+    StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
 
-    DBRecurringCharge ch;
-    DBRecurringChargeResult chargeResult = ch.retrieveByAccountID(this->id);
+    PFM_DB & db = PFM_DB::getInstance();
 
-    for (int i = 0;i < chargeResult.getNumRows();i++) {
-        DBRecurringCharge charge = chargeResult.getResultAt(i);
+    try {
+        db.begin();
 
-        DBTransaction transaction;
-        transaction.date = charge.date;
+        DBRecurringCharge ch;
+        DBRecurringChargeResult chargeResult = ch.retrieveByAccountID(this->id);
 
-        while (transaction.date <= dateToday) {
-            int hasFoundTransaction = transaction.findLatestByRecurringChargeID(charge.id);
+        for (int i = 0;i < chargeResult.getNumRows();i++) {
+            DBRecurringCharge charge = chargeResult.getResultAt(i);
 
-            if (hasFoundTransaction) {
-                charge.createNextTransactionForCharge(transaction.date);
+            DBTransaction transaction;
+            transaction.date = charge.date;
+
+            int chargeStatus = CHARGE_OK;
+
+            while (transaction.date < periodStartDate && chargeStatus == CHARGE_OK) {
+                transaction.findLatestByRecurringChargeID(charge.id);
+
+                chargeStatus = charge.createNextTransactionForCharge(transaction.date);
             }
         }
+
+        db.commit();
+    }
+    catch (pfm_error & e) {
+        db.rollback();
+
+        fprintf(stderr, "DBAccount.createRecurringTransactions() - caught exception: %s\n", e.what());
+
+        throw e;
     }
 }
 
@@ -99,32 +117,51 @@ void DBAccount::createCarriedOverLogs() {
     StrDate dateToday;
     StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
 
-    DBCarriedOver co;
-    co.retrieveLatestByAccountId(this->id);
+    PFM_DB & db = PFM_DB::getInstance();
 
-    while (co.date < periodStartDate) {
-        DBCarriedOver newCO(co);
+    try {
+        db.begin();
 
-        StrDate firstDate(co.date.year(), co.date.month(), 1);
-        StrDate secondDate(co.date.year(), co.date.month(), co.date.daysInMonth());
+        DBCarriedOver co;
+        int hasCO = co.retrieveLatestByAccountId(this->id);
 
-        DBTransaction tr;
-        DBTransactionResult transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, firstDate, secondDate);
-
-        Money balance(0.0);
-
-        for (int i = 0;i < transactionResult.getNumRows();i++) {
-            DBTransaction transaction = transactionResult.getResultAt(i);
-
-            balance += transaction.amount;
+        if (!hasCO) {
+            co.date.clear();
         }
 
-        newCO.accountId = this->id;
-        newCO.date.set(co.date.year(), co.date.month() + 1, co.date.day());
-        newCO.description = "Carried over";
-        newCO.balance = balance;
+        while (co.date < periodStartDate) {
+            DBCarriedOver newCO(co);
 
-        newCO.save();
+            StrDate firstDate(co.date.year(), co.date.month(), 1);
+            StrDate secondDate(co.date.year(), co.date.month(), co.date.daysInMonth());
+
+            DBTransaction tr;
+            DBTransactionResult transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, firstDate, secondDate);
+
+            Money balance(0.0);
+
+            for (int i = 0;i < transactionResult.getNumRows();i++) {
+                DBTransaction transaction = transactionResult.getResultAt(i);
+
+                balance += transaction.amount;
+            }
+
+            newCO.accountId = this->id;
+            newCO.date.set(co.date.year(), co.date.month() + 1, co.date.day());
+            newCO.description = "Carried over";
+            newCO.balance = balance;
+
+            newCO.save();
+        }
+
+        db.commit();
+    }
+    catch (pfm_error & e) {
+        db.rollback();
+
+        fprintf(stderr, "DBAccount.createCarriedOverLogs() - caught exception: %s\n", e.what());
+
+        throw e;
     }
 }
 
@@ -134,32 +171,47 @@ Money DBAccount::calculateBalanceAfterBills() {
 
     Money balance = co.balance;
 
-    StrDate dateToday;
-    StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
+    PFM_DB & db = PFM_DB::getInstance();
 
-    DBTransaction tr;
-    DBTransactionResult transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, periodStartDate, dateToday);
+    try {
+        db.begin();
 
-    for (int i = 0;i < transactionResult.getNumRows();i++) {
-        DBTransaction transaction = transactionResult.getResultAt(i);
+        StrDate dateToday;
+        StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
 
-        if (transaction.isCredit) {
-            balance += transaction.amount;
+        DBTransaction tr;
+        DBTransactionResult transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, periodStartDate, dateToday);
+
+        for (int i = 0;i < transactionResult.getNumRows();i++) {
+            DBTransaction transaction = transactionResult.getResultAt(i);
+
+            if (transaction.isCredit) {
+                balance += transaction.amount;
+            }
+            else {
+                balance -= transaction.amount;
+            }
         }
-        else {
-            balance -= transaction.amount;
+
+        DBRecurringCharge ch;
+        DBRecurringChargeResult chargeResult = ch.retrieveByAccountID(this->id);
+
+        for (int i = 0;i < chargeResult.getNumRows();i++) {
+            DBRecurringCharge charge = chargeResult.getResultAt(i);
+
+            if (charge.isChargeDueThisPeriod()) {
+                balance -= charge.amount;
+            }
         }
+
+        db.commit();
     }
+    catch (pfm_error & e) {
+        db.rollback();
 
-    DBRecurringCharge ch;
-    DBRecurringChargeResult chargeResult = ch.retrieveByAccountID(this->id);
+        fprintf(stderr, "DBAccount.calculateBalanceAfterBills() - caught exception: %s\n", e.what());
 
-    for (int i = 0;i < chargeResult.getNumRows();i++) {
-        DBRecurringCharge charge = chargeResult.getResultAt(i);
-
-        if (charge.isChargeDueThisPeriod()) {
-            balance -= charge.amount;
-        }
+        throw e;
     }
 
     return balance;

@@ -194,11 +194,11 @@ void DBRecurringCharge::setNextPaymentDate() {
     this->nextPaymentDate = calculateNextPaymentDate();
 }
 
-void DBRecurringCharge::createNextTransactionForCharge(StrDate & latestDate) {
+int DBRecurringCharge::createNextTransactionForCharge(StrDate & latestDate) {
     StrDate dateToday;
 
     if (latestDate <= dateToday) {
-        StrDate nextPaymentDate = this->date;
+        StrDate nextPaymentDate = latestDate;
 
         char frequencyValue = this->getFrequencyValue();
         char frequencyUnit = this->getFrequencyUnit();
@@ -224,6 +224,10 @@ void DBRecurringCharge::createNextTransactionForCharge(StrDate & latestDate) {
         if (nextPaymentDate <= dateToday) {
             DBTransaction transaction;
             transaction.createFromRecurringChargeAndDate(*this, nextPaymentDate);
+
+            return CHARGE_OK;
         }
     }
+
+    return CHARGE_NOT_DUE;
 }

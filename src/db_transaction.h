@@ -29,6 +29,7 @@ class DBTransaction : public DBPayment {
                         "account_id," \
                         "category_id," \
                         "payee_id," \
+                        "recurring_charge_id," \
                         "date," \
                         "reference," \
                         "description," \
@@ -46,6 +47,7 @@ class DBTransaction : public DBPayment {
                         "account_id," \
                         "category_id," \
                         "payee_id," \
+                        "recurring_charge_id," \
                         "date," \
                         "reference," \
                         "description," \
@@ -63,6 +65,7 @@ class DBTransaction : public DBPayment {
                         "account_id," \
                         "category_id," \
                         "payee_id," \
+                        "recurring_charge_id," \
                         "date," \
                         "reference," \
                         "description," \
@@ -82,6 +85,7 @@ class DBTransaction : public DBPayment {
                         "account_id," \
                         "category_id," \
                         "payee_id," \
+                        "recurring_charge_id," \
                         "date," \
                         "reference," \
                         "description," \
@@ -100,6 +104,7 @@ class DBTransaction : public DBPayment {
                         "account_id," \
                         "category_id," \
                         "payee_id," \
+                        "recurring_charge_id," \
                         "date," \
                         "reference," \
                         "description," \
@@ -108,13 +113,14 @@ class DBTransaction : public DBPayment {
                         "is_reconciled," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, %lld, %lld, '%s', '%s', '%s', " \
-                        "'%s', %s, '%s', '%s', '%s');";
+                        "VALUES (%lld, %lld, %lld, %lld, '%s', '%s', " \
+                        "'%s', '%s', %s, '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE account_transaction " \
                         "SET category_id = %lld," \
                         "payee_id = %lld," \
+                        "recurring_charge_id = %lld,"
                         "date = '%s'," \
                         "reference = '%s'," \
                         "description = '%s'," \
@@ -130,6 +136,7 @@ class DBTransaction : public DBPayment {
         DBTransactionResult retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
     public:
+        pfm_id_t recurringChargeId;
         string reference;
         bool isCredit;
         bool isReconciled;
@@ -161,6 +168,7 @@ class DBTransaction : public DBPayment {
             this->id = 0;
 
             this->date = transactionDate;
+            this->recurringChargeId = src.id;
             this->isCredit = false;
             this->isReconciled = false;
 
@@ -170,6 +178,7 @@ class DBTransaction : public DBPayment {
         void print() {
             DBPayment::print();
 
+            cout << "RecurringChargeId: " << recurringChargeId << endl;
             cout << "Reference: '" << reference << "'" << endl;
             cout << "Debit/Credit: '" << (isCredit ? "CR" : "DB") << "'" << endl;
             cout << "isReconciled: " << isReconciled << endl;
@@ -207,6 +216,7 @@ class DBTransaction : public DBPayment {
                 accountId,
                 categoryId,
                 payeeId,
+                recurringChargeId,
                 date.shortDate().c_str(),
                 reference.c_str(),
                 description.c_str(),
@@ -230,6 +240,7 @@ class DBTransaction : public DBPayment {
                 sqlUpdate,
                 categoryId,
                 payeeId,
+                recurringChargeId,
                 date.shortDate().c_str(),
                 reference.c_str(),
                 description.c_str(),
@@ -309,6 +320,9 @@ class DBTransactionResult : public DBResult {
                 }
                 else if (column.getName() == "payee_id") {
                     transaction.payeeId = column.getIDValue();
+                }
+                else if (column.getName() == "recurring_charge_id") {
+                    transaction.recurringChargeId = column.getIDValue();
                 }
                 else if (column.getName() == "date") {
                     transaction.date = column.getValue();

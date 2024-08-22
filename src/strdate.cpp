@@ -197,9 +197,13 @@ void StrDate::set(const string & date) {
 }
 
 void StrDate::set(const char * date) {
-    validateDateString(date);
-
-    this->_date = date;
+    if (strlen(date) > 0) {
+        validateDateString(date);
+        this->_date = date;
+    }
+    else {
+        clear();
+    }
 }
 
 void StrDate::set(int year, int month, int day) {

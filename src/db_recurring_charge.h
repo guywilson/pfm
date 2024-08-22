@@ -19,6 +19,9 @@ using namespace std;
 #ifndef __INCL_RECURRING_CHARGE
 #define __INCL_RECURRING_CHARGE
 
+#define CHARGE_OK                   0
+#define CHARGE_NOT_DUE              -1
+
 class DBRecurringChargeResult;
 
 class DBRecurringCharge : public DBPayment {
@@ -146,8 +149,8 @@ class DBRecurringCharge : public DBPayment {
         bool isChargeDueThisPeriod();
         StrDate calculateNextPaymentDate();
         void setNextPaymentDate();
-        void createNextTransactionForCharge(StrDate & latestDate);
-        
+        int createNextTransactionForCharge(StrDate & latestDate);
+
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 

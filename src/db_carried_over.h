@@ -179,7 +179,7 @@ class DBCarriedOver : public DBEntity {
         }
 
         void retrieveByID(pfm_id_t id);
-        void retrieveLatestByAccountId(pfm_id_t accountId);
+        int retrieveLatestByAccountId(pfm_id_t accountId);
         DBCarriedOverResult retrieveByAccountId(pfm_id_t accountId);
         DBCarriedOverResult retrieveAll();
 };

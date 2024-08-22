@@ -329,3 +329,48 @@ void PFM_DB::createSchema() {
     
     sqlite3_free(pszErrorMsg);
 }
+
+void PFM_DB::begin() {
+    char * pszErrorMsg;
+
+    int error = sqlite3_exec(dbHandle, "BEGIN DEFERRED TRANSACTION;", NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "BEGIN TRANSACTION failed: %s", 
+                pszErrorMsg), 
+            __FILE__, 
+            __LINE__);
+    }
+}
+
+void PFM_DB::commit() {
+    char * pszErrorMsg;
+
+    int error = sqlite3_exec(dbHandle, "COMMIT TRANSACTION;", NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "COMMIT TRANSACTION failed: %s", 
+                pszErrorMsg), 
+            __FILE__, 
+            __LINE__);
+    }
+}
+
+void PFM_DB::rollback() {
+    char * pszErrorMsg;
+
+    int error = sqlite3_exec(dbHandle, "ROLLBACK TRANSACTION;", NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "ROLLBACK TRANSACTION failed: %s", 
+                pszErrorMsg), 
+            __FILE__, 
+            __LINE__);
+    }
+}

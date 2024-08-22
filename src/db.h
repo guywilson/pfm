@@ -34,6 +34,10 @@ class PFM_DB {
 
         bool open(string dbName);
 
+        void begin();
+        void commit();
+        void rollback();
+        
         pfm_id_t executeInsert(const char * sqlStatement);
         int executeSelect(const char * sqlStatement, DBResult * result);
         void executeUpdate(const char * sqlStatement);

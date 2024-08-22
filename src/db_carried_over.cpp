@@ -37,7 +37,7 @@ void DBCarriedOver::retrieveByID(pfm_id_t id) {
     set(result.getResultAt(0));
 }
 
-void DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
+int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     int rowsRetrievedCount;
     DBCarriedOverResult result;
@@ -51,14 +51,11 @@ void DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
     PFM_DB & db = PFM_DB::getInstance();
     rowsRetrievedCount = db.executeSelect(szStatement, &result);
 
-    if (rowsRetrievedCount != 1) {
-        throw pfm_error(
-                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
-                __FILE__, 
-                __LINE__);
+    if (rowsRetrievedCount == 1) {
+        set(result.getResultAt(0));
     }
 
-    set(result.getResultAt(0));
+    return rowsRetrievedCount;
 }
 
 DBCarriedOverResult DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
