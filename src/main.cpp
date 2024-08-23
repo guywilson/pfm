@@ -11,6 +11,7 @@
 #include <readline/history.h>
 
 #include "db.h"
+#include "logger.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
@@ -66,12 +67,16 @@ int main(int argc, char ** argv) {
         pszDatabase = strdup(DEFAULT_DATABASE_NAME);
     }
 
-    PFM_DB & db = PFM_DB::getInstance();
+    string logFileName = "./pfm.log";
 
+    Logger & log = Logger::getInstance();
+    log.initLogger(logFileName, LOG_LEVEL_ALL);
+
+    PFM_DB & db = PFM_DB::getInstance();
     db.open(pszDatabase);
 
-    selectedAccount.set(choose_account("HSBC"));
-    exit(0);
+    // selectedAccount.set(choose_account("HSBC"));
+    // exit(0);
 
 #ifdef PFM_TEST_SUITE_ENABLED
     MoneyTest::run();

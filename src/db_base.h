@@ -2,9 +2,12 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <stdint.h>
 
 #include <sqlite3.h>
+
+#include "pfm_error.h"
 
 using namespace std;
 
@@ -15,8 +18,25 @@ typedef sqlite3_int64       pfm_id_t;
 
 class DBEntity {
     private:
+        unordered_map<string, string> fieldHashMap;
+
         pfm_id_t insert();
         void update();
+
+    protected:
+        void addColumnForField(string key, string columnName) {
+            fieldHashMap.insert({key, columnName});
+        }
+
+        string getColumnForField(string key) {
+            unordered_map<string, string>::const_iterator item = fieldHashMap.find(key);
+
+            if (item != fieldHashMap.end()) {
+                return item->second;
+            }
+
+            throw pfm_error(pfm_error::buildMsg("Field '%s' not found", key.c_str()));
+        }
 
     public:
         pfm_id_t id;
@@ -27,6 +47,10 @@ class DBEntity {
 
         DBEntity() {
             clear();
+
+            addColumnForField("id", "id");
+            addColumnForField("createdDate", "created");
+            addColumnForField("updatedDate", "updated");
         }
 
         DBEntity(const DBEntity & src) {
@@ -44,6 +68,10 @@ class DBEntity {
         }
 
         virtual const char * getDeleteStatement() {
+            return "";
+        }
+
+        virtual const char * getTableName() {
             return "";
         }
 

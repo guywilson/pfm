@@ -10,7 +10,7 @@ using namespace std;
 #ifndef __INCL_STRDATE
 #define __INCL_STRDATE
 
-#define TIME_STAMP_BUFFER_LEN               20
+#define TIME_STAMP_BUFFER_LEN               32
 #define DATE_STAMP_BUFFER_LEN               12
 
 class StrDate {
@@ -28,6 +28,7 @@ class StrDate {
         void validateDateString(const string & date);
 
         static bool isLeapYear(int year);
+        static string getTimestamp(bool includems);
 
     public:
         StrDate();
@@ -44,6 +45,7 @@ class StrDate {
 
         static string today();
         static string getTimestamp();
+        static string getTimestampToMicrosecond();
         static bool isDateValid(const string & date);
         
         string shortDate() const;

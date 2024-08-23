@@ -126,6 +126,10 @@ class DBCarriedOver : public DBEntity {
             cout << "Balance: " << balance.getFormattedStringValue() << endl;
         }
 
+        const char * getTableName() override {
+            return "carried_over_log";
+        }
+
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 

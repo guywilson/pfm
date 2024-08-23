@@ -10,6 +10,7 @@
 
 #include <sqlite3.h>
 
+#include "logger.h"
 #include "db_base.h"
 #include "db_config.h"
 #include "db_currency.h"
@@ -42,7 +43,9 @@ int PFM_DB::executeSelect(const char * sqlStatement, DBResult * result) {
     char *          pszErrorMsg;
     int             error;
 
-    cout << "Executing statement '" << sqlStatement << "'" << endl;
+    Logger & log = Logger::getInstance();
+
+    log.logDebug("Executing statement '%s'", sqlStatement);
 
     error = sqlite3_exec(
                 dbHandle, 
@@ -52,6 +55,8 @@ int PFM_DB::executeSelect(const char * sqlStatement, DBResult * result) {
                 &pszErrorMsg);
 
     if (error) {
+        log.logError("Failed to execute statement '%s' with error '%s'", sqlStatement, pszErrorMsg);
+        
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Failed to execute statement '%s': %s",

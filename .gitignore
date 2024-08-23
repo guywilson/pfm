@@ -5,3 +5,4 @@ pfm
 *.db
 .pfm
 ~$data.xlsx
+*.log
