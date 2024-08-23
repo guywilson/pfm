@@ -60,7 +60,8 @@ DBAccount choose_account(const char * szAccountCode) {
     
     Money balanceAfterBills = account.calculateBalanceAfterBills();
 
-    cout << "Balance after bills: " << balanceAfterBills.getFormattedStringValue() << endl;
+    cout << "Current balance: " << right << setw(13) << account.currentBalance.getFormattedStringValue() << endl;
+    cout << "Balance after bills: " << right << setw(13) << balanceAfterBills.getFormattedStringValue() << endl;
 
     return account;
 }
@@ -236,7 +237,7 @@ void add_transaction(DBAccount & account) {
 
 void list_transactions(DBAccount & account) {
     DBTransaction transactionInstance;
-    DBTransactionResult result = transactionInstance.retrieveByAccountID(account.id);
+    DBTransactionResult result = transactionInstance.retrieveByAccountID(account.id, sort_ascending, 0);
 
     TransactionListView view;
     view.addResults(result, account.code);

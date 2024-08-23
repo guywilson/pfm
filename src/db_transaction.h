@@ -76,8 +76,7 @@ class DBTransaction : public DBPayment {
                         "updated " \
                         "FROM account_transaction " \
                         "WHERE account_id = %lld " \
-                        "ORDER BY date %s " \
-                        "LIMIT %d;"; 
+                        "ORDER BY date %s";
 
         const char * sqlSelectByAccountIDBetweenDates = 
                         "SELECT " \
@@ -168,6 +167,7 @@ class DBTransaction : public DBPayment {
         void clear() {
             DBPayment::clear();
 
+            this->recurringChargeId = 0;
             this->reference = "";
             this->isCredit = false;
             this->isReconciled = false;
@@ -176,6 +176,7 @@ class DBTransaction : public DBPayment {
         void set(const DBTransaction & src) {
             DBPayment::set(src);
 
+            this->recurringChargeId = src.recurringChargeId;
             this->reference = src.reference;
             this->isCredit = src.isCredit;
             this->isReconciled = src.isReconciled;

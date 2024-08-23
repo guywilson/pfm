@@ -61,9 +61,18 @@ DBTransactionResult DBTransaction::retrieveByAccountID(pfm_id_t accountId, db_so
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIDSortedByDate, 
         accountId,
-        (dateSortDirection == sort_ascending ? "ASC" : "DESC"),
-        rowLimit);
+        (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
 
+    if (rowLimit > 0) {
+        char szLimit[16];
+
+        snprintf(szLimit, 16, " LIMIT %d;", rowLimit);
+        strcat(szStatement, szLimit);
+    }
+    else {
+        strcat(szStatement, ";");
+    }
+    
     PFM_DB & db = PFM_DB::getInstance();
     db.executeSelect(szStatement, &result);
 

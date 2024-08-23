@@ -192,11 +192,8 @@ Money DBAccount::calculateBalanceAfterBills() {
         for (int i = 0;i < transactionResult.getNumRows();i++) {
             DBTransaction transaction = transactionResult.getResultAt(i);
 
-            if (transaction.isCredit) {
-                balance += transaction.amount;
-            }
-            else {
-                balance -= transaction.amount;
+            if (transaction.recurringChargeId == 0) {
+                balance += transaction.getSignedAmount();
             }
         }
 
