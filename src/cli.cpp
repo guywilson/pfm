@@ -60,7 +60,7 @@ DBAccount choose_account(const char * szAccountCode) {
     
     Money balanceAfterBills = account.calculateBalanceAfterBills();
 
-    cout << "Current balance: " << right << setw(13) << account.currentBalance.getFormattedStringValue() << endl;
+    cout << "Current balance:     " << right << setw(13) << account.currentBalance.getFormattedStringValue() << endl;
     cout << "Balance after bills: " << right << setw(13) << balanceAfterBills.getFormattedStringValue() << endl;
 
     return account;
