@@ -141,21 +141,23 @@ void DBAccount::createCarriedOverLogs() {
             DBTransaction tr;
             DBTransactionResult transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, firstDate, secondDate);
 
-            Money balance(0.0);
-
             for (int i = 0;i < transactionResult.getNumRows();i++) {
                 DBTransaction transaction = transactionResult.getResultAt(i);
 
-                balance += transaction.amount;
+                newCO.balance += transaction.getSignedAmount();
             }
 
-            newCO.accountId = this->id;
-            newCO.date.set(co.date.year(), co.date.month() + 1, co.date.day());
-            newCO.description = "Carried over (" + newCO.date.shortDate() + ")";
-            newCO.balance = balance;
+            /*
+            ** Clear the ID so we insert a new record in save()...
+            */
+            newCO.id = 0;
 
-            co.date = newCO.date;
-            
+            newCO.accountId = this->id;
+            newCO.date.addMonths(1);
+            newCO.description = "Carried over (" + newCO.date.shortDate() + ")";
+
+            co = newCO;
+
             newCO.save();
         }
 

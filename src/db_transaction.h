@@ -220,6 +220,10 @@ class DBTransaction : public DBPayment {
             }
         }
 
+        Money getSignedAmount() {
+            return (isCredit ? amount : (amount * -1));
+        }
+
         const char * getIsReconciledValue() {
             return (isReconciled ? "Y" : "N");
         }

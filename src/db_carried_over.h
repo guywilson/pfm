@@ -97,6 +97,10 @@ class DBCarriedOver : public DBEntity {
             clear();
         }
 
+        DBCarriedOver(const DBCarriedOver & src) : DBEntity(src) {
+            set(src);
+        }
+
         void clear() {
             DBEntity::clear();
 

@@ -128,7 +128,7 @@ class TransactionListView : public CLIListView {
                 row.addCellValue(transaction.amount.getFormattedStringValue());
                 row.addCellValue(transaction.getIsReconciledValue());
 
-                total += transaction.amount;
+                total += transaction.getSignedAmount();
                 addRow(row);
             }
         }
