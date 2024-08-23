@@ -231,7 +231,6 @@ void add_transaction(DBAccount & account) {
 
     DBTransaction transaction = view.getTransaction();
     transaction.accountId = account.id;
-
     transaction.save();
 }
 
@@ -419,6 +418,9 @@ void update_transaction(DBTransaction & transaction) {
     view.show();
 
     DBTransaction updatedTransaction = view.getTransaction();
-
     updatedTransaction.save();
+}
+
+void delete_transaction(DBTransaction & transaction) {
+    transaction.remove();
 }

@@ -292,6 +292,10 @@ class DBTransaction : public DBPayment {
             return szStatement;
         }
 
+        void afterInsert() override;
+        void beforeUpdate() override;
+        void afterRemove() override;
+
         void retrieveByID(pfm_id_t id);
         int findLatestByRecurringChargeID(pfm_id_t chargeId);
 

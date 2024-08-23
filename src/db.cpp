@@ -45,7 +45,7 @@ int PFM_DB::executeSelect(const char * sqlStatement, DBResult * result) {
 
     Logger & log = Logger::getInstance();
 
-    log.logDebug("Executing statement '%s'", sqlStatement);
+    log.logDebug("Executing SELECT statement '%s'", sqlStatement);
 
     error = sqlite3_exec(
                 dbHandle, 
@@ -56,7 +56,7 @@ int PFM_DB::executeSelect(const char * sqlStatement, DBResult * result) {
 
     if (error) {
         log.logError("Failed to execute statement '%s' with error '%s'", sqlStatement, pszErrorMsg);
-        
+
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Failed to execute statement '%s': %s",
@@ -72,6 +72,10 @@ int PFM_DB::executeSelect(const char * sqlStatement, DBResult * result) {
 pfm_id_t PFM_DB::executeInsert(const char * sqlStatement) {
     char *          pszErrorMsg;
     int             error;
+
+    Logger & log = Logger::getInstance();
+
+    log.logDebug("Executing INSERT statement '%s'", sqlStatement);
 
     error = sqlite3_exec(dbHandle, sqlStatement, NULL, NULL, &pszErrorMsg);
 
@@ -92,6 +96,10 @@ void PFM_DB::executeUpdate(const char * sqlStatement) {
     char *          pszErrorMsg;
     int             error;
 
+    Logger & log = Logger::getInstance();
+
+    log.logDebug("Executing UPDATE statement '%s'", sqlStatement);
+
     error = sqlite3_exec(dbHandle, sqlStatement, NULL, NULL, &pszErrorMsg);
 
     if (error) {
@@ -108,6 +116,10 @@ void PFM_DB::executeUpdate(const char * sqlStatement) {
 void PFM_DB::executeDelete(const char * sqlStatement) {
     char *          pszErrorMsg;
     int             error;
+
+    Logger & log = Logger::getInstance();
+
+    log.logDebug("Executing DELETE statement '%s'", sqlStatement);
 
     error = sqlite3_exec(dbHandle, sqlStatement, NULL, NULL, &pszErrorMsg);
 

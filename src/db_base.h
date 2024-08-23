@@ -38,6 +38,30 @@ class DBEntity {
             throw pfm_error(pfm_error::buildMsg("Field '%s' not found", key.c_str()));
         }
 
+        virtual void beforeInsert() {
+            return;
+        }
+
+        virtual void afterInsert() {
+            return;
+        }
+
+        virtual void beforeUpdate() {
+            return;
+        }
+
+        virtual void afterUpdate() {
+            return;
+        }
+
+        virtual void beforeRemove() {
+            return;
+        }
+
+        virtual void afterRemove() {
+            return;
+        }
+
     public:
         pfm_id_t id;
 

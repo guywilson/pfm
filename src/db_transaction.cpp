@@ -10,6 +10,7 @@
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_transaction.h"
+#include "db_account.h"
 #include "db.h"
 #include "strdate.h"
 
@@ -72,7 +73,7 @@ DBTransactionResult DBTransaction::retrieveByAccountID(pfm_id_t accountId, db_so
     else {
         strcat(szStatement, ";");
     }
-    
+
     PFM_DB & db = PFM_DB::getInstance();
     db.executeSelect(szStatement, &result);
 
@@ -204,4 +205,36 @@ DBTransactionResult DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t acco
     db.executeSelect(szStatement, &result);
 
     return result;
+}
+
+void DBTransaction::afterInsert() {
+    DBAccount account;
+    account.retrieveByID(this->accountId);
+
+    account.currentBalance += this->getSignedAmount();
+    account.save();
+}
+
+void DBTransaction::beforeUpdate() {
+    DBTransaction transaction;
+    transaction.retrieveByID(this->id);
+
+    /*
+    ** If the amount has been updated on the transaction,
+    ** revert and re-add the transaction amount to the 
+    ** current balance...
+    */
+    if (this->amount != transaction.amount) {
+        DBAccount account;
+        account.retrieveByID(transaction.accountId);
+
+        account.currentBalance -= transaction.getSignedAmount();
+        account.currentBalance += this->getSignedAmount();
+
+        account.save();
+    }
+}
+
+void DBTransaction::afterRemove() {
+
 }

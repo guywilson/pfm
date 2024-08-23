@@ -308,7 +308,7 @@ int main(int argc, char ** argv) {
                 DBTransaction t;
                 t.set(get_transaction(sequence));
 
-                t.remove();
+                delete_transaction(t);
             }
         }
     }

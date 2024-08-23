@@ -170,7 +170,7 @@ class DBAccount : public DBEntity {
             createRecurringTransactions();
             createCarriedOverLogs();
         }
-        
+
         Money calculateBalanceAfterBills();
 
         void retrieveByID(pfm_id_t id);

@@ -9,34 +9,66 @@
 #include "strdate.h"
 #include "db.h"
 #include "db_base.h"
+#include "pfm_error.h"
+#include "logger.h"
 
 using namespace std;
 
 pfm_id_t DBEntity::insert() {
-    createdDate = StrDate::today();
-    updatedDate = StrDate::today();
-
     PFM_DB & db = PFM_DB::getInstance();
     return db.executeInsert(getInsertStatement());
 }
 
 void DBEntity::update() {
-    updatedDate = StrDate::today();
-
     PFM_DB & db = PFM_DB::getInstance();
     db.executeUpdate(getUpdateStatement());
 }
 
 void DBEntity::remove() {
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeDelete(getDeleteStatement());
+    Logger & log = Logger::getInstance();
+
+    try {
+        db.begin();
+
+        beforeRemove();
+        db.executeDelete(getDeleteStatement());
+        afterRemove();
+
+        db.commit();
+    }
+    catch (pfm_error & e) {
+        db.rollback();
+        log.logError("Failed to save entity with id: %lld", id);
+
+        throw e;
+    }
 }
 
 void DBEntity::save() {
-    if (id == 0) {
-        id = insert();
+    PFM_DB & db = PFM_DB::getInstance();
+    Logger & log = Logger::getInstance();
+
+    try {
+        db.begin();
+
+        if (id == 0) {
+            beforeInsert();
+            id = insert();
+            afterInsert();
+        }
+        else {
+            beforeUpdate();
+            update();
+            afterUpdate();
+        }
+
+        db.commit();
     }
-    else {
-        update();
+    catch (pfm_error & e) {
+        db.rollback();
+        log.logError("Failed to save entity with id: %lld", id);
+
+        throw e;
     }
 }
