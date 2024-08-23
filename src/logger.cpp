@@ -122,8 +122,6 @@ int Logger::getLogLevelFromString(string & logLevel) {
 int Logger::logMessage(int logLevel, const char * fmt, va_list args) {
     int         bytesWritten = 0;
 
-	pthread_mutex_lock(&mutex);
-
     if (this->loggingLevel & logLevel) {
         string buffer = "[" + StrDate::getTimestampToMicrosecond() + "] ";
 
@@ -152,11 +150,13 @@ int Logger::logMessage(int logLevel, const char * fmt, va_list args) {
         buffer += fmt;
         buffer += "\n";
 
+	    pthread_mutex_lock(&mutex);
+
         bytesWritten = vfprintf(this->lfp, buffer.c_str(), args);
         fflush(this->lfp);
-    }
 
-	pthread_mutex_unlock(&mutex);
+	    pthread_mutex_unlock(&mutex);
+    }
 
     return bytesWritten;
 }
