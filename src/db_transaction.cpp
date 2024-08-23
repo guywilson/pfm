@@ -32,21 +32,6 @@ DBTransactionResult DBTransaction::retrieveByStatementAndID(const char * sqlSele
     return result;
 }
 
-void DBTransaction::retrieveByID(pfm_id_t id) {
-    DBTransactionResult result = retrieveByStatementAndID(sqlSelectByID, id);
-
-    if (result.getNumRows() != 1) {
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Expected exactly 1 row, got %d", 
-                    result.getNumRows()), 
-                __FILE__, 
-                __LINE__);
-    }
-
-    set(result.getResultAt(0));
-}
-
 DBTransactionResult DBTransaction::retrieveByAccountID(pfm_id_t accountId) {
     DBTransactionResult result = retrieveByStatementAndID(sqlSelectByAccountID, accountId);
 
@@ -209,7 +194,11 @@ DBTransactionResult DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t acco
 
 void DBTransaction::afterInsert() {
     DBAccount account;
-    account.retrieveByID(this->accountId);
+    account.id = accountId;
+
+    DBAccountResult result;
+    account.retrieveByID(&result);
+    account.set(result.getResultAt(0));
 
     account.currentBalance += this->getSignedAmount();
     account.save();
@@ -217,7 +206,11 @@ void DBTransaction::afterInsert() {
 
 void DBTransaction::beforeUpdate() {
     DBTransaction transaction;
-    transaction.retrieveByID(this->id);
+    transaction.id = this->id;
+
+    DBTransactionResult result;
+    transaction.retrieveByID(&result);
+    transaction.set(result.getResultAt(0));
 
     /*
     ** If the amount has been updated on the transaction,
@@ -226,7 +219,11 @@ void DBTransaction::beforeUpdate() {
     */
     if (this->amount != transaction.amount) {
         DBAccount account;
-        account.retrieveByID(transaction.accountId);
+        account.id = transaction.accountId;
+
+        DBAccountResult result;
+        account.retrieveByID(&result);
+        account.set(result.getResultAt(0));
 
         account.currentBalance -= transaction.getSignedAmount();
         account.currentBalance += this->getSignedAmount();
@@ -237,7 +234,11 @@ void DBTransaction::beforeUpdate() {
 
 void DBTransaction::afterRemove() {
     DBAccount account;
-    account.retrieveByID(accountId);
+    account.id = accountId;
+
+    DBAccountResult result;
+    account.retrieveByID(&result);
+    account.set(result.getResultAt(0));
 
     account.currentBalance -= getSignedAmount();
 

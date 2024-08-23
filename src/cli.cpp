@@ -209,7 +209,11 @@ DBRecurringCharge get_recurring_charge(int sequence) {
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
     DBRecurringCharge charge = cacheMgr.getRecurringCharge(selectedSequence);
-    charge.retrieveByID(charge.id);
+
+    DBRecurringChargeResult result;
+    charge.retrieveByID(&result);
+
+    charge.set(result.getResultAt(0));
 
     return charge;
 }

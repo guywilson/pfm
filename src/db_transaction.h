@@ -23,24 +23,6 @@ class DBTransactionResult;
 
 class DBTransaction : public DBPayment {
     private:
-        const char * sqlSelectByID = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "recurring_charge_id," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "credit_debit," \
-                        "amount," \
-                        "is_reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM account_transaction " \
-                        "WHERE id = %lld;";
-
         const char * sqlSelectByAccountID = 
                         "SELECT " \
                         "id," \
@@ -229,6 +211,10 @@ class DBTransaction : public DBPayment {
             return (isReconciled ? "Y" : "N");
         }
 
+        const char * getTableName() override {
+            return "account_transaction";
+        }
+
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
@@ -296,7 +282,6 @@ class DBTransaction : public DBPayment {
         void beforeUpdate() override;
         void afterRemove() override;
 
-        void retrieveByID(pfm_id_t id);
         int findLatestByRecurringChargeID(pfm_id_t chargeId);
 
         DBTransactionResult retrieveByAccountID(pfm_id_t accountId);
@@ -380,13 +365,17 @@ class DBTransactionResult : public DBResult {
                 }
             }
             
-            DBCategory category;
-            category.retrieveByID(transaction.categoryId);
-            transaction.category.set(category);
+            transaction.category.id = transaction.categoryId;
 
-            DBPayee payee;
-            payee.retrieveByID(transaction.payeeId);
-            transaction.payee.set(payee);
+            DBCategoryResult categoryResult;
+            transaction.category.retrieveByID(&categoryResult);
+            transaction.category.set(categoryResult.getResultAt(0));
+
+            transaction.payee.id = transaction.payeeId;
+
+            DBPayeeResult payeeResult;
+            transaction.payee.retrieveByID(&payeeResult);
+            transaction.payee.set(payeeResult.getResultAt(0));
 
             transaction.sequence = sequenceCounter++;
 

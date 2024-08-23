@@ -24,6 +24,18 @@ void DBEntity::update() {
     db.executeUpdate(getUpdateStatement());
 }
 
+void DBEntity::retrieveByID(DBResult * result) {
+    PFM_DB & db = PFM_DB::getInstance();
+    int rowsRetrievedCount = db.executeSelect(getSelectByIDStatement(), result);
+
+    if (rowsRetrievedCount != 1) {
+        throw pfm_error(
+                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
+                __FILE__, 
+                __LINE__);
+    }
+}
+
 void DBEntity::remove() {
     PFM_DB & db = PFM_DB::getInstance();
     Logger & log = Logger::getInstance();

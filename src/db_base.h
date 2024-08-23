@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <string.h>
 #include <vector>
 #include <unordered_map>
 #include <stdint.h>
@@ -13,6 +14,8 @@ using namespace std;
 
 #ifndef __INCL_DB_BASE
 #define __INCL_DB_BASE
+
+class DBResult;
 
 typedef sqlite3_int64       pfm_id_t;
 
@@ -83,6 +86,18 @@ class DBEntity {
         
         virtual ~DBEntity() {}
 
+        virtual const char * getTableName() {
+            return "";
+        }
+
+        virtual const char * getSelectByIDStatement() {
+            static char statement[64];
+
+            snprintf(statement, 64, "SELECT * FROM %s WHERE id = %lld;", getTableName(), id);
+ 
+            return statement;
+        }
+
         virtual const char * getInsertStatement() {
             return "";
         }
@@ -95,10 +110,7 @@ class DBEntity {
             return "";
         }
 
-        virtual const char * getTableName() {
-            return "";
-        }
-
+        void retrieveByID(DBResult * result);
         void remove();
         void save();
 

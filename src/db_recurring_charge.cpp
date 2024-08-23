@@ -14,30 +14,6 @@
 
 using namespace std;
 
-void DBRecurringCharge::retrieveByID(pfm_id_t id) {
-    char                    szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int                     rowsRetrievedCount;
-    DBRecurringChargeResult result;
-
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByID, 
-        id);
-
-    PFM_DB & db = PFM_DB::getInstance();
-    rowsRetrievedCount = db.executeSelect(szStatement, &result);
-
-    if (rowsRetrievedCount != 1) {
-        throw pfm_error(
-                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
-                __FILE__, 
-                __LINE__);
-    }
-
-    set(result.getResultAt(0));
-}
-
 DBRecurringChargeResult DBRecurringCharge::retrieveByAccountID(pfm_id_t accountId) {
     char                    szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBRecurringChargeResult result;

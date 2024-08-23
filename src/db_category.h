@@ -17,9 +17,6 @@ class DBCategoryResult;
 
 class DBCategory : public DBEntity {
     private:
-        const char * sqlSelectByID = 
-                        "SELECT id, code, description, created, updated FROM category where id= %lld;";
-
         const char * sqlSelectByCode = 
                         "SELECT id, code, description, created, updated FROM category where code = '%s';";
 
@@ -62,6 +59,10 @@ class DBCategory : public DBEntity {
 
             cout << "Description: '" << description << "'" << endl;
             cout << "Code: '" << code << "'" << endl;
+        }
+
+        const char * getTableName() override {
+            return "category";
         }
 
         const char * getInsertStatement() override {
@@ -112,7 +113,6 @@ class DBCategory : public DBEntity {
             return szStatement;
         }
 
-        void                retrieveByID(pfm_id_t id);
         void                retrieveByCode(string & code);
         DBCategoryResult    retrieveAll();
 };

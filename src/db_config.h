@@ -17,9 +17,6 @@ class DBConfigResult;
 
 class DBConfig : public DBEntity {
     private:
-        const char * sqlSelectByID = 
-                        "SELECT id, key, value, description, created, updated FROM config where id= %lld;";
-
         const char * sqlSelectByKey = 
                         "SELECT id, key, value, description, created, updated FROM config where key = '%s';";
 
@@ -66,6 +63,10 @@ class DBConfig : public DBEntity {
             cout << "Key: '" << key << "'" << endl;
             cout << "Value: '" << value << "'" << endl;
             cout << "Description: '" << description << "'" << endl;
+        }
+
+        const char * getTableName() override {
+            return "config";
         }
 
         const char * getInsertStatement() override {
@@ -118,7 +119,6 @@ class DBConfig : public DBEntity {
             return szStatement;
         }
 
-        void                retrieveByID(pfm_id_t id);
         void                retrieveByKey(string & key);
         DBConfigResult      retrieveAll();
 };

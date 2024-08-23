@@ -17,9 +17,6 @@ class DBCurrencyResult;
 
 class DBCurrency : public DBEntity {
     private:
-        const char * sqlSelectByID = 
-                        "SELECT id, code, name, symbol, created, updated FROM currency where id= %lld;";
-
         const char * sqlSelectByCode = 
                         "SELECT id, code, name, symbol, created, updated FROM currency where code = '%s';";
 
@@ -66,6 +63,10 @@ class DBCurrency : public DBEntity {
             cout << "Code: '" << code << "'" << endl;
             cout << "Name: '" << name << "'" << endl;
             cout << "Symbol: '" << symbol << "'" << endl;
+        }
+
+        const char * getTableName() override {
+            return "currency";
         }
 
         const char * getInsertStatement() override {
@@ -118,7 +119,6 @@ class DBCurrency : public DBEntity {
             return szStatement;
         }
 
-        void                retrieveByID(pfm_id_t id);
         void                retrieveByCode(string & code);
         DBCurrencyResult    retrieveAll();
 };

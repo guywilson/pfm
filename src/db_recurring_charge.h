@@ -26,22 +26,6 @@ class DBRecurringChargeResult;
 
 class DBRecurringCharge : public DBPayment {
     private:
-        const char * sqlSelectByID = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "date," \
-                        "end_date," \
-                        "description," \
-                        "amount," \
-                        "frequency," \
-                        "created," \
-                        "updated " \
-                        "FROM recurring_charge " \
-                        "WHERE id = %lld;";
-
         const char * sqlSelectByAccountID = 
                         "SELECT " \
                         "id," \
@@ -151,6 +135,10 @@ class DBRecurringCharge : public DBPayment {
         void setNextPaymentDate();
         int createNextTransactionForCharge(StrDate & latestDate);
 
+        const char * getTableName() override {
+            return "recurring_charge";
+        }
+
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
@@ -210,7 +198,6 @@ class DBRecurringCharge : public DBPayment {
             return szStatement;
         }
 
-        void                    retrieveByID(pfm_id_t id);
         DBRecurringChargeResult retrieveByAccountID(pfm_id_t accountId);
         DBRecurringChargeResult retrieveAll();
 };
@@ -281,9 +268,18 @@ class DBRecurringChargeResult : public DBResult {
                 }
             }
             
-            charge.category.retrieveByID(charge.categoryId);
-            charge.payee.retrieveByID(charge.payeeId);
+            charge.category.id = charge.categoryId;
 
+            DBCategoryResult categoryResult;
+            charge.category.retrieveByID(&categoryResult);
+            charge.category.set(categoryResult.getResultAt(0));
+
+            charge.payee.id = charge.payeeId;
+
+            DBPayeeResult payeeResult;
+            charge.payee.retrieveByID(&payeeResult);
+            charge.payee.set(payeeResult.getResultAt(0));
+            
             charge.sequence = sequenceCounter++;
             
             charge.setNextPaymentDate();

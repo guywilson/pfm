@@ -20,17 +20,6 @@ class DBAccountResult;
 
 class DBAccount : public DBEntity {
     private:
-        const char * sqlSelectByID = 
-                        "SELECT id, " \
-                        "name," \
-                        "code," \
-                        "opening_balance," \
-                        "current_balance," \
-                        "created," \
-                        "updated " \
-                        "FROM account " \
-                        "WHERE id = %lld;";
-
         const char * sqlSelectByCode = 
                         "SELECT id," \
                         "name," \
@@ -114,6 +103,10 @@ class DBAccount : public DBEntity {
             cout << "Current balance: " << currentBalance.getFormattedStringValue() << endl;
         }
 
+        const char * getTableName() override {
+            return "account";
+        }
+
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
@@ -173,7 +166,6 @@ class DBAccount : public DBEntity {
 
         Money calculateBalanceAfterBills();
 
-        void retrieveByID(pfm_id_t id);
         void retrieveByCode(string & code);
         DBAccountResult retrieveAll();
 };

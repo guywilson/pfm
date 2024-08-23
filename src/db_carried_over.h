@@ -20,17 +20,6 @@ class DBCarriedOverResult;
 
 class DBCarriedOver : public DBEntity {
     private:
-        const char * sqlSelectByID = 
-                        "SELECT id, " \
-                        "account_id," \
-                        "date," \
-                        "description," \
-                        "balance," \
-                        "created," \
-                        "updated " \
-                        "FROM carried_over_log " \
-                        "WHERE id = %lld;";
-
         const char * sqlSelectByAccountId = 
                         "SELECT id, " \
                         "account_id," \
@@ -186,7 +175,6 @@ class DBCarriedOver : public DBEntity {
             return szStatement;
         }
 
-        void retrieveByID(pfm_id_t id);
         int retrieveLatestByAccountId(pfm_id_t accountId);
         DBCarriedOverResult retrieveByAccountId(pfm_id_t accountId);
         DBCarriedOverResult retrieveAll();

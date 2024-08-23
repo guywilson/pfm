@@ -17,9 +17,6 @@ class DBPayeeResult;
 
 class DBPayee : public DBEntity {
     private:
-        const char * sqlSelectByID = 
-                        "SELECT id, code, name, created, updated FROM payee where id= %lld;";
-
         const char * sqlSelectByCode = 
                         "SELECT id, code, name, created, updated FROM payee where code = '%s';";
 
@@ -62,6 +59,10 @@ class DBPayee : public DBEntity {
 
             cout << "Description: '" << name << "'" << endl;
             cout << "Code: '" << code << "'" << endl;
+        }
+
+        const char * getTableName() override {
+            return "payee";
         }
 
         const char * getInsertStatement() override {
@@ -112,7 +113,6 @@ class DBPayee : public DBEntity {
             return szStatement;
         }
 
-        void                retrieveByID(pfm_id_t id);
         void                retrieveByCode(string & code);
         DBPayeeResult       retrieveAll();
 };
