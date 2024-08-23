@@ -236,5 +236,10 @@ void DBTransaction::beforeUpdate() {
 }
 
 void DBTransaction::afterRemove() {
+    DBAccount account;
+    account.retrieveByID(accountId);
 
+    account.currentBalance -= getSignedAmount();
+
+    account.save();
 }
