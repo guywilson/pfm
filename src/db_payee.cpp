@@ -34,11 +34,3 @@ void DBPayee::retrieveByCode(string & code) {
 
     set(result.getResultAt(0));
 }
-
-DBResult<DBPayee> DBPayee::retrieveAll() {
-    DBResult<DBPayee> result;
-
-    result.executeSelect(sqlSelectAll);
-
-    return result;
-}

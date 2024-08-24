@@ -23,12 +23,12 @@ class CategorySpinField : public CLISpinTextField {
         void show() override {
             setLengthLimit(CODE_FIELD_MAX_LENGTH);
 
-            DBCategory category;
-            DBResult<DBCategory> result = category.retrieveAll();
+            DBResult<DBCategory> result;
+            result.retrieveAll();
 
             for (int i = 0;i < result.getNumRows();i++) {
-                DBCategory c = result.getResultAt(i);
-                addItem(c.code);
+                DBCategory category = result.getResultAt(i);
+                addItem(category.code);
             }
 
             populate();
@@ -56,12 +56,12 @@ class PayeeSpinField : public CLISpinTextField {
         PayeeSpinField(const char * label) : CLISpinTextField(label) {}
 
         void show() override {
-            DBPayee payee;
-            DBResult<DBPayee> result = payee.retrieveAll();
+            DBResult<DBPayee> result;
+            result.retrieveAll();
 
             for (int i = 0;i < result.getNumRows();i++) {
-                DBPayee p = result.getResultAt(i);
-                addItem(p.code);
+                DBPayee payee = result.getResultAt(i);
+                addItem(payee.code);
             }
 
             populate();

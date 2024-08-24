@@ -34,11 +34,3 @@ void DBCurrency::retrieveByCode(string & code) {
 
     set(result.getResultAt(0));
 }
-
-DBResult<DBCurrency> DBCurrency::retrieveAll() {
-    DBResult<DBCurrency> result;
-
-    result.executeSelect(sqlSelectAll);
-
-    return result;
-}

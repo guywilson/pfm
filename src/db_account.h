@@ -31,14 +31,6 @@ class DBAccount : public DBEntity {
                         "FROM account " \
                         "WHERE code = '%s';";
 
-        const char * sqlSelectAll = 
-                        "SELECT id," \
-                        "name," \
-                        "code," \
-                        "opening_balance," \
-                        "current_balance " \
-                        "FROM account;";
-
         const char * sqlInsert = 
                         "INSERT INTO account (" \
                         "name," \
@@ -184,7 +176,6 @@ class DBAccount : public DBEntity {
         Money calculateBalanceAfterBills();
 
         void retrieveByCode(string & code);
-        DBResult<DBAccount> retrieveAll();
 };
 
 #endif

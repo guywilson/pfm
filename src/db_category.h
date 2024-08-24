@@ -20,9 +20,6 @@ class DBCategory : public DBEntity {
         const char * sqlSelectByCode = 
                         "SELECT id, code, description, created, updated FROM category where code = '%s';";
 
-        const char * sqlSelectAll = 
-                        "SELECT id, code, description, created, updated FROM category;";
-
         const char * sqlInsert = 
                         "INSERT INTO category (description, code, created, updated) VALUES ('%s', '%s', '%s', '%s');";
 
@@ -125,7 +122,6 @@ class DBCategory : public DBEntity {
         }
 
         void retrieveByCode(string & code);
-        DBResult<DBCategory> retrieveAll();
 };
 
 #endif

@@ -29,14 +29,6 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t acco
     return result;
 }
 
-DBResult<DBRecurringCharge> DBRecurringCharge::retrieveAll() {
-    DBResult<DBRecurringCharge> result;
-
-    result.executeSelect(sqlSelectAll);
-
-    return result;
-}
-
 int DBRecurringCharge::getFrequencyValue() {
     return atoi(frequency.substr(0, frequency.length() - 1).c_str());
 }

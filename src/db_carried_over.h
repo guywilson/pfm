@@ -194,7 +194,6 @@ class DBCarriedOver : public DBEntity {
 
         int retrieveLatestByAccountId(pfm_id_t accountId);
         DBResult<DBCarriedOver> retrieveByAccountId(pfm_id_t accountId);
-        DBResult<DBCarriedOver> retrieveAll();
 };
 
 #endif

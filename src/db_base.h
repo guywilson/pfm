@@ -166,6 +166,14 @@ class DBEntity {
             return statement;
         }
 
+        virtual const char * getSelectAllStatement() {
+            static char statement[64];
+
+            snprintf(statement, 64, "SELECT * FROM %s;", getTableName());
+ 
+            return statement;
+        }
+
         virtual const char * getInsertStatement() {
             return "";
         }
@@ -390,7 +398,9 @@ T DBResult<T>::retrieveByID(pfm_id_t id) {
 
 template <class T>
 void DBResult<T>::retrieveAll() {
+    T entity;
 
+    executeSelect(entity.getSelectAllStatement());
 }
 
 #endif

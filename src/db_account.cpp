@@ -40,14 +40,6 @@ void DBAccount::retrieveByCode(string & code) {
     set(result.getResultAt(0));
 }
 
-DBResult<DBAccount> DBAccount::retrieveAll() {
-    DBResult<DBAccount> result;
-
-    result.executeSelect(sqlSelectAll);
-
-    return result;
-}
-
 void DBAccount::createRecurringTransactions() {
     StrDate dateToday;
     StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);

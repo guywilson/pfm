@@ -20,9 +20,6 @@ class DBPayee : public DBEntity {
         const char * sqlSelectByCode = 
                         "SELECT id, code, name, created, updated FROM payee where code = '%s';";
 
-        const char * sqlSelectAll = 
-                        "SELECT id, code, name, created, updated FROM payee;";
-
         const char * sqlInsert = 
                         "INSERT INTO payee (code, name, created, updated) VALUES ('%s', '%s', '%s', '%s');";
 
@@ -125,7 +122,6 @@ class DBPayee : public DBEntity {
         }
 
         void retrieveByCode(string & code);
-        DBResult<DBPayee> retrieveAll();
 };
 
 #endif

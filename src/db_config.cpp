@@ -34,11 +34,3 @@ void DBConfig::retrieveByKey(string & key) {
 
     set(result.getResultAt(0));
 }
-
-DBResult<DBConfig> DBConfig::retrieveAll() {
-    DBResult<DBConfig> result;
-
-    result.executeSelect(sqlSelectAll);
-
-    return result;
-}

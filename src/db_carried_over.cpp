@@ -46,11 +46,3 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
 
     return result;
 }
-
-DBResult<DBCarriedOver> DBCarriedOver::retrieveAll() {
-    DBResult<DBCarriedOver> result;
-
-    result.executeSelect(sqlSelectAll);
-
-    return result;
-}

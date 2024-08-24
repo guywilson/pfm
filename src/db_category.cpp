@@ -34,11 +34,3 @@ void DBCategory::retrieveByCode(string & code) {
 
     set(result.getResultAt(0));
 }
-
-DBResult<DBCategory> DBCategory::retrieveAll() {
-    DBResult<DBCategory> result;
-
-    result.executeSelect(sqlSelectAll);
-
-    return result;
-}

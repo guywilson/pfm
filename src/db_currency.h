@@ -20,9 +20,6 @@ class DBCurrency : public DBEntity {
         const char * sqlSelectByCode = 
                         "SELECT id, code, name, symbol, created, updated FROM currency where code = '%s';";
 
-        const char * sqlSelectAll = 
-                        "SELECT id, code, name, symbol, created, updated FROM currency;";
-
         const char * sqlInsert = 
                         "INSERT INTO currency (code, name, symbol, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s');";
 
@@ -134,7 +131,6 @@ class DBCurrency : public DBEntity {
         }
 
         void retrieveByCode(string & code);
-        DBResult<DBCurrency> retrieveAll();
 };
 
 #endif

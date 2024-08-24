@@ -32,8 +32,8 @@ void add_account() {
 }
 
 void list_accounts() {
-    DBAccount accountInstance;
-    DBResult<DBAccount> result = accountInstance.retrieveAll();
+    DBResult<DBAccount> result;
+    result.retrieveAll();
 
     AccountListView view;
 
@@ -86,8 +86,8 @@ void add_category() {
 }
 
 void list_categories() {
-    DBCategory category;
-    DBResult<DBCategory> result =  category.retrieveAll();
+    DBResult<DBCategory> result;
+    result.retrieveAll();
 
     CategoryListView view;
     view.addResults(result);
@@ -132,8 +132,8 @@ void add_payee() {
 }
 
 void list_payees() {
-    DBPayee payee;
-    DBResult<DBPayee> result =  payee.retrieveAll();
+    DBResult<DBPayee> result;
+    result.retrieveAll();
 
     PayeeListView view;
     view.addResults(result);
@@ -266,8 +266,8 @@ void find_transactions(DBAccount & account) {
     using_history();
     clear_history();
 
-    DBCategory category;
-    DBResult<DBCategory> catResult = category.retrieveAll();
+    DBResult<DBCategory> catResult;
+    catResult.retrieveAll();
 
     for (int i = 0;i < catResult.getNumRows();i++) {
         add_history(catResult.getResultAt(i).code.c_str());
@@ -279,6 +279,7 @@ void find_transactions(DBAccount & account) {
     if (hasCategory) {
         DBCriteria * criteria = &criterion[numCriteria++];
 
+        DBCategory category;
         category.retrieveByCode(criteria->value);
 
         char buffer[32];
@@ -292,8 +293,8 @@ void find_transactions(DBAccount & account) {
     using_history();
     clear_history();
 
-    DBPayee payee;
-    DBResult<DBPayee> payResult = payee.retrieveAll();
+    DBResult<DBPayee> payResult;
+    payResult.retrieveAll();
 
     for (int i = 0;i < payResult.getNumRows();i++) {
         add_history(payResult.getResultAt(i).code.c_str());

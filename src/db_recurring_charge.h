@@ -42,21 +42,6 @@ class DBRecurringCharge : public DBPayment {
                         "FROM recurring_charge " \
                         "WHERE account_id = %lld;";
 
-        const char * sqlSelectAll = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "date," \
-                        "end_date," \
-                        "description," \
-                        "amount," \
-                        "frequency," \
-                        "created," \
-                        "updated " \
-                        "FROM recurring_charge;";
-
         const char * sqlInsert = 
                         "INSERT INTO recurring_charge (" \
                         "account_id," \
@@ -240,7 +225,6 @@ class DBRecurringCharge : public DBPayment {
         }
 
         DBResult<DBRecurringCharge> retrieveByAccountID(pfm_id_t accountId);
-        DBResult<DBRecurringCharge> retrieveAll();
 };
 
 #endif

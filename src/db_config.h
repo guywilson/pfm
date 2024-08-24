@@ -20,9 +20,6 @@ class DBConfig : public DBEntity {
         const char * sqlSelectByKey = 
                         "SELECT id, key, value, description, created, updated FROM config where key = '%s';";
 
-        const char * sqlSelectAll = 
-                        "SELECT id, key, value, description, created, updated FROM config;";
-
         const char * sqlInsert = 
                         "INSERT INTO config (key, value, description, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s');";
 
@@ -134,7 +131,6 @@ class DBConfig : public DBEntity {
         }
 
         void retrieveByKey(string & key);
-        DBResult<DBConfig> retrieveAll();
 };
 
 #endif
