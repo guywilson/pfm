@@ -242,11 +242,21 @@ void PFM_DB::createSchema() {
 }
 
 void PFM_DB::begin() {
-    char * pszErrorMsg;
+    Logger & log = Logger::getInstance();
 
+    if (isTransactionActive) {
+        log.logInfo("Begin transaction - transaction already active, skipping");
+        return;
+    }
+
+    log.logDebug("BEGIN TRANSACTION");
+
+    char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, "BEGIN DEFERRED TRANSACTION;", NULL, NULL, &pszErrorMsg);
 
     if (error) {
+        log.logError("Failed to begin transaction with error '%s'", pszErrorMsg);
+
         throw pfm_error(
             pfm_error::buildMsg(
                 "BEGIN TRANSACTION failed: %s", 
@@ -254,14 +264,26 @@ void PFM_DB::begin() {
             __FILE__, 
             __LINE__);
     }
+
+    isTransactionActive = true;
 }
 
 void PFM_DB::commit() {
-    char * pszErrorMsg;
+    Logger & log = Logger::getInstance();
 
+    if (!isTransactionActive) {
+        log.logInfo("Commit transaction - no transaction active, skipping");
+        return;
+    }
+    
+    log.logDebug("COMMIT TRANSACTION");
+
+    char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, "COMMIT TRANSACTION;", NULL, NULL, &pszErrorMsg);
 
     if (error) {
+        log.logError("Failed to commit transaction with error '%s'", pszErrorMsg);
+
         throw pfm_error(
             pfm_error::buildMsg(
                 "COMMIT TRANSACTION failed: %s", 
@@ -269,14 +291,26 @@ void PFM_DB::commit() {
             __FILE__, 
             __LINE__);
     }
+
+    isTransactionActive = false;
 }
 
 void PFM_DB::rollback() {
-    char * pszErrorMsg;
+    Logger & log = Logger::getInstance();
 
+    if (!isTransactionActive) {
+        log.logInfo("Rollback transaction - no transaction active, skipping");
+        return;
+    }
+
+    log.logDebug("ROLLBACK TRANSACTION");
+
+    char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, "ROLLBACK TRANSACTION;", NULL, NULL, &pszErrorMsg);
 
     if (error) {
+        log.logError("Failed to rollback transaction with error '%s'", pszErrorMsg);
+
         throw pfm_error(
             pfm_error::buildMsg(
                 "ROLLBACK TRANSACTION failed: %s", 
@@ -284,4 +318,6 @@ void PFM_DB::rollback() {
             __FILE__, 
             __LINE__);
     }
+
+    isTransactionActive = false;
 }

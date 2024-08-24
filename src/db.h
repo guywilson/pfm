@@ -28,9 +28,12 @@ class PFM_DB {
         }
 
     private:
-        PFM_DB() {}
-
         sqlite3 * dbHandle;
+        bool isTransactionActive;
+
+        PFM_DB() {
+            isTransactionActive = false;
+        }
 
         void createSchema();
 

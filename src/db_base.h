@@ -309,8 +309,8 @@ class DBResult : public Result {
                 entity.assignColumn(column);
             }
             
-            incrementSequence();
             entity.onRowComplete(getSequence());
+            incrementSequence();
 
             results.push_back(entity);
             incrementNumRows();
