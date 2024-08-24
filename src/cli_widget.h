@@ -336,9 +336,6 @@ class CLIListRow : public CLIWidget {
         int printPadding(CLIListColumn & column, string & value) {
             int numPaddingChars = getNumPaddingChars(column, value);
 
-            // cout << endl;
-            // cout << "Padding: " << value << "(" << value.length() << "), width: " << column.getWidth() << ", " << numPaddingChars << endl << endl;
-
             for (int i = 0;i < numPaddingChars;i++) {
                 cout << " ";
             }
@@ -451,6 +448,12 @@ class CLIListRow : public CLIWidget {
         }
 
         void addCellValue(Money & val) {
+            /*
+            ** Handle 2-byte characters, e.g. currency symbols,
+            ** width is adjusted in printCell() for Money cells.
+            ** Changes specified in P2675 should fix this:
+            ** https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p2675r1.pdf
+            */
             string value = "#" + val.getFormattedStringValue();
             columnValues.push_back(value);
         }
