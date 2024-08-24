@@ -69,7 +69,7 @@ class CategoryListView : public CLIListView {
     public:
         CategoryListView() : CLIListView() {}
 
-        void addResults(DBCategoryResult & result) {
+        void addResults(DBResult<DBCategory> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
             snprintf(szTitle, TITLE_BUFFER_LEN, "Categories (%d)", result.getNumRows());

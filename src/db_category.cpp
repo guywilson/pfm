@@ -14,9 +14,8 @@
 using namespace std;
 
 void DBCategory::retrieveByCode(string & code) {
-    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int                 rowsRetrievedCount;
-    DBCategoryResult    result;
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBCategory> result;
 
     snprintf(
         szStatement, 
@@ -25,7 +24,7 @@ void DBCategory::retrieveByCode(string & code) {
         code.c_str());
 
     PFM_DB & db = PFM_DB::getInstance();
-    rowsRetrievedCount = db.executeSelect(szStatement, &result);
+    int rowsRetrievedCount = db.executeSelect <DBResult<DBCategory>> (szStatement, &result);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
@@ -37,11 +36,11 @@ void DBCategory::retrieveByCode(string & code) {
     set(result.getResultAt(0));
 }
 
-DBCategoryResult DBCategory::retrieveAll() {
-    DBCategoryResult result;
+DBResult<DBCategory> DBCategory::retrieveAll() {
+    DBResult<DBCategory> result;
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(sqlSelectAll, &result);
+    db.executeSelect <DBResult<DBCategory>> (sqlSelectAll, &result);
 
     return result;
 }

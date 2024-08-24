@@ -65,6 +65,18 @@ class DBConfig : public DBEntity {
             cout << "Description: '" << description << "'" << endl;
         }
 
+        void assignColumn(DBColumn & column) override {
+            if (column.getName() == "key") {
+                key = column.getValue();
+            }
+            else if (column.getName() == "value") {
+                value = column.getValue();
+            }
+            else if (column.getName() == "description") {
+                description = column.getValue();
+            }
+        }
+
         const char * getTableName() override {
             return "config";
         }
@@ -119,64 +131,8 @@ class DBConfig : public DBEntity {
             return szStatement;
         }
 
-        void                retrieveByKey(string & key);
-        DBConfigResult      retrieveAll();
-};
-
-class DBConfigResult : public DBResult {
-    private:
-        vector<DBConfig>        results;
-
-    public:
-        DBConfigResult() : DBResult() {}
-
-        void clear() {
-            DBResult::clear();
-            results.clear();
-        }
-
-        DBConfig getResultAt(int i) {
-            if (getNumRows() > i) {
-                return results[i];
-            }
-            else {
-                throw pfm_error(
-                        pfm_error::buildMsg(
-                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
-                        __FILE__, 
-                        __LINE__);
-            }
-        }
-
-        void processRow(DBRow & row) {
-            DBConfig config;
-
-            for (size_t i = 0;i < row.getNumColumns();i++) {
-                DBColumn column = row.getColumnAt(i);
-
-                if (column.getName() == "id") {
-                    config.id = column.getIDValue();
-                }
-                else if (column.getName() == "key") {
-                    config.key = column.getValue();
-                }
-                else if (column.getName() == "value") {
-                    config.value = column.getValue();
-                }
-                else if (column.getName() == "description") {
-                    config.description = column.getValue();
-                }
-                else if (column.getName() == "created") {
-                    config.createdDate = column.getValue();
-                }
-                else if (column.getName() == "updated") {
-                    config.updatedDate = column.getValue();
-                }
-            }
-            
-            results.push_back(config);
-            incrementNumRows();
-        }
+        void retrieveByKey(string & key);
+        DBResult<DBConfig> retrieveAll();
 };
 
 #endif

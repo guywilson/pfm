@@ -69,7 +69,7 @@ class PayeeListView : public CLIListView {
     public:
         PayeeListView() : CLIListView() {}
 
-        void addResults(DBPayeeResult & result) {
+        void addResults(DBResult<DBPayee> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
             snprintf(szTitle, TITLE_BUFFER_LEN, "Payees (%d)", result.getNumRows());

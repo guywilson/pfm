@@ -92,6 +92,21 @@ class DBAccount : public DBEntity {
             this->currentBalance =  src.currentBalance;
         }
 
+        void assignColumn(DBColumn & column) override {
+            if (column.getName() == "name") {
+                name = column.getValue();
+            }
+            else if (column.getName() == "code") {
+                code = column.getValue();
+            }
+            else if (column.getName() == "opening_balance") {
+                openingBalance = column.getDoubleValue();
+            }
+            else if (column.getName() == "current_balance") {
+                currentBalance = column.getDoubleValue();
+            }
+        }
+
         void print() {
             DBEntity::print();
 
@@ -167,66 +182,7 @@ class DBAccount : public DBEntity {
         Money calculateBalanceAfterBills();
 
         void retrieveByCode(string & code);
-        DBAccountResult retrieveAll();
-};
-
-class DBAccountResult : public DBResult {
-    private:
-        vector<DBAccount>       results;
-
-    public:
-        DBAccountResult() : DBResult() {}
-
-        void clear() {
-            DBResult::clear();
-            results.clear();
-        }
-
-        DBAccount getResultAt(int i) {
-            if (getNumRows() > i) {
-                return results[i];
-            }
-            else {
-                throw pfm_error(
-                        pfm_error::buildMsg(
-                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
-                        __FILE__, 
-                        __LINE__);
-            }
-        }
-
-        void processRow(DBRow & row) {
-            DBAccount account;
-
-            for (size_t i = 0;i < row.getNumColumns();i++) {
-                DBColumn column = row.getColumnAt(i);
-
-                if (column.getName() == "id") {
-                    account.id = column.getIDValue();
-                }
-                else if (column.getName() == "name") {
-                    account.name = column.getValue();
-                }
-                else if (column.getName() == "code") {
-                    account.code = column.getValue();
-                }
-                else if (column.getName() == "opening_balance") {
-                    account.openingBalance = column.getDoubleValue();
-                }
-                else if (column.getName() == "current_balance") {
-                    account.currentBalance = column.getDoubleValue();
-                }
-                else if (column.getName() == "created") {
-                    account.createdDate = column.getValue();
-                }
-                else if (column.getName() == "updated") {
-                    account.updatedDate = column.getValue();
-                }
-            }
-            
-            results.push_back(account);
-            incrementNumRows();
-        }
+        DBResult<DBAccount> retrieveAll();
 };
 
 #endif

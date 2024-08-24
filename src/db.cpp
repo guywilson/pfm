@@ -24,7 +24,7 @@
 using namespace std;
 
 static int _retrieveCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
-    DBResult * result = (DBResult *)p;
+    Result * result = (Result *)p;
     vector<DBColumn> columnVector;
 
     for (int i = 0;i < numColumns;i++) {
@@ -39,7 +39,8 @@ static int _retrieveCallback(void * p, int numColumns, char ** columns, char ** 
     return SQLITE_OK;
 }
 
-int PFM_DB::executeSelect(const char * sqlStatement, DBResult * result) {
+template <class T>
+int PFM_DB::executeSelect(const char * sqlStatement, T * result) {
     char *          pszErrorMsg;
     int             error;
 

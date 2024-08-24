@@ -14,9 +14,8 @@
 using namespace std;
 
 void DBCurrency::retrieveByCode(string & code) {
-    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int                 rowsRetrievedCount;
-    DBCurrencyResult    result;
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBCurrency> result;
 
     snprintf(
         szStatement, 
@@ -25,7 +24,7 @@ void DBCurrency::retrieveByCode(string & code) {
         code.c_str());
 
     PFM_DB & db = PFM_DB::getInstance();
-    rowsRetrievedCount = db.executeSelect(szStatement, &result);
+    int rowsRetrievedCount = db.executeSelect <DBResult<DBCurrency>> (szStatement, &result);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
@@ -37,11 +36,11 @@ void DBCurrency::retrieveByCode(string & code) {
     set(result.getResultAt(0));
 }
 
-DBCurrencyResult DBCurrency::retrieveAll() {
-    DBCurrencyResult result;
+DBResult<DBCurrency> DBCurrency::retrieveAll() {
+    DBResult<DBCurrency> result;
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(sqlSelectAll, &result);
+    db.executeSelect <DBResult<DBCurrency>> (sqlSelectAll, &result);
 
     return result;
 }

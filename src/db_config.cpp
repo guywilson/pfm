@@ -14,9 +14,8 @@
 using namespace std;
 
 void DBConfig::retrieveByKey(string & key) {
-    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int                 rowsRetrievedCount;
-    DBConfigResult      result;
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBConfig> result;
 
     snprintf(
         szStatement, 
@@ -25,7 +24,7 @@ void DBConfig::retrieveByKey(string & key) {
         key.c_str());
 
     PFM_DB & db = PFM_DB::getInstance();
-    rowsRetrievedCount = db.executeSelect(szStatement, &result);
+    int rowsRetrievedCount = db.executeSelect <DBResult<DBConfig>> (szStatement, &result);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
@@ -37,8 +36,8 @@ void DBConfig::retrieveByKey(string & key) {
     set(result.getResultAt(0));
 }
 
-DBConfigResult DBConfig::retrieveAll() {
-    DBConfigResult result;
+DBResult<DBConfig> DBConfig::retrieveAll() {
+    DBResult<DBConfig> result;
 
     PFM_DB & db = PFM_DB::getInstance();
     db.executeSelect(sqlSelectAll, &result);

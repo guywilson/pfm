@@ -134,7 +134,7 @@ class DBTransaction : public DBPayment {
         const char * sqlDelete = 
                         "DELETE FROM account_transaction WHERE id = %lld;";
 
-        DBTransactionResult retrieveByStatementAndID(const char * statement, pfm_id_t id);
+        DBResult<DBTransaction> retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
     public:
         pfm_id_t recurringChargeId;
@@ -185,6 +185,53 @@ class DBTransaction : public DBPayment {
             cout << "Reference: '" << reference << "'" << endl;
             cout << "Debit/Credit: '" << (isCredit ? "CR" : "DB") << "'" << endl;
             cout << "isReconciled: " << isReconciled << endl;
+        }
+
+        void assignColumn(DBColumn & column) override {
+            if (column.getName() == "account_id") {
+                accountId = column.getIDValue();
+            }
+            else if (column.getName() == "category_id") {
+                categoryId = column.getIDValue();
+            }
+            else if (column.getName() == "payee_id") {
+                payeeId = column.getIDValue();
+            }
+            else if (column.getName() == "recurring_charge_id") {
+                recurringChargeId = column.getIDValue();
+            }
+            else if (column.getName() == "date") {
+                date = column.getValue();
+            }
+            else if (column.getName() == "reference") {
+                reference = column.getValue();
+            }
+            else if (column.getName() == "description") {
+                description = column.getValue();
+            }
+            else if (column.getName() == "amount") {
+                amount = column.getDoubleValue();
+            }
+            else if (column.getName() == "credit_debit") {
+                isCredit = column.getBoolValue();
+            }
+            else if (column.getName() == "is_reconciled") {
+                isReconciled = column.getBoolValue();
+            }
+        }
+
+        void onRowComplete(int sequence) override {
+            category.id = categoryId;
+
+            DBResult<DBCategory> categoryResult;
+            category.retrieveByID <DBResult<DBCategory>> (&categoryResult);
+
+            payee.id = payeeId;
+
+            DBResult<DBPayee> payeeResult;
+            payee.retrieveByID <DBResult<DBPayee>> (&payeeResult);
+
+            this->sequence = sequence;
         }
 
         string getCreditDebitValue() {
@@ -284,104 +331,13 @@ class DBTransaction : public DBPayment {
 
         int findLatestByRecurringChargeID(pfm_id_t chargeId);
 
-        DBTransactionResult retrieveByAccountID(pfm_id_t accountId);
-        DBTransactionResult retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
-        DBTransactionResult retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
-        DBTransactionResult findTransactionsForAccountID(
+        DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
+        DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
+        DBResult<DBTransaction> retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransaction> findTransactionsForAccountID(
                                     pfm_id_t accountId, 
                                     DBCriteria * criteria, 
                                     int numCriteria);
-};
-
-class DBTransactionResult : public DBResult {
-    private:
-        vector<DBTransaction> results;
-
-    public:
-        DBTransactionResult() : DBResult() {}
-
-        void clear() {
-            DBResult::clear();
-            results.clear();
-        }
-
-        DBTransaction getResultAt(int i) {
-            if (getNumRows() > i) {
-                return results[i];
-            }
-            else {
-                throw pfm_error(
-                        pfm_error::buildMsg(
-                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
-                        __FILE__, 
-                        __LINE__);
-            }
-        }
-
-        void processRow(DBRow & row) {
-            DBTransaction transaction;
-
-            for (size_t i = 0;i < row.getNumColumns();i++) {
-                DBColumn column = row.getColumnAt(i);
-
-                if (column.getName() == "id") {
-                    transaction.id = column.getIDValue();
-                }
-                else if (column.getName() == "account_id") {
-                    transaction.accountId = column.getIDValue();
-                }
-                else if (column.getName() == "category_id") {
-                    transaction.categoryId = column.getIDValue();
-                }
-                else if (column.getName() == "payee_id") {
-                    transaction.payeeId = column.getIDValue();
-                }
-                else if (column.getName() == "recurring_charge_id") {
-                    transaction.recurringChargeId = column.getIDValue();
-                }
-                else if (column.getName() == "date") {
-                    transaction.date = column.getValue();
-                }
-                else if (column.getName() == "reference") {
-                    transaction.reference = column.getValue();
-                }
-                else if (column.getName() == "description") {
-                    transaction.description = column.getValue();
-                }
-                else if (column.getName() == "amount") {
-                    transaction.amount = column.getDoubleValue();
-                }
-                else if (column.getName() == "credit_debit") {
-                    transaction.isCredit = column.getBoolValue();
-                }
-                else if (column.getName() == "is_reconciled") {
-                    transaction.isReconciled = column.getBoolValue();
-                }
-                else if (column.getName() == "created") {
-                    transaction.createdDate = column.getValue();
-                }
-                else if (column.getName() == "updated") {
-                    transaction.updatedDate = column.getValue();
-                }
-            }
-            
-            transaction.category.id = transaction.categoryId;
-
-            DBCategoryResult categoryResult;
-            transaction.category.retrieveByID(&categoryResult);
-            transaction.category.set(categoryResult.getResultAt(0));
-
-            transaction.payee.id = transaction.payeeId;
-
-            DBPayeeResult payeeResult;
-            transaction.payee.retrieveByID(&payeeResult);
-            transaction.payee.set(payeeResult.getResultAt(0));
-
-            transaction.sequence = sequenceCounter++;
-
-            results.push_back(transaction);
-            incrementNumRows();
-        }
 };
 
 #endif

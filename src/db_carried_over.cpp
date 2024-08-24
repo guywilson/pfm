@@ -15,8 +15,7 @@ using namespace std;
 
 int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int rowsRetrievedCount;
-    DBCarriedOverResult result;
+    DBResult<DBCarriedOver> result;
 
     snprintf(
         szStatement, 
@@ -25,7 +24,7 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
         accountId);
 
     PFM_DB & db = PFM_DB::getInstance();
-    rowsRetrievedCount = db.executeSelect(szStatement, &result);
+    int rowsRetrievedCount = db.executeSelect <DBResult<DBCarriedOver>> (szStatement, &result);
 
     if (rowsRetrievedCount == 1) {
         set(result.getResultAt(0));
@@ -34,9 +33,9 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
     return rowsRetrievedCount;
 }
 
-DBCarriedOverResult DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
+DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBCarriedOverResult result;
+    DBResult<DBCarriedOver> result;
 
     snprintf(
         szStatement, 
@@ -45,16 +44,16 @@ DBCarriedOverResult DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
         accountId);
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(sqlSelectAll, &result);
+    db.executeSelect <DBResult<DBCarriedOver>> (sqlSelectAll, &result);
 
     return result;
 }
 
-DBCarriedOverResult DBCarriedOver::retrieveAll() {
-    DBCarriedOverResult result;
+DBResult<DBCarriedOver> DBCarriedOver::retrieveAll() {
+    DBResult<DBCarriedOver> result;
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(sqlSelectAll, &result);
+    db.executeSelect <DBResult<DBCarriedOver>> (sqlSelectAll, &result);
 
     return result;
 }

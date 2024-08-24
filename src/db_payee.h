@@ -61,6 +61,15 @@ class DBPayee : public DBEntity {
             cout << "Code: '" << code << "'" << endl;
         }
 
+        void assignColumn(DBColumn & column) override {
+            if (column.getName() == "code") {
+                code = column.getValue();
+            }
+            else if (column.getName() == "name") {
+                name = column.getValue();
+            }
+        }
+
         const char * getTableName() override {
             return "payee";
         }
@@ -113,61 +122,8 @@ class DBPayee : public DBEntity {
             return szStatement;
         }
 
-        void                retrieveByCode(string & code);
-        DBPayeeResult       retrieveAll();
-};
-
-class DBPayeeResult : public DBResult {
-    private:
-        vector<DBPayee>           results;
-
-    public:
-        DBPayeeResult() : DBResult() {}
-
-        void clear() {
-            DBResult::clear();
-            results.clear();
-        }
-
-        DBPayee getResultAt(int i) {
-            if (getNumRows() > i) {
-                return results[i];
-            }
-            else {
-                throw pfm_error(
-                        pfm_error::buildMsg(
-                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
-                        __FILE__, 
-                        __LINE__);
-            }
-        }
-
-        void processRow(DBRow & row) {
-            DBPayee payee;
-
-            for (size_t i = 0;i < row.getNumColumns();i++) {
-                DBColumn column = row.getColumnAt(i);
-
-                if (column.getName() == "id") {
-                    payee.id = column.getIDValue();
-                }
-                else if (column.getName() == "code") {
-                    payee.code = column.getValue();
-                }
-                else if (column.getName() == "name") {
-                    payee.name = column.getValue();
-                }
-                else if (column.getName() == "created") {
-                    payee.createdDate = column.getValue();
-                }
-                else if (column.getName() == "updated") {
-                    payee.updatedDate = column.getValue();
-                }
-            }
-
-            results.push_back(payee);
-            incrementNumRows();
-        }
+        void retrieveByCode(string & code);
+        DBResult<DBPayee> retrieveAll();
 };
 
 #endif

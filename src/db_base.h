@@ -15,9 +15,75 @@ using namespace std;
 #ifndef __INCL_DB_BASE
 #define __INCL_DB_BASE
 
-class DBResult;
+template <class T> class DBResult;
 
 typedef sqlite3_int64       pfm_id_t;
+
+class DBColumn {
+    private:
+        string name;
+        string value;
+
+    public:
+        DBColumn(const char * name, const char * value) {
+            this->name = name;
+            
+            /*
+            ** value will be NULL for blank NULLable columns...
+            */
+            if (value != NULL) {
+                this->value = value;
+            }
+        }
+
+        string getName() {
+            return name;
+        }
+
+        string getValue() {
+            return value;
+        }
+
+        double getDoubleValue() {
+            return strtod(value.c_str(), NULL);
+        }
+
+        long getIntValue() {
+            return strtol(value.c_str(), NULL, 10);
+        }
+
+        unsigned long getUnsignedIntValue() {
+            return strtoul(value.c_str(), NULL, 10);
+        }
+
+        bool getBoolValue() {
+            return ((value[0] == 'Y' || value[0] == 'y') ? true : false);
+        }
+
+        pfm_id_t getIDValue() {
+            return strtoll(value.c_str(), NULL, 10);
+        }
+};
+
+class DBRow {
+    private:
+        vector<DBColumn>  columns;
+
+    public:
+        DBRow(int numColumns, vector<DBColumn> & columnVector) {
+            for (int i = 0;i < columnVector.size();i++) {
+                columns.push_back(columnVector[i]);
+            }
+        }
+
+        size_t getNumColumns() {
+            return columns.size();
+        }
+
+        DBColumn getColumnAt(int i) {
+            return columns[i];
+        }
+};
 
 class DBEntity {
     private:
@@ -110,7 +176,9 @@ class DBEntity {
             return "";
         }
 
-        void retrieveByID(DBResult * result);
+        template <class T>
+        void retrieveByID(T * result);
+
         void remove();
         void save();
 
@@ -126,6 +194,14 @@ class DBEntity {
             this->createdDate = src.createdDate;
             this->updatedDate = src.updatedDate;
             this->sequence = src.sequence;
+        }
+
+        virtual void assignColumn(DBColumn & column) {
+            return;
+        }
+
+        virtual void onRowComplete(int sequence) {
+            return;
         }
 
         void print() {
@@ -145,86 +221,22 @@ class DBEntity {
         }
 };
 
-class DBColumn {
+class Result {
     private:
-        string name;
-        string value;
-
-    public:
-        DBColumn(const char * name, const char * value) {
-            this->name = name;
-            
-            /*
-            ** value will be NULL for blank NULLable columns...
-            */
-            if (value != NULL) {
-                this->value = value;
-            }
-        }
-
-        string getName() {
-            return name;
-        }
-
-        string getValue() {
-            return value;
-        }
-
-        double getDoubleValue() {
-            return strtod(value.c_str(), NULL);
-        }
-
-        long getIntValue() {
-            return strtol(value.c_str(), NULL, 10);
-        }
-
-        unsigned long getUnsignedIntValue() {
-            return strtoul(value.c_str(), NULL, 10);
-        }
-
-        bool getBoolValue() {
-            return ((value[0] == 'Y' || value[0] == 'y') ? true : false);
-        }
-
-        pfm_id_t getIDValue() {
-            return strtoll(value.c_str(), NULL, 10);
-        }
-};
-
-class DBRow {
-    private:
-        vector<DBColumn>  columns;
-
-    public:
-        DBRow(int numColumns, vector<DBColumn> & columnVector) {
-            for (int i = 0;i < columnVector.size();i++) {
-                columns.push_back(columnVector[i]);
-            }
-        }
-
-        size_t getNumColumns() {
-            return columns.size();
-        }
-
-        DBColumn getColumnAt(int i) {
-            return columns[i];
-        }
-};
-
-class DBResult {
-    protected:
         int numRows;
         int sequenceCounter;
 
     public:
-        DBResult() {
+        Result() {
             clear();
         }
 
-        void clear() {
+        virtual void clear() {
             numRows = 0;
             sequenceCounter = 1;
         }
+
+        virtual void processRow(DBRow & row) {}
 
         int getNumRows() {
             return numRows;
@@ -233,13 +245,76 @@ class DBResult {
         void incrementNumRows() {
             numRows++;
         }
-
-        void addRow(DBEntity & entity) {
-            return;
+        
+        void incrementSequence() {
+            sequenceCounter++;
         }
 
-        virtual void processRow(DBRow & row) {
-            return;
+        int getSequence() {
+            return sequenceCounter;
+        }
+};
+
+template <class T> class DBResult : public Result {
+    private:
+        vector<T> results;
+
+    public:
+        DBResult() : Result() {
+            clear();
+        }
+
+        void clear() override {
+            Result::clear();
+
+            T entity;
+
+            entity.clear();
+        }
+
+        T getResultAt(int i) {
+            if (getNumRows() > i) {
+                return results[i];
+            }
+            else {
+                throw pfm_error(
+                        pfm_error::buildMsg(
+                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
+                        __FILE__, 
+                        __LINE__);
+            }
+        }
+
+        void addRow(T & entity) {
+            results.push_back(entity);
+        }
+
+        void processRow(DBRow & row) override {
+            T entity;
+
+            for (size_t i = 0;i < row.getNumColumns();i++) {
+                DBColumn column = row.getColumnAt(i);
+
+                if (column.getName() == "id") {
+                    entity.id = column.getIDValue();
+                }
+                else if (column.getName() == "created") {
+                    entity.createdDate = column.getValue();
+                }
+                else if (column.getName() == "updated") {
+                    entity.updatedDate = column.getValue();
+                }
+                else {
+                    entity.assignColumn(column);
+                }
+            }
+            
+            incrementSequence();
+
+            entity.onRowComplete(getSequence());
+
+            results.push_back(entity);
+            incrementNumRows();
         }
 };
 

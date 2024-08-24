@@ -14,9 +14,8 @@
 using namespace std;
 
 void DBPayee::retrieveByCode(string & code) {
-    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int                 rowsRetrievedCount;
-    DBPayeeResult       result;
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBPayee> result;
 
     snprintf(
         szStatement, 
@@ -25,7 +24,7 @@ void DBPayee::retrieveByCode(string & code) {
         code.c_str());
 
     PFM_DB & db = PFM_DB::getInstance();
-    rowsRetrievedCount = db.executeSelect(szStatement, &result);
+    int rowsRetrievedCount = db.executeSelect <DBResult<DBPayee>> (szStatement, &result);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
@@ -37,11 +36,11 @@ void DBPayee::retrieveByCode(string & code) {
     set(result.getResultAt(0));
 }
 
-DBPayeeResult DBPayee::retrieveAll() {
-    DBPayeeResult result;
+DBResult<DBPayee> DBPayee::retrieveAll() {
+    DBResult<DBPayee> result;
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(sqlSelectAll, &result);
+    db.executeSelect <DBResult<DBPayee>> (sqlSelectAll, &result);
 
     return result;
 }

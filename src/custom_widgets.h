@@ -24,7 +24,7 @@ class CategorySpinField : public CLISpinTextField {
             setLengthLimit(CODE_FIELD_MAX_LENGTH);
 
             DBCategory category;
-            DBCategoryResult result = category.retrieveAll();
+            DBResult<DBCategory> result = category.retrieveAll();
 
             for (int i = 0;i < result.getNumRows();i++) {
                 DBCategory c = result.getResultAt(i);
@@ -57,7 +57,7 @@ class PayeeSpinField : public CLISpinTextField {
 
         void show() override {
             DBPayee payee;
-            DBPayeeResult result = payee.retrieveAll();
+            DBResult<DBPayee> result = payee.retrieveAll();
 
             for (int i = 0;i < result.getNumRows();i++) {
                 DBPayee p = result.getResultAt(i);

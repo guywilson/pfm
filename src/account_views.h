@@ -76,7 +76,7 @@ class AccountListView : public CLIListView {
     public:
         AccountListView() : CLIListView() {}
 
-        void addResults(DBAccountResult & result) {
+        void addResults(DBResult<DBAccount> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
             snprintf(szTitle, TITLE_BUFFER_LEN, "Accounts (%d)", result.getNumRows());

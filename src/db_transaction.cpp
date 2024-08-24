@@ -16,9 +16,9 @@
 
 using namespace std;
 
-DBTransactionResult DBTransaction::retrieveByStatementAndID(const char * sqlSelect, pfm_id_t id) {
-    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBTransactionResult result;
+DBResult<DBTransaction> DBTransaction::retrieveByStatementAndID(const char * sqlSelect, pfm_id_t id) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBTransaction> result;
 
     snprintf(
         szStatement, 
@@ -27,20 +27,20 @@ DBTransactionResult DBTransaction::retrieveByStatementAndID(const char * sqlSele
         id);
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(szStatement, &result);
+    db.executeSelect <DBResult<DBTransaction>> (szStatement, &result);
 
     return result;
 }
 
-DBTransactionResult DBTransaction::retrieveByAccountID(pfm_id_t accountId) {
-    DBTransactionResult result = retrieveByStatementAndID(sqlSelectByAccountID, accountId);
+DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId) {
+    DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectByAccountID, accountId);
 
     return result;
 }
 
-DBTransactionResult DBTransaction::retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
-    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBTransactionResult result;
+DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBTransaction> result;
 
     snprintf(
         szStatement, 
@@ -60,13 +60,13 @@ DBTransactionResult DBTransaction::retrieveByAccountID(pfm_id_t accountId, db_so
     }
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(szStatement, &result);
+    db.executeSelect <DBResult<DBTransaction>> (szStatement, &result);
 
     return result;
 }
 
 int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
-    DBTransactionResult result = retrieveByStatementAndID(sqlSelectLatestByChargeID, chargeId);
+    DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectLatestByChargeID, chargeId);
 
     if (result.getNumRows() == 1) {
         set(result.getResultAt(0));
@@ -83,14 +83,14 @@ int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
     return result.getNumRows();
 }
 
-DBTransactionResult DBTransaction::findTransactionsForAccountID(
+DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(
                                             pfm_id_t accountId, 
                                             DBCriteria * criteria, 
                                             int numCriteria)
 {
-    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int                 sqlRowLimit = SQL_ROW_LIMIT;
-    DBTransactionResult result;
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int sqlRowLimit = SQL_ROW_LIMIT;
+    DBResult<DBTransaction> result;
 
     snprintf(
         szStatement, 
@@ -169,14 +169,14 @@ DBTransactionResult DBTransaction::findTransactionsForAccountID(
         sqlRowLimit);
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(szStatement, &result);
+    db.executeSelect <DBResult<DBTransaction>> (szStatement, &result);
 
     return result;
 }
 
-DBTransactionResult DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
-    char                szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBTransactionResult result;
+DBResult<DBTransaction> DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBTransaction> result;
 
     snprintf(
         szStatement, 
@@ -187,7 +187,7 @@ DBTransactionResult DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t acco
         secondDate.shortDate().c_str());
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(szStatement, &result);
+    db.executeSelect <DBResult<DBTransaction>> (szStatement, &result);
 
     return result;
 }
@@ -196,9 +196,8 @@ void DBTransaction::afterInsert() {
     DBAccount account;
     account.id = accountId;
 
-    DBAccountResult result;
+    DBResult<DBAccount> result;
     account.retrieveByID(&result);
-    account.set(result.getResultAt(0));
 
     account.currentBalance += this->getSignedAmount();
     account.save();
@@ -208,9 +207,8 @@ void DBTransaction::beforeUpdate() {
     DBTransaction transaction;
     transaction.id = this->id;
 
-    DBTransactionResult result;
+    DBResult<DBTransaction> result;
     transaction.retrieveByID(&result);
-    transaction.set(result.getResultAt(0));
 
     /*
     ** If the amount has been updated on the transaction,
@@ -221,9 +219,8 @@ void DBTransaction::beforeUpdate() {
         DBAccount account;
         account.id = transaction.accountId;
 
-        DBAccountResult result;
+        DBResult<DBAccount> result;
         account.retrieveByID(&result);
-        account.set(result.getResultAt(0));
 
         account.currentBalance -= transaction.getSignedAmount();
         account.currentBalance += this->getSignedAmount();
@@ -236,9 +233,8 @@ void DBTransaction::afterRemove() {
     DBAccount account;
     account.id = accountId;
 
-    DBAccountResult result;
+    DBResult<DBAccount> result;
     account.retrieveByID(&result);
-    account.set(result.getResultAt(0));
 
     account.currentBalance -= getSignedAmount();
 

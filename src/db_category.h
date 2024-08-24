@@ -61,6 +61,15 @@ class DBCategory : public DBEntity {
             cout << "Code: '" << code << "'" << endl;
         }
 
+        void assignColumn(DBColumn & column) override {
+            if (column.getName() == "code") {
+                code = column.getValue();
+            }
+            else if (column.getName() == "description") {
+                description = column.getValue();
+            }
+        }
+
         const char * getTableName() override {
             return "category";
         }
@@ -113,61 +122,8 @@ class DBCategory : public DBEntity {
             return szStatement;
         }
 
-        void                retrieveByCode(string & code);
-        DBCategoryResult    retrieveAll();
-};
-
-class DBCategoryResult : public DBResult {
-    private:
-        vector<DBCategory>        results;
-
-    public:
-        DBCategoryResult() : DBResult() {}
-
-        void clear() {
-            DBResult::clear();
-            results.clear();
-        }
-
-        DBCategory getResultAt(int i) {
-            if (getNumRows() > i) {
-                return results[i];
-            }
-            else {
-                throw pfm_error(
-                        pfm_error::buildMsg(
-                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
-                        __FILE__, 
-                        __LINE__);
-            }
-        }
-
-        void processRow(DBRow & row) {
-            DBCategory category;
-
-            for (size_t i = 0;i < row.getNumColumns();i++) {
-                DBColumn column = row.getColumnAt(i);
-
-                if (column.getName() == "id") {
-                    category.id = column.getIDValue();
-                }
-                else if (column.getName() == "code") {
-                    category.code = column.getValue();
-                }
-                else if (column.getName() == "description") {
-                    category.description = column.getValue();
-                }
-                else if (column.getName() == "created") {
-                    category.createdDate = column.getValue();
-                }
-                else if (column.getName() == "updated") {
-                    category.updatedDate = column.getValue();
-                }
-            }
-            
-            results.push_back(category);
-            incrementNumRows();
-        }
+        void retrieveByCode(string & code);
+        DBResult<DBCategory> retrieveAll();
 };
 
 #endif

@@ -33,7 +33,7 @@ void add_account() {
 
 void list_accounts() {
     DBAccount accountInstance;
-    DBAccountResult result = accountInstance.retrieveAll();
+    DBResult<DBAccount> result = accountInstance.retrieveAll();
 
     AccountListView view;
 
@@ -87,7 +87,7 @@ void add_category() {
 
 void list_categories() {
     DBCategory category;
-    DBCategoryResult result =  category.retrieveAll();
+    DBResult<DBCategory> result =  category.retrieveAll();
 
     CategoryListView view;
     view.addResults(result);
@@ -133,7 +133,7 @@ void add_payee() {
 
 void list_payees() {
     DBPayee payee;
-    DBPayeeResult result =  payee.retrieveAll();
+    DBResult<DBPayee> result =  payee.retrieveAll();
 
     PayeeListView view;
     view.addResults(result);
@@ -180,7 +180,7 @@ void add_recurring_charge(DBAccount & account) {
 
 void list_recurring_charges(DBAccount & account) {
     DBRecurringCharge chargeInstance;
-    DBRecurringChargeResult result = chargeInstance.retrieveByAccountID(account.id);
+    DBResult<DBRecurringCharge> result = chargeInstance.retrieveByAccountID(account.id);
 
     RecurringChargeListView view;
     view.addResults(result, account.code);
@@ -210,7 +210,7 @@ DBRecurringCharge get_recurring_charge(int sequence) {
     CacheMgr & cacheMgr = CacheMgr::getInstance();
     DBRecurringCharge charge = cacheMgr.getRecurringCharge(selectedSequence);
 
-    DBRecurringChargeResult result;
+    DBResult<DBRecurringCharge> result;
     charge.retrieveByID(&result);
 
     charge.set(result.getResultAt(0));
@@ -240,7 +240,7 @@ void add_transaction(DBAccount & account) {
 
 void list_transactions(DBAccount & account) {
     DBTransaction transactionInstance;
-    DBTransactionResult result = transactionInstance.retrieveByAccountID(account.id, sort_ascending, 0);
+    DBResult<DBTransaction> result = transactionInstance.retrieveByAccountID(account.id, sort_ascending, 0);
 
     TransactionListView view;
     view.addResults(result, account.code);
@@ -267,7 +267,7 @@ void find_transactions(DBAccount & account) {
     clear_history();
 
     DBCategory category;
-    DBCategoryResult catResult = category.retrieveAll();
+    DBResult<DBCategory> catResult = category.retrieveAll();
 
     for (int i = 0;i < catResult.getNumRows();i++) {
         add_history(catResult.getResultAt(i).code.c_str());
@@ -293,7 +293,7 @@ void find_transactions(DBAccount & account) {
     clear_history();
 
     DBPayee payee;
-    DBPayeeResult payResult = payee.retrieveAll();
+    DBResult<DBPayee> payResult = payee.retrieveAll();
 
     for (int i = 0;i < payResult.getNumRows();i++) {
         add_history(payResult.getResultAt(i).code.c_str());
@@ -377,7 +377,7 @@ void find_transactions(DBAccount & account) {
         }
     }
 
-    DBTransactionResult result;
+    DBResult<DBTransaction> result;
 
     if (numCriteria) {
         DBTransaction tr;

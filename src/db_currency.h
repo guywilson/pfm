@@ -65,6 +65,18 @@ class DBCurrency : public DBEntity {
             cout << "Symbol: '" << symbol << "'" << endl;
         }
 
+        void assignColumn(DBColumn & column) override {
+            if (column.getName() == "code") {
+                code = column.getValue();
+            }
+            else if (column.getName() == "name") {
+                name = column.getValue();
+            }
+            else if (column.getName() == "symbol") {
+                symbol = column.getValue();
+            }
+        }
+
         const char * getTableName() override {
             return "currency";
         }
@@ -119,64 +131,8 @@ class DBCurrency : public DBEntity {
             return szStatement;
         }
 
-        void                retrieveByCode(string & code);
-        DBCurrencyResult    retrieveAll();
-};
-
-class DBCurrencyResult : public DBResult {
-    private:
-        vector<DBCurrency>      results;
-
-    public:
-        DBCurrencyResult() : DBResult() {}
-
-        void clear() {
-            DBResult::clear();
-            results.clear();
-        }
-
-        DBCurrency getResultAt(int i) {
-            if (getNumRows() > i) {
-                return results[i];
-            }
-            else {
-                throw pfm_error(
-                        pfm_error::buildMsg(
-                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
-                        __FILE__, 
-                        __LINE__);
-            }
-        }
-
-        void processRow(DBRow & row) {
-            DBCurrency currency;
-
-            for (size_t i = 0;i < row.getNumColumns();i++) {
-                DBColumn column = row.getColumnAt(i);
-
-                if (column.getName() == "id") {
-                    currency.id = column.getIDValue();
-                }
-                else if (column.getName() == "code") {
-                    currency.code = column.getValue();
-                }
-                else if (column.getName() == "name") {
-                    currency.name = column.getValue();
-                }
-                else if (column.getName() == "symbol") {
-                    currency.symbol = column.getValue();
-                }
-                else if (column.getName() == "created") {
-                    currency.createdDate = column.getValue();
-                }
-                else if (column.getName() == "updated") {
-                    currency.updatedDate = column.getValue();
-                }
-            }
-            
-            results.push_back(currency);
-            incrementNumRows();
-        }
+        void retrieveByCode(string & code);
+        DBResult<DBCurrency> retrieveAll();
 };
 
 #endif

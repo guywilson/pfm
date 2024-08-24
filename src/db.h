@@ -44,8 +44,10 @@ class PFM_DB {
         void commit();
         void rollback();
 
+        template <class T>
+        int executeSelect(const char * sqlStatement, T * result);
+
         pfm_id_t executeInsert(const char * sqlStatement);
-        int executeSelect(const char * sqlStatement, DBResult * result);
         void executeUpdate(const char * sqlStatement);
         void executeDelete(const char * sqlStatement);
 };

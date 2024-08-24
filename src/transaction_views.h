@@ -80,7 +80,7 @@ class TransactionListView : public CLIListView {
             total = 0.0;
         }
 
-        void addResults(DBTransactionResult & result, string & accountCode) {
+        void addResults(DBResult<DBTransaction> & result, string & accountCode) {
             char szTitle[TITLE_BUFFER_LEN];
 
             snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%d)", accountCode.c_str(), result.getNumRows());

@@ -127,6 +127,49 @@ class DBRecurringCharge : public DBPayment {
             cout << "NextPaymentDate: '" << nextPaymentDate.shortDate() << "'" << endl;
         }
 
+        void assignColumn(DBColumn & column) override {
+            if (column.getName() == "account_id") {
+                accountId = column.getIDValue();
+            }
+            else if (column.getName() == "category_id") {
+                categoryId = column.getIDValue();
+            }
+            else if (column.getName() == "payee_id") {
+                payeeId = column.getIDValue();
+            }
+            else if (column.getName() == "date") {
+                date = column.getValue();
+            }
+            else if (column.getName() == "end_date") {
+                endDate = column.getValue();
+            }
+            else if (column.getName() == "description") {
+                description = column.getValue();
+            }
+            else if (column.getName() == "amount") {
+                amount = column.getDoubleValue();
+            }
+            else if (column.getName() == "frequency") {
+                frequency = column.getValue();
+            }
+        }
+
+        void onRowComplete(int sequence) override {
+            category.id = categoryId;
+
+            DBResult<DBCategory> categoryResult;
+            category.retrieveByID <DBResult<DBCategory>> (&categoryResult);
+
+            payee.id = payeeId;
+
+            DBResult<DBPayee> payeeResult;
+            payee.retrieveByID <DBResult<DBPayee>> (&payeeResult);
+
+            this->sequence = sequence;
+            
+            setNextPaymentDate();
+        }
+
         int getFrequencyValue();
         char getFrequencyUnit();
 
@@ -198,95 +241,8 @@ class DBRecurringCharge : public DBPayment {
             return szStatement;
         }
 
-        DBRecurringChargeResult retrieveByAccountID(pfm_id_t accountId);
-        DBRecurringChargeResult retrieveAll();
-};
-
-class DBRecurringChargeResult : public DBResult {
-    private:
-        vector<DBRecurringCharge> results;
-
-    public:
-        DBRecurringChargeResult() : DBResult() {}
-
-        void clear() {
-            DBResult::clear();
-            results.clear();
-        }
-
-        DBRecurringCharge getResultAt(int i) {
-            if (getNumRows() > i) {
-                return results[i];
-            }
-            else {
-                throw pfm_error(
-                        pfm_error::buildMsg(
-                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
-                        __FILE__, 
-                        __LINE__);
-            }
-        }
-
-        void processRow(DBRow & row) {
-            DBRecurringCharge charge;
-
-            for (size_t i = 0;i < row.getNumColumns();i++) {
-                DBColumn column = row.getColumnAt(i);
-
-                if (column.getName() == "id") {
-                    charge.id = column.getIDValue();
-                }
-                else if (column.getName() == "account_id") {
-                    charge.accountId = column.getIDValue();
-                }
-                else if (column.getName() == "category_id") {
-                    charge.categoryId = column.getIDValue();
-                }
-                else if (column.getName() == "payee_id") {
-                    charge.payeeId = column.getIDValue();
-                }
-                else if (column.getName() == "date") {
-                    charge.date = column.getValue();
-                }
-                else if (column.getName() == "end_date") {
-                    charge.endDate = column.getValue();
-                }
-                else if (column.getName() == "description") {
-                    charge.description = column.getValue();
-                }
-                else if (column.getName() == "amount") {
-                    charge.amount = column.getDoubleValue();
-                }
-                else if (column.getName() == "frequency") {
-                    charge.frequency = column.getValue();
-                }
-                else if (column.getName() == "created") {
-                    charge.createdDate = column.getValue();
-                }
-                else if (column.getName() == "updated") {
-                    charge.updatedDate = column.getValue();
-                }
-            }
-            
-            charge.category.id = charge.categoryId;
-
-            DBCategoryResult categoryResult;
-            charge.category.retrieveByID(&categoryResult);
-            charge.category.set(categoryResult.getResultAt(0));
-
-            charge.payee.id = charge.payeeId;
-
-            DBPayeeResult payeeResult;
-            charge.payee.retrieveByID(&payeeResult);
-            charge.payee.set(payeeResult.getResultAt(0));
-            
-            charge.sequence = sequenceCounter++;
-            
-            charge.setNextPaymentDate();
-            
-            results.push_back(charge);
-            incrementNumRows();
-        }
+        DBResult<DBRecurringCharge> retrieveByAccountID(pfm_id_t accountId);
+        DBResult<DBRecurringCharge> retrieveAll();
 };
 
 #endif

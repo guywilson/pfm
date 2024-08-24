@@ -175,68 +175,24 @@ class DBCarriedOver : public DBEntity {
             return szStatement;
         }
 
+        void assignColumn(DBColumn & column) override {
+            if (column.getName() == "account_id") {
+                accountId = column.getIDValue();
+            }
+            else if (column.getName() == "date") {
+                date = column.getValue();
+            }
+            else if (column.getName() == "description") {
+                description = column.getValue();
+            }
+            else if (column.getName() == "balance") {
+                balance = column.getValue();
+            }
+        }
+
         int retrieveLatestByAccountId(pfm_id_t accountId);
-        DBCarriedOverResult retrieveByAccountId(pfm_id_t accountId);
-        DBCarriedOverResult retrieveAll();
-};
-
-class DBCarriedOverResult : public DBResult {
-    private:
-        vector<DBCarriedOver>       results;
-
-    public:
-        DBCarriedOverResult() : DBResult() {}
-
-        void clear() {
-            DBResult::clear();
-            results.clear();
-        }
-
-        DBCarriedOver getResultAt(int i) {
-            if (getNumRows() > i) {
-                return results[i];
-            }
-            else {
-                throw pfm_error(
-                        pfm_error::buildMsg(
-                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
-                        __FILE__, 
-                        __LINE__);
-            }
-        }
-
-        void processRow(DBRow & row) {
-            DBCarriedOver carriedOver;
-
-            for (size_t i = 0;i < row.getNumColumns();i++) {
-                DBColumn column = row.getColumnAt(i);
-
-                if (column.getName() == "id") {
-                    carriedOver.id = column.getIDValue();
-                }
-                else if (column.getName() == "account_id") {
-                    carriedOver.accountId = column.getIDValue();
-                }
-                else if (column.getName() == "date") {
-                    carriedOver.date = column.getValue();
-                }
-                else if (column.getName() == "description") {
-                    carriedOver.description = column.getValue();
-                }
-                else if (column.getName() == "balance") {
-                    carriedOver.balance = column.getValue();
-                }
-                else if (column.getName() == "created") {
-                    carriedOver.createdDate = column.getValue();
-                }
-                else if (column.getName() == "updated") {
-                    carriedOver.updatedDate = column.getValue();
-                }
-            }
-            
-            results.push_back(carriedOver);
-            incrementNumRows();
-        }
+        DBResult<DBCarriedOver> retrieveByAccountId(pfm_id_t accountId);
+        DBResult<DBCarriedOver> retrieveAll();
 };
 
 #endif

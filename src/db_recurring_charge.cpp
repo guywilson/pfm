@@ -14,9 +14,9 @@
 
 using namespace std;
 
-DBRecurringChargeResult DBRecurringCharge::retrieveByAccountID(pfm_id_t accountId) {
-    char                    szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBRecurringChargeResult result;
+DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t accountId) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBRecurringCharge> result;
 
     snprintf(
         szStatement, 
@@ -25,16 +25,16 @@ DBRecurringChargeResult DBRecurringCharge::retrieveByAccountID(pfm_id_t accountI
         accountId);
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(szStatement, &result);
+    db.executeSelect <DBResult<DBRecurringCharge>> (szStatement, &result);
 
     return result;
 }
 
-DBRecurringChargeResult DBRecurringCharge::retrieveAll() {
-    DBRecurringChargeResult result;
+DBResult<DBRecurringCharge> DBRecurringCharge::retrieveAll() {
+    DBResult<DBRecurringCharge> result;
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(sqlSelectAll, &result);
+    db.executeSelect <DBResult<DBRecurringCharge>> (sqlSelectAll, &result);
 
     return result;
 }

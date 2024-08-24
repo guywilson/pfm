@@ -91,7 +91,7 @@ class RecurringChargeListView : public CLIListView {
             total = 0.0;
         }
 
-        void addResults(DBRecurringChargeResult & result, string & accountCode) {
+        void addResults(DBResult<DBRecurringCharge> & result, string & accountCode) {
             char szTitle[TITLE_BUFFER_LEN];
 
             snprintf(szTitle, TITLE_BUFFER_LEN, "Recurring charges for account: %s (%d)", accountCode.c_str(), result.getNumRows());

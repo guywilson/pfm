@@ -24,7 +24,8 @@ void DBEntity::update() {
     db.executeUpdate(getUpdateStatement());
 }
 
-void DBEntity::retrieveByID(DBResult * result) {
+template <class T>
+void DBEntity::retrieveByID(T * result) {
     PFM_DB & db = PFM_DB::getInstance();
     int rowsRetrievedCount = db.executeSelect(getSelectByIDStatement(), result);
 
@@ -34,6 +35,8 @@ void DBEntity::retrieveByID(DBResult * result) {
                 __FILE__, 
                 __LINE__);
     }
+
+    set(result->getResultAt(0));
 }
 
 void DBEntity::remove() {
