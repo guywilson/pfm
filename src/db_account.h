@@ -93,6 +93,8 @@ class DBAccount : public DBEntity {
         }
 
         void assignColumn(DBColumn & column) override {
+            DBEntity::assignColumn(column);
+            
             if (column.getName() == "name") {
                 name = column.getValue();
             }

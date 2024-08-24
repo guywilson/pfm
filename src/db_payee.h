@@ -62,6 +62,8 @@ class DBPayee : public DBEntity {
         }
 
         void assignColumn(DBColumn & column) override {
+            DBEntity::assignColumn(column);
+            
             if (column.getName() == "code") {
                 code = column.getValue();
             }

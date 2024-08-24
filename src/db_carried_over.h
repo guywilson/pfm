@@ -176,6 +176,8 @@ class DBCarriedOver : public DBEntity {
         }
 
         void assignColumn(DBColumn & column) override {
+            DBEntity::assignColumn(column);
+            
             if (column.getName() == "account_id") {
                 accountId = column.getIDValue();
             }

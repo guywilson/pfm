@@ -158,10 +158,10 @@ class DBEntity {
             return "";
         }
 
-        virtual const char * getSelectByIDStatement() {
+        virtual const char * getSelectByIDStatement(pfm_id_t key) {
             static char statement[64];
 
-            snprintf(statement, 64, "SELECT * FROM %s WHERE id = %lld;", getTableName(), id);
+            snprintf(statement, 64, "SELECT * FROM %s WHERE id = %lld;", getTableName(), key);
  
             return statement;
         }
@@ -318,7 +318,7 @@ class DBResult : public Result {
 };
 
 static inline int _retrieveCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
-    Result * result = (Result *)p;
+    vector<DBRow> * rows = (vector<DBRow> *)p;
     vector<DBColumn> columnVector;
 
     for (int i = 0;i < numColumns;i++) {
@@ -328,14 +328,14 @@ static inline int _retrieveCallback(void * p, int numColumns, char ** columns, c
 
     DBRow row(numColumns, columnVector);
 
-    result->processRow(row);
+    rows->push_back(row);
 
     return SQLITE_OK;
 }
 
 template <class T>
 int DBResult<T>::executeSelect(const char * sqlStatement) {
-    vector<T> entities;
+    vector<DBRow> rows;
 
     Logger & log = Logger::getInstance();
 
@@ -349,7 +349,7 @@ int DBResult<T>::executeSelect(const char * sqlStatement) {
                 db.getHandle(), 
                 sqlStatement, 
                 _retrieveCallback, 
-                this, 
+                &rows, 
                 &pszErrorMsg);
 
     if (error) {
@@ -363,6 +363,11 @@ int DBResult<T>::executeSelect(const char * sqlStatement) {
                 __FILE__, 
                 __LINE__);
     }
+    else {
+        for (int i = 0;i < rows.size();i++) {
+            processRow(rows[i]);
+        }
+    }
 
     return this->getNumRows();
 }
@@ -371,7 +376,7 @@ template <class T>
 T DBResult<T>::retrieveByID(pfm_id_t id) {
     T entity;
 
-    int rowsRetrievedCount = executeSelect(entity.getSelectByIDStatement());
+    int rowsRetrievedCount = executeSelect(entity.getSelectByIDStatement(id));
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(

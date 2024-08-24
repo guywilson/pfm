@@ -188,6 +188,8 @@ class DBTransaction : public DBPayment {
         }
 
         void assignColumn(DBColumn & column) override {
+            DBEntity::assignColumn(column);
+            
             if (column.getName() == "account_id") {
                 accountId = column.getIDValue();
             }
