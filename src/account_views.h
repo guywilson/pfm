@@ -90,7 +90,7 @@ class AccountListView : public CLIListView {
             CLIListColumn column2 = CLIListColumn("Name", 25, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
-            CLIListColumn column3 = CLIListColumn("Balance", 13, CLIListColumn::rightAligned);
+            CLIListColumn column3 = CLIListColumn("Balance", 16, CLIListColumn::rightAligned);
             headerRow.addColumn(column3);
 
             addHeaderRow(headerRow);
@@ -102,7 +102,7 @@ class AccountListView : public CLIListView {
 
                 row.addCellValue(account.code);
                 row.addCellValue(account.name);
-                row.addCellValue(account.currentBalance.getFormattedStringValue());
+                row.addCellValue(account.currentBalance);
 
                 addRow(row);
             }

@@ -6,6 +6,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include "money.h"
 #include "pfm_error.h"
 
 using namespace std;
@@ -335,6 +336,9 @@ class CLIListRow : public CLIWidget {
         int printPadding(CLIListColumn & column, string & value) {
             int numPaddingChars = getNumPaddingChars(column, value);
 
+            // cout << endl;
+            // cout << "Padding: " << value << "(" << value.length() << "), width: " << column.getWidth() << ", " << numPaddingChars << endl << endl;
+
             for (int i = 0;i < numPaddingChars;i++) {
                 cout << " ";
             }
@@ -357,13 +361,21 @@ class CLIListRow : public CLIWidget {
         }
 
         void printCell(CLIListColumn & column, string value) {
+            int width = column.getWidth();
+            string v = value;
+
+            if (value[0] == '#') {
+                width++;
+                v = v.substr(1);
+            }
+
             switch (column.getAlignment()) {
                 case CLIListColumn::leftAligned:
-                    cout << left << setw(column.getWidth()) << value;
+                    cout << left << setw(width) << v;
                     break;
 
                 case CLIListColumn::rightAligned:
-                    cout << right << setw(column.getWidth()) << value;
+                    cout << right << setw(width) << v;
                     break;
             }
 
@@ -435,6 +447,11 @@ class CLIListRow : public CLIWidget {
 
         void addCellValue(const char * szValue) {
             string value = szValue;
+            columnValues.push_back(value);
+        }
+
+        void addCellValue(Money & val) {
+            string value = "#" + val.getFormattedStringValue();
             columnValues.push_back(value);
         }
 

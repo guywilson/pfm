@@ -106,7 +106,7 @@ class TransactionListView : public CLIListView {
             CLIListColumn column6 = CLIListColumn("CR/DB", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column6);
 
-            CLIListColumn column7 = CLIListColumn("Amount", 13, CLIListColumn::rightAligned);
+            CLIListColumn column7 = CLIListColumn("Amount", 16, CLIListColumn::rightAligned);
             headerRow.addColumn(column7);
 
             CLIListColumn column8 = CLIListColumn("Rec", 3, CLIListColumn::leftAligned);
@@ -125,7 +125,7 @@ class TransactionListView : public CLIListView {
                 row.addCellValue(transaction.category.code);
                 row.addCellValue(transaction.payee.code);
                 row.addCellValue(transaction.getCreditDebitValue());
-                row.addCellValue(transaction.amount.getFormattedStringValue());
+                row.addCellValue(transaction.amount);
                 row.addCellValue(transaction.getIsReconciledValue());
 
                 total += transaction.getSignedAmount();
