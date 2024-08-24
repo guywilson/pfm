@@ -155,15 +155,11 @@ class DBRecurringCharge : public DBPayment {
         }
 
         void onRowComplete(int sequence) override {
-            category.id = categoryId;
-
             DBResult<DBCategory> categoryResult;
-            category.retrieveByID <DBResult<DBCategory>> (&categoryResult);
-
-            payee.id = payeeId;
+            category = categoryResult.retrieveByID(categoryId);
 
             DBResult<DBPayee> payeeResult;
-            payee.retrieveByID <DBResult<DBPayee>> (&payeeResult);
+            payee = payeeResult.retrieveByID(payeeId);
 
             this->sequence = sequence;
             

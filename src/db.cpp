@@ -15,125 +15,12 @@
 #include "db_config.h"
 #include "db_currency.h"
 #include "db_category.h"
-#include "db.h"
 #include "utils.h"
 #include "strdate.h"
 #include "pfm_error.h"
 #include "schema.h"
 
 using namespace std;
-
-static int _retrieveCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
-    Result * result = (Result *)p;
-    vector<DBColumn> columnVector;
-
-    for (int i = 0;i < numColumns;i++) {
-        DBColumn column(columnNames[i], columns[i]);
-        columnVector.push_back(column);
-    }
-
-    DBRow row(numColumns, columnVector);
-
-    result->processRow(row);
-
-    return SQLITE_OK;
-}
-
-template <class T>
-int PFM_DB::executeSelect(const char * sqlStatement, T * result) {
-    char *          pszErrorMsg;
-    int             error;
-
-    Logger & log = Logger::getInstance();
-
-    log.logDebug("Executing SELECT statement '%s'", sqlStatement);
-
-    error = sqlite3_exec(
-                dbHandle, 
-                sqlStatement, 
-                _retrieveCallback, 
-                result, 
-                &pszErrorMsg);
-
-    if (error) {
-        log.logError("Failed to execute statement '%s' with error '%s'", sqlStatement, pszErrorMsg);
-
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Failed to execute statement '%s': %s",
-                    sqlStatement, 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-    }
-
-    return result->getNumRows();
-}
-
-pfm_id_t PFM_DB::executeInsert(const char * sqlStatement) {
-    char *          pszErrorMsg;
-    int             error;
-
-    Logger & log = Logger::getInstance();
-
-    log.logDebug("Executing INSERT statement '%s'", sqlStatement);
-
-    error = sqlite3_exec(dbHandle, sqlStatement, NULL, NULL, &pszErrorMsg);
-
-    if (error) {
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Failed to execute statement '%s': %s",
-                    sqlStatement, 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-    }
-
-    return sqlite3_last_insert_rowid(dbHandle);
-}
-
-void PFM_DB::executeUpdate(const char * sqlStatement) {
-    char *          pszErrorMsg;
-    int             error;
-
-    Logger & log = Logger::getInstance();
-
-    log.logDebug("Executing UPDATE statement '%s'", sqlStatement);
-
-    error = sqlite3_exec(dbHandle, sqlStatement, NULL, NULL, &pszErrorMsg);
-
-    if (error) {
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Failed to execute statement '%s': %s",
-                    sqlStatement, 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-    }
-}
-
-void PFM_DB::executeDelete(const char * sqlStatement) {
-    char *          pszErrorMsg;
-    int             error;
-
-    Logger & log = Logger::getInstance();
-
-    log.logDebug("Executing DELETE statement '%s'", sqlStatement);
-
-    error = sqlite3_exec(dbHandle, sqlStatement, NULL, NULL, &pszErrorMsg);
-
-    if (error) {
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Failed to execute statement '%s': %s",
-                    sqlStatement, 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-    }
-}
 
 bool PFM_DB::open(string dbName) {
     int error = sqlite3_open_v2(
@@ -170,6 +57,10 @@ bool PFM_DB::open(string dbName) {
 
 PFM_DB::~PFM_DB() {
     sqlite3_close_v2(this->dbHandle);
+}
+
+sqlite3 * PFM_DB::getHandle() {
+    return this->dbHandle;
 }
 
 void PFM_DB::createSchema() {

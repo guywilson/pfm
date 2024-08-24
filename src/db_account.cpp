@@ -28,8 +28,7 @@ void DBAccount::retrieveByCode(string & code) {
         sqlSelectByCode, 
         code.c_str());
 
-    PFM_DB & db = PFM_DB::getInstance();
-    int rowsRetrievedCount = db.executeSelect <DBResult<DBAccount>> (szStatement, &result);
+    int rowsRetrievedCount = result.executeSelect(szStatement);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
@@ -44,8 +43,7 @@ void DBAccount::retrieveByCode(string & code) {
 DBResult<DBAccount> DBAccount::retrieveAll() {
     DBResult<DBAccount> result;
 
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect <DBResult<DBAccount>> (sqlSelectAll, &result);
+    result.executeSelect(sqlSelectAll);
 
     return result;
 }

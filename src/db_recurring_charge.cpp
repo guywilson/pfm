@@ -24,8 +24,7 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t acco
         sqlSelectByAccountID, 
         accountId);
 
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect <DBResult<DBRecurringCharge>> (szStatement, &result);
+    result.executeSelect(szStatement);
 
     return result;
 }
@@ -33,8 +32,7 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t acco
 DBResult<DBRecurringCharge> DBRecurringCharge::retrieveAll() {
     DBResult<DBRecurringCharge> result;
 
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect <DBResult<DBRecurringCharge>> (sqlSelectAll, &result);
+    result.executeSelect(sqlSelectAll);
 
     return result;
 }

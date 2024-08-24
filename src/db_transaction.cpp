@@ -26,8 +26,7 @@ DBResult<DBTransaction> DBTransaction::retrieveByStatementAndID(const char * sql
         sqlSelect, 
         id);
 
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect <DBResult<DBTransaction>> (szStatement, &result);
+    result.executeSelect(szStatement);
 
     return result;
 }
@@ -59,8 +58,7 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, d
         strcat(szStatement, ";");
     }
 
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect <DBResult<DBTransaction>> (szStatement, &result);
+    result.executeSelect(szStatement);
 
     return result;
 }
@@ -168,8 +166,7 @@ DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(
         " ORDER BY date DESC LIMIT %d;", 
         sqlRowLimit);
 
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect <DBResult<DBTransaction>> (szStatement, &result);
+    result.executeSelect(szStatement);
 
     return result;
 }
@@ -186,29 +183,22 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t 
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());
 
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect <DBResult<DBTransaction>> (szStatement, &result);
+    result.executeSelect(szStatement);
 
     return result;
 }
 
 void DBTransaction::afterInsert() {
-    DBAccount account;
-    account.id = accountId;
-
     DBResult<DBAccount> result;
-    account.retrieveByID(&result);
+    DBAccount account = result.retrieveByID(accountId);
 
     account.currentBalance += this->getSignedAmount();
     account.save();
 }
 
 void DBTransaction::beforeUpdate() {
-    DBTransaction transaction;
-    transaction.id = this->id;
-
     DBResult<DBTransaction> result;
-    transaction.retrieveByID(&result);
+    DBTransaction transaction = result.retrieveByID(id);
 
     /*
     ** If the amount has been updated on the transaction,
@@ -216,11 +206,8 @@ void DBTransaction::beforeUpdate() {
     ** current balance...
     */
     if (this->amount != transaction.amount) {
-        DBAccount account;
-        account.id = transaction.accountId;
-
         DBResult<DBAccount> result;
-        account.retrieveByID(&result);
+        DBAccount account = result.retrieveByID(accountId);
 
         account.currentBalance -= transaction.getSignedAmount();
         account.currentBalance += this->getSignedAmount();
@@ -230,11 +217,8 @@ void DBTransaction::beforeUpdate() {
 }
 
 void DBTransaction::afterRemove() {
-    DBAccount account;
-    account.id = accountId;
-
     DBResult<DBAccount> result;
-    account.retrieveByID(&result);
+    DBAccount account = result.retrieveByID(accountId);
 
     account.currentBalance -= getSignedAmount();
 

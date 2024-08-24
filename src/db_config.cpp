@@ -23,8 +23,7 @@ void DBConfig::retrieveByKey(string & key) {
         sqlSelectByKey, 
         key.c_str());
 
-    PFM_DB & db = PFM_DB::getInstance();
-    int rowsRetrievedCount = db.executeSelect <DBResult<DBConfig>> (szStatement, &result);
+    int rowsRetrievedCount = result.executeSelect(szStatement);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
@@ -39,8 +38,7 @@ void DBConfig::retrieveByKey(string & key) {
 DBResult<DBConfig> DBConfig::retrieveAll() {
     DBResult<DBConfig> result;
 
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect(sqlSelectAll, &result);
+    result.executeSelect(sqlSelectAll);
 
     return result;
 }

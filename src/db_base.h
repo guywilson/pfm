@@ -8,6 +8,8 @@
 
 #include <sqlite3.h>
 
+#include "db.h"
+#include "logger.h"
 #include "pfm_error.h"
 
 using namespace std;
@@ -176,9 +178,6 @@ class DBEntity {
             return "";
         }
 
-        template <class T>
-        void retrieveByID(T * result);
-
         void remove();
         void save();
 
@@ -197,7 +196,15 @@ class DBEntity {
         }
 
         virtual void assignColumn(DBColumn & column) {
-            return;
+            if (column.getName() == "id") {
+                id = column.getIDValue();
+            }
+            else if (column.getName() == "created") {
+                createdDate = column.getValue();
+            }
+            else if (column.getName() == "updated") {
+                updatedDate = column.getValue();
+            }
         }
 
         virtual void onRowComplete(int sequence) {
@@ -236,8 +243,6 @@ class Result {
             sequenceCounter = 1;
         }
 
-        virtual void processRow(DBRow & row) {}
-
         int getNumRows() {
             return numRows;
         }
@@ -253,9 +258,12 @@ class Result {
         int getSequence() {
             return sequenceCounter;
         }
+
+        virtual void processRow(DBRow & row) {}
 };
 
-template <class T> class DBResult : public Result {
+template <class T>
+class DBResult : public Result {
     private:
         vector<T> results;
 
@@ -267,10 +275,13 @@ template <class T> class DBResult : public Result {
         void clear() override {
             Result::clear();
 
-            T entity;
-
-            entity.clear();
+            results.clear();
         }
+
+        int executeSelect(const char * sqlStatement);
+
+        T retrieveByID(pfm_id_t id);
+        void retrieveAll();
 
         T getResultAt(int i) {
             if (getNumRows() > i) {
@@ -295,27 +306,86 @@ template <class T> class DBResult : public Result {
             for (size_t i = 0;i < row.getNumColumns();i++) {
                 DBColumn column = row.getColumnAt(i);
 
-                if (column.getName() == "id") {
-                    entity.id = column.getIDValue();
-                }
-                else if (column.getName() == "created") {
-                    entity.createdDate = column.getValue();
-                }
-                else if (column.getName() == "updated") {
-                    entity.updatedDate = column.getValue();
-                }
-                else {
-                    entity.assignColumn(column);
-                }
+                entity.assignColumn(column);
             }
             
             incrementSequence();
-
             entity.onRowComplete(getSequence());
 
             results.push_back(entity);
             incrementNumRows();
         }
 };
+
+static inline int _retrieveCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
+    Result * result = (Result *)p;
+    vector<DBColumn> columnVector;
+
+    for (int i = 0;i < numColumns;i++) {
+        DBColumn column(columnNames[i], columns[i]);
+        columnVector.push_back(column);
+    }
+
+    DBRow row(numColumns, columnVector);
+
+    result->processRow(row);
+
+    return SQLITE_OK;
+}
+
+template <class T>
+int DBResult<T>::executeSelect(const char * sqlStatement) {
+    vector<T> entities;
+
+    Logger & log = Logger::getInstance();
+
+    log.logDebug("Executing SELECT statement '%s'", sqlStatement);
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    char * pszErrorMsg;
+
+    int error = sqlite3_exec(
+                db.getHandle(), 
+                sqlStatement, 
+                _retrieveCallback, 
+                this, 
+                &pszErrorMsg);
+
+    if (error) {
+        log.logError("Failed to execute statement '%s' with error '%s'", sqlStatement, pszErrorMsg);
+
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to execute statement '%s': %s",
+                    sqlStatement, 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    return this->getNumRows();
+}
+
+template <class T>
+T DBResult<T>::retrieveByID(pfm_id_t id) {
+    T entity;
+
+    int rowsRetrievedCount = executeSelect(entity.getSelectByIDStatement());
+
+    if (rowsRetrievedCount != 1) {
+        throw pfm_error(
+                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    return getResultAt(0);
+}
+
+template <class T>
+void DBResult<T>::retrieveAll() {
+
+}
 
 #endif

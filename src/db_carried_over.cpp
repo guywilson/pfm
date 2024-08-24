@@ -23,8 +23,7 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
         sqlSelectLatestByAccountId, 
         accountId);
 
-    PFM_DB & db = PFM_DB::getInstance();
-    int rowsRetrievedCount = db.executeSelect <DBResult<DBCarriedOver>> (szStatement, &result);
+    int rowsRetrievedCount = result.executeSelect(szStatement);
 
     if (rowsRetrievedCount == 1) {
         set(result.getResultAt(0));
@@ -43,8 +42,7 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
         sqlSelectByAccountId, 
         accountId);
 
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect <DBResult<DBCarriedOver>> (sqlSelectAll, &result);
+    result.executeSelect(sqlSelectAll);
 
     return result;
 }
@@ -52,8 +50,7 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
 DBResult<DBCarriedOver> DBCarriedOver::retrieveAll() {
     DBResult<DBCarriedOver> result;
 
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeSelect <DBResult<DBCarriedOver>> (sqlSelectAll, &result);
+    result.executeSelect(sqlSelectAll);
 
     return result;
 }

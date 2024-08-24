@@ -4,7 +4,6 @@
 #include <sqlite3.h>
 
 #include "db_criteria.h"
-#include "db_base.h"
 
 using namespace std;
 
@@ -40,16 +39,11 @@ class PFM_DB {
 
         bool open(string dbName);
 
+        sqlite3 * getHandle();
+
         void begin();
         void commit();
         void rollback();
-
-        template <class T>
-        int executeSelect(const char * sqlStatement, T * result);
-
-        pfm_id_t executeInsert(const char * sqlStatement);
-        void executeUpdate(const char * sqlStatement);
-        void executeDelete(const char * sqlStatement);
 };
 
 #endif

@@ -15,49 +15,86 @@
 using namespace std;
 
 pfm_id_t DBEntity::insert() {
-    PFM_DB & db = PFM_DB::getInstance();
-    return db.executeInsert(getInsertStatement());
-}
+    const char * statement = getInsertStatement();
 
-void DBEntity::update() {
-    PFM_DB & db = PFM_DB::getInstance();
-    db.executeUpdate(getUpdateStatement());
-}
+    Logger & log = Logger::getInstance();
+    log.logDebug("Executing INSERT statement '%s'", statement);
 
-template <class T>
-void DBEntity::retrieveByID(T * result) {
     PFM_DB & db = PFM_DB::getInstance();
-    int rowsRetrievedCount = db.executeSelect(getSelectByIDStatement(), result);
 
-    if (rowsRetrievedCount != 1) {
+    char * pszErrorMsg;
+
+    int error = sqlite3_exec(db.getHandle(), statement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
         throw pfm_error(
-                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
+                pfm_error::buildMsg(
+                    "Failed to execute statement '%s': %s",
+                    statement, 
+                    pszErrorMsg), 
                 __FILE__, 
                 __LINE__);
     }
 
-    set(result->getResultAt(0));
+    return sqlite3_last_insert_rowid(db.getHandle());
+}
+
+void DBEntity::update() {
+    const char * statement = getUpdateStatement();
+
+    Logger & log = Logger::getInstance();
+
+    log.logDebug("Executing UPDATE statement '%s'", statement);
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    char * pszErrorMsg;
+
+    int error = sqlite3_exec(db.getHandle(), statement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to execute statement '%s': %s",
+                    statement, 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
+    }
 }
 
 void DBEntity::remove() {
+    const char * statement = getDeleteStatement();
+
     PFM_DB & db = PFM_DB::getInstance();
+
+    db.begin();
+
+    beforeRemove();
+
     Logger & log = Logger::getInstance();
 
-    try {
-        db.begin();
+    log.logDebug("Executing DELETE statement '%s'", statement);
 
-        beforeRemove();
-        db.executeDelete(getDeleteStatement());
-        afterRemove();
+    char * pszErrorMsg;
 
-        db.commit();
-    }
-    catch (pfm_error & e) {
+    int error = sqlite3_exec(db.getHandle(), statement, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
         db.rollback();
-        log.logError("Failed to save entity with id: %lld", id);
 
-        throw e;
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to execute statement '%s': %s",
+                    statement, 
+                    pszErrorMsg), 
+                __FILE__, 
+                __LINE__);
     }
+
+    afterRemove();
+
+    db.commit();
 }
 
 void DBEntity::save() {

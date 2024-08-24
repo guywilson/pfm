@@ -211,7 +211,7 @@ DBRecurringCharge get_recurring_charge(int sequence) {
     DBRecurringCharge charge = cacheMgr.getRecurringCharge(selectedSequence);
 
     DBResult<DBRecurringCharge> result;
-    charge.retrieveByID(&result);
+    charge = result.retrieveByID(charge.id);
 
     charge.set(result.getResultAt(0));
 
