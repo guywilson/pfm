@@ -24,6 +24,8 @@
 using namespace std;
 
 bool PFM_DB::open(string dbName) {
+    log.logEntry("PFM_DB::open()");
+
     int error = sqlite3_open_v2(
                     dbName.c_str(), 
                     &this->dbHandle, 
@@ -53,11 +55,15 @@ bool PFM_DB::open(string dbName) {
         }
     }
 
+    log.logExit("PFM_DB::open()");
+
     return true;
 }
 
 PFM_DB::~PFM_DB() {
+    log.logEntry("PFM_DB::~PFM_DB()");
     sqlite3_close_v2(this->dbHandle);
+    log.logExit("PFM_DB::~PFM_DB()");
 }
 
 sqlite3 * PFM_DB::getHandle() {
@@ -65,32 +71,43 @@ sqlite3 * PFM_DB::getHandle() {
 }
 
 bool PFM_DB::getIsTransactionActive() {
-    bool active;
+    log.logEntry("PFM_DB::getIsTransactionActive()");
 
     pthread_mutex_lock(&mutex);
-    active = isTransactionActive;
+    bool active = isTransactionActive;
     pthread_mutex_unlock(&mutex);
+
+    log.logExit("PFM_DB::getIsTransactionActive()");
 
     return active;
 }
 
 void PFM_DB::setIsTransactionActive() {
+    log.logEntry("PFM_DB::setIsTransactionActive()");
+
     pthread_mutex_lock(&mutex);
     isTransactionActive = true;
     pthread_mutex_unlock(&mutex);
+
+    log.logExit("PFM_DB::setIsTransactionActive()");
 }
 
 void PFM_DB::clearIsTransactionActive() {
+    log.logEntry("PFM_DB::clearIsTransactionActive()");
+
     pthread_mutex_lock(&mutex);
     isTransactionActive = false;
     pthread_mutex_unlock(&mutex);
+
+    log.logExit("PFM_DB::clearIsTransactionActive()");
 }
 
 void PFM_DB::createTable(const char * sql) {
-    char * pszErrorMsg;
+    log.logEntry("PFM_DB::createTable()");
     
     log.logDebug("Creating table with sql %s", sql);
 
+    char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, sql, NULL, NULL, &pszErrorMsg);
 
     if (error) {
@@ -104,11 +121,12 @@ void PFM_DB::createTable(const char * sql) {
             __FILE__, 
             __LINE__);
     }
+
+    log.logExit("PFM_DB::createTable()");
 }
 
 void PFM_DB::createSchema() {
-    int     error = SQLITE_OK;
-    char *  pszErrorMsg;
+    log.logEntry("PFM_DB::createSchema()");
 
     try {
         createTable(pszCreateConfigTable);
@@ -159,9 +177,13 @@ void PFM_DB::createSchema() {
         log.logError("Failed to create schema: %s", e.what());
         throw e;
     }
+
+    log.logExit("PFM_DB::createSchema()");
 }
 
 void PFM_DB::begin() {
+    log.logEntry("PFM_DB::begin()");
+
     if (getIsTransactionActive()) {
         log.logInfo("Begin transaction - transaction already active, skipping");
         return;
@@ -184,9 +206,13 @@ void PFM_DB::begin() {
     }
 
     setIsTransactionActive();
+
+    log.logExit("PFM_DB::begin()");
 }
 
 void PFM_DB::commit() {
+    log.logEntry("PFM_DB::commit()");
+
     if (!getIsTransactionActive()) {
         log.logInfo("Commit transaction - no transaction active, skipping");
         return;
@@ -209,9 +235,13 @@ void PFM_DB::commit() {
     }
 
     clearIsTransactionActive();
+
+    log.logExit("PFM_DB::commit()");
 }
 
 void PFM_DB::rollback() {
+    log.logEntry("PFM_DB::rollback()");
+
     if (!getIsTransactionActive()) {
         log.logInfo("Rollback transaction - no transaction active, skipping");
         return;
@@ -234,4 +264,6 @@ void PFM_DB::rollback() {
     }
 
     clearIsTransactionActive();
+
+    log.logExit("PFM_DB::rollback()");
 }
