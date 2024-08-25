@@ -44,6 +44,10 @@ class PFM_DB {
 
         void createTable(const char * sql);
         void createSchema();
+        
+        void createDefaultCategories();
+        void createDefaultConfig();
+        void createCurrencies();
 
     public:
         ~PFM_DB();

@@ -138,40 +138,9 @@ void PFM_DB::createSchema() {
         createTable(pszCreateTransationTable);
         createTable(pszCreateCarriedOverTable);
 
-        DBCategory category;
-
-        for (int i = 0;i < NUM_DEFAULT_CATEGORIES;i++) {
-            category.clear();
-
-            category.code = defaultCategories[i][0];
-            category.description = defaultCategories[i][1];
-
-            category.save();
-        }
-
-        DBCurrency currency;
-
-        for (int i = 0;i < NUM_CURRENCIES;i++) {
-            currency.clear();
-
-            currency.code = currencies[i][0];
-            currency.name = currencies[i][1];
-            currency.symbol = currencies[i][2];
-
-            currency.save();
-        }
-
-        DBConfig config;
-
-        for (int i = 0;i < NUM_CONFIG_ITEMS;i++) {
-            config.clear();
-
-            config.key = defaultConfig[i][0];
-            config.value = defaultConfig[i][1];
-            config.description = defaultConfig[i][2];
-
-            config.save();
-        }
+        createCurrencies();
+        createDefaultCategories();
+        createDefaultConfig();
     }
     catch (pfm_error & e) {
         log.logError("Failed to create schema: %s", e.what());
@@ -179,6 +148,59 @@ void PFM_DB::createSchema() {
     }
 
     log.logExit("PFM_DB::createSchema()");
+}
+
+void PFM_DB::createDefaultCategories() {
+    log.logEntry("PFM_DB::createDefaultCategories()");
+
+    DBCategory category;
+
+    for (int i = 0;i < NUM_DEFAULT_CATEGORIES;i++) {
+        category.clear();
+
+        category.code = defaultCategories[i][0];
+        category.description = defaultCategories[i][1];
+
+        category.save();
+    }
+
+    log.logExit("PFM_DB::createDefaultCategories()");
+}
+
+void PFM_DB::createDefaultConfig() {
+    log.logEntry("PFM_DB::createDefaultConfig()");
+
+    DBConfig config;
+
+    for (int i = 0;i < NUM_CONFIG_ITEMS;i++) {
+        config.clear();
+
+        config.key = defaultConfig[i][0];
+        config.value = defaultConfig[i][1];
+        config.description = defaultConfig[i][2];
+
+        config.save();
+    }
+
+    log.logExit("PFM_DB::createDefaultConfig()");
+}
+
+void PFM_DB::createCurrencies() {
+    log.logEntry("PFM_DB::createCurrencies()");
+
+    DBCurrency currency;
+
+    for (int i = 0;i < NUM_CURRENCIES;i++) {
+        currency.clear();
+
+        currency.code = currencies[i][0];
+        currency.name = currencies[i][1];
+        currency.symbol = currencies[i][2];
+
+        currency.save();
+    }
+
+    log.logExit("PFM_DB::createCurrencies()");
 }
 
 void PFM_DB::begin() {
