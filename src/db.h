@@ -38,13 +38,16 @@ class PFM_DB {
             isTransactionActive = false;
         }
 
+        void executeSQL(const char * sql);
+
         bool getIsTransactionActive();
         void setIsTransactionActive();
         void clearIsTransactionActive();
 
         void createTable(const char * sql);
+        void createView(const char * sql);
         void createSchema();
-        
+
         void createDefaultCategories();
         void createDefaultConfig();
         void createCurrencies();

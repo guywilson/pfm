@@ -102,27 +102,67 @@ void PFM_DB::clearIsTransactionActive() {
     log.logExit("PFM_DB::clearIsTransactionActive()");
 }
 
-void PFM_DB::createTable(const char * sql) {
-    log.logEntry("PFM_DB::createTable()");
-    
-    log.logDebug("Creating table with sql %s", sql);
-
+void PFM_DB::executeSQL(const char * sql) {
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, sql, NULL, NULL, &pszErrorMsg);
 
     if (error) {
-        log.logError("Failed to create table with error '%s'", pszErrorMsg);
+        log.logError("Failed to execute statement '%s' with error '%s'", sql, pszErrorMsg);
 
         throw pfm_error(
             pfm_error::buildMsg(
-                "Failed to create table with statement '%s' with error %s",
+                "Failed to execute statement '%s' with error %s",
                 sql,
                 pszErrorMsg), 
             __FILE__, 
             __LINE__);
     }
+}
+
+void PFM_DB::createTable(const char * sql) {
+    log.logEntry("PFM_DB::createTable()");
+    
+    log.logDebug("Creating table with sql %s", sql);
+
+    try {
+        executeSQL(sql);
+    }
+    catch (pfm_error & e) {
+        log.logError("Failed to create table with error '%s'", e.what());
+
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to create table with statement '%s' with error %s",
+                sql,
+                e.what()), 
+            __FILE__, 
+            __LINE__);
+    }
 
     log.logExit("PFM_DB::createTable()");
+}
+
+void PFM_DB::createView(const char * sql) {
+    log.logEntry("PFM_DB::createView()");
+    
+    log.logDebug("Creating view with sql %s", sql);
+
+    try {
+        executeSQL(sql);
+    }
+    catch (pfm_error & e) {
+        log.logError("Failed to create view with error '%s'", e.what());
+
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to create view with statement '%s' with error %s",
+                sql,
+                e.what()), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    log.logExit("PFM_DB::createView()");
 }
 
 void PFM_DB::createSchema() {
@@ -137,6 +177,9 @@ void PFM_DB::createSchema() {
         createTable(pszCreateRCTable);
         createTable(pszCreateTransationTable);
         createTable(pszCreateCarriedOverTable);
+
+        // createView(pszCreateListRCView);
+        // createView(pszCreateListTransationView);
 
         createCurrencies();
         createDefaultCategories();

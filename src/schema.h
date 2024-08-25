@@ -327,4 +327,51 @@ static const char * pszCreateCarriedOverTable =
     "updated TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id));";
 
+/*
+** Create views, do this last...
+*/
+const char * pszCreateListRCView = 
+    "CREATE VIEW v_recurring_charge_list " \
+    "AS SELECT " \
+    "rc.id," \
+    "rc.account_id," \
+    "rc.category_id," \
+    "cat.code AS category_code," \
+    "rc.payee_id," \
+    "pay.code AS payee_code,"
+    "rc.date," \
+    "rc.end_date," \
+    "rc.description," \
+    "rc.amount," \
+    "rc.frequency," \
+    "rc.created," \
+    "rc.updated " \
+    "FROM recurring_charge rc " \
+    "LEFT JOIN category cat ON cat.id = rc.category_id " \
+    "LEFT JOIN payee pay ON pay.id = rc.payee_id;";
+
+static const char * pszCreateListTransationView = 
+    "CREATE VIEW v_transaction_list " \
+    "AS SELECT " \
+    "tr.id," \
+    "tr.account_id," \
+    "tr.category_id," \
+    "cat.code AS category_code," \
+    "tr.payee_id," \
+    "pay.code AS payee_code,"
+    "tr.recurring_charge_id,"
+    "tr.date," \
+    "tr.reference," \
+    "tr.description," \
+    "tr.credit_debit," \
+    "tr.amount," \
+    "tr.is_reconciled," \
+    "tr.created," \
+    "tr.updated " \
+    "FROM account_transaction tr," \
+    "category cat," \
+    "payee pay " \
+    "WHERE cat.id = tr.category_id " \
+    "AND pay.id = tr.payee_id;";
+
 #endif

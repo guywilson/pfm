@@ -9,6 +9,8 @@ using namespace std;
 #ifndef __PFM_ERROR
 #define __PFM_ERROR
 
+#define MESSAGE_BUFFER_LEN                  4096
+
 class pfm_error : public exception
 {
     private:
@@ -42,18 +44,15 @@ class pfm_error : public exception
             return this->message.c_str();
         }
 
-        static const char * buildMsg(const char * fmt, ...) {
+        static char * buildMsg(const char * fmt, ...) {
             va_list     args;
             char *      buffer;
-            size_t      length;
 
             va_start(args, fmt);
             
-            length = strlen(fmt) + 512;
-
-            buffer = (char *)malloc(length);
+            buffer = (char *)malloc(MESSAGE_BUFFER_LEN);
             
-            vsnprintf(buffer, length, fmt, args);
+            vsnprintf(buffer, MESSAGE_BUFFER_LEN, fmt, args);
             
             va_end(args);
 
