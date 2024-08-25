@@ -127,23 +127,31 @@ int Logger::logMessage(int logLevel, const char * fmt, va_list args) {
 
         switch (logLevel) {
             case LOG_LEVEL_DEBUG:
-                buffer += "[DBG]";
+                buffer += "[DEBUG]";
                 break;
 
             case LOG_LEVEL_STATUS:
-                buffer += "[STA]";
+                buffer += "[STATUS]";
                 break;
 
             case LOG_LEVEL_INFO:
-                buffer += "[INF]";
+                buffer += "[INFO]";
+                break;
+
+            case LOG_LEVEL_ENTRY:
+                buffer += "[ENTRY]";
+                break;
+
+            case LOG_LEVEL_EXIT:
+                buffer += "[EXIT]";
                 break;
 
             case LOG_LEVEL_ERROR:
-                buffer += "[ERR]";
+                buffer += "[ERROR]";
                 break;
 
             case LOG_LEVEL_FATAL:
-                buffer += "[FTL]";
+                buffer += "[FATAL]";
                 break;
         }
 
@@ -198,6 +206,32 @@ int Logger::logDebug(const char * fmt, ...) {
     va_start (args, fmt);
     
     bytesWritten = logMessage(LOG_LEVEL_DEBUG, fmt, args);
+    
+    va_end(args);
+    
+    return bytesWritten;
+}
+
+int Logger::logEntry(const char * fmt, ...) {
+    va_list     args;
+    int         bytesWritten;
+
+    va_start (args, fmt);
+    
+    bytesWritten = logMessage(LOG_LEVEL_ENTRY, fmt, args);
+    
+    va_end(args);
+    
+    return bytesWritten;
+}
+
+int Logger::logExit(const char * fmt, ...) {
+    va_list     args;
+    int         bytesWritten;
+
+    va_start (args, fmt);
+    
+    bytesWritten = logMessage(LOG_LEVEL_EXIT, fmt, args);
     
     va_end(args);
     

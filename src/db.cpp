@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <pthread.h>
 #include <sqlite3.h>
 
 #include "logger.h"
@@ -63,140 +64,61 @@ sqlite3 * PFM_DB::getHandle() {
     return this->dbHandle;
 }
 
+bool PFM_DB::getIsTransactionActive() {
+    bool active;
+
+    pthread_mutex_lock(&mutex);
+    active = isTransactionActive;
+    pthread_mutex_unlock(&mutex);
+
+    return active;
+}
+
+void PFM_DB::setIsTransactionActive() {
+    pthread_mutex_lock(&mutex);
+    isTransactionActive = true;
+    pthread_mutex_unlock(&mutex);
+}
+
+void PFM_DB::clearIsTransactionActive() {
+    pthread_mutex_lock(&mutex);
+    isTransactionActive = false;
+    pthread_mutex_unlock(&mutex);
+}
+
+void PFM_DB::createTable(const char * sql) {
+    char * pszErrorMsg;
+    
+    log.logDebug("Creating table with sql %s", sql);
+
+    int error = sqlite3_exec(dbHandle, sql, NULL, NULL, &pszErrorMsg);
+
+    if (error) {
+        log.logError("Failed to create table with error '%s'", pszErrorMsg);
+
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to create table with statement '%s' with error %s",
+                sql,
+                pszErrorMsg), 
+            __FILE__, 
+            __LINE__);
+    }
+}
+
 void PFM_DB::createSchema() {
     int     error = SQLITE_OK;
     char *  pszErrorMsg;
 
-    pszErrorMsg = (char *)sqlite3_malloc(SQLITE_ERROR_BUFFER_LEN);
-
     try {
-        error = sqlite3_exec(
-                        dbHandle, 
-                        pszCreateConfigTable,
-                        NULL,
-                        NULL,
-                        &pszErrorMsg);
-
-        if (error) {
-            throw pfm_error(
-                pfm_error::buildMsg(
-                    "Execute failed in createSchema(): %s", 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-        }
-
-        error = sqlite3_exec(
-                        dbHandle, 
-                        pszCreateCurrencyTable,
-                        NULL,
-                        NULL,
-                        &pszErrorMsg);
-
-        if (error) {
-            throw pfm_error(
-                pfm_error::buildMsg(
-                    "Execute failed in createSchema(): %s", 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-        }
-
-        error = sqlite3_exec(
-                        dbHandle, 
-                        pszCreateAccountTable,
-                        NULL,
-                        NULL,
-                        &pszErrorMsg);
-
-        if (error) {
-            throw pfm_error(
-                pfm_error::buildMsg(
-                    "Execute failed in createSchema(): %s", 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-        }
-
-        error = sqlite3_exec(
-                        dbHandle, 
-                        pszCreateCategoryTable,
-                        NULL,
-                        NULL,
-                        &pszErrorMsg);
-
-        if (error) {
-            throw pfm_error(
-                pfm_error::buildMsg(
-                    "Execute failed in createSchema(): %s", 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-        }        
-
-        error = sqlite3_exec(
-                        dbHandle, 
-                        pszCreatePayeeTable,
-                        NULL,
-                        NULL,
-                        &pszErrorMsg);
-
-        if (error) {
-            throw pfm_error(
-                pfm_error::buildMsg(
-                    "Execute failed in createSchema(): %s", 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-        }        
-
-        error = sqlite3_exec(
-                        dbHandle, 
-                        pszCreateRCTable,
-                        NULL,
-                        NULL,
-                        &pszErrorMsg);
-
-        if (error) {
-            throw pfm_error(
-                pfm_error::buildMsg(
-                    "Execute failed in createSchema(): %s", 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-        }        
-
-        error = sqlite3_exec(
-                        dbHandle, 
-                        pszCreateTransationTable,
-                        NULL,
-                        NULL,
-                        &pszErrorMsg);
-
-        if (error) {
-            throw pfm_error(
-                pfm_error::buildMsg(
-                    "Execute failed in createSchema(): %s", 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-        }
-
-        error = sqlite3_exec(
-                        dbHandle, 
-                        pszCreateCarriedOverTable,
-                        NULL,
-                        NULL,
-                        &pszErrorMsg);
-
-        if (error) {
-            throw pfm_error(
-                pfm_error::buildMsg(
-                    "Execute failed in createSchema(): %s", 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-        }
+        createTable(pszCreateConfigTable);
+        createTable(pszCreateCurrencyTable);
+        createTable(pszCreateAccountTable);
+        createTable(pszCreateCategoryTable);
+        createTable(pszCreatePayeeTable);
+        createTable(pszCreateRCTable);
+        createTable(pszCreateTransationTable);
+        createTable(pszCreateCarriedOverTable);
 
         DBCategory category;
 
@@ -234,17 +156,13 @@ void PFM_DB::createSchema() {
         }
     }
     catch (pfm_error & e) {
-        sqlite3_free(pszErrorMsg);
+        log.logError("Failed to create schema: %s", e.what());
         throw e;
     }
-    
-    sqlite3_free(pszErrorMsg);
 }
 
 void PFM_DB::begin() {
-    Logger & log = Logger::getInstance();
-
-    if (isTransactionActive) {
+    if (getIsTransactionActive()) {
         log.logInfo("Begin transaction - transaction already active, skipping");
         return;
     }
@@ -265,13 +183,11 @@ void PFM_DB::begin() {
             __LINE__);
     }
 
-    isTransactionActive = true;
+    setIsTransactionActive();
 }
 
 void PFM_DB::commit() {
-    Logger & log = Logger::getInstance();
-
-    if (!isTransactionActive) {
+    if (!getIsTransactionActive()) {
         log.logInfo("Commit transaction - no transaction active, skipping");
         return;
     }
@@ -292,13 +208,11 @@ void PFM_DB::commit() {
             __LINE__);
     }
 
-    isTransactionActive = false;
+    clearIsTransactionActive();
 }
 
 void PFM_DB::rollback() {
-    Logger & log = Logger::getInstance();
-
-    if (!isTransactionActive) {
+    if (!getIsTransactionActive()) {
         log.logInfo("Rollback transaction - no transaction active, skipping");
         return;
     }
@@ -319,5 +233,5 @@ void PFM_DB::rollback() {
             __LINE__);
     }
 
-    isTransactionActive = false;
+    clearIsTransactionActive();
 }

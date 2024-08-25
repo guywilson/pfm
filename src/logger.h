@@ -16,10 +16,13 @@ using namespace std;
 #define LOG_LEVEL_INFO          0x01
 #define LOG_LEVEL_STATUS        0x02
 #define LOG_LEVEL_DEBUG         0x04
-#define LOG_LEVEL_ERROR         0x08
-#define LOG_LEVEL_FATAL         0x10
+#define LOG_LEVEL_ENTRY         0x08
+#define LOG_LEVEL_EXIT          0x10
+#define LOG_LEVEL_ENTRYEXIT     (LOG_LEVEL_ENTRY | LOG_LEVEL_EXIT)
+#define LOG_LEVEL_ERROR         0x40
+#define LOG_LEVEL_FATAL         0x80
 
-#define LOG_LEVEL_ALL           (LOG_LEVEL_INFO | LOG_LEVEL_STATUS | LOG_LEVEL_DEBUG | LOG_LEVEL_ERROR | LOG_LEVEL_FATAL)
+#define LOG_LEVEL_ALL           (LOG_LEVEL_INFO | LOG_LEVEL_STATUS | LOG_LEVEL_DEBUG | LOG_LEVEL_ENTRYEXIT | LOG_LEVEL_ERROR | LOG_LEVEL_FATAL)
 
 class Logger
 {
@@ -57,6 +60,8 @@ public:
     int logInfo(const char * fmt, ...);
     int logStatus(const char * fmt, ...);
     int logDebug(const char * fmt, ...);
+    int logEntry(const char * fmt, ...);
+    int logExit(const char * fmt, ...);
     int logError(const char * fmt, ...);
     int logFatal(const char * fmt, ...);
 };

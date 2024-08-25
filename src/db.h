@@ -1,9 +1,10 @@
 #include <string>
 #include <stdint.h>
 
+#include <pthread.h>
 #include <sqlite3.h>
 
-#include "db_criteria.h"
+#include "logger.h"
 
 using namespace std;
 
@@ -30,11 +31,18 @@ class PFM_DB {
     private:
         sqlite3 * dbHandle;
         bool isTransactionActive;
+        pthread_mutex_t mutex;
+        Logger & log = Logger::getInstance();
 
         PFM_DB() {
             isTransactionActive = false;
         }
 
+        bool getIsTransactionActive();
+        void setIsTransactionActive();
+        void clearIsTransactionActive();
+
+        void createTable(const char * sql);
         void createSchema();
 
     public:
