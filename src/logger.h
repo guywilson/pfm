@@ -24,8 +24,7 @@ using namespace std;
 
 #define LOG_LEVEL_ALL           (LOG_LEVEL_INFO | LOG_LEVEL_STATUS | LOG_LEVEL_DEBUG | LOG_LEVEL_ENTRYEXIT | LOG_LEVEL_ERROR | LOG_LEVEL_FATAL)
 
-class Logger
-{
+class Logger {
 public:
     static Logger & getInstance() {
         static Logger instance;
