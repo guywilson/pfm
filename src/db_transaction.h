@@ -6,7 +6,6 @@
 
 #include <sqlite3.h>
 
-#include "db_criteria.h"
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_recurring_charge.h"

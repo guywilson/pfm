@@ -6,7 +6,6 @@
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_transaction.h"
-#include "db_criteria.h"
 
 using namespace std;
 

@@ -20,7 +20,6 @@
 
 using namespace std;
 
-
 bool validateCreditDebit(const char * pszCD) {
     if (strlen(pszCD) != 2) {
         return false;
