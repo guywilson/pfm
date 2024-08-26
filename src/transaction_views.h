@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "pfm_error.h"
-#include "utils.h"
 #include "cli_widget.h"
 #include "custom_widgets.h"
 #include "db_transaction.h"

@@ -9,7 +9,6 @@
 #include <readline/history.h>
 
 #include "db.h"
-#include "utils.h"
 #include "cache.h"
 #include "cli.h"
 #include "strdate.h"
@@ -265,135 +264,13 @@ void list_transactions(DBAccount & account) {
 }
 
 void find_transactions(DBAccount & account) {
-    int                     numCriteria = 0;
-    bool                    isDateValid = false;
-    bool                    isCreditDebitValid = false;
-    bool                    isReconciledValid = false;
-    DBCriteria              criterion[8];
+    FindTransactionView findView;
+    findView.show();
 
-    cout << "*** Find transactions ***" << endl;
+    string criteria = findView.getCriteria();
 
-    using_history();
-    clear_history();
-
-    DBResult<DBCategory> catResult;
-    catResult.retrieveAll();
-
-    for (int i = 0;i < catResult.getNumRows();i++) {
-        add_history(catResult.getResultAt(i).code.c_str());
-    }
-
-    const db_operator ops1[] = {db_operator::equals};
-    int hasCategory = readCriteria("category_code", db_column_type::text, true, ops1, 1, &criterion[numCriteria]);
-
-    if (hasCategory) {
-        DBCriteria * criteria = &criterion[numCriteria++];
-
-        DBCategory category;
-        category.retrieveByCode(criteria->value);
-
-        char buffer[32];
-        snprintf(buffer, 32, "%lld", category.id);
-
-        criteria->columnName = "category_id";
-        criteria->columnType = db_column_type::numeric;
-        criteria->value = buffer;
-    }
-
-    using_history();
-    clear_history();
-
-    DBResult<DBPayee> payResult;
-    payResult.retrieveAll();
-
-    for (int i = 0;i < payResult.getNumRows();i++) {
-        add_history(payResult.getResultAt(i).code.c_str());
-    }
-
-    const db_operator ops2[] = {db_operator::equals};
-    int hasPayee = readCriteria("payee_code", db_column_type::text, false, ops2, 1, &criterion[numCriteria]);
-
-    if (hasPayee) {
-        DBCriteria * criteria = &criterion[numCriteria++];
-
-        DBPayee payee;
-        payee.retrieveByCode(criteria->value);
-
-        criteria->columnName = "payee_id";
-        criteria->columnType = db_column_type::numeric;
-        criteria->value = payee.id;
-    }
-
-    while (!isDateValid) {
-        const db_operator ops3[] = {
-                    db_operator::equals, 
-                    db_operator::less_than, 
-                    db_operator::less_than_or_equal_to, 
-                    db_operator::greater_than, 
-                    db_operator::greater_than_or_equal_to};
-        int hasDate = readCriteria("date", db_column_type::text, false, ops3, 5, &criterion[numCriteria]);
-
-        if (hasDate) {
-            isDateValid = StrDate::isDateValid(criterion[numCriteria].value);
-
-            if (isDateValid) {
-                numCriteria++;
-            }
-        }
-        else {
-            isDateValid = true;
-        }
-    }
-
-    const db_operator ops4[] = {db_operator::equals, db_operator::like};
-    numCriteria += readCriteria("description", db_column_type::text, false, ops4, 2, &criterion[numCriteria]);
-
-    while (!isCreditDebitValid) {
-        const db_operator ops5[] = {db_operator::equals};
-        int hasCreditDebit = readCriteria("credit_debit", db_column_type::text, false, ops5, 1, &criterion[numCriteria]);
-
-        if (hasCreditDebit) {
-            isCreditDebitValid = validateCreditDebit(criterion[numCriteria].value.c_str());
-
-            if (hasCreditDebit) {
-                numCriteria++;
-            }
-        }
-        else {
-            isCreditDebitValid = true;
-        }
-    }
-
-    const db_operator ops6[] = {
-                    db_operator::equals, 
-                    db_operator::greater_than,
-                    db_operator::greater_than_or_equal_to,
-                    db_operator::less_than,
-                    db_operator::less_than_or_equal_to};
-    numCriteria += readCriteria("amount", db_column_type::numeric, false, ops6, 5, &criterion[numCriteria]);
-
-    while (!isReconciledValid) {
-        const db_operator ops7[] = {db_operator::equals};
-        int hasReconciled = readCriteria("is_reconciled", db_column_type::text, false, ops7, 1, &criterion[numCriteria]);
-
-        if (hasReconciled) {
-            isReconciledValid = (criterion[numCriteria].value.at(0) == 'Y' || criterion[numCriteria].value.at(0) == 'N');
-
-            if (isReconciledValid) {
-                numCriteria++;
-            }
-        }
-        else {
-            isReconciledValid = true;
-        }
-    }
-
-    DBResult<DBTransaction> result;
-
-    if (numCriteria) {
-        DBTransaction tr;
-        result = tr.findTransactionsForAccountID(account.id, criterion, numCriteria);
-    }
+    DBTransaction tr;
+    DBResult<DBTransaction> result = tr.findTransactionsForAccountID(account.id, criteria);
 
     TransactionListView view;
     view.addResults(result, account.code);

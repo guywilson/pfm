@@ -330,10 +330,7 @@ class DBTransaction : public DBPayment {
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
         DBResult<DBTransaction> retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransaction> findTransactionsForAccountID(
-                                    pfm_id_t accountId, 
-                                    DBCriteria * criteria, 
-                                    int numCriteria);
+        DBResult<DBTransaction> findTransactionsForAccountID(pfm_id_t accountId, string & criteria);
 };
 
 #endif

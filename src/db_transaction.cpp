@@ -81,11 +81,7 @@ int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
     return result.getNumRows();
 }
 
-DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(
-                                            pfm_id_t accountId, 
-                                            DBCriteria * criteria, 
-                                            int numCriteria)
-{
+DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(pfm_id_t accountId, string & criteria) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     int sqlRowLimit = SQL_ROW_LIMIT;
     DBResult<DBTransaction> result;
@@ -96,70 +92,16 @@ DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(
         sqlSelectByAccountID, 
         accountId);
 
-    if (numCriteria > 0 && criteria != NULL) {
+    if (criteria.length() > 0) {
         /*
         ** Remove the trailing ';' from the statement...
         */
         szStatement[strlen(szStatement) - 1] = 0;
 
-        for (int i = 0;i < numCriteria;i++) {
-            strcat(szStatement, " AND ");
-            strcat(szStatement, criteria[i].columnName.c_str());
-            strcat(szStatement, " ");
-
-            switch (criteria[i].operation) {
-                case less_than:
-                    strcat(szStatement, "< ");
-                    break;
-
-                case less_than_or_equal_to:
-                    strcat(szStatement, "<= ");
-                    break;
-
-                case greater_than:
-                    strcat(szStatement, "> ");
-                    break;
-
-                case greater_than_or_equal_to:
-                    strcat(szStatement, ">= ");
-                    break;
-
-                case equals:
-                    strcat(szStatement, "= ");
-                    break;
-
-                case not_equals:
-                    strcat(szStatement, "<> ");
-                    break;
-
-                case like:
-                    strcat(szStatement, "~ ");
-                    break;
-
-                case unknown:
-                    break;
-            }
-
-            switch (criteria[i].columnType) {
-                case db_column_type::date:
-                    strcat(szStatement, "'");
-                    strcat(szStatement, criteria[i].value.c_str());
-                    strcat(szStatement, "'");
-                    break;
-
-                case db_column_type::text:
-                    strcat(szStatement, "'");
-                    strcat(szStatement, criteria[i].value.c_str());
-                    strcat(szStatement, "'");
-                    break;
-
-                case db_column_type::numeric:
-                    strcat(szStatement, criteria[i].value.c_str());
-                    break;
-            }
-        }
+        strcat(szStatement, " AND ");
+        strcat(szStatement, criteria.c_str());
     }
-
+    
     snprintf(
         &szStatement[strlen(szStatement)], 
         SQL_STATEMENT_BUFFER_LEN, 
