@@ -17,12 +17,21 @@ using namespace std;
 class AddTransactionView : public CLIView {
     private:
         CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
-        PayeeSpinField payeeField = PayeeSpinField("Category code (max. 5 chars): ");
+        PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
         DateField dateField = DateField("Date (yyyy-mm-dd)[today]: ");
         CLITextField descriptionField = CLITextField("Description: ");
         CLITextField creditDebitField = CLITextField("Credit/Debit [DB]: ");
         CLICurrencyField amountField = CLICurrencyField("Amount: ");
         CLITextField isReconciledField = CLITextField("Is reconciled [N]: ");
+
+        bool strtobool(const char * yes_no) {
+            if (yes_no[0] == 'y' || yes_no[0] == 'Y') {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
 
     public:
         AddTransactionView() : AddTransactionView("Add transaction") {}
@@ -171,6 +180,18 @@ class UpdateTransactionView : public CLIView {
         CLICurrencyField amountField;
         CLITextField isReconciledField;
 
+        bool decodeCreditDebit(const char * credit_debit) {
+            if (strncmp(credit_debit, "CR", 2) == 0) {
+                return true;
+            }
+            else if (strncmp(credit_debit, "DB", 2) == 0) {
+                return false;
+            }
+            else {
+                return false;
+            }
+        }
+
     public:
         UpdateTransactionView() : UpdateTransactionView("Update transaction") {}
         UpdateTransactionView(const char * title) : CLIView(title) {}
@@ -237,6 +258,192 @@ class UpdateTransactionView : public CLIView {
             transaction.amount = amountField.getValue();
 
             return transaction;
+        }
+};
+
+class FindTransactionByPayeeView : CLIView {
+    private:
+        PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
+        DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
+        DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+
+    public:
+        FindTransactionByPayeeView() : FindTransactionByPayeeView("Find transaction (by payee)") {}
+
+        FindTransactionByPayeeView(const char * title) : CLIView(title) {
+            string today = StrDate::today();
+            beforeDateField.setDefaultValue(today);
+        }
+
+        void show() override {
+            CLIView::show();
+
+            payeeField.show();
+            afterDateField.show();
+            beforeDateField.show();
+        }
+
+        string getCriteria() {
+            static string criteria;
+
+            DBPayee payee = payeeField.getPayee();
+
+            char buffer[32];
+            snprintf(buffer, 16, "payee_id = %lld", payee.id);
+            criteria = buffer;
+
+            if (afterDateField.getValue().length() > 0) {
+                criteria += " AND date > '" + afterDateField.getValue() + "'";
+            }
+
+            if (beforeDateField.getValue().length() > 0) {
+                criteria += " AND date <= '" + beforeDateField.getValue() + "'";
+            }
+
+            return criteria;
+        }
+};
+
+class FindTransactionByCategoryView : CLIView {
+    private:
+        CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
+        DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
+        DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+
+    public:
+        FindTransactionByCategoryView() : FindTransactionByCategoryView("Find transaction (by category)") {}
+
+        FindTransactionByCategoryView(const char * title) : CLIView(title) {
+            string today = StrDate::today();
+            beforeDateField.setDefaultValue(today);
+        }
+
+        void show() override {
+            CLIView::show();
+
+            categoryField.show();
+            afterDateField.show();
+            beforeDateField.show();
+        }
+
+        string getCriteria() {
+            static string criteria;
+
+            DBCategory category = categoryField.getCategory();
+
+            char buffer[32];
+            snprintf(buffer, 16, "category_id = %lld", category.id);
+            criteria = buffer;
+
+            if (afterDateField.getValue().length() > 0) {
+                criteria += " AND date > '" + afterDateField.getValue() + "'";
+            }
+
+            if (beforeDateField.getValue().length() > 0) {
+                criteria += " AND date <= '" + beforeDateField.getValue() + "'";
+            }
+
+            return criteria;
+        }
+};
+
+class FindTransactionByDescriptionView : CLIView {
+    private:
+        CLITextField descriptionField = CLITextField("Transaction description: ");
+        DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
+        DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+
+    public:
+        FindTransactionByDescriptionView() : FindTransactionByDescriptionView("Find transaction (by description)") {}
+
+        FindTransactionByDescriptionView(const char * title) : CLIView(title) {
+            string today = StrDate::today();
+            beforeDateField.setDefaultValue(today);
+        }
+
+        void show() override {
+            CLIView::show();
+
+            descriptionField.show();
+            afterDateField.show();
+            beforeDateField.show();
+        }
+
+        string getCriteria() {
+            static string criteria;
+
+            string description = descriptionField.getValue();
+
+            criteria = "description~= '*" + description + "*'";
+
+            if (afterDateField.getValue().length() > 0) {
+                criteria += " AND date > '" + afterDateField.getValue() + "'";
+            }
+
+            if (beforeDateField.getValue().length() > 0) {
+                criteria += " AND date <= '" + beforeDateField.getValue() + "'";
+            }
+
+            return criteria;
+        }
+};
+
+class FindTransactionByDateView : CLIView {
+    private:
+        DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
+        DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+
+    public:
+        FindTransactionByDateView() : FindTransactionByDateView("Find transaction (by date)") {}
+
+        FindTransactionByDateView(const char * title) : CLIView(title) {
+            string today = StrDate::today();
+            beforeDateField.setDefaultValue(today);
+        }
+
+        void show() override {
+            CLIView::show();
+
+            afterDateField.show();
+            beforeDateField.show();
+        }
+
+        string getCriteria() {
+            static string criteria;
+
+            if (afterDateField.getValue().length() > 0) {
+                criteria += " date > '" + afterDateField.getValue() + "'";
+            }
+
+            if (beforeDateField.getValue().length() > 0) {
+                if (afterDateField.getValue().length() > 0) {
+                    criteria += " AND";
+                }
+
+                criteria += " date <= '" + beforeDateField.getValue() + "'";
+            }
+
+            return criteria;
+        }
+};
+
+class FindTransactionView : CLIView {
+    private:
+        CLITextField criteriaField = CLITextField("WHERE: ");
+
+    public:
+        FindTransactionView() : FindTransactionView("Find transaction (by SQL criteria)") {}
+
+        FindTransactionView(const char * title) : CLIView(title) {}
+
+        void show() override {
+            CLIView::show();
+
+            criteriaField.show();
+        }
+
+        string getCriteria() {
+            return criteriaField.getValue();
         }
 };
 

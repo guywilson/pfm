@@ -21,6 +21,19 @@
 
 using namespace std;
 
+
+bool validateCreditDebit(const char * pszCD) {
+    if (strlen(pszCD) != 2) {
+        return false;
+    }
+    else if (strncmp(pszCD, "CR", 2) != 0 && strncmp(pszCD, "DB", 2) != 0) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 void add_account() {
     AddAccountView view;
     view.show();

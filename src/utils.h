@@ -14,9 +14,5 @@ int         readCriteria(
                 const db_operator acceptedOperators[], 
                 int numCriteria, 
                 DBCriteria * pCriteria);
-bool        validatePaymentFrequency(char * pszFrequency);
-bool        strtobool(const char * yes_no);
-bool        decodeCreditDebit(const char * credit_debit);
-bool        validateCreditDebit(const char * pszCD);
 
 #endif

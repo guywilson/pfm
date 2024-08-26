@@ -327,6 +327,32 @@ static const char * pszCreateCarriedOverTable =
     "updated TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id));";
 
+static const char * pszCreateBudgetTable = 
+    "CREATE TABLE budget (" \
+    "id INTEGER PRIMARY KEY," \
+    "start_date TEXT NOT NULL," \
+    "end_date TEXT NOT NULL," \
+    "category_id INTEGER," \
+    "payee_id INTEGER," \
+    "description TEXT NOT NULL," \
+    "ideal_budget NUMERIC NOT NULL," \
+    "min_budget NUMERIC NOT NULL," \
+    "max_budget NUMERIC NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
+    "FOREIGN KEY(payee_id) REFERENCES payee(id)," \
+    "FOREIGN KEY(category_id) REFERENCES category(id));";
+
+static const char * pszCreateBudgetTrackTable = 
+    "CREATE TABLE period_budget_track (" \
+    "id INTEGER PRIMARY KEY," \
+    "budget_id INTEGER NOT NULL," \
+    "date TEXT NOT NULL," \
+    "balance NUMERIC NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
+    "FOREIGN KEY(budget_id) REFERENCES budget(id));";
+
 /*
 ** Create views, do this last...
 */
