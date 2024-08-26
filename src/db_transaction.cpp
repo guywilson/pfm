@@ -26,7 +26,7 @@ DBResult<DBTransaction> DBTransaction::retrieveByStatementAndID(const char * sql
         sqlSelect, 
         id);
 
-    result.executeSelect(szStatement);
+    result.retrieve(szStatement);
 
     return result;
 }
@@ -58,7 +58,7 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, d
         strcat(szStatement, ";");
     }
 
-    result.executeSelect(szStatement);
+    result.retrieve(szStatement);
 
     return result;
 }
@@ -166,7 +166,7 @@ DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(
         " ORDER BY date DESC LIMIT %d;", 
         sqlRowLimit);
 
-    result.executeSelect(szStatement);
+    result.retrieve(szStatement);
 
     return result;
 }
@@ -183,7 +183,7 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t 
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());
 
-    result.executeSelect(szStatement);
+    result.retrieve(szStatement);
 
     return result;
 }

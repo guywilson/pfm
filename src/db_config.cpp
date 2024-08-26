@@ -23,7 +23,7 @@ void DBConfig::retrieveByKey(string & key) {
         sqlSelectByKey, 
         key.c_str());
 
-    int rowsRetrievedCount = result.executeSelect(szStatement);
+    int rowsRetrievedCount = result.retrieve(szStatement);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(

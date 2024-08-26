@@ -23,7 +23,7 @@ void DBPayee::retrieveByCode(string & code) {
         sqlSelectByCode, 
         code.c_str());
 
-    int rowsRetrievedCount = result.executeSelect(szStatement);
+    int rowsRetrievedCount = result.retrieve(szStatement);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(

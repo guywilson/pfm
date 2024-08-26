@@ -22,21 +22,7 @@ pfm_id_t DBEntity::insert() {
 
     PFM_DB & db = PFM_DB::getInstance();
 
-    char * pszErrorMsg;
-
-    int error = sqlite3_exec(db.getHandle(), statement, NULL, NULL, &pszErrorMsg);
-
-    if (error) {
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Failed to execute statement '%s': %s",
-                    statement, 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-    }
-
-    return sqlite3_last_insert_rowid(db.getHandle());
+    return db.executeInsert(statement);
 }
 
 void DBEntity::update() {
@@ -48,23 +34,13 @@ void DBEntity::update() {
 
     PFM_DB & db = PFM_DB::getInstance();
 
-    char * pszErrorMsg;
-
-    int error = sqlite3_exec(db.getHandle(), statement, NULL, NULL, &pszErrorMsg);
-
-    if (error) {
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Failed to execute statement '%s': %s",
-                    statement, 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-    }
+    db.executeUpdate(statement);
 }
 
 void DBEntity::remove() {
     const char * statement = getDeleteStatement();
+
+    Logger & log = Logger::getInstance();
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -72,25 +48,8 @@ void DBEntity::remove() {
 
     beforeRemove();
 
-    Logger & log = Logger::getInstance();
-
     log.logDebug("Executing DELETE statement '%s'", statement);
-
-    char * pszErrorMsg;
-
-    int error = sqlite3_exec(db.getHandle(), statement, NULL, NULL, &pszErrorMsg);
-
-    if (error) {
-        db.rollback();
-
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Failed to execute statement '%s': %s",
-                    statement, 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-    }
+    db.executeDelete(statement);
 
     afterRemove();
 

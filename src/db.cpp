@@ -12,16 +12,28 @@
 #include <sqlite3.h>
 
 #include "logger.h"
-#include "db_base.h"
-#include "db_config.h"
-#include "db_currency.h"
-#include "db_category.h"
-#include "utils.h"
+#include "db.h"
 #include "strdate.h"
 #include "pfm_error.h"
 #include "schema.h"
 
 using namespace std;
+
+static inline int _retrieveCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
+    vector<DBRow> * rows = (vector<DBRow> *)p;
+    vector<DBColumn> columnVector;
+
+    for (int i = 0;i < numColumns;i++) {
+        DBColumn column(columnNames[i], columns[i]);
+        columnVector.push_back(column);
+    }
+
+    DBRow row(numColumns, columnVector);
+
+    rows->push_back(row);
+
+    return SQLITE_OK;
+}
 
 bool PFM_DB::open(string dbName) {
     log.logEntry("PFM_DB::open()");
@@ -66,10 +78,6 @@ PFM_DB::~PFM_DB() {
     log.logExit("PFM_DB::~PFM_DB()");
 }
 
-sqlite3 * PFM_DB::getHandle() {
-    return this->dbHandle;
-}
-
 bool PFM_DB::getIsTransactionActive() {
     log.logEntry("PFM_DB::getIsTransactionActive()");
 
@@ -102,7 +110,9 @@ void PFM_DB::clearIsTransactionActive() {
     log.logExit("PFM_DB::clearIsTransactionActive()");
 }
 
-void PFM_DB::executeSQL(const char * sql) {
+void PFM_DB::_executeSQLNoCallback(const char * sql) {
+    log.logEntry("PFM_DB::_executeSQLNoCallback()");
+
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, sql, NULL, NULL, &pszErrorMsg);
 
@@ -117,6 +127,29 @@ void PFM_DB::executeSQL(const char * sql) {
             __FILE__, 
             __LINE__);
     }
+
+    log.logExit("PFM_DB::_executeSQLNoCallback()");
+}
+
+void PFM_DB::_executeSQLCallback(const char * sql, vector<DBRow> * rows) {
+    log.logEntry("PFM_DB::_executeSQLCallback()");
+
+    char * pszErrorMsg;
+    int error = sqlite3_exec(dbHandle, sql, _retrieveCallback, rows, &pszErrorMsg);
+
+    if (error) {
+        log.logError("Failed to execute statement '%s' with error '%s'", sql, pszErrorMsg);
+
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to execute statement '%s' with error %s",
+                sql,
+                pszErrorMsg), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    log.logExit("PFM_DB::_executeSQLCallback()");
 }
 
 void PFM_DB::createTable(const char * sql) {
@@ -125,7 +158,7 @@ void PFM_DB::createTable(const char * sql) {
     log.logDebug("Creating table with sql %s", sql);
 
     try {
-        executeSQL(sql);
+        _executeSQLNoCallback(sql);
     }
     catch (pfm_error & e) {
         log.logError("Failed to create table with error '%s'", e.what());
@@ -148,7 +181,7 @@ void PFM_DB::createView(const char * sql) {
     log.logDebug("Creating view with sql %s", sql);
 
     try {
-        executeSQL(sql);
+        _executeSQLNoCallback(sql);
     }
     catch (pfm_error & e) {
         log.logError("Failed to create view with error '%s'", e.what());
@@ -198,15 +231,36 @@ void PFM_DB::createSchema() {
 void PFM_DB::createDefaultCategories() {
     log.logEntry("PFM_DB::createDefaultCategories()");
 
-    DBCategory category;
+    const char * insertStatement = 
+        "INSERT INTO category (code, description, created, updated) VALUES ('%s', '%s', '%s', '%s')";
 
-    for (int i = 0;i < NUM_DEFAULT_CATEGORIES;i++) {
-        category.clear();
+    char statement[SQL_STATEMENT_BUFFER_LEN];
 
-        category.code = defaultCategories[i][0];
-        category.description = defaultCategories[i][1];
+    string now = StrDate::getTimestamp();
 
-        category.save();
+    try {
+        begin();
+
+        for (int i = 0;i < NUM_DEFAULT_CATEGORIES;i++) {
+            snprintf(
+                statement, 
+                SQL_STATEMENT_BUFFER_LEN, 
+                insertStatement, 
+                defaultCategories[i][0], 
+                defaultCategories[i][1], 
+                now.c_str(), 
+                now.c_str());
+
+            executeInsert(statement);
+        }
+
+        commit();
+    }
+    catch (pfm_error & e) {
+        rollback();
+
+        log.logError("Failed to insert default categories");
+        throw pfm_error("Failed to insert default categories", __FILE__, __LINE__);
     }
 
     log.logExit("PFM_DB::createDefaultCategories()");
@@ -215,16 +269,37 @@ void PFM_DB::createDefaultCategories() {
 void PFM_DB::createDefaultConfig() {
     log.logEntry("PFM_DB::createDefaultConfig()");
 
-    DBConfig config;
+    const char * insertStatement = 
+        "INSERT INTO config (key, value, description, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s')";
 
-    for (int i = 0;i < NUM_CONFIG_ITEMS;i++) {
-        config.clear();
+    char statement[SQL_STATEMENT_BUFFER_LEN];
 
-        config.key = defaultConfig[i][0];
-        config.value = defaultConfig[i][1];
-        config.description = defaultConfig[i][2];
+    string now = StrDate::getTimestamp();
 
-        config.save();
+    try {
+        begin();
+
+        for (int i = 0;i < NUM_CONFIG_ITEMS;i++) {
+            snprintf(
+                statement, 
+                SQL_STATEMENT_BUFFER_LEN, 
+                insertStatement, 
+                defaultConfig[i][0], 
+                defaultConfig[i][1], 
+                defaultConfig[i][2], 
+                now.c_str(), 
+                now.c_str());
+
+            executeInsert(statement);
+        }
+
+        commit();
+    }
+    catch (pfm_error & e) {
+        rollback();
+
+        log.logError("Failed to insert default config");
+        throw pfm_error("Failed to insert default config", __FILE__, __LINE__);
     }
 
     log.logExit("PFM_DB::createDefaultConfig()");
@@ -233,19 +308,60 @@ void PFM_DB::createDefaultConfig() {
 void PFM_DB::createCurrencies() {
     log.logEntry("PFM_DB::createCurrencies()");
 
-    DBCurrency currency;
+    const char * insertStatement = 
+        "INSERT INTO currency (code, name, symbol, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s')";
 
-    for (int i = 0;i < NUM_CURRENCIES;i++) {
-        currency.clear();
+    char statement[SQL_STATEMENT_BUFFER_LEN];
 
-        currency.code = currencies[i][0];
-        currency.name = currencies[i][1];
-        currency.symbol = currencies[i][2];
+    string now = StrDate::getTimestamp();
 
-        currency.save();
+    try {
+        begin();
+
+        for (int i = 0;i < NUM_CURRENCIES;i++) {
+            snprintf(
+                statement, 
+                SQL_STATEMENT_BUFFER_LEN, 
+                insertStatement, 
+                currencies[i][0], 
+                currencies[i][1], 
+                currencies[i][2], 
+                now.c_str(), 
+                now.c_str());
+
+            executeInsert(statement);
+        }
+
+        commit();
+    }
+    catch (pfm_error & e) {
+        rollback();
+
+        log.logError("Failed to insert currencies");
+        throw pfm_error("Failed to insert currencies", __FILE__, __LINE__);
     }
 
     log.logExit("PFM_DB::createCurrencies()");
+}
+
+int PFM_DB::executeSelect(const char * statement, vector<DBRow> * rows) {
+    _executeSQLCallback(statement, rows);
+
+    return rows->size();
+}
+
+pfm_id_t PFM_DB::executeInsert(const char * statement) {
+    _executeSQLNoCallback(statement);
+
+    return sqlite3_last_insert_rowid(dbHandle);
+}
+
+void PFM_DB::executeUpdate(const char * statement) {
+    _executeSQLNoCallback(statement);
+}
+
+void PFM_DB::executeDelete(const char * statement) {
+    _executeSQLNoCallback(statement);
 }
 
 void PFM_DB::begin() {

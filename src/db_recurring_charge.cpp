@@ -24,7 +24,7 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t acco
         sqlSelectByAccountID, 
         accountId);
 
-    result.executeSelect(szStatement);
+    result.retrieve(szStatement);
 
     return result;
 }

@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include <stdint.h>
 
 #include <pthread.h>
@@ -21,6 +22,74 @@ typedef enum {
 }
 db_sort_t;
 
+typedef sqlite3_int64 pfm_id_t;
+
+class DBColumn {
+    private:
+        string name;
+        string value;
+
+    public:
+        DBColumn(const char * name, const char * value) {
+            this->name = name;
+            
+            /*
+            ** value will be NULL for blank NULLable columns...
+            */
+            if (value != NULL) {
+                this->value = value;
+            }
+        }
+
+        string getName() {
+            return name;
+        }
+
+        string getValue() {
+            return value;
+        }
+
+        double getDoubleValue() {
+            return strtod(value.c_str(), NULL);
+        }
+
+        long getIntValue() {
+            return strtol(value.c_str(), NULL, 10);
+        }
+
+        unsigned long getUnsignedIntValue() {
+            return strtoul(value.c_str(), NULL, 10);
+        }
+
+        bool getBoolValue() {
+            return ((value[0] == 'Y' || value[0] == 'y') ? true : false);
+        }
+
+        pfm_id_t getIDValue() {
+            return strtoll(value.c_str(), NULL, 10);
+        }
+};
+
+class DBRow {
+    private:
+        vector<DBColumn>  columns;
+
+    public:
+        DBRow(int numColumns, vector<DBColumn> & columnVector) {
+            for (int i = 0;i < columnVector.size();i++) {
+                columns.push_back(columnVector[i]);
+            }
+        }
+
+        size_t getNumColumns() {
+            return columns.size();
+        }
+
+        DBColumn getColumnAt(int i) {
+            return columns[i];
+        }
+};
+
 class PFM_DB {
     public:
         static PFM_DB & getInstance() {
@@ -38,14 +107,13 @@ class PFM_DB {
             isTransactionActive = false;
         }
 
-        void executeSQL(const char * sql);
+        void _executeSQLNoCallback(const char * sql);
+        void _executeSQLCallback(const char * sql, vector<DBRow> * rows);
 
         bool getIsTransactionActive();
         void setIsTransactionActive();
         void clearIsTransactionActive();
 
-        void createTable(const char * sql);
-        void createView(const char * sql);
         void createSchema();
 
         void createDefaultCategories();
@@ -57,7 +125,15 @@ class PFM_DB {
 
         bool open(string dbName);
 
-        sqlite3 * getHandle();
+        void createTable(const char * sql);
+        void createView(const char * sql);
+
+        int executeSelect(const char * statement, vector<DBRow> * rows);
+        
+        pfm_id_t executeInsert(const char * statement);
+
+        void executeUpdate(const char * statement);
+        void executeDelete(const char * statement);
 
         void begin();
         void commit();

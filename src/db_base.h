@@ -19,96 +19,12 @@ using namespace std;
 
 template <class T> class DBResult;
 
-typedef sqlite3_int64       pfm_id_t;
-
-class DBColumn {
-    private:
-        string name;
-        string value;
-
-    public:
-        DBColumn(const char * name, const char * value) {
-            this->name = name;
-            
-            /*
-            ** value will be NULL for blank NULLable columns...
-            */
-            if (value != NULL) {
-                this->value = value;
-            }
-        }
-
-        string getName() {
-            return name;
-        }
-
-        string getValue() {
-            return value;
-        }
-
-        double getDoubleValue() {
-            return strtod(value.c_str(), NULL);
-        }
-
-        long getIntValue() {
-            return strtol(value.c_str(), NULL, 10);
-        }
-
-        unsigned long getUnsignedIntValue() {
-            return strtoul(value.c_str(), NULL, 10);
-        }
-
-        bool getBoolValue() {
-            return ((value[0] == 'Y' || value[0] == 'y') ? true : false);
-        }
-
-        pfm_id_t getIDValue() {
-            return strtoll(value.c_str(), NULL, 10);
-        }
-};
-
-class DBRow {
-    private:
-        vector<DBColumn>  columns;
-
-    public:
-        DBRow(int numColumns, vector<DBColumn> & columnVector) {
-            for (int i = 0;i < columnVector.size();i++) {
-                columns.push_back(columnVector[i]);
-            }
-        }
-
-        size_t getNumColumns() {
-            return columns.size();
-        }
-
-        DBColumn getColumnAt(int i) {
-            return columns[i];
-        }
-};
-
 class DBEntity {
     private:
-        unordered_map<string, string> fieldHashMap;
-
         pfm_id_t insert();
         void update();
 
     protected:
-        void addColumnForField(string key, string columnName) {
-            fieldHashMap.insert({key, columnName});
-        }
-
-        string getColumnForField(string key) {
-            unordered_map<string, string>::const_iterator item = fieldHashMap.find(key);
-
-            if (item != fieldHashMap.end()) {
-                return item->second;
-            }
-
-            throw pfm_error(pfm_error::buildMsg("Field '%s' not found", key.c_str()));
-        }
-
         virtual void beforeInsert() {
             return;
         }
@@ -142,10 +58,6 @@ class DBEntity {
 
         DBEntity() {
             clear();
-
-            addColumnForField("id", "id");
-            addColumnForField("createdDate", "created");
-            addColumnForField("updatedDate", "updated");
         }
 
         DBEntity(const DBEntity & src) {
@@ -266,8 +178,6 @@ class Result {
         int getSequence() {
             return sequenceCounter;
         }
-
-        virtual void processRow(DBRow & row) {}
 };
 
 template <class T>
@@ -286,10 +196,9 @@ class DBResult : public Result {
             results.clear();
         }
 
-        int executeSelect(const char * sqlStatement);
-
         T retrieveByID(pfm_id_t id);
-        void retrieveAll();
+        int retrieve(const char * sqlStatement);
+        int retrieveAll();
 
         T getResultAt(int i) {
             if (getNumRows() > i) {
@@ -308,7 +217,7 @@ class DBResult : public Result {
             results.push_back(entity);
         }
 
-        void processRow(DBRow & row) override {
+        void processRow(DBRow & row) {
             T entity;
 
             for (size_t i = 0;i < row.getNumColumns();i++) {
@@ -325,66 +234,14 @@ class DBResult : public Result {
         }
 };
 
-static inline int _retrieveCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
-    vector<DBRow> * rows = (vector<DBRow> *)p;
-    vector<DBColumn> columnVector;
-
-    for (int i = 0;i < numColumns;i++) {
-        DBColumn column(columnNames[i], columns[i]);
-        columnVector.push_back(column);
-    }
-
-    DBRow row(numColumns, columnVector);
-
-    rows->push_back(row);
-
-    return SQLITE_OK;
-}
-
-template <class T>
-int DBResult<T>::executeSelect(const char * sqlStatement) {
-    vector<DBRow> rows;
-
-    Logger & log = Logger::getInstance();
-
-    log.logDebug("Executing SELECT statement '%s'", sqlStatement);
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    char * pszErrorMsg;
-
-    int error = sqlite3_exec(
-                db.getHandle(), 
-                sqlStatement, 
-                _retrieveCallback, 
-                &rows, 
-                &pszErrorMsg);
-
-    if (error) {
-        log.logError("Failed to execute statement '%s' with error '%s'", sqlStatement, pszErrorMsg);
-
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Failed to execute statement '%s': %s",
-                    sqlStatement, 
-                    pszErrorMsg), 
-                __FILE__, 
-                __LINE__);
-    }
-    else {
-        for (int i = 0;i < rows.size();i++) {
-            processRow(rows[i]);
-        }
-    }
-
-    return this->getNumRows();
-}
-
 template <class T>
 T DBResult<T>::retrieveByID(pfm_id_t id) {
     T entity;
+    vector<DBRow> rows;
 
-    int rowsRetrievedCount = executeSelect(entity.getSelectByIDStatement(id));
+    PFM_DB & db = PFM_DB::getInstance();
+
+    int rowsRetrievedCount = db.executeSelect(entity.getSelectByIDStatement(id), &rows);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
@@ -393,14 +250,40 @@ T DBResult<T>::retrieveByID(pfm_id_t id) {
                 __LINE__);
     }
 
+    processRow(rows[0]);
+
     return getResultAt(0);
 }
 
 template <class T>
-void DBResult<T>::retrieveAll() {
+int DBResult<T>::retrieveAll() {
     T entity;
+    vector<DBRow> rows;
 
-    executeSelect(entity.getSelectAllStatement());
+    PFM_DB & db = PFM_DB::getInstance();
+
+    int rowsRetrievedCount = db.executeSelect(entity.getSelectAllStatement(), &rows);
+
+    for (int i = 0;i < rowsRetrievedCount;i++) {
+        processRow(rows[i]);
+    }
+
+    return rowsRetrievedCount;
+}
+
+template <class T>
+int DBResult<T>::retrieve(const char * sqlStatement) {
+    vector<DBRow> rows;
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    int rowsRetrievedCount = db.executeSelect(sqlStatement, &rows);
+
+    for (int i = 0;i < rowsRetrievedCount;i++) {
+        processRow(rows[i]);
+    }
+
+    return rowsRetrievedCount;
 }
 
 #endif

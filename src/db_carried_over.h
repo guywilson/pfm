@@ -44,16 +44,6 @@ class DBCarriedOver : public DBEntity {
                         "ORDER BY date DESC " \
                         "LIMIT 1;";
 
-        const char * sqlSelectAll = 
-                        "SELECT id, " \
-                        "account_id," \
-                        "date," \
-                        "description," \
-                        "balance," \
-                        "created," \
-                        "updated " \
-                        "FROM carried_over_log;";
-
         const char * sqlInsert = 
                         "INSERT INTO carried_over_log (" \
                         "account_id," \

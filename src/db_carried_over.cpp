@@ -23,7 +23,7 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
         sqlSelectLatestByAccountId, 
         accountId);
 
-    int rowsRetrievedCount = result.executeSelect(szStatement);
+    int rowsRetrievedCount = result.retrieve(szStatement);
 
     if (rowsRetrievedCount == 1) {
         set(result.getResultAt(0));
@@ -42,7 +42,7 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
         sqlSelectByAccountId, 
         accountId);
 
-    result.executeSelect(sqlSelectAll);
+    result.retrieve(szStatement);
 
     return result;
 }
