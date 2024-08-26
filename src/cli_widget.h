@@ -577,34 +577,26 @@ class CLIFindView : public CLIView {
             return s;
         }
 
-        bool containsInsert(string & criteria) {
-            string upper = makeUpperCase(criteria);
+        bool doesExistInString(string & src, const char * checkStr) {
+            string upper = makeUpperCase(src);
 
-            if (upper.find("INSERT") == string::npos) {
+            if (upper.find(checkStr) == string::npos) {
                 return false;
             }
 
             return true;
+        }
+
+        bool containsInsert(string & criteria) {
+            return doesExistInString(criteria, "INSERT");
         }
 
         bool containsUpdate(string & criteria) {
-            string upper = makeUpperCase(criteria);
-
-            if (upper.find("UPDATE") == string::npos) {
-                return false;
-            }
-
-            return true;
+            return doesExistInString(criteria, "UPDATE");
         }
 
         bool containsDelete(string & criteria) {
-            string upper = makeUpperCase(criteria);
-
-            if (upper.find("DELETE") == string::npos) {
-                return false;
-            }
-
-            return true;
+            return doesExistInString(criteria, "DELETE");
         }
 
         virtual void validateCriteria(string & criteria) {
