@@ -100,6 +100,8 @@ class DBEntity {
 
         void remove();
         void save();
+        void retrieve();
+        void retrieve(pfm_id_t id);
 
         void clear() {
             this->id = 0;
@@ -196,7 +198,6 @@ class DBResult : public Result {
             results.clear();
         }
 
-        T retrieveByID(pfm_id_t id);
         int retrieve(const char * sqlStatement);
         int retrieveAll();
 
@@ -233,27 +234,6 @@ class DBResult : public Result {
             incrementNumRows();
         }
 };
-
-template <class T>
-T DBResult<T>::retrieveByID(pfm_id_t id) {
-    T entity;
-    vector<DBRow> rows;
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    int rowsRetrievedCount = db.executeSelect(entity.getSelectByIDStatement(id), &rows);
-
-    if (rowsRetrievedCount != 1) {
-        throw pfm_error(
-                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
-                __FILE__, 
-                __LINE__);
-    }
-
-    processRow(rows[0]);
-
-    return getResultAt(0);
-}
 
 template <class T>
 int DBResult<T>::retrieveAll() {

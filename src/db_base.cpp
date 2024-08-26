@@ -37,6 +37,44 @@ void DBEntity::update() {
     db.executeUpdate(statement);
 }
 
+void DBEntity::retrieve() {
+    retrieve(this->id);
+}
+
+void DBEntity::retrieve(pfm_id_t id) {
+    const char * statement = getSelectByIDStatement(id);
+
+    Logger & log = Logger::getInstance();
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    vector<DBRow> rows;
+
+    log.logDebug("Executing SELECT BY id statement '%s'", statement);
+    int rowsRetrievedCount = db.executeSelect(statement, &rows);
+
+    if (rowsRetrievedCount != 1) {
+        throw pfm_error(
+                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
+                __FILE__, 
+                __LINE__);
+    }
+
+    DBRow row = rows[0];
+
+    for (size_t i = 0;i < row.getNumColumns();i++) {
+        DBColumn column = row.getColumnAt(i);
+
+        assignColumn(column);
+    }
+    
+    /*
+    ** We're only returning a single row,
+    ** so sequence will always be 1...
+    */
+    onRowComplete(1);
+}
+
 void DBEntity::remove() {
     const char * statement = getDeleteStatement();
 

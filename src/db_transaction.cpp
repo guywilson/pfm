@@ -189,16 +189,16 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t 
 }
 
 void DBTransaction::afterInsert() {
-    DBResult<DBAccount> result;
-    DBAccount account = result.retrieveByID(accountId);
+    DBAccount account;
+    account.retrieve(accountId);
 
     account.currentBalance += this->getSignedAmount();
     account.save();
 }
 
 void DBTransaction::beforeUpdate() {
-    DBResult<DBTransaction> result;
-    DBTransaction transaction = result.retrieveByID(id);
+    DBTransaction transaction;
+    transaction.retrieve(id);
 
     /*
     ** If the amount has been updated on the transaction,
@@ -206,8 +206,8 @@ void DBTransaction::beforeUpdate() {
     ** current balance...
     */
     if (this->amount != transaction.amount) {
-        DBResult<DBAccount> result;
-        DBAccount account = result.retrieveByID(accountId);
+        DBAccount account;
+        account.retrieve(accountId);
 
         account.currentBalance -= transaction.getSignedAmount();
         account.currentBalance += this->getSignedAmount();
@@ -217,8 +217,8 @@ void DBTransaction::beforeUpdate() {
 }
 
 void DBTransaction::afterRemove() {
-    DBResult<DBAccount> result;
-    DBAccount account = result.retrieveByID(accountId);
+    DBAccount account;
+    account.retrieve(accountId);
 
     account.currentBalance -= getSignedAmount();
 
