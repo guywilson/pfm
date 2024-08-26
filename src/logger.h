@@ -25,44 +25,44 @@ using namespace std;
 #define LOG_LEVEL_ALL           (LOG_LEVEL_INFO | LOG_LEVEL_STATUS | LOG_LEVEL_DEBUG | LOG_LEVEL_ENTRYEXIT | LOG_LEVEL_ERROR | LOG_LEVEL_FATAL)
 
 class Logger {
-public:
-    static Logger & getInstance() {
-        static Logger instance;
-        return instance;
-    }
+    public:
+        static Logger & getInstance() {
+            static Logger instance;
+            return instance;
+        }
 
-private:
-    Logger() {}
+    private:
+        Logger() {}
 
-    FILE * lfp;
-    int loggingLevel;
-    pthread_mutex_t mutex;
+        FILE * lfp;
+        int loggingLevel;
+        pthread_mutex_t mutex;
 
-    static char * trim(const char * src);
+        static char * trim(const char * src);
 
-    int logMessage(int logLevel, const char * fmt, va_list args);
+        int logMessage(int logLevel, const char * fmt, va_list args);
 
-public:
-    ~Logger();
+    public:
+        ~Logger();
 
-    static int getLogLevelFromString(string & logLevel);
+        static int getLogLevelFromString(string & logLevel);
 
-    void initLogger(string & filename, int logLevel);
-    void initLogger(int logLevel);
-    
-    void closeLogger();
+        void initLogger(string & filename, int logLevel);
+        void initLogger(int logLevel);
+        
+        void closeLogger();
 
-    void setLogLevel(int logLevel);
-    bool isLogLevel(int logLevel);
+        void setLogLevel(int logLevel);
+        bool isLogLevel(int logLevel);
 
-    void newline();
-    int logInfo(const char * fmt, ...);
-    int logStatus(const char * fmt, ...);
-    int logDebug(const char * fmt, ...);
-    int logEntry(const char * fmt, ...);
-    int logExit(const char * fmt, ...);
-    int logError(const char * fmt, ...);
-    int logFatal(const char * fmt, ...);
+        void newline();
+        int logInfo(const char * fmt, ...);
+        int logStatus(const char * fmt, ...);
+        int logDebug(const char * fmt, ...);
+        int logEntry(const char * fmt, ...);
+        int logExit(const char * fmt, ...);
+        int logError(const char * fmt, ...);
+        int logFatal(const char * fmt, ...);
 };
 
 #endif
