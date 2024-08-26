@@ -302,6 +302,8 @@ class FindTransactionByPayeeView : public CLIFindView {
                 criteria += " AND date <= '" + beforeDateField.getValue() + "'";
             }
 
+            validateCriteria(criteria);
+            
             return criteria;
         }
 };
@@ -345,6 +347,8 @@ class FindTransactionByCategoryView : public CLIFindView {
                 criteria += " AND date <= '" + beforeDateField.getValue() + "'";
             }
 
+            validateCriteria(criteria);
+            
             return criteria;
         }
 };
@@ -376,7 +380,7 @@ class FindTransactionByDescriptionView : public CLIFindView {
 
             string description = descriptionField.getValue();
 
-            criteria = "description LIKE '*" + description + "*'";
+            criteria = "description LIKE '%" + description + "%'";
 
             if (afterDateField.getValue().length() > 0) {
                 criteria += " AND date > '" + afterDateField.getValue() + "'";
@@ -386,6 +390,8 @@ class FindTransactionByDescriptionView : public CLIFindView {
                 criteria += " AND date <= '" + beforeDateField.getValue() + "'";
             }
 
+            validateCriteria(criteria);
+            
             return criteria;
         }
 };
@@ -425,6 +431,8 @@ class FindTransactionByDateView : public CLIFindView {
                 criteria += " date <= '" + beforeDateField.getValue() + "'";
             }
 
+            validateCriteria(criteria);
+
             return criteria;
         }
 };
@@ -445,7 +453,11 @@ class FindTransactionView : public CLIFindView {
         }
 
         string getCriteria() override {
-            return criteriaField.getValue();
+            string criteria = criteriaField.getValue();
+
+            validateCriteria(criteria);
+
+            return criteria;
         }
 };
 
