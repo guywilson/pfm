@@ -15,26 +15,35 @@
 using namespace std;
 
 pfm_id_t DBEntity::insert() {
+    Logger & log = Logger::getInstance();
+    
+    log.logEntry("DBEntity::insert()");
+
     const char * statement = getInsertStatement();
 
-    Logger & log = Logger::getInstance();
     log.logDebug("Executing INSERT statement '%s'", statement);
 
     PFM_DB & db = PFM_DB::getInstance();
+
+    log.logExit("DBEntity::insert()");
 
     return db.executeInsert(statement);
 }
 
 void DBEntity::update() {
-    const char * statement = getUpdateStatement();
-
     Logger & log = Logger::getInstance();
+    
+    log.logEntry("DBEntity::update()");
+
+    const char * statement = getUpdateStatement();
 
     log.logDebug("Executing UPDATE statement '%s'", statement);
 
     PFM_DB & db = PFM_DB::getInstance();
 
     db.executeUpdate(statement);
+
+    log.logExit("DBEntity::update()");
 }
 
 void DBEntity::retrieve() {
@@ -42,9 +51,11 @@ void DBEntity::retrieve() {
 }
 
 void DBEntity::retrieve(pfm_id_t id) {
-    const char * statement = getSelectByIDStatement(id);
-
     Logger & log = Logger::getInstance();
+    
+    log.logEntry("DBEntity::retrieve()");
+
+    const char * statement = getSelectByIDStatement(id);
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -73,12 +84,16 @@ void DBEntity::retrieve(pfm_id_t id) {
     ** so sequence will always be 1...
     */
     onRowComplete(1);
+
+    log.logExit("DBEntity::retrieve()");
 }
 
 void DBEntity::remove() {
-    const char * statement = getDeleteStatement();
-
     Logger & log = Logger::getInstance();
+    
+    log.logEntry("DBEntity::remove()");
+
+    const char * statement = getDeleteStatement();
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -92,11 +107,16 @@ void DBEntity::remove() {
     afterRemove();
 
     db.commit();
+
+    log.logExit("DBEntity::remove()");
 }
 
 void DBEntity::save() {
-    PFM_DB & db = PFM_DB::getInstance();
     Logger & log = Logger::getInstance();
+    
+    log.logEntry("DBEntity::save()");
+
+    PFM_DB & db = PFM_DB::getInstance();
 
     try {
         db.begin();
@@ -120,4 +140,6 @@ void DBEntity::save() {
 
         throw e;
     }
+
+    log.logExit("DBEntity::save()");
 }

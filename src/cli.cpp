@@ -263,11 +263,49 @@ void list_transactions(DBAccount & account) {
 }
 
 void find_transactions(DBAccount & account) {
-    FindTransactionView findView;
-    findView.show();
+    cout << "How do you want to search for transactions:" << endl;
+    cout << "1) By category" << endl;
+    cout << "2) By payee" << endl;
+    cout << "3) By description" << endl;
+    cout << "4) Between dates" << endl;
 
-    string criteria = findView.getCriteria();
+    CLITextField optionField = CLITextField("Enter search option: ");
+    optionField.show();
 
+    int option = (int)optionField.getIntegerValue();
+
+    cout << "Option = " << option << endl;
+
+    CLIFindView * findView;
+
+    switch (option) {
+        case 1:
+            findView = new FindTransactionByCategoryView();
+            break;
+
+        case 2:
+            findView = new FindTransactionByPayeeView();
+            break;
+
+        case 3:
+            findView = new FindTransactionByDescriptionView();
+            break;
+
+        case 4:
+            findView = new FindTransactionByDateView();
+            break;
+
+        default:
+            findView = new FindTransactionView();
+            break;
+    }
+
+    findView->show();
+    
+    string criteria = findView->getCriteria();
+
+    delete findView;
+    
     DBTransaction tr;
     DBResult<DBTransaction> result = tr.findTransactionsForAccountID(account.id, criteria);
 

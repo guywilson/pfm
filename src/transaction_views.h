@@ -13,6 +13,9 @@ using namespace std;
 #ifndef __TRANSACTION_VIEW
 #define __TRANSACTION_VIEW
 
+#define PAYEE_ID_BUFFER_LENGTH                      32
+#define CATEGORY_ID_BUFFER_LENGTH                   32
+
 class AddTransactionView : public CLIView {
     private:
         CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
@@ -260,7 +263,7 @@ class UpdateTransactionView : public CLIView {
         }
 };
 
-class FindTransactionByPayeeView : CLIView {
+class FindTransactionByPayeeView : public CLIFindView {
     private:
         PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
         DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
@@ -269,26 +272,26 @@ class FindTransactionByPayeeView : CLIView {
     public:
         FindTransactionByPayeeView() : FindTransactionByPayeeView("Find transaction (by payee)") {}
 
-        FindTransactionByPayeeView(const char * title) : CLIView(title) {
+        FindTransactionByPayeeView(const char * title) : CLIFindView(title) {
             string today = StrDate::today();
             beforeDateField.setDefaultValue(today);
         }
 
         void show() override {
-            CLIView::show();
+            CLIFindView::show();
 
             payeeField.show();
             afterDateField.show();
             beforeDateField.show();
         }
 
-        string getCriteria() {
+        string getCriteria() override {
             static string criteria;
 
             DBPayee payee = payeeField.getPayee();
 
-            char buffer[32];
-            snprintf(buffer, 16, "payee_id = %lld", payee.id);
+            char buffer[PAYEE_ID_BUFFER_LENGTH];
+            snprintf(buffer, PAYEE_ID_BUFFER_LENGTH, "payee_id = %lld", payee.id);
             criteria = buffer;
 
             if (afterDateField.getValue().length() > 0) {
@@ -303,7 +306,7 @@ class FindTransactionByPayeeView : CLIView {
         }
 };
 
-class FindTransactionByCategoryView : CLIView {
+class FindTransactionByCategoryView : public CLIFindView {
     private:
         CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
         DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
@@ -312,26 +315,26 @@ class FindTransactionByCategoryView : CLIView {
     public:
         FindTransactionByCategoryView() : FindTransactionByCategoryView("Find transaction (by category)") {}
 
-        FindTransactionByCategoryView(const char * title) : CLIView(title) {
+        FindTransactionByCategoryView(const char * title) : CLIFindView(title) {
             string today = StrDate::today();
             beforeDateField.setDefaultValue(today);
         }
 
         void show() override {
-            CLIView::show();
+            CLIFindView::show();
 
             categoryField.show();
             afterDateField.show();
             beforeDateField.show();
         }
 
-        string getCriteria() {
+        string getCriteria() override {
             static string criteria;
 
             DBCategory category = categoryField.getCategory();
 
-            char buffer[32];
-            snprintf(buffer, 16, "category_id = %lld", category.id);
+            char buffer[CATEGORY_ID_BUFFER_LENGTH];
+            snprintf(buffer, CATEGORY_ID_BUFFER_LENGTH, "category_id = %lld", category.id);
             criteria = buffer;
 
             if (afterDateField.getValue().length() > 0) {
@@ -346,7 +349,7 @@ class FindTransactionByCategoryView : CLIView {
         }
 };
 
-class FindTransactionByDescriptionView : CLIView {
+class FindTransactionByDescriptionView : public CLIFindView {
     private:
         CLITextField descriptionField = CLITextField("Transaction description: ");
         DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
@@ -355,7 +358,7 @@ class FindTransactionByDescriptionView : CLIView {
     public:
         FindTransactionByDescriptionView() : FindTransactionByDescriptionView("Find transaction (by description)") {}
 
-        FindTransactionByDescriptionView(const char * title) : CLIView(title) {
+        FindTransactionByDescriptionView(const char * title) : CLIFindView(title) {
             string today = StrDate::today();
             beforeDateField.setDefaultValue(today);
         }
@@ -368,12 +371,12 @@ class FindTransactionByDescriptionView : CLIView {
             beforeDateField.show();
         }
 
-        string getCriteria() {
+        string getCriteria() override {
             static string criteria;
 
             string description = descriptionField.getValue();
 
-            criteria = "description~= '*" + description + "*'";
+            criteria = "description LIKE '*" + description + "*'";
 
             if (afterDateField.getValue().length() > 0) {
                 criteria += " AND date > '" + afterDateField.getValue() + "'";
@@ -387,7 +390,7 @@ class FindTransactionByDescriptionView : CLIView {
         }
 };
 
-class FindTransactionByDateView : CLIView {
+class FindTransactionByDateView : public CLIFindView {
     private:
         DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
@@ -395,7 +398,7 @@ class FindTransactionByDateView : CLIView {
     public:
         FindTransactionByDateView() : FindTransactionByDateView("Find transaction (by date)") {}
 
-        FindTransactionByDateView(const char * title) : CLIView(title) {
+        FindTransactionByDateView(const char * title) : CLIFindView(title) {
             string today = StrDate::today();
             beforeDateField.setDefaultValue(today);
         }
@@ -407,7 +410,7 @@ class FindTransactionByDateView : CLIView {
             beforeDateField.show();
         }
 
-        string getCriteria() {
+        string getCriteria() override {
             static string criteria;
 
             if (afterDateField.getValue().length() > 0) {
@@ -426,14 +429,14 @@ class FindTransactionByDateView : CLIView {
         }
 };
 
-class FindTransactionView : CLIView {
+class FindTransactionView : public CLIFindView {
     private:
         CLITextField criteriaField = CLITextField("WHERE: ");
 
     public:
         FindTransactionView() : FindTransactionView("Find transaction (by SQL criteria)") {}
 
-        FindTransactionView(const char * title) : CLIView(title) {}
+        FindTransactionView(const char * title) : CLIFindView(title) {}
 
         void show() override {
             CLIView::show();
@@ -441,7 +444,7 @@ class FindTransactionView : CLIView {
             criteriaField.show();
         }
 
-        string getCriteria() {
+        string getCriteria() override {
             return criteriaField.getValue();
         }
 };

@@ -567,4 +567,19 @@ class CLIListView : public CLIView {
         }
 };
 
+class CLIFindView : public CLIView {
+    public:
+        CLIFindView() : CLIView() {}
+        CLIFindView(string & title) : CLIView(title) {}
+        CLIFindView(const char * szTitle) : CLIView(szTitle) {}
+
+        void show() override {
+            CLIView::show();
+        }
+
+        virtual string getCriteria() {
+            return "";
+        }
+};
+
 #endif

@@ -187,6 +187,8 @@ class DBResult : public Result {
     private:
         vector<T> results;
 
+        Logger & log = Logger::getInstance();
+
     public:
         DBResult() : Result() {
             clear();
@@ -237,6 +239,8 @@ class DBResult : public Result {
 
 template <class T>
 int DBResult<T>::retrieveAll() {
+    log.logEntry("DBResult<T>::retrieveAll()");
+
     T entity;
     vector<DBRow> rows;
 
@@ -244,24 +248,34 @@ int DBResult<T>::retrieveAll() {
 
     int rowsRetrievedCount = db.executeSelect(entity.getSelectAllStatement(), &rows);
 
+    log.logDebug("execute SELECT retrieved %d rows", rowsRetrievedCount);
+
     for (int i = 0;i < rowsRetrievedCount;i++) {
         processRow(rows[i]);
     }
+
+    log.logExit("DBResult<T>::retrieveAll()");
 
     return rowsRetrievedCount;
 }
 
 template <class T>
 int DBResult<T>::retrieve(const char * sqlStatement) {
+    log.logEntry("DBResult<T>::retrieve()");
+
     vector<DBRow> rows;
 
     PFM_DB & db = PFM_DB::getInstance();
 
     int rowsRetrievedCount = db.executeSelect(sqlStatement, &rows);
 
+    log.logDebug("execute SELECT retrieved %d rows", rowsRetrievedCount);
+    
     for (int i = 0;i < rowsRetrievedCount;i++) {
         processRow(rows[i]);
     }
+
+    log.logExit("DBResult<T>::retrieve()");
 
     return rowsRetrievedCount;
 }

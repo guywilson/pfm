@@ -113,6 +113,8 @@ void PFM_DB::clearIsTransactionActive() {
 void PFM_DB::_executeSQLNoCallback(const char * sql) {
     log.logEntry("PFM_DB::_executeSQLNoCallback()");
 
+    log.logDebug("Executing SQL '%s'", sql);
+    
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, sql, NULL, NULL, &pszErrorMsg);
 
@@ -133,6 +135,8 @@ void PFM_DB::_executeSQLNoCallback(const char * sql) {
 
 void PFM_DB::_executeSQLCallback(const char * sql, vector<DBRow> * rows) {
     log.logEntry("PFM_DB::_executeSQLCallback()");
+
+    log.logDebug("Executing SQL '%s'", sql);
 
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, sql, _retrieveCallback, rows, &pszErrorMsg);
@@ -345,23 +349,41 @@ void PFM_DB::createCurrencies() {
 }
 
 int PFM_DB::executeSelect(const char * statement, vector<DBRow> * rows) {
+    log.logEntry("PFM_DB::executeSelect()");
+
     _executeSQLCallback(statement, rows);
+
+    log.logDebug("Execute SELECT returned %d rows", rows->size());
+
+    log.logExit("PFM_DB::executeSelect()");
 
     return rows->size();
 }
 
 pfm_id_t PFM_DB::executeInsert(const char * statement) {
+    log.logEntry("PFM_DB::executeInsert()");
+
     _executeSQLNoCallback(statement);
+
+    log.logExit("PFM_DB::executeInsert()");
 
     return sqlite3_last_insert_rowid(dbHandle);
 }
 
 void PFM_DB::executeUpdate(const char * statement) {
+    log.logEntry("PFM_DB::executeUpdate()");
+
     _executeSQLNoCallback(statement);
+
+    log.logExit("PFM_DB::executeUpdate()");
 }
 
 void PFM_DB::executeDelete(const char * statement) {
+    log.logEntry("PFM_DB::executeDelete()");
+
     _executeSQLNoCallback(statement);
+
+    log.logExit("PFM_DB::executeDelete()");
 }
 
 void PFM_DB::begin() {
