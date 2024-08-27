@@ -7,6 +7,7 @@
 #include "cli_widget.h"
 #include "custom_widgets.h"
 #include "db_transaction.h"
+#include "db_transaction_view.h"
 
 using namespace std;
 
@@ -91,7 +92,7 @@ class TransactionListView : public CLIListView {
             total = 0.0;
         }
 
-        void addResults(DBResult<DBTransaction> & result, string & accountCode) {
+        void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
             char szTitle[TITLE_BUFFER_LEN];
 
             snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%d)", accountCode.c_str(), result.getNumRows());
@@ -126,15 +127,15 @@ class TransactionListView : public CLIListView {
             addHeaderRow(headerRow);
 
             for (int i = 0;i < result.getNumRows();i++) {
-                DBTransaction transaction = result.getResultAt(i);
+                DBTransactionView transaction = result.getResultAt(i);
 
                 CLIListRow row(headerRow);
 
                 row.addCellValue(transaction.sequence);
                 row.addCellValue(transaction.date.shortDate());
                 row.addCellValue(transaction.description);
-                row.addCellValue(transaction.category.code);
-                row.addCellValue(transaction.payee.code);
+                row.addCellValue(transaction.categoryCode);
+                row.addCellValue(transaction.payeeCode);
                 row.addCellValue(transaction.getCreditDebitValue());
                 row.addCellValue(transaction.amount);
                 row.addCellValue(transaction.getIsReconciledValue());

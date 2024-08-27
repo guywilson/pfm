@@ -190,8 +190,8 @@ void add_recurring_charge(DBAccount & account) {
 }
 
 void list_recurring_charges(DBAccount & account) {
-    DBRecurringCharge chargeInstance;
-    DBResult<DBRecurringCharge> result = chargeInstance.retrieveByAccountID(account.id);
+    DBRecurringChargeView chargeInstance;
+    DBResult<DBRecurringChargeView> result = chargeInstance.retrieveByAccountID(account.id);
 
     RecurringChargeListView view;
     view.addResults(result, account.code);
@@ -247,8 +247,8 @@ void add_transaction(DBAccount & account) {
 }
 
 void list_transactions(DBAccount & account) {
-    DBTransaction transactionInstance;
-    DBResult<DBTransaction> result = transactionInstance.retrieveByAccountID(account.id, sort_ascending, 0);
+    DBTransactionView transactionInstance;
+    DBResult<DBTransactionView> result = transactionInstance.retrieveByAccountID(account.id, sort_ascending, 0);
 
     TransactionListView view;
     view.addResults(result, account.code);
@@ -306,8 +306,8 @@ void find_transactions(DBAccount & account) {
 
     delete findView;
     
-    DBTransaction tr;
-    DBResult<DBTransaction> result = tr.findTransactionsForAccountID(account.id, criteria);
+    DBTransactionView tr;
+    DBResult<DBTransactionView> result = tr.findTransactionsForAccountID(account.id, criteria);
 
     TransactionListView view;
     view.addResults(result, account.code);

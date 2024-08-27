@@ -7,6 +7,7 @@
 #include "cli_widget.h"
 #include "custom_widgets.h"
 #include "db_recurring_charge.h"
+#include "db_recurring_charge_view.h"
 #include "money.h"
 
 using namespace std;
@@ -91,7 +92,7 @@ class RecurringChargeListView : public CLIListView {
             total = 0.0;
         }
 
-        void addResults(DBResult<DBRecurringCharge> & result, string & accountCode) {
+        void addResults(DBResult<DBRecurringChargeView> & result, string & accountCode) {
             char szTitle[TITLE_BUFFER_LEN];
 
             snprintf(szTitle, TITLE_BUFFER_LEN, "Recurring charges for account: %s (%d)", accountCode.c_str(), result.getNumRows());
@@ -126,7 +127,7 @@ class RecurringChargeListView : public CLIListView {
             addHeaderRow(headerRow);
 
             for (int i = 0;i < result.getNumRows();i++) {
-                DBRecurringCharge charge = result.getResultAt(i);
+                DBRecurringChargeView charge = result.getResultAt(i);
 
                 CLIListRow row(headerRow);
 
@@ -134,8 +135,8 @@ class RecurringChargeListView : public CLIListView {
                 row.addCellValue(charge.date.shortDate());
                 row.addCellValue(charge.nextPaymentDate.shortDate());
                 row.addCellValue(charge.description);
-                row.addCellValue(charge.category.code);
-                row.addCellValue(charge.payee.code);
+                row.addCellValue(charge.categoryCode);
+                row.addCellValue(charge.payeeCode);
                 row.addCellValue(charge.frequency);
                 row.addCellValue(charge.amount);
 

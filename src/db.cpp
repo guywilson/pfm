@@ -217,8 +217,8 @@ void PFM_DB::createSchema() {
         createTable(pszCreateBudgetTable);
         createTable(pszCreateBudgetTrackTable);
 
-        // createView(pszCreateListRCView);
-        // createView(pszCreateListTransationView);
+        createView(pszCreateListRCView);
+        createView(pszCreateListTransationView);
 
         createCurrencies();
         createDefaultCategories();

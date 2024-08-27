@@ -22,8 +22,6 @@ using namespace std;
 #define CHARGE_OK                   0
 #define CHARGE_NOT_DUE              -1
 
-class DBRecurringChargeResult;
-
 class DBRecurringCharge : public DBPayment {
     private:
         const char * sqlSelectByAccountID = 

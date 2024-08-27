@@ -19,8 +19,6 @@ using namespace std;
 #ifndef __INCL_TRANSACTION
 #define __INCL_TRANSACTION
 
-class DBTransactionResult;
-
 class DBTransaction : public DBPayment {
     private:
         const char * sqlSelectByAccountID = 
@@ -168,13 +166,14 @@ class DBTransaction : public DBPayment {
             return doesExistInString(criteria, "JOIN");
         }
 
+        DBResult<DBTransaction> retrieveByStatementAndID(const char * statement, pfm_id_t id);
+
+    protected:
         void validateCriteria(string & criteria) {
             if (containsInsert(criteria) || containsUpdate(criteria) || containsDelete(criteria) || containsJoin(criteria)) {
                 throw pfm_error("Invalid criteria string, SQL keywords are not permitted");
             }
         }
-
-        DBResult<DBTransaction> retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
     public:
         pfm_id_t recurringChargeId;
