@@ -31,6 +31,18 @@ class DBCarriedOver : public DBEntity {
                         "FROM carried_over_log " \
                         "WHERE account_id = %lld;";
 
+        const char * sqlSelectByAccountIdAfterDate = 
+                        "SELECT id, " \
+                        "account_id," \
+                        "date," \
+                        "description," \
+                        "balance," \
+                        "created," \
+                        "updated " \
+                        "FROM carried_over_log " \
+                        "WHERE account_id = %lld " \
+                        "AND date >= '%s'";
+
         const char * sqlSelectLatestByAccountId = 
                         "SELECT id, " \
                         "account_id," \
@@ -184,6 +196,7 @@ class DBCarriedOver : public DBEntity {
 
         int retrieveLatestByAccountId(pfm_id_t accountId);
         DBResult<DBCarriedOver> retrieveByAccountId(pfm_id_t accountId);
+        DBResult<DBCarriedOver> retrieveByAccountIdAfterDate(pfm_id_t accountId, StrDate & after);
 };
 
 #endif

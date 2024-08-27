@@ -25,12 +25,10 @@ void DBPayee::retrieveByCode(string & code) {
 
     int rowsRetrievedCount = result.retrieve(szStatement);
 
-    if (rowsRetrievedCount != 1) {
-        throw pfm_error(
-                pfm_error::buildMsg("Expected exactly 1 row, got %d", rowsRetrievedCount), 
-                __FILE__, 
-                __LINE__);
+    if (rowsRetrievedCount == 1) {
+        set(result.getResultAt(0));
     }
-
-    set(result.getResultAt(0));
+    else {
+        clear();
+    }
 }

@@ -263,8 +263,12 @@ class DBTransaction : public DBPayment {
         }
 
         void onRowComplete(int sequence) override {
-            category.retrieve(categoryId);
-            payee.retrieve(payeeId);
+            if (categoryId != 0) {
+                category.retrieve(categoryId);
+            }
+            if (payeeId != 0) {
+                payee.retrieve(payeeId);
+            }
 
             this->sequence = sequence;
         }

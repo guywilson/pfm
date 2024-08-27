@@ -46,3 +46,19 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
 
     return result;
 }
+
+DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t accountId, StrDate & after) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBCarriedOver> result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlSelectByAccountIdAfterDate, 
+        accountId,
+        after.shortDate().c_str());
+
+    result.retrieve(szStatement);
+
+    return result;
+}

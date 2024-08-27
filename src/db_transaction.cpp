@@ -5,12 +5,14 @@
 
 #include <sqlite3.h>
 
+#include "logger.h"
 #include "pfm_error.h"
 #include "db_base.h"
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_transaction.h"
 #include "db_account.h"
+#include "db_carried_over.h"
 #include "db.h"
 #include "strdate.h"
 
@@ -87,7 +89,7 @@ DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(pfm_id_t acc
     DBResult<DBTransaction> result;
 
     validateCriteria(criteria);
-    
+
     snprintf(
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
@@ -133,14 +135,32 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t 
 }
 
 void DBTransaction::afterInsert() {
+    Logger & log = Logger::getInstance();
+    log.logEntry("DBTransaction::afterInsert()");
+
     DBAccount account;
     account.retrieve(accountId);
 
     account.currentBalance += this->getSignedAmount();
     account.save();
+
+    DBCarriedOver co;
+    DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
+
+    for (int i = 0;i < coResult.getNumRows();i++) {
+        DBCarriedOver carriedOver = coResult.getResultAt(i);
+
+        carriedOver.balance += getSignedAmount();
+        carriedOver.save();
+    }
+
+    log.logExit("DBTransaction::afterInsert()");
 }
 
 void DBTransaction::beforeUpdate() {
+    Logger & log = Logger::getInstance();
+    log.logEntry("DBTransaction::beforeUpdate()");
+
     DBTransaction transaction;
     transaction.retrieve(id);
 
@@ -151,20 +171,46 @@ void DBTransaction::beforeUpdate() {
     */
     if (this->amount != transaction.amount) {
         DBAccount account;
-        account.retrieve(accountId);
+        account.retrieve(transaction.accountId);
 
         account.currentBalance -= transaction.getSignedAmount();
         account.currentBalance += this->getSignedAmount();
 
         account.save();
+
+        DBCarriedOver co;
+        DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
+
+        for (int i = 0;i < coResult.getNumRows();i++) {
+            DBCarriedOver carriedOver = coResult.getResultAt(i);
+
+            carriedOver.balance -= transaction.getSignedAmount();
+            carriedOver.balance += this->getSignedAmount();
+            carriedOver.save();
+        }
     }
+
+    log.logExit("DBTransaction::beforeUpdate()");
 }
 
 void DBTransaction::afterRemove() {
+    Logger & log = Logger::getInstance();
+    log.logEntry("DBTransaction::afterRemove()");
+
     DBAccount account;
     account.retrieve(accountId);
     account.currentBalance -= getSignedAmount();
     account.save();
 
+    DBCarriedOver co;
+    DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
 
+    for (int i = 0;i < coResult.getNumRows();i++) {
+        DBCarriedOver carriedOver = coResult.getResultAt(i);
+
+        carriedOver.balance -= getSignedAmount();
+        carriedOver.save();
+    }
+
+    log.logExit("DBTransaction::afterRemove()");
 }
