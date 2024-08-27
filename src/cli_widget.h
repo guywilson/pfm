@@ -568,43 +568,6 @@ class CLIListView : public CLIView {
 };
 
 class CLIFindView : public CLIView {
-    protected:
-        string makeUpperCase(string s) {
-            for (int i = 0;i < s.length();i++) {
-                s[i] = (char)toupper(s.at(i));
-            }
-
-            return s;
-        }
-
-        bool doesExistInString(string & src, const char * checkStr) {
-            string upper = makeUpperCase(src);
-
-            if (upper.find(checkStr) == string::npos) {
-                return false;
-            }
-
-            return true;
-        }
-
-        bool containsInsert(string & criteria) {
-            return doesExistInString(criteria, "INSERT");
-        }
-
-        bool containsUpdate(string & criteria) {
-            return doesExistInString(criteria, "UPDATE");
-        }
-
-        bool containsDelete(string & criteria) {
-            return doesExistInString(criteria, "DELETE");
-        }
-
-        virtual void validateCriteria(string & criteria) {
-            if (containsInsert(criteria) || containsUpdate(criteria) || containsDelete(criteria)) {
-                throw pfm_error("Invalid criteria string, SQL keywords are not permitted");
-            }
-        }
-
     public:
         CLIFindView() : CLIView() {}
         CLIFindView(string & title) : CLIView(title) {}
