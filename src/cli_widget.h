@@ -346,7 +346,7 @@ class CLIListRow : public CLIWidget {
         int getColumnWidth(CLIListColumn & column) {
             string columnName = column.getName();
 
-            return (columnName.length() + getNumPaddingChars(column, columnName) + 4);
+            return (columnName.length() + getNumPaddingChars(column, columnName) + 3);
         }
 
         void printColumnHeader(CLIListColumn & column) {
@@ -401,11 +401,7 @@ class CLIListRow : public CLIWidget {
         }
 
         void printBottomBorder() {
-            for (int i = 0;i < tableWidth;i++) {
-                cout << "-";
-            }
-
-            cout << endl;
+            printTopBorder();
         }
 
         int getNumColumns() const {
@@ -513,7 +509,7 @@ class CLIListRow : public CLIWidget {
 
             cout << endl;
 
-            tableWidth -= 2;
+            tableWidth += 1;
 
             printTopBorder();
         }
