@@ -7,7 +7,7 @@
 #include "cli_widget.h"
 #include "custom_widgets.h"
 #include "db_transaction.h"
-#include "db_transaction_view.h"
+#include "db_v_transaction.h"
 
 using namespace std;
 

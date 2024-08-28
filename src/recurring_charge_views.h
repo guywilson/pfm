@@ -7,7 +7,7 @@
 #include "cli_widget.h"
 #include "custom_widgets.h"
 #include "db_recurring_charge.h"
-#include "db_recurring_charge_view.h"
+#include "db_v_recurring_charge.h"
 #include "money.h"
 
 using namespace std;

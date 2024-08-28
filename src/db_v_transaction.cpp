@@ -8,7 +8,7 @@
 #include "logger.h"
 #include "pfm_error.h"
 #include "db_base.h"
-#include "db_transaction_view.h"
+#include "db_v_transaction.h"
 #include "db.h"
 #include "strdate.h"
 

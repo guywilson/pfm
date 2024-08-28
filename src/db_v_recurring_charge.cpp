@@ -7,7 +7,7 @@
 
 #include "pfm_error.h"
 #include "db_base.h"
-#include "db_recurring_charge_view.h"
+#include "db_v_recurring_charge.h"
 #include "db.h"
 #include "strdate.h"
 
