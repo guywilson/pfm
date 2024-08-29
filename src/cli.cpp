@@ -32,7 +32,7 @@ bool validateCreditDebit(const char * pszCD) {
     }
 }
 
-void add_account() {
+void addAccount() {
     AddAccountView view;
     view.show();
 
@@ -42,7 +42,7 @@ void add_account() {
     cout << "Created account with ID " << account.id << endl;
 }
 
-void list_accounts() {
+void listAccounts() {
     DBResult<DBAccount> result;
     result.retrieveAll();
 
@@ -52,7 +52,7 @@ void list_accounts() {
     view.show();
 }
 
-DBAccount choose_account(const char * szAccountCode) {
+DBAccount chooseAccount(const char * szAccountCode) {
     string accountCode;
 
     if (szAccountCode == NULL || strlen(szAccountCode) == 0) {
@@ -77,7 +77,7 @@ DBAccount choose_account(const char * szAccountCode) {
     return account;
 }
 
-void update_account(DBAccount & account) {
+void updateAccount(DBAccount & account) {
     UpdateAccountView view;
     view.setAccount(account);
     view.show();
@@ -87,7 +87,7 @@ void update_account(DBAccount & account) {
     updatedAccount.save();
 }
 
-void add_category() {
+void addCategory() {
     AddCategoryView view;
     view.show();
 
@@ -96,7 +96,7 @@ void add_category() {
     category.save();
 }
 
-void list_categories() {
+void listCategories() {
     DBResult<DBCategory> result;
     result.retrieveAll();
 
@@ -105,7 +105,7 @@ void list_categories() {
     view.show();
 }
 
-DBCategory get_category(const char * pszCategoryCode) {
+DBCategory getCategory(const char * pszCategoryCode) {
     string categoryCode;
 
     if (pszCategoryCode == NULL || strlen(pszCategoryCode) == 0) {
@@ -124,7 +124,7 @@ DBCategory get_category(const char * pszCategoryCode) {
     return category;
 }
 
-void update_category(DBCategory & category) {
+void updateCategory(DBCategory & category) {
     UpdateCategoryView view;
     view.setCategory(category);
     view.show();
@@ -133,7 +133,7 @@ void update_category(DBCategory & category) {
     updatedCategory.save();
 }
 
-void add_payee() {
+void addPayee() {
     AddPayeeView view;
     view.show();
 
@@ -142,7 +142,7 @@ void add_payee() {
     payee.save();
 }
 
-void list_payees() {
+void listPayees() {
     DBResult<DBPayee> result;
     result.retrieveAll();
 
@@ -151,7 +151,7 @@ void list_payees() {
     view.show();
 }
 
-DBPayee get_payee(const char * pszPayeeCode) {
+DBPayee getPayee(const char * pszPayeeCode) {
     string payeeCode;
 
     if (pszPayeeCode == NULL || strlen(pszPayeeCode) == 0) {
@@ -170,7 +170,7 @@ DBPayee get_payee(const char * pszPayeeCode) {
     return payee;
 }
 
-void update_payee(DBPayee & payee) {
+void updatePayee(DBPayee & payee) {
     UpdatePayeeView view;
     view.setPayee(payee);
     view.show();
@@ -179,7 +179,7 @@ void update_payee(DBPayee & payee) {
     updatedPayee.save();
 }
 
-void add_recurring_charge(DBAccount & account) {
+void addRecurringCharge(DBAccount & account) {
     AddRecurringChargeView view;
     view.show();
 
@@ -189,7 +189,7 @@ void add_recurring_charge(DBAccount & account) {
     charge.save();
 }
 
-void list_recurring_charges(DBAccount & account) {
+void listRecurringCharges(DBAccount & account) {
     DBRecurringChargeView chargeInstance;
     DBResult<DBRecurringChargeView> result = chargeInstance.retrieveByAccountID(account.id);
 
@@ -205,7 +205,7 @@ void list_recurring_charges(DBAccount & account) {
     }
 }
 
-DBRecurringCharge get_recurring_charge(int sequence) {
+DBRecurringCharge getRecurringCharge(int sequence) {
     int selectedSequence;
 
     if (sequence == 0) {
@@ -226,7 +226,7 @@ DBRecurringCharge get_recurring_charge(int sequence) {
     return charge;
 }
 
-void update_recurring_charge(DBRecurringCharge & charge) {
+void updateRecurringCharge(DBRecurringCharge & charge) {
     UpdateRecurringChargeView view;
     
     view.setRecurringCharge(charge);
@@ -237,7 +237,7 @@ void update_recurring_charge(DBRecurringCharge & charge) {
     updatedCharge.save();
 }
 
-void add_transaction(DBAccount & account) {
+void addTransaction(DBAccount & account) {
     AddTransactionView view;
     view.show();
 
@@ -246,7 +246,7 @@ void add_transaction(DBAccount & account) {
     transaction.save();
 }
 
-void list_transactions(DBAccount & account) {
+void listTransactions(DBAccount & account) {
     DBTransactionView transactionInstance;
     DBResult<DBTransactionView> result = transactionInstance.retrieveByAccountID(account.id, sort_ascending, 0);
 
@@ -262,7 +262,7 @@ void list_transactions(DBAccount & account) {
     }
 }
 
-void find_transactions(DBAccount & account) {
+void findTransactions(DBAccount & account) {
     cout << "How do you want to search for transactions:" << endl;
     cout << "1) By category" << endl;
     cout << "2) By payee" << endl;
@@ -321,7 +321,7 @@ void find_transactions(DBAccount & account) {
     }
 }
 
-DBTransaction get_transaction(int sequence) {
+DBTransaction getTransaction(int sequence) {
     int selectedSequence;
 
     if (sequence == 0) {
@@ -341,7 +341,7 @@ DBTransaction get_transaction(int sequence) {
     return transaction;
 }
 
-void update_transaction(DBTransaction & transaction) {
+void updateTransaction(DBTransaction & transaction) {
     UpdateTransactionView view;
     view.setTransaction(transaction);
     view.show();
@@ -350,6 +350,6 @@ void update_transaction(DBTransaction & transaction) {
     updatedTransaction.save();
 }
 
-void delete_transaction(DBTransaction & transaction) {
+void deleteTransaction(DBTransaction & transaction) {
     transaction.remove();
 }
