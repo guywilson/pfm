@@ -16,34 +16,34 @@ using namespace std;
 #define MAX_PROMPT_LENGTH                      128
 #define AMOUNT_FIELD_STRING_LEN                 16
 
-void                add_account();
-void                list_accounts();
-DBAccount           choose_account(const char * szAccountCode);
-void                update_account(DBAccount & account);
+void                addAccount();
+void                listAccounts();
+DBAccount           chooseAccount(const char * szAccountCode);
+void                updateAccount(DBAccount & account);
 
-void                add_category();
-void                list_categories();
-DBCategory          get_category(const char * pszCategoryCode);
-void                update_category(DBCategory & category);
-void                delete_category(DBCategory & category);
+void                addCategory();
+void                listCategories();
+DBCategory          getCategory(const char * pszCategoryCode);
+void                updateCategory(DBCategory & category);
+void                deleteCategory(DBCategory & category);
 
-void                add_payee();
-void                list_payees();
-DBPayee             get_payee(const char * pszPayeeCode);
-void                update_payee(DBPayee & payee);
-void                delete_payee(DBPayee & payee);
+void                addPayee();
+void                listPayees();
+DBPayee             getPayee(const char * pszPayeeCode);
+void                updatePayee(DBPayee & payee);
+void                deletePayee(DBPayee & payee);
 
-void                add_recurring_charge(DBAccount & account);
-void                list_recurring_charges(DBAccount & account);
-DBRecurringCharge   get_recurring_charge(int sequence);
-void                update_recurring_charge(DBRecurringCharge & charge);
-void                delete_recurring_charge(DBRecurringCharge & charge);
+void                addRecurringCharge(DBAccount & account);
+void                listRecurringCharges(DBAccount & account);
+DBRecurringCharge   getRecurringCharge(int sequence);
+void                updateRecurringCharge(DBRecurringCharge & charge);
+void                deleteRecurringCharge(DBRecurringCharge & charge);
 
-void                add_transaction(DBAccount & account);
-void                list_transactions(DBAccount & account);
-void                find_transactions(DBAccount & account);
-DBTransaction       get_transaction(int sequence);
-void                update_transaction(DBTransaction & transaction);
-void                delete_transaction(DBTransaction & transaction);
+void                addTransaction(DBAccount & account);
+void                listTransactions(DBAccount & account);
+void                findTransactions(DBAccount & account);
+DBTransaction       getTransaction(int sequence);
+void                updateTransaction(DBTransaction & transaction);
+void                deleteTransaction(DBTransaction & transaction);
 
 #endif

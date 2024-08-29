@@ -101,10 +101,10 @@ int main(int argc, char ** argv) {
                 printVersion();
             }
             else if (strncmp(pszCommand, "add account", 11) == 0 || strncmp(pszCommand, "aa", 2) == 0) {
-                add_account();
+                addAccount();
             }
             else if (strncmp(pszCommand, "list accounts", 14) == 0 || strncmp(pszCommand, "la", 2) == 0) {
-                list_accounts();
+                listAccounts();
             }
             else if (strncmp(pszCommand, "use account", 12) == 0 || strncmp(pszCommand, "use", 3) == 0) {
                 char * accountCode = NULL;
@@ -120,20 +120,20 @@ int main(int argc, char ** argv) {
                     }
                 }
 
-                selectedAccount.set(choose_account(accountCode));
+                selectedAccount.set(chooseAccount(accountCode));
             }
             else if (strncmp(pszCommand, "update account", 15) == 0 || strncmp(pszCommand, "ua", 2) == 0) {
-                update_account(selectedAccount);
+                updateAccount(selectedAccount);
             }
             else if (strncmp(pszCommand, "delete account", 15) == 0 || strncmp(pszCommand, "da", 2) == 0) {
                 selectedAccount.remove();
                 selectedAccount.clear();
             }
             else if (strncmp(pszCommand, "add category", 13) == 0 || strncmp(pszCommand, "ac", 2) == 0) {
-                add_category();
+                addCategory();
             }
             else if (strncmp(pszCommand, "list categories", 16) == 0 || strncmp(pszCommand, "lc", 2) == 0) {
-                list_categories();
+                listCategories();
             }
             else if (strncmp(pszCommand, "update category", 15) == 0 || strncmp(pszCommand, "uc", 2) == 0) {
                 char * categoryCode = NULL;
@@ -150,9 +150,9 @@ int main(int argc, char ** argv) {
                 }
 
                 DBCategory c;
-                c.set(get_category(categoryCode));
+                c.set(getCategory(categoryCode));
 
-                update_category(c);
+                updateCategory(c);
             }
             else if (strncmp(pszCommand, "delete category", 15) == 0 || strncmp(pszCommand, "dc", 2) == 0) {
                 char * categoryCode = NULL;
@@ -169,16 +169,16 @@ int main(int argc, char ** argv) {
                 }
 
                 DBCategory c;
-                c.set(get_category(categoryCode));
+                c.set(getCategory(categoryCode));
                 c.print();
 
                 c.remove();
             }
             else if (strncmp(pszCommand, "add payee", 9) == 0 || strncmp(pszCommand, "ap", 2) == 0) {
-                add_payee();
+                addPayee();
             }
             else if (strncmp(pszCommand, "list payees", 11) == 0 || strncmp(pszCommand, "lp", 2) == 0) {
-                list_payees();
+                listPayees();
             }
             else if (strncmp(pszCommand, "update payee", 12) == 0 || strncmp(pszCommand, "up", 2) == 0) {
                 char * payeeCode = NULL;
@@ -195,9 +195,9 @@ int main(int argc, char ** argv) {
                 }
 
                 DBPayee p;
-                p.set(get_payee(payeeCode));
+                p.set(getPayee(payeeCode));
 
-                update_payee(p);
+                updatePayee(p);
             }
             else if (strncmp(pszCommand, "delete payee", 12) == 0 || strncmp(pszCommand, "dc", 2) == 0) {
                 char * payeeCode = NULL;
@@ -214,16 +214,16 @@ int main(int argc, char ** argv) {
                 }
 
                 DBPayee p;
-                p.set(get_payee(payeeCode));
+                p.set(getPayee(payeeCode));
                 p.print();
 
                 p.remove();
             }
             else if (strncmp(pszCommand, "add recurring charge", 20) == 0 || strncmp(pszCommand, "arc", 3) == 0) {
-                add_recurring_charge(selectedAccount);
+                addRecurringCharge(selectedAccount);
             }
             else if (strncmp(pszCommand, "list recurring charges", 22) == 0 || strncmp(pszCommand, "lrc", 3) == 0) {
-                list_recurring_charges(selectedAccount);
+                listRecurringCharges(selectedAccount);
             }
             else if (strncmp(pszCommand, "update recurring charge", 23) == 0 || strncmp(pszCommand, "urc", 3) == 0) {
                 int sequence = 0;
@@ -240,9 +240,9 @@ int main(int argc, char ** argv) {
                 }
 
                 DBRecurringCharge rc;
-                rc.set(get_recurring_charge(sequence));
+                rc.set(getRecurringCharge(sequence));
 
-                update_recurring_charge(rc);
+                updateRecurringCharge(rc);
             }
             else if (strncmp(pszCommand, "delete recurring charge", 23) == 0 || strncmp(pszCommand, "drc", 3) == 0) {
                 int sequence = 0;
@@ -259,18 +259,18 @@ int main(int argc, char ** argv) {
                 }
 
                 DBRecurringCharge rc;
-                rc.set(get_recurring_charge(sequence));
+                rc.set(getRecurringCharge(sequence));
 
                 rc.remove();
             }
             else if (strncmp(pszCommand, "add transaction", 15) == 0 || strncmp(pszCommand, "at", 2) == 0) {
-                add_transaction(selectedAccount);
+                addTransaction(selectedAccount);
             }
             else if (strncmp(pszCommand, "list transactions", 17) == 0 || strncmp(pszCommand, "lt", 2) == 0) {
-                list_transactions(selectedAccount);
+                listTransactions(selectedAccount);
             }
             else if (strncmp(pszCommand, "find transactions", 17) == 0 || strncmp(pszCommand, "ft", 2) == 0) {
-                find_transactions(selectedAccount);
+                findTransactions(selectedAccount);
             }
             else if (strncmp(pszCommand, "update transaction", 18) == 0 || strncmp(pszCommand, "ut", 2) == 0) {
                 int sequence = 0;
@@ -287,9 +287,9 @@ int main(int argc, char ** argv) {
                 }
 
                 DBTransaction t;
-                t.set(get_transaction(sequence));
+                t.set(getTransaction(sequence));
 
-                update_transaction(t);
+                updateTransaction(t);
             }
             else if (strncmp(pszCommand, "delete transaction", 18) == 0 || strncmp(pszCommand, "dt", 2) == 0) {
                 int sequence = 0;
@@ -306,9 +306,9 @@ int main(int argc, char ** argv) {
                 }
 
                 DBTransaction t;
-                t.set(get_transaction(sequence));
+                t.set(getTransaction(sequence));
 
-                delete_transaction(t);
+                deleteTransaction(t);
             }
         }
     }
