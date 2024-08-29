@@ -1,0 +1,240 @@
+#include <string>
+#include <string.h>
+#include <stdint.h>
+
+#include "pfm_error.h"
+#include "db.h"
+#include "db_base.h"
+#include "strdate.h"
+#include "money.h"
+#include "db_category.h"
+#include "db_payee.h"
+
+using namespace std;
+
+#ifndef __INCL_BUDGET
+#define __INCL_BUDGET
+
+class DBBudget : public DBEntity {
+    private:
+        const char * sqlSelectByPayeeCode = 
+            "SELECT " \
+            "id," \
+            "start_date," \
+            "end_date," \
+            "category_code," \
+            "payee_code," \
+            "description," \
+            "ideal_budget," \
+            "min_budget," \
+            "max_budget," \
+            "created," \
+            "updated " \
+            "FROM budget " \
+            "WHERE payee_code = '%s';";
+
+        const char * sqlSelectByCategoryCode = 
+            "SELECT " \
+            "id," \
+            "start_date," \
+            "end_date," \
+            "category_code," \
+            "payee_code," \
+            "description," \
+            "ideal_budget," \
+            "min_budget," \
+            "max_budget," \
+            "created," \
+            "updated " \
+            "FROM budget " \
+            "WHERE category_code = '%s';";
+
+        const char * sqlInsert = 
+            "INSERT INTO budget (" \
+            "start_date," \
+            "end_date," \
+            "category_code," \
+            "payee_code," \
+            "description," \
+            "ideal_budget," \
+            "min_budget," \
+            "max_budget," \
+            "created," \
+            "updated)" \
+            "VALUES (" \
+            "'%s', '%s', '%s', '%s', '%s'," \
+            "%.2f, %.2f, %.2f, '%s', '%s');";
+
+        const char * sqlUpdate = 
+            "UPDATE budget SET " \
+            "start_date = '%s'," \
+            "end_date = '%s'," \
+            "category_code = '%s'," \
+            "payee_code = '%s'," \
+            "description = '%s'," \
+            "ideal_budget = %.2f," \
+            "min_budget = %.2f," \
+            "max_budget = %.2f," \
+            "updated = '%s' " \
+            "WHERE id = %lld;";
+
+        const char * sqlDelete = 
+            "DELETE FROM budget WHERE id = %lld;";
+
+    public:
+        StrDate startDate;
+        StrDate endDate;
+        string categoryCode;
+        string payeeCode;
+        string description;
+        Money idealBudget;
+        Money minimumBudget;
+        Money maximumBudget;
+
+        DBBudget() : DBEntity() {
+            clear();
+        }
+
+        DBBudget(const DBBudget & src) : DBEntity(src) {
+            set(src);
+        }
+
+        void clear() {
+            DBEntity::clear();
+
+            this->startDate.clear();
+            this->endDate.clear();
+            this->payeeCode = "";
+            this->categoryCode = "";
+            this->description = "";
+            this->idealBudget = 0.0;
+            this->minimumBudget = 0.0;
+            this->maximumBudget = 0.0;
+        }
+
+        void set(const DBBudget & src) {
+            DBEntity::set(src);
+
+            this->startDate = src.startDate;
+            this->endDate = src.endDate;
+            this->payeeCode = src.payeeCode;
+            this->categoryCode = src.categoryCode;
+            this->description = src.description;
+            this->idealBudget = src.idealBudget;
+            this->minimumBudget = src.minimumBudget;
+            this->maximumBudget = src.maximumBudget;
+        }
+
+        void print() {
+            DBEntity::print();
+
+            cout << "StartDate: '" << startDate.shortDate() << "'" << endl;
+            cout << "EndDate: '" << endDate.shortDate() << "'" << endl;
+            cout << "PayeeCode: '" << payeeCode << "'" << endl;
+            cout << "CategoryCode: '" << categoryCode << "'" << endl;
+            cout << "Description: '" << description << "'" << endl;
+            cout << "IdealBudget: " << idealBudget.getRawStringValue() << endl;
+            cout << "MinimumBudget: " << minimumBudget.getRawStringValue() << endl;
+            cout << "MaximumBudget: " << maximumBudget.getRawStringValue() << endl;
+        }
+
+        void assignColumn(DBColumn & column) override {
+            DBEntity::assignColumn(column);
+            
+            if (column.getName() == "payee_code") {
+                payeeCode = column.getValue();
+            }
+            else if (column.getName() == "category_code") {
+                categoryCode = column.getValue();
+            }
+            else if (column.getName() == "start_date") {
+                startDate = column.getValue();
+            }
+            else if (column.getName() == "end_date") {
+                endDate = column.getValue();
+            }
+            else if (column.getName() == "description") {
+                description = column.getValue();
+            }
+            else if (column.getName() == "ideal_budget") {
+                idealBudget = column.getDoubleValue();
+            }
+            else if (column.getName() == "minimum_budget") {
+                minimumBudget = column.getDoubleValue();
+            }
+            else if (column.getName() == "maximum_budget") {
+                maximumBudget = column.getDoubleValue();
+            }
+        }
+
+        void onRowComplete(int sequence) override {
+            this->sequence = sequence;
+        }
+
+        const char * getTableName() override {
+            return "budget";
+        }
+
+        const char * getInsertStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            string now = StrDate::getTimestamp();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlInsert,
+                startDate,
+                endDate,
+                categoryCode,
+                payeeCode,
+                description,
+                idealBudget.getDoubleValue(),
+                minimumBudget.getDoubleValue(),
+                maximumBudget.getDoubleValue(),
+                now.c_str(),
+                now.c_str());
+
+            return szStatement;
+        }
+
+        const char * getUpdateStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            string now = StrDate::getTimestamp();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlUpdate,
+                startDate,
+                endDate,
+                categoryCode,
+                payeeCode,
+                description,
+                idealBudget.getDoubleValue(),
+                minimumBudget.getDoubleValue(),
+                maximumBudget.getDoubleValue(),
+                now.c_str(),
+                id);
+
+            return szStatement;
+        }
+
+        const char * getDeleteStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlDelete,
+                id);
+
+            return szStatement;
+        }
+
+        DBResult<DBBudget> retrieveByPayeeCode(string & code);
+        DBResult<DBBudget> retrieveByCategoryCode(string & code);
+};
+
+#endif

@@ -3,7 +3,7 @@
 
 /*
 ** You must get this right, there is no way for the code
-** that uses the arrays, to know just how many there are, 
+** that uses the arrays to know just how many there are, 
 ** unless you tell it...
 */
 #define NUM_DEFAULT_CATEGORIES                       27
@@ -331,17 +331,17 @@ static const char * pszCreateBudgetTable =
     "CREATE TABLE budget (" \
     "id INTEGER PRIMARY KEY," \
     "start_date TEXT NOT NULL," \
-    "end_date TEXT NOT NULL," \
-    "category_id INTEGER," \
-    "payee_id INTEGER," \
+    "end_date TEXT," \
+    "category_code TEXT," \
+    "payee_code TEXT," \
     "description TEXT NOT NULL," \
     "ideal_budget NUMERIC NOT NULL," \
-    "min_budget NUMERIC NOT NULL," \
-    "max_budget NUMERIC NOT NULL," \
+    "min_budget NUMERIC," \
+    "max_budget NUMERIC," \
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
-    "FOREIGN KEY(payee_id) REFERENCES payee(id)," \
-    "FOREIGN KEY(category_id) REFERENCES category(id));";
+    "FOREIGN KEY(payee_code) REFERENCES payee(code)," \
+    "FOREIGN KEY(category_code) REFERENCES category(code));";
 
 static const char * pszCreateBudgetTrackTable = 
     "CREATE TABLE period_budget_track (" \
