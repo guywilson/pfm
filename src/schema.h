@@ -335,7 +335,6 @@ static const char * pszCreateBudgetTable =
     "category_code TEXT," \
     "payee_code TEXT," \
     "description TEXT NOT NULL," \
-    "ideal_budget NUMERIC NOT NULL," \
     "min_budget NUMERIC," \
     "max_budget NUMERIC," \
     "created TEXT NOT NULL," \

@@ -17,6 +17,7 @@
 #include "db_category.h"
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
+#include "db_budget.h"
 
 using namespace std;
 
@@ -352,4 +353,61 @@ void updateTransaction(DBTransaction & transaction) {
 
 void deleteTransaction(DBTransaction & transaction) {
     transaction.remove();
+}
+
+void addBudget() {
+    AddBudgetView view;
+    view.show();
+
+    DBBudget budget = view.getBudget();
+    budget.save();
+}
+
+void listBudgets() {
+    DBResult<DBBudget> result;
+    result.retrieveAll();
+
+    BudgetListView view;
+    view.addResults(result);
+    view.show();
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    for (int i = 0;i < result.getNumRows();i++) {
+        DBBudget budget = result.getResultAt(i);
+        cacheMgr.addBudget(budget.sequence, budget);
+    }
+}
+
+DBBudget getBudget(int sequence) {
+    int selectedSequence;
+
+    if (sequence == 0) {
+        ChooseBudgetView view;
+        view.show();
+
+        selectedSequence = view.getSequence();
+    }
+    else {
+        selectedSequence = sequence;
+    }
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    DBBudget budget = cacheMgr.getBudget(selectedSequence);
+
+    return budget;
+}
+
+void updateBudget(DBBudget & budget) {
+    UpdateBudgetView view;
+    view.setBudget(budget);
+    view.show();
+
+    DBBudget updatedBudget = view.getBudget();
+    updatedBudget.save();
+}
+
+void deleteBudget(DBBudget & budget) {
+    budget.remove();
 }

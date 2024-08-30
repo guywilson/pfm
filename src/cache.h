@@ -10,6 +10,7 @@
 #include "db_payee.h"
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
+#include "db_budget.h"
 
 using namespace std;
 
@@ -28,12 +29,21 @@ class CacheMgr {
 
         unordered_map<int, DBRecurringCharge> recurringChargeBySequence;
         unordered_map<int, DBTransaction> transactionBySequence;
+        unordered_map<int, DBBudget> budgetBySequence;
 
     public:
         ~CacheMgr() {}
 
         void addRecurringCharge(int sequence, DBRecurringCharge & charge) {
             recurringChargeBySequence.insert({sequence, charge});
+        }
+
+        void addTransaction(int sequence, DBTransaction & transaction) {
+            transactionBySequence.insert({sequence, transaction});
+        }
+
+        void addBudget(int sequence, DBBudget & budget) {
+            budgetBySequence.insert({sequence, budget});
         }
 
         DBRecurringCharge getRecurringCharge(int sequence) {
@@ -46,10 +56,6 @@ class CacheMgr {
             throw pfm_error("DBRecurringCharge not found in cache.");
         }
 
-        void addTransaction(int sequence, DBTransaction & transaction) {
-            transactionBySequence.insert({sequence, transaction});
-        }
-
         DBTransaction getTransaction(int sequence) {
             unordered_map<int, DBTransaction>::const_iterator item = transactionBySequence.find(sequence);
 
@@ -58,6 +64,16 @@ class CacheMgr {
             }
 
             throw pfm_error("DBTransaction not found in cache.");
+        }
+
+        DBBudget getBudget(int sequence) {
+            unordered_map<int, DBBudget>::const_iterator item = budgetBySequence.find(sequence);
+
+            if (item != budgetBySequence.end()) {
+                return item->second;
+            }
+
+            throw pfm_error("DBBudget not found in cache.");
         }
 };
 

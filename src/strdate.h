@@ -49,10 +49,13 @@ class StrDate {
         static bool isDateValid(const string & date);
         
         string shortDate() const;
+        string getDisplayDate() const;
     
-        int year();
-        int month();
-        int day();
+        int year() const;
+        int month() const;
+        int day() const;
+
+        bool isEpoch() const;
 
         int daysInMonth();
 

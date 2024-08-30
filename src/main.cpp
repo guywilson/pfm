@@ -75,7 +75,7 @@ int main(int argc, char ** argv) {
     PFM_DB & db = PFM_DB::getInstance();
     db.open(pszDatabase);
 
-    // selectedAccount.set(choose_account("HSBC"));
+    // selectedAccount.set(chooseAccount("HSBC"));
     // exit(0);
 
 #ifdef PFM_TEST_SUITE_ENABLED
@@ -309,6 +309,52 @@ int main(int argc, char ** argv) {
                 t.set(getTransaction(sequence));
 
                 deleteTransaction(t);
+            }
+            else if (strncmp(pszCommand, "add budget", 10) == 0 || strncmp(pszCommand, "ab", 2) == 0) {
+                addBudget();
+            }
+            else if (strncmp(pszCommand, "list budgets", 12) == 0 || strncmp(pszCommand, "lb", 2) == 0) {
+                listBudgets();
+            }
+            else if (strncmp(pszCommand, "update budget", 13) == 0 || strncmp(pszCommand, "ub", 2) == 0) {
+                int sequence = 0;
+
+                if (strncmp(pszCommand, "update budget", 13) == 0) {
+                    if (strlen(pszCommand) >= 15) {
+                        sequence = atoi(&pszCommand[14]);
+                    }
+                }
+                else if (strncmp(pszCommand, "ub", 2) == 0) {
+                    if (strlen(pszCommand) >= 4) {
+                        sequence = atoi(&pszCommand[3]);
+                    }
+                }
+
+                DBBudget b;
+                b.set(getBudget(sequence));
+
+                b.print();
+                
+                updateBudget(b);
+            }
+            else if (strncmp(pszCommand, "delete budget", 13) == 0 || strncmp(pszCommand, "db", 2) == 0) {
+                int sequence = 0;
+
+                if (strncmp(pszCommand, "delete budget", 13) == 0) {
+                    if (strlen(pszCommand) >= 15) {
+                        sequence = atoi(&pszCommand[14]);
+                    }
+                }
+                else if (strncmp(pszCommand, "db", 2) == 0) {
+                    if (strlen(pszCommand) >= 4) {
+                        sequence = atoi(&pszCommand[3]);
+                    }
+                }
+
+                DBBudget b;
+                b.set(getBudget(sequence));
+
+                deleteBudget(b);
             }
         }
     }

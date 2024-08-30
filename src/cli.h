@@ -6,6 +6,7 @@
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_transaction.h"
+#include "db_budget.h"
 
 using namespace std;
 
@@ -45,5 +46,11 @@ void                findTransactions(DBAccount & account);
 DBTransaction       getTransaction(int sequence);
 void                updateTransaction(DBTransaction & transaction);
 void                deleteTransaction(DBTransaction & transaction);
+
+void                addBudget();
+void                listBudgets();
+DBBudget            getBudget(int sequence);
+void                updateBudget(DBBudget & budget);
+void                deleteBudget(DBBudget & budget);
 
 #endif

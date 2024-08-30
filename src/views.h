@@ -3,3 +3,4 @@
 #include "payee_views.h"
 #include "recurring_charge_views.h"
 #include "transaction_views.h"
+#include "budget_views.h"

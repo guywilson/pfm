@@ -138,6 +138,10 @@ void StrDate::validateDateString(const string & date) {
     int                 month;
     int                 year;
 
+    if (date == "N/A") {
+        return;
+    }
+
     if (date.length() < 10) {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
@@ -155,10 +159,10 @@ void StrDate::validateDateString(const string & date) {
     month = atoi(date.substr(5, 2).c_str());
     day = atoi(date.substr(8, 2).c_str());
 
-    if (year < 1900) {
+    if (year < EPOCH_YEAR) {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
-                    "Invalid date '%s': Date must be greater than '1900-01-01'",
+                    "Invalid date '%s': Date must be greater than '1970-01-01'",
                     date.c_str()),
                 __FILE__,
                 __LINE__);
@@ -215,12 +219,24 @@ string StrDate::shortDate() const {
     return _date;
 }
 
+string StrDate::getDisplayDate() const {
+    if (isEpoch()) {
+        return "N/A";
+    }
+    else {
+        return shortDate();
+    }
+}
+
 void StrDate::set(const string & date) {
     set(date.c_str());
 }
 
 void StrDate::set(const char * date) {
-    if (strlen(date) > 0) {
+    if (strncmp(date, "N/A", 3) == 0) {
+        clear();
+    }
+    else if (strlen(date) > 0) {
         validateDateString(date);
         this->_date = date;
     }
@@ -315,16 +331,20 @@ int StrDate::daysInMonth() {
     return daysInMonth(year(), month());
 }
 
-int StrDate::year() {
+int StrDate::year() const {
     return atoi(_date.substr(0, 4).c_str());
 }
 
-int StrDate::month() {
+int StrDate::month() const {
     return atoi(_date.substr(5, 2).c_str());
 }
 
-int StrDate::day() {
+int StrDate::day() const {
     return atoi(_date.substr(8, 2).c_str());
+}
+
+bool StrDate::isEpoch() const {
+    return (year() == EPOCH_YEAR && month() == EPOCH_MONTH && day() == EPOCH_DAY);
 }
 
 void StrDate::addYears(int years) {
@@ -410,8 +430,6 @@ void StrDate::addDays(int days) {
             m = 12;
             d = daysInMonth(y, m);
         }
-
-        // cout << "[" << y << ", " << m << ", " << d << "] (" << dayCounter << ")" << endl;
     }
     
     set(y, m, d);

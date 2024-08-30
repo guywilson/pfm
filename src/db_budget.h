@@ -25,7 +25,6 @@ class DBBudget : public DBEntity {
             "category_code," \
             "payee_code," \
             "description," \
-            "ideal_budget," \
             "min_budget," \
             "max_budget," \
             "created," \
@@ -41,7 +40,6 @@ class DBBudget : public DBEntity {
             "category_code," \
             "payee_code," \
             "description," \
-            "ideal_budget," \
             "min_budget," \
             "max_budget," \
             "created," \
@@ -56,14 +54,13 @@ class DBBudget : public DBEntity {
             "category_code," \
             "payee_code," \
             "description," \
-            "ideal_budget," \
             "min_budget," \
             "max_budget," \
             "created," \
             "updated)" \
             "VALUES (" \
             "'%s', '%s', '%s', '%s', '%s'," \
-            "%.2f, %.2f, %.2f, '%s', '%s');";
+            "%.2f, %.2f, '%s', '%s');";
 
         const char * sqlUpdate = 
             "UPDATE budget SET " \
@@ -72,7 +69,6 @@ class DBBudget : public DBEntity {
             "category_code = '%s'," \
             "payee_code = '%s'," \
             "description = '%s'," \
-            "ideal_budget = %.2f," \
             "min_budget = %.2f," \
             "max_budget = %.2f," \
             "updated = '%s' " \
@@ -87,7 +83,6 @@ class DBBudget : public DBEntity {
         string categoryCode;
         string payeeCode;
         string description;
-        Money idealBudget;
         Money minimumBudget;
         Money maximumBudget;
 
@@ -107,7 +102,6 @@ class DBBudget : public DBEntity {
             this->payeeCode = "";
             this->categoryCode = "";
             this->description = "";
-            this->idealBudget = 0.0;
             this->minimumBudget = 0.0;
             this->maximumBudget = 0.0;
         }
@@ -120,7 +114,6 @@ class DBBudget : public DBEntity {
             this->payeeCode = src.payeeCode;
             this->categoryCode = src.categoryCode;
             this->description = src.description;
-            this->idealBudget = src.idealBudget;
             this->minimumBudget = src.minimumBudget;
             this->maximumBudget = src.maximumBudget;
         }
@@ -133,7 +126,6 @@ class DBBudget : public DBEntity {
             cout << "PayeeCode: '" << payeeCode << "'" << endl;
             cout << "CategoryCode: '" << categoryCode << "'" << endl;
             cout << "Description: '" << description << "'" << endl;
-            cout << "IdealBudget: " << idealBudget.getRawStringValue() << endl;
             cout << "MinimumBudget: " << minimumBudget.getRawStringValue() << endl;
             cout << "MaximumBudget: " << maximumBudget.getRawStringValue() << endl;
         }
@@ -156,13 +148,10 @@ class DBBudget : public DBEntity {
             else if (column.getName() == "description") {
                 description = column.getValue();
             }
-            else if (column.getName() == "ideal_budget") {
-                idealBudget = column.getDoubleValue();
-            }
-            else if (column.getName() == "minimum_budget") {
+            else if (column.getName() == "min_budget") {
                 minimumBudget = column.getDoubleValue();
             }
-            else if (column.getName() == "maximum_budget") {
+            else if (column.getName() == "max_budget") {
                 maximumBudget = column.getDoubleValue();
             }
         }
@@ -189,7 +178,6 @@ class DBBudget : public DBEntity {
                 categoryCode.c_str(),
                 payeeCode.c_str(),
                 description.c_str(),
-                idealBudget.getDoubleValue(),
                 minimumBudget.getDoubleValue(),
                 maximumBudget.getDoubleValue(),
                 now.c_str(),
@@ -212,7 +200,6 @@ class DBBudget : public DBEntity {
                 categoryCode.c_str(),
                 payeeCode.c_str(),
                 description.c_str(),
-                idealBudget.getDoubleValue(),
                 minimumBudget.getDoubleValue(),
                 maximumBudget.getDoubleValue(),
                 now.c_str(),

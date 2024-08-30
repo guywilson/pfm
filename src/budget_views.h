@@ -17,161 +17,212 @@ class AddBudgetView : public CLIView {
     private:
         DateField startDateField = DateField("Start date: ");
         DateField endDateField = DateField("End date: ");
-        CLITextField codeField = CLITextField("Code (max. 5 chars): ");
-        CLITextField openingBalanceField = CLITextField("Opening balance [0.00]: ");
+        CategorySpinField categoryCodeField = CategorySpinField("Category code: ");
+        PayeeSpinField payeeCodeField = PayeeSpinField("Payee code: ");
+        CLITextField descriptionField = CLITextField("Description: ");
+        CLICurrencyField minBudgetField = CLICurrencyField("Minimum budget: ");
+        CLICurrencyField maxBudgetField = CLICurrencyField("Maximum budget: ");
 
     public:
         AddBudgetView() : AddBudgetView("Add budget") {}
 
         AddBudgetView(const char * title) : CLIView(title) {
-            nameField.setLengthLimit(FIELD_STRING_LEN);
-            codeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
+            descriptionField.setLengthLimit(FIELD_STRING_LEN);
 
-            openingBalanceField.setDefaultValue("0.00");
-            openingBalanceField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+            categoryCodeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
+            payeeCodeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
+
+            minBudgetField.setDefaultValue("0.00");
+            minBudgetField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+
+            maxBudgetField.setDefaultValue("0.00");
+            maxBudgetField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
         }
 
         void show() override {
             CLIView::show();
 
-            nameField.show();
-            codeField.show();
-            openingBalanceField.show();
+            startDateField.show();
+            endDateField.show();
+            categoryCodeField.show();
+            payeeCodeField.show();
+            descriptionField.show();
+            minBudgetField.show();
+            maxBudgetField.show();
         }
 
         DBBudget getBudget() {
             DBBudget budget;
 
-            account.name = nameField.getValue();
-            account.code = codeField.getValue();
-            account.openingBalance = openingBalanceField.getValue();
-            account.currentBalance = openingBalanceField.getValue();
+            budget.startDate = startDateField.getValue();
+            budget.endDate = endDateField.getValue();
+            budget.categoryCode = categoryCodeField.getValue();
+            budget.payeeCode = payeeCodeField.getValue();
+            budget.description = descriptionField.getValue();
+            budget.minimumBudget = minBudgetField.getDoubleValue();
+            budget.maximumBudget = maxBudgetField.getDoubleValue();
 
             return budget;
         }
 };
 
-class ChooseAccountView : public CLIView {
+class ChooseBudgetView : public CLIView {
     private:
-        CLITextField codeField = CLITextField("Code (max. 5 chars): ");
+        CLITextField sequenceField = CLITextField("Sequence: ");
 
     public:
-        ChooseAccountView() : ChooseAccountView("Use account") {}
-        
-        ChooseAccountView(const char * title) : CLIView(title) {
-            codeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
-        }
+        ChooseBudgetView() : ChooseBudgetView("Use transaction") {}
+        ChooseBudgetView(const char * title) : CLIView(title) {}
 
         void show() override {
             CLIView::show();
 
-            codeField.show();
+            sequenceField.show();
         }
 
-        string getCode() {
-            return codeField.getValue();
+        int getSequence() {
+            return sequenceField.getIntegerValue();
         }
 };
 
-class AccountListView : public CLIListView {
+class BudgetListView : public CLIListView {
     public:
-        AccountListView() : CLIListView() {}
+        BudgetListView() : CLIListView() {}
 
-        void addResults(DBResult<DBAccount> & result) {
+        void addResults(DBResult<DBBudget> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Accounts (%d)", result.getNumRows());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Budgets (%d)", result.getNumRows());
             setTitle(szTitle);
 
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Code", 5, CLIListColumn::leftAligned);
+            CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
             headerRow.addColumn(column1);
 
-            CLIListColumn column2 = CLIListColumn("Name", 25, CLIListColumn::leftAligned);
+            CLIListColumn column2 = CLIListColumn("Start dt", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
-            CLIListColumn column3 = CLIListColumn("Balance", 16, CLIListColumn::rightAligned);
+            CLIListColumn column3 = CLIListColumn("End dt", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
             headerRow.addColumn(column3);
+
+            CLIListColumn column4 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
+            headerRow.addColumn(column4);
+
+            CLIListColumn column5 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
+            headerRow.addColumn(column5);
+
+            CLIListColumn column6 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
+            headerRow.addColumn(column6);
+
+            CLIListColumn column7 = CLIListColumn("Minimum budget", 16, CLIListColumn::rightAligned);
+            headerRow.addColumn(column7);
+
+            CLIListColumn column8 = CLIListColumn("Maximum budget", 16, CLIListColumn::rightAligned);
+            headerRow.addColumn(column8);
 
             addHeaderRow(headerRow);
 
             for (int i = 0;i < result.getNumRows();i++) {
-                DBAccount account = result.getResultAt(i);
+                DBBudget budget = result.getResultAt(i);
 
                 CLIListRow row(headerRow);
 
-                row.addCellValue(account.code);
-                row.addCellValue(account.name);
-                row.addCellValue(account.currentBalance);
+                row.addCellValue(budget.sequence);
+                row.addCellValue(budget.startDate.shortDate());
+                row.addCellValue(budget.endDate.getDisplayDate());
+                row.addCellValue(budget.categoryCode);
+                row.addCellValue(budget.payeeCode);
+                row.addCellValue(budget.description);
+                row.addCellValue(budget.minimumBudget);
+                row.addCellValue(budget.maximumBudget);
 
                 addRow(row);
             }
         }
 };
 
-class UpdateAccountView : public CLIView {
+class UpdateBudgetView : public CLIView {
     private:
-        pfm_id_t accountId;
+        pfm_id_t budgetId;
 
-        CLITextField nameField;
-        CLITextField codeField;
-        CLICurrencyField openingBalanceField;
-        CLICurrencyField currentBalanceField;
+        DateField startDateField = DateField("Start date: ");
+        DateField endDateField = DateField("End date: ");
+        CategorySpinField categoryCodeField = CategorySpinField("Category code: ");
+        PayeeSpinField payeeCodeField = PayeeSpinField("Payee code: ");
+        CLITextField descriptionField = CLITextField("Description: ");
+        CLICurrencyField minBudgetField = CLICurrencyField("Minimum budget: ");
+        CLICurrencyField maxBudgetField = CLICurrencyField("Maximum budget: ");
 
     public:
-        UpdateAccountView() : UpdateAccountView("Update account") {}
+        UpdateBudgetView() : UpdateBudgetView("Update budget") {}
 
-        UpdateAccountView(const char * title) : CLIView(title) {}
+        UpdateBudgetView(const char * title) : CLIView(title) {}
 
-        void setAccount(DBAccount & account) {
+        void setBudget(DBBudget & budget) {
             char szPrompt[MAX_PROMPT_LENGTH];
 
-            accountId = account.id;
+            budgetId = budget.id;
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Name ['%s']: ", account.name.c_str());
-            nameField.setLabel(szPrompt);
-            nameField.setDefaultValue(account.name);
-            nameField.setLengthLimit(FIELD_STRING_LEN);
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Start date ['%s']: ", budget.startDate.shortDate().c_str());
+            startDateField.setLabel(szPrompt);
+            startDateField.setDefaultValue(budget.startDate.shortDate());
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Code ['%s']: ", account.code.c_str());
-            codeField.setLabel(szPrompt);
-            codeField.setDefaultValue(account.code);
-            codeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "End date ['%s']: ", budget.endDate.getDisplayDate().c_str());
+            endDateField.setLabel(szPrompt);
+            endDateField.setDefaultValue(budget.endDate.getDisplayDate());
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%s]: ", account.openingBalance.getRawStringValue().c_str());
-            openingBalanceField.setLabel(szPrompt);
-            openingBalanceField.setDefaultValue(account.openingBalance.getRawStringValue());
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category ['%s']: ", budget.categoryCode.c_str());
+            categoryCodeField.setLabel(szPrompt);
+            categoryCodeField.setDefaultValue(budget.categoryCode);
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Current balance [%s]: ", account.currentBalance.getRawStringValue().c_str());
-            currentBalanceField.setLabel(szPrompt);
-            currentBalanceField.setDefaultValue(account.currentBalance.getRawStringValue());
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Payee ['%s']: ", budget.payeeCode.c_str());
+            payeeCodeField.setLabel(szPrompt);
+            payeeCodeField.setDefaultValue(budget.payeeCode);
+
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", budget.description.c_str());
+            descriptionField.setLabel(szPrompt);
+            descriptionField.setDefaultValue(budget.description);
+
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Minimum budget [%s]: ", budget.minimumBudget.getRawStringValue().c_str());
+            minBudgetField.setLabel(szPrompt);
+            minBudgetField.setDefaultValue(budget.minimumBudget.getRawStringValue());
+
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Maximum budget [%s]: ", budget.maximumBudget.getRawStringValue().c_str());
+            maxBudgetField.setLabel(szPrompt);
+            maxBudgetField.setDefaultValue(budget.maximumBudget.getRawStringValue());
         }
 
         void show() override {
             CLIView::show();
 
-            nameField.show();
-            codeField.show();
-            openingBalanceField.show();
-            currentBalanceField.show();
+            startDateField.show();
+            endDateField.show();
+            categoryCodeField.show();
+            payeeCodeField.show();
+            descriptionField.show();
+            minBudgetField.show();
+            maxBudgetField.show();
         }
 
-        DBAccount getAccount() {
-            DBAccount account;
+        DBBudget getBudget() {
+            DBBudget budget;
 
-            account.id = accountId;
+            budget.id = budgetId;
 
-            account.name = nameField.getValue();
-            account.code = codeField.getValue();
-            account.openingBalance = openingBalanceField.getValue();
-            account.currentBalance = openingBalanceField.getValue();
+            budget.startDate = startDateField.getValue();
 
-            if (account.code.length() == 0) {
-                throw pfm_error("Account code must have a value");
+            if (endDateField.getValue() != "N/A") {
+                budget.endDate = endDateField.getValue();
             }
+            
+            budget.categoryCode = categoryCodeField.getValue();
+            budget.payeeCode = payeeCodeField.getValue();
+            budget.description = descriptionField.getValue();
+            budget.minimumBudget = minBudgetField.getDoubleValue();
+            budget.maximumBudget = maxBudgetField.getDoubleValue();
 
-            return account;
+            return budget;
         }
 };
 
