@@ -24,6 +24,22 @@ DBResult<DBBudgetTrack> DBBudgetTrack::retrieveByBudgetId(pfm_id_t budgetId) {
     return result;
 }
 
+DBResult<DBBudgetTrack> DBBudgetTrack::retrieveByBudgetIdAfterDate(pfm_id_t budgetId, StrDate & date) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBBudgetTrack> result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlSelectByBudgetIdAfterDate, 
+        budgetId,
+        date.shortDate().c_str());
+
+    result.retrieve(szStatement);
+
+    return result;
+}
+
 int DBBudgetTrack::retrieveLatestByBudgetId(pfm_id_t budgetId) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBBudgetTrack> result;

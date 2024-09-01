@@ -26,6 +26,18 @@ class DBBudgetTrack : public DBEntity {
             "FROM period_budget_track " \
             "WHERE budget_id = %lld;";
 
+        const char * sqlSelectByBudgetIdAfterDate = 
+            "SELECT " \
+            "id," \
+            "budget_id," \
+            "date," \
+            "balance," \
+            "created," \
+            "updated " \
+            "FROM period_budget_track " \
+            "WHERE budget_id = %lld " \
+            "AND date >= '%s';";
+
         const char * sqlSelectLatestByBudgetId = 
             "SELECT " \
             "id," \
@@ -164,6 +176,7 @@ class DBBudgetTrack : public DBEntity {
         }
 
         DBResult<DBBudgetTrack> retrieveByBudgetId(pfm_id_t budgetId);
+        DBResult<DBBudgetTrack> retrieveByBudgetIdAfterDate(pfm_id_t budgetId, StrDate & date);
         int retrieveLatestByBudgetId(pfm_id_t budgetId);
 };
 

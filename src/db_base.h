@@ -232,7 +232,7 @@ class DBResult : public Result {
             entity.onRowComplete(getSequence());
             incrementSequence();
 
-            results.push_back(entity);
+            addRow(entity);
             incrementNumRows();
         }
 };

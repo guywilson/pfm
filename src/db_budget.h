@@ -220,8 +220,13 @@ class DBBudget : public DBEntity {
             return szStatement;
         }
 
+        void afterInsert() override;
+
+        int createOutstandingTrackingRecords();
+
         DBResult<DBBudget> retrieveByPayeeCode(string & code);
         DBResult<DBBudget> retrieveByCategoryCode(string & code);
+        DBResult<DBBudget> retrieveByCategoryOrPayeeCode(string & categoryCode, string & payeeCode);
 };
 
 #endif
