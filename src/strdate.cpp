@@ -14,6 +14,13 @@ using namespace std;
 #define EPOCH_MONTH                    1
 #define EPOCH_DAY                      1
 
+#ifdef PFM_TEST_SUITE_ENABLED
+static char _todayTestDate[DATE_STAMP_BUFFER_LEN];
+
+void setTodayTestDate(const char * date) {
+    strncpy(_todayTestDate, date, DATE_STAMP_BUFFER_LEN);
+}
+#endif
 
 StrDate::StrDate() {
     this->_date = StrDate::today();
@@ -46,18 +53,16 @@ StrDate::StrDate(int year, int month, int day) {
 }
 
 string StrDate::today() {
-    struct timeval		tv;
-    struct tm *         localTime;
-    time_t				t;
-    char *              today;
-
-    gettimeofday(&tv, NULL);
-    t = tv.tv_sec;
-    localTime = localtime(&t);
-
-    today = (char *)malloc(DATE_STAMP_BUFFER_LEN);
+    char * today = (char *)malloc(DATE_STAMP_BUFFER_LEN);
 
     if (today != NULL) {
+#ifndef PFM_TEST_SUITE_ENABLED
+        struct timeval tv;
+
+        gettimeofday(&tv, NULL);
+        time_t t = tv.tv_sec;
+        struct tm * localTime = localtime(&t);
+
         snprintf(
             today, 
             DATE_STAMP_BUFFER_LEN, 
@@ -65,6 +70,9 @@ string StrDate::today() {
             localTime->tm_year + 1900, 
             localTime->tm_mon + 1, 
             localTime->tm_mday);
+#else
+        strncpy(today, _todayTestDate, DATE_STAMP_BUFFER_LEN);
+#endif
     }
 
     return string(today);
@@ -79,18 +87,15 @@ string StrDate::getTimestampToMicrosecond() {
 }
 
 string StrDate::getTimestamp(bool includeus) {
-    struct timeval		tv;
-    struct tm *         localTime;
-    time_t				t;
-    char *              now;
-
-    gettimeofday(&tv, NULL);
-    t = tv.tv_sec;
-    localTime = localtime(&t);
-
-    now = (char *)malloc(TIME_STAMP_BUFFER_LEN);
+    char * now = (char *)malloc(TIME_STAMP_BUFFER_LEN);
 
     if (now != NULL) {
+        struct timeval tv;
+
+        gettimeofday(&tv, NULL);
+        time_t t = tv.tv_sec;
+        struct tm * localTime = localtime(&t);
+
         if (includeus) {
             snprintf(
                 now, 

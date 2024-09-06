@@ -29,7 +29,7 @@ PRECOMPILE = @ mkdir -p $(BUILD) $(DEP)
 # postcompile step
 POSTCOMPILE = @ mv -f $(DEP)/$*.Td $(DEP)/$*.d
 
-#GLOBAL_DEF=-DPFM_TEST_SUITE_ENABLED
+GLOBAL_DEF=-DPFM_TEST_SUITE_ENABLED
 
 CFLAGS_BASE=-c -Wall -pedantic $(GLOBAL_DEF)
 CFLAGS_REL=$(CFLAGS_BASE) -O2

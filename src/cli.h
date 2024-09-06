@@ -53,4 +53,6 @@ DBBudget            getBudget(int sequence);
 void                updateBudget(DBBudget & budget);
 void                deleteBudget(DBBudget & budget);
 
+void                testAccount(const char * accountCode);
+
 #endif

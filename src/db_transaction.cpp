@@ -67,6 +67,10 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, d
     return result;
 }
 
+DBResult<DBTransaction> DBTransaction::retrieveByRecurringChargeID(pfm_id_t recurringChargeId) {
+    return retrieveByStatementAndID(sqlSelectByRecurringChargeID, recurringChargeId);
+}
+
 int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
     DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectLatestByChargeID, chargeId);
 
@@ -260,7 +264,6 @@ void DBTransaction::afterRemove() {
             DBBudgetTrack t = trkResult.getResultAt(j);
 
             t.balance -= this->getSignedAmount();
-
             t.save();
         }
     }

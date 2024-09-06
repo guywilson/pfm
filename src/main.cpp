@@ -25,6 +25,10 @@ using namespace std;
 
 #define DEFAULT_DATABASE_NAME                   ".pfm"
 
+#ifdef PFM_TEST_SUITE_ENABLED
+extern void testAccount();
+#endif
+
 static void printUsage(void) {
 
 }
@@ -82,6 +86,8 @@ int main(int argc, char ** argv) {
     MoneyTest::run();
     cout << endl << endl;
     StrDateTest::run();
+    cout << endl << endl;
+    testAccount();
     exit(0);
 #endif
 
@@ -334,7 +340,7 @@ int main(int argc, char ** argv) {
                 b.set(getBudget(sequence));
 
                 b.print();
-                
+
                 updateBudget(b);
             }
             else if (strncmp(pszCommand, "delete budget", 13) == 0 || strncmp(pszCommand, "db", 2) == 0) {
