@@ -100,6 +100,10 @@ void DBAccount::createCarriedOverLogs() {
             DBTransaction transaction;
             DBResult<DBTransaction> result = transaction.retrieveByAccountID(this->id, sort_ascending, 1);
 
+            if (result.getNumRows() == 0) {
+                return;
+            }
+            
             co.date = result.getResultAt(0).date;
         }
 
