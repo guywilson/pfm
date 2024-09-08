@@ -18,7 +18,7 @@ using namespace std;
 class AddRecurringChargeView : public CLIView {
     private:
         CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
-        PayeeSpinField payeeField = PayeeSpinField("Category code (max. 5 chars): ");
+        PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
         DateField startDateField = DateField("Start date (yyyy-mm-dd)[today]: ");
         DateField endDateField = DateField("End date (yyyy-mm-dd): ");
         CLITextField descriptionField = CLITextField("Description: ");

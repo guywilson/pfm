@@ -94,8 +94,6 @@ DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(pfm_id_t acc
     int sqlRowLimit = SQL_ROW_LIMIT;
     DBResult<DBTransaction> result;
 
-    validateCriteria(criteria);
-
     snprintf(
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 

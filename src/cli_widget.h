@@ -50,7 +50,56 @@ class CLIField : public CLIWidget {
         string value;
         string label;
 
+        string makeUpperCase(string s) {
+            for (int i = 0;i < s.length();i++) {
+                s[i] = (char)toupper(s.at(i));
+            }
+
+            return s;
+        }
+
+        bool doesExistInString(string & src, const char * checkStr) {
+            string upper = makeUpperCase(src);
+
+            if (upper.find(checkStr) == string::npos) {
+                return false;
+            }
+
+            return true;
+        }
+
+        bool containsInsert(string & fieldValue) {
+            return doesExistInString(fieldValue, "INSERT");
+        }
+
+        bool containsUpdate(string & fieldValue) {
+            return doesExistInString(fieldValue, "UPDATE");
+        }
+
+        bool containsDelete(string & fieldValue) {
+            return doesExistInString(fieldValue, "DELETE");
+        }
+
+        bool containsJoin(string & fieldValue) {
+            return doesExistInString(fieldValue, "JOIN");
+        }
+
+        bool containsOr(string & fieldValue) {
+            return doesExistInString(fieldValue, "OR");
+        }
+
     protected:
+        void validateField(string & fieldValue) {
+            if (containsInsert(fieldValue) || 
+                containsUpdate(fieldValue) || 
+                containsDelete(fieldValue) || 
+                containsJoin(fieldValue) || 
+                containsOr(fieldValue))
+            {
+                throw pfm_error("Invalid field value, SQL keywords are not permitted");
+            }
+        }
+
         string _getLabel() {
             return label;
         }
@@ -60,6 +109,7 @@ class CLIField : public CLIWidget {
         }
 
         void _setValue(string value) {
+            validateField(value);
             this->value = value;
         } 
 

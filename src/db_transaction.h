@@ -150,48 +150,7 @@ class DBTransaction : public DBPayment {
         const char * sqlDelete = 
                         "DELETE FROM account_transaction WHERE id = %lld;";
 
-        string makeUpperCase(string s) {
-            for (int i = 0;i < s.length();i++) {
-                s[i] = (char)toupper(s.at(i));
-            }
-
-            return s;
-        }
-
-        bool doesExistInString(string & src, const char * checkStr) {
-            string upper = makeUpperCase(src);
-
-            if (upper.find(checkStr) == string::npos) {
-                return false;
-            }
-
-            return true;
-        }
-
-        bool containsInsert(string & criteria) {
-            return doesExistInString(criteria, "INSERT");
-        }
-
-        bool containsUpdate(string & criteria) {
-            return doesExistInString(criteria, "UPDATE");
-        }
-
-        bool containsDelete(string & criteria) {
-            return doesExistInString(criteria, "DELETE");
-        }
-
-        bool containsJoin(string & criteria) {
-            return doesExistInString(criteria, "JOIN");
-        }
-
         DBResult<DBTransaction> retrieveByStatementAndID(const char * statement, pfm_id_t id);
-
-    protected:
-        void validateCriteria(string & criteria) {
-            if (containsInsert(criteria) || containsUpdate(criteria) || containsDelete(criteria) || containsJoin(criteria)) {
-                throw pfm_error("Invalid criteria string, SQL keywords are not permitted");
-            }
-        }
 
     public:
         pfm_id_t recurringChargeId;
