@@ -386,6 +386,7 @@ class DBTransaction : public DBPayment {
         void afterRemove() override;
 
         int findLatestByRecurringChargeID(pfm_id_t chargeId);
+        int createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate);
 
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);

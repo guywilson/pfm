@@ -140,6 +140,44 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDBetweenDates(pfm_id_t 
     return result;
 }
 
+int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate) {
+    StrDate dateToday;
+
+    if (latestDate <= dateToday) {
+        StrDate nextPaymentDate = latestDate;
+
+        char frequencyValue = charge.getFrequencyValue();
+        char frequencyUnit = charge.getFrequencyUnit();
+
+        switch (frequencyUnit) {
+            case 'y':
+                nextPaymentDate.addYears(frequencyValue);
+                break;
+
+            case 'm':
+                nextPaymentDate.addMonths(frequencyValue);
+                break;
+
+            case 'w':
+                nextPaymentDate.addWeeks(frequencyValue);
+                break;
+
+            case 'd':
+                nextPaymentDate.addDays(frequencyValue);
+                break;
+        }
+
+        if (nextPaymentDate <= dateToday) {
+            DBTransaction transaction;
+            transaction.createFromRecurringChargeAndDate(charge, nextPaymentDate);
+
+            return CHARGE_OK;
+        }
+    }
+
+    return CHARGE_NOT_DUE;
+}
+
 void DBTransaction::afterInsert() {
     Logger & log = Logger::getInstance();
     log.logEntry("DBTransaction::afterInsert()");
@@ -189,7 +227,7 @@ void DBTransaction::beforeUpdate() {
     ** revert and re-add the transaction amount to the 
     ** current balance...
     */
-    if (this->amount != transaction.amount) {
+    if (this->getSignedAmount() != transaction.getSignedAmount()) {
         DBAccount account;
         account.retrieve(transaction.accountId);
 

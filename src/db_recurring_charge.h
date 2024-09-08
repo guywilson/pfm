@@ -158,7 +158,6 @@ class DBRecurringCharge : public DBPayment {
         bool isChargeDueThisPeriod();
         StrDate calculateNextPaymentDate();
         void setNextPaymentDate();
-        int createNextTransactionForCharge(StrDate & latestDate);
 
         const char * getTableName() override {
             return "recurring_charge";

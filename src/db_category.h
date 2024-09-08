@@ -13,8 +13,6 @@ using namespace std;
 #ifndef __INCL_CATEGORY
 #define __INCL_CATEGORY
 
-class DBCategoryResult;
-
 class DBCategory : public DBEntity {
     private:
         const char * sqlSelectByCode = 

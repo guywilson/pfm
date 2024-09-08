@@ -13,8 +13,6 @@ using namespace std;
 #ifndef __INCL_CURRENCY
 #define __INCL_CURRENCY
 
-class DBCurrencyResult;
-
 class DBCurrency : public DBEntity {
     private:
         const char * sqlSelectByCode = 

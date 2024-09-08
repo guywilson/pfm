@@ -13,6 +13,7 @@
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_recurring_charge.h"
+#include "db_carried_over.h"
 #include "db_transaction.h"
 #include "db_budget.h"
 
@@ -158,5 +159,131 @@ void testAccount() {
 
     if (trResult3.getNumRows() != 5) {
         throw pfm_error(pfm_error::buildMsg("Expected 5 transactions, got %d", trResult3.getNumRows()));
+    }
+
+    /*
+    ** Check that we have the right number of carried-over logs...
+    */
+    DBCarriedOver co;
+    DBResult<DBCarriedOver> coResultBeforeInsert = co.retrieveByAccountId(accountId);
+
+    if (coResultBeforeInsert.getNumRows() != 7) {
+        throw pfm_error(pfm_error::buildMsg("Expected 7 carried over logs, got %d", coResultBeforeInsert.getNumRows()));
+    }
+
+    /*
+    ** Insert a transaction and check carried over logs...
+    */
+    DBTransaction trTest;
+    trTest.accountId = accountId;
+    trTest.amount = 28.30;
+    trTest.categoryId = getCategoryId("LUNCH");
+    trTest.date = "2024-03-24";
+    trTest.description = "Lunch";
+    trTest.isCredit = false;
+    trTest.isReconciled = false;
+    trTest.payeeId = getPayeeId("WASAB");
+    trTest.recurringChargeId = 0;
+    trTest.save();
+
+    DBResult<DBCarriedOver> coResultAfterInsert = co.retrieveByAccountId(accountId);
+
+    for (int i = 0;i < coResultAfterInsert.getNumRows();i++) {
+        DBCarriedOver coBefore = coResultBeforeInsert.getResultAt(i);
+        DBCarriedOver coAfter = coResultAfterInsert.getResultAt(i);
+
+        if (coAfter.id >= 3) {
+            Money expected = (coBefore.balance - trTest.amount);
+
+            if (coAfter.balance != expected) {
+                throw pfm_error(
+                        pfm_error::buildMsg(
+                            "Carried Over Test 1: Expected balance %.2f, got %.2f", 
+                            expected.getDoubleValue(), 
+                            coAfter.balance.getDoubleValue()),
+                        __FILE__,
+                        __LINE__);
+            }
+        }
+    }
+
+    /*
+    ** Update the transaction amount...
+    */
+    trTest.amount = 8.30;
+    trTest.save();
+
+    DBResult<DBCarriedOver> coResultAfterUpdate = co.retrieveByAccountId(accountId);
+
+    for (int i = 0;i < coResultAfterUpdate.getNumRows();i++) {
+        DBCarriedOver coBefore = coResultBeforeInsert.getResultAt(i);
+        DBCarriedOver coAfter = coResultAfterUpdate.getResultAt(i);
+
+        if (coAfter.id >= 3) {
+            Money expected = (coBefore.balance - trTest.amount);
+
+            if (coAfter.balance != expected) {
+                throw pfm_error(
+                        pfm_error::buildMsg(
+                            "Carried Over Test 2: Expected balance %.2f, got %.2f", 
+                            expected.getDoubleValue(), 
+                            coAfter.balance.getDoubleValue()),
+                        __FILE__,
+                        __LINE__);
+            }
+        }
+    }
+
+    /*
+    ** Update the transaction from debit to credit...
+    */
+    trTest.isCredit = true;
+    trTest.save();
+
+    DBResult<DBCarriedOver> coResultAfterUpdate2 = co.retrieveByAccountId(accountId);
+
+    for (int i = 0;i < coResultAfterUpdate2.getNumRows();i++) {
+        DBCarriedOver coBefore = coResultBeforeInsert.getResultAt(i);
+        DBCarriedOver coAfter = coResultAfterUpdate2.getResultAt(i);
+
+        if (coAfter.id >= 3) {
+            Money expected = (coBefore.balance + trTest.amount);
+
+            if (coAfter.balance != expected) {
+                throw pfm_error(
+                        pfm_error::buildMsg(
+                            "Carried Over Test 3: Expected balance %.2f, got %.2f", 
+                            expected.getDoubleValue(), 
+                            coAfter.balance.getDoubleValue()),
+                        __FILE__,
+                        __LINE__);
+            }
+        }
+    }
+
+    /*
+    ** Delete the transaction...
+    */
+    trTest.remove();
+
+    DBResult<DBCarriedOver> coResultAfterDelete = co.retrieveByAccountId(accountId);
+
+    for (int i = 0;i < coResultAfterDelete.getNumRows();i++) {
+        DBCarriedOver coBefore = coResultBeforeInsert.getResultAt(i);
+        DBCarriedOver coAfter = coResultAfterDelete.getResultAt(i);
+
+        if (coAfter.id >= 3) {
+            Money expected = coBefore.balance;
+
+            if (coAfter.balance != expected) {
+                throw pfm_error(
+                        pfm_error::buildMsg(
+                            "Carried Over Test 4: Expected balance %.2f, got %.2f", 
+                            expected.getDoubleValue(), 
+                            coAfter.balance.getDoubleValue()),
+                        __FILE__,
+                        __LINE__);
+            }
+        }
     }
 }

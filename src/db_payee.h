@@ -13,8 +13,6 @@ using namespace std;
 #ifndef __INCL_PAYEE
 #define __INCL_PAYEE
 
-class DBPayeeResult;
-
 class DBPayee : public DBEntity {
     private:
         const char * sqlSelectByCode = 

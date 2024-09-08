@@ -59,11 +59,17 @@ void DBAccount::createRecurringTransactions() {
             transaction.date = charge.date;
 
             int chargeStatus = CHARGE_OK;
+            int numRows = 0;
 
             while (transaction.date < periodStartDate && chargeStatus == CHARGE_OK) {
-                transaction.findLatestByRecurringChargeID(charge.id);
+                numRows = transaction.findLatestByRecurringChargeID(charge.id);
 
-                chargeStatus = charge.createNextTransactionForCharge(transaction.date);
+                if (numRows == 0) {
+                    transaction.createFromRecurringChargeAndDate(charge, charge.date);
+                }
+                else {
+                    chargeStatus = transaction.createNextTransactionForCharge(charge, transaction.date);
+                }
             }
         }
 

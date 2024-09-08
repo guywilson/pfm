@@ -16,8 +16,6 @@ using namespace std;
 #ifndef __INCL_ACCOUNT
 #define __INCL_ACCOUNT
 
-class DBAccountResult;
-
 class DBAccount : public DBEntity {
     private:
         const char * sqlSelectByCode = 

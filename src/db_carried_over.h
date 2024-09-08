@@ -16,8 +16,6 @@ using namespace std;
 #ifndef __INCL_CARRIED_OVER
 #define __INCL_CARRIED_OVER
 
-class DBCarriedOverResult;
-
 class DBCarriedOver : public DBEntity {
     private:
         const char * sqlSelectByAccountId = 

@@ -13,8 +13,6 @@ using namespace std;
 #ifndef __INCL_CONFIG
 #define __INCL_CONFIG
 
-class DBConfigResult;
-
 class DBConfig : public DBEntity {
     private:
         const char * sqlSelectByKey = 
