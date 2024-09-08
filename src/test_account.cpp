@@ -97,14 +97,17 @@ static pfm_id_t createAccount() {
     return account.id;
 }
 
+#ifdef PFM_TEST_SUITE_ENABLED
 extern void setTodayTestDate(const char * date);
+#endif
 
 void testAccount() {
     createPayees();
     pfm_id_t accountId = createAccount();
 
+#ifdef PFM_TEST_SUITE_ENABLED
     setTodayTestDate("2024-08-16");
-
+#endif
     StrDate today;
 
     DBRecurringCharge charge1;
