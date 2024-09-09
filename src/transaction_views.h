@@ -23,6 +23,7 @@ class AddTransactionView : public CLIView {
         PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
         DateField dateField = DateField("Date (yyyy-mm-dd)[today]: ");
         CLITextField descriptionField = CLITextField("Description: ");
+        CLITextField referenceField = CLITextField("Reference: ");
         CLITextField creditDebitField = CLITextField("Credit/Debit [DB]: ");
         CLICurrencyField amountField = CLICurrencyField("Amount: ");
         CLITextField isReconciledField = CLITextField("Is reconciled [N]: ");
@@ -57,6 +58,7 @@ class AddTransactionView : public CLIView {
             payeeField.show();
             dateField.show();
             descriptionField.show();
+            referenceField.show();
             creditDebitField.show();
             amountField.show();
             isReconciledField.show();
@@ -73,6 +75,7 @@ class AddTransactionView : public CLIView {
 
             transaction.date = dateField.getValue();
             transaction.description = descriptionField.getValue();
+            transaction.reference = referenceField.getValue();
 
             string creditDebit = creditDebitField.getValue();
             transaction.isCredit = transaction.getIsCredit(creditDebit);
@@ -109,20 +112,23 @@ class TransactionListView : public CLIListView {
             CLIListColumn column3 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
             headerRow.addColumn(column3);
 
-            CLIListColumn column4 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
+            CLIListColumn column4 = CLIListColumn("Reference", 12, CLIListColumn::leftAligned);
             headerRow.addColumn(column4);
 
-            CLIListColumn column5 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
+            CLIListColumn column5 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column5);
 
-            CLIListColumn column6 = CLIListColumn("CR/DB", 5, CLIListColumn::leftAligned);
+            CLIListColumn column6 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column6);
 
-            CLIListColumn column7 = CLIListColumn("Amount", 16, CLIListColumn::rightAligned);
+            CLIListColumn column7 = CLIListColumn("CR/DB", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column7);
 
-            CLIListColumn column8 = CLIListColumn("Rec", 3, CLIListColumn::leftAligned);
+            CLIListColumn column8 = CLIListColumn("Amount", 16, CLIListColumn::rightAligned);
             headerRow.addColumn(column8);
+
+            CLIListColumn column9 = CLIListColumn("Rec", 3, CLIListColumn::leftAligned);
+            headerRow.addColumn(column9);
 
             addHeaderRow(headerRow);
 
@@ -134,6 +140,7 @@ class TransactionListView : public CLIListView {
                 row.addCellValue(transaction.sequence);
                 row.addCellValue(transaction.date.shortDate());
                 row.addCellValue(transaction.description);
+                row.addCellValue(transaction.reference);
                 row.addCellValue(transaction.categoryCode);
                 row.addCellValue(transaction.payeeCode);
                 row.addCellValue(transaction.getCreditDebitValue());
@@ -148,7 +155,7 @@ class TransactionListView : public CLIListView {
         void show() override {
             CLIListView::show();
             showBottomBorder();
-            cout << "                                                         Total amount: | " << bold_on << right << setw(17) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
+            cout << "                                                                        Total amount: | " << bold_on << right << setw(17) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
         }
 };
 
@@ -179,6 +186,7 @@ class UpdateTransactionView : public CLIView {
         PayeeSpinField payeeField;
         DateField dateField;
         CLITextField descriptionField;
+        CLITextField referenceField;
         CLITextField creditDebitField;
         CLICurrencyField amountField;
         CLITextField isReconciledField;
@@ -219,6 +227,10 @@ class UpdateTransactionView : public CLIView {
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", transaction.description.c_str());
             descriptionField.setLabel(szPrompt);
             descriptionField.setDefaultValue(transaction.description);
+
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Reference ['%s']: ", transaction.reference.c_str());
+            referenceField.setLabel(szPrompt);
+            referenceField.setDefaultValue(transaction.reference);
 
             string creditDebit = transaction.getCreditDebitValue();
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Credit/debit ['%s']: ", creditDebit.c_str());
