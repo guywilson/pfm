@@ -21,6 +21,7 @@ void                addAccount();
 void                listAccounts();
 DBAccount           chooseAccount(const char * szAccountCode);
 void                updateAccount(DBAccount & account);
+void                showAccountBalances(DBAccount & account);
 
 void                addCategory();
 void                listCategories();

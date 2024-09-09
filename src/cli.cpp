@@ -70,11 +70,8 @@ DBAccount chooseAccount(const char * szAccountCode) {
     account.retrieveByCode(accountCode);
     account.onUseAccountTrigger();
     
-    Money balanceAfterBills = account.calculateBalanceAfterBills();
-
-    cout << "Current balance:     " << right << setw(13) << account.currentBalance.getFormattedStringValue() << endl;
-    cout << "Balance after bills: " << right << setw(13) << balanceAfterBills.getFormattedStringValue() << endl;
-
+    showAccountBalances(account);
+    
     return account;
 }
 
@@ -86,6 +83,13 @@ void updateAccount(DBAccount & account) {
     DBAccount updatedAccount = view.getAccount();
 
     updatedAccount.save();
+}
+
+void showAccountBalances(DBAccount & account) {
+    Money balanceAfterBills = account.calculateBalanceAfterBills();
+
+    cout << "Current balance:     " << right << setw(13) << account.currentBalance.getFormattedStringValue() << endl;
+    cout << "Balance after bills: " << right << setw(13) << balanceAfterBills.getFormattedStringValue() << endl;
 }
 
 void addCategory() {

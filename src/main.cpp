@@ -130,11 +130,29 @@ int main(int argc, char ** argv) {
                     selectedAccount.set(chooseAccount(accountCode));
                 }
                 else if (strncmp(pszCommand, "update account", 15) == 0 || strncmp(pszCommand, "ua", 2) == 0) {
-                    updateAccount(selectedAccount);
+                    if (selectedAccount.id != 0) {
+                        updateAccount(selectedAccount);
+                    }
+                    else {
+                        throw pfm_error("No account selected");
+                    }
                 }
                 else if (strncmp(pszCommand, "delete account", 15) == 0 || strncmp(pszCommand, "da", 2) == 0) {
-                    selectedAccount.remove();
-                    selectedAccount.clear();
+                    if (selectedAccount.id != 0) {
+                        selectedAccount.remove();
+                        selectedAccount.clear();
+                    }
+                    else {
+                        throw pfm_error("No account selected");
+                    }
+                }
+                else if (strncmp(pszCommand, "show balance", 12) == 0 || strncmp(pszCommand, "sb", 2) == 0) {
+                    if (selectedAccount.id != 0) {
+                        showAccountBalances(selectedAccount);
+                    }
+                    else {
+                        throw pfm_error("No account selected");
+                    }
                 }
                 else if (strncmp(pszCommand, "add category", 13) == 0 || strncmp(pszCommand, "ac", 2) == 0) {
                     addCategory();
