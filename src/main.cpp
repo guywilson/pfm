@@ -20,6 +20,7 @@
 #include "cli.h"
 #include "money.h"
 #include "strdate.h"
+#include "version.h"
 
 using namespace std;
 
@@ -34,7 +35,7 @@ static void printUsage(void) {
 }
 
 static void printVersion(void) {
-
+    cout << "PFM version '" << getVersion() << "' - built [" << getBuildDate() << "]" << endl << endl;
 }
 
 int main(int argc, char ** argv) {
@@ -58,6 +59,10 @@ int main(int argc, char ** argv) {
 					printUsage();
 					return 0;
 				}
+                else if (argv[i][1] == 'v' || strncmp(&argv[i][1], "-version", 8) == 0) {
+                    printVersion();
+                    return 0;
+                }
 				else {
 					printf("Unknown argument '%s'", &argv[i][0]);
 					printUsage();
