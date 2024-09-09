@@ -356,6 +356,20 @@ class CLIListColumn : public CLIField {
         int width;
         alignment align;
 
+        int getNumPaddingChars(string & value) {
+            return (getWidth() - value.length());
+        }
+
+        int printPadding(string & value) {
+            int numPaddingChars = getNumPaddingChars(value);
+
+            for (int i = 0;i < numPaddingChars;i++) {
+                cout << " ";
+            }
+
+            return numPaddingChars;
+        }
+
     public:
         CLIListColumn() : CLIField() {}
         CLIListColumn(const char * name, int width, CLIListColumn::alignment align) : CLIField(name) {
@@ -375,7 +389,42 @@ class CLIListColumn : public CLIField {
                 throw pfm_error("Column name is too long for specified width");
             }
         }
+        
+        int getColumnWidth() {
+            string columnName = getName();
 
+            return (columnName.length() + getNumPaddingChars(columnName) + 3);
+        }
+
+        void printColumnHeader() {
+            string name = getName();
+
+            cout << name;
+            printPadding(name);
+            cout << " | ";
+        }
+
+        void printCell(string value) {
+            int width = getWidth();
+            string v = value;
+
+            if (value[0] == '#') {
+                width++;
+                v = v.substr(1);
+            }
+
+            switch (getAlignment()) {
+                case CLIListColumn::leftAligned:
+                    cout << left << setw(width) << v;
+                    break;
+
+                case CLIListColumn::rightAligned:
+                    cout << right << setw(width) << v;
+                    break;
+            }
+
+            cout << " | ";
+        }
 
         string getName() {
             return _getLabel();
@@ -397,56 +446,6 @@ class CLIListRow : public CLIWidget {
         vector<CLIListColumn> columnDefintions;
         vector<string> columnValues;
         int tableWidth;
-
-        int getNumPaddingChars(CLIListColumn & column, string & value) {
-            return (column.getWidth() - value.length());
-        }
-
-        int printPadding(CLIListColumn & column, string & value) {
-            int numPaddingChars = getNumPaddingChars(column, value);
-
-            for (int i = 0;i < numPaddingChars;i++) {
-                cout << " ";
-            }
-
-            return numPaddingChars;
-        }
-        
-        int getColumnWidth(CLIListColumn & column) {
-            string columnName = column.getName();
-
-            return (columnName.length() + getNumPaddingChars(column, columnName) + 3);
-        }
-
-        void printColumnHeader(CLIListColumn & column) {
-            string name = column.getName();
-
-            cout << name;
-            printPadding(column, name);
-            cout << " | ";
-        }
-
-        void printCell(CLIListColumn & column, string value) {
-            int width = column.getWidth();
-            string v = value;
-
-            if (value[0] == '#') {
-                width++;
-                v = v.substr(1);
-            }
-
-            switch (column.getAlignment()) {
-                case CLIListColumn::leftAligned:
-                    cout << left << setw(width) << v;
-                    break;
-
-                case CLIListColumn::rightAligned:
-                    cout << right << setw(width) << v;
-                    break;
-            }
-
-            cout << " | ";
-        }
 
     public:
         CLIListRow() : CLIWidget() {}
@@ -571,9 +570,9 @@ class CLIListRow : public CLIWidget {
             for (int i = 0;i < getNumColumns();i++) {
                 CLIListColumn column = getColumnAt(i);
 
-                printColumnHeader(column);
+                column.printColumnHeader();
 
-                tableWidth += getColumnWidth(column);
+                tableWidth += column.getColumnWidth();
             }
 
             cout << endl;
@@ -590,7 +589,7 @@ class CLIListRow : public CLIWidget {
                 CLIListColumn column = getColumnAt(i);
                 string value = getValueAt(i);
 
-                printCell(column, value);
+                column.printCell(value);
             }
 
             cout << endl;
