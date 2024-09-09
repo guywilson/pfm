@@ -179,10 +179,10 @@ class CLITextField : public CLIField {
         string defaultValue;
 
     protected:
-        string readLine() {
+        string readLine(const char * prompt) {
             string text;
 
-            char * line = readline(_getLabel().c_str());
+            char * line = readline(prompt);
 
             if (line != NULL && line[0] != 0) {
                 text = line;
@@ -193,6 +193,15 @@ class CLITextField : public CLIField {
             }
 
             return text;
+        }
+
+        string readLine(string & prompt) {
+            return readLine(prompt.c_str());
+        }
+
+        string readLine() {
+            string s = _getLabel();
+            return readLine(s);
         }
 
     public:

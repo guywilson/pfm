@@ -15,6 +15,9 @@ using namespace std;
 #define DATE_FIELD_LENGTH                       10
 
 class CategorySpinField : public CLISpinTextField {
+    private:
+        DBCategory category;
+
     public:
         CategorySpinField() : CLISpinTextField() {}
         CategorySpinField(string & label) : CLISpinTextField(label) {}
@@ -33,23 +36,29 @@ class CategorySpinField : public CLISpinTextField {
 
             populate();
 
-            string line = readLine();
-            _setValue(line);
+            string code = readLine();
+            _setValue(code);
+
+            category.retrieveByCode(code);
+
+            if (category.id == 0) {
+                category.code = code;
+                category.description = readLine("Category description: ");
+                category.save();
+            }
 
             clear();
         }
 
         DBCategory getCategory() {
-            string code = getValue();
-
-            DBCategory category;
-            category.retrieveByCode(code);
-
             return category;
         }
 };
 
 class PayeeSpinField : public CLISpinTextField {
+    private:
+        DBPayee payee;
+
     public:
         PayeeSpinField() : CLISpinTextField() {}
         PayeeSpinField(string & label) : CLISpinTextField(label) {}
@@ -66,18 +75,21 @@ class PayeeSpinField : public CLISpinTextField {
 
             populate();
 
-            string line = readLine();
-            _setValue(line);
+            string code = readLine();
+            _setValue(code);
+
+            payee.retrieveByCode(code);
+
+            if (payee.id == 0) {
+                payee.code = code;
+                payee.name = readLine("Payee name: ");
+                payee.save();
+            }
 
             clear();
         }
 
         DBPayee getPayee() {
-            string code = getValue();
-
-            DBPayee payee;
-            payee.retrieveByCode(code);
-
             return payee;
         }
 };
