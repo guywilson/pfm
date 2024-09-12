@@ -119,6 +119,8 @@ void DBEntity::save() {
     PFM_DB & db = PFM_DB::getInstance();
 
     try {
+        validate();
+        
         db.begin();
 
         if (id == 0) {

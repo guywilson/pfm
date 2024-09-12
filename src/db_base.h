@@ -49,6 +49,10 @@ class DBEntity {
             return;
         }
 
+        virtual void validate() {
+            return;
+        }
+
     public:
         pfm_id_t id;
 

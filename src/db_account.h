@@ -119,11 +119,13 @@ class DBAccount : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string key = "F6FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                name.c_str(),
+                DBColumn::encrypt(name, key).c_str(),
                 code.c_str(),
                 openingBalance.getRawStringValue().c_str(),
                 currentBalance.getRawStringValue().c_str(),

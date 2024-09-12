@@ -340,6 +340,7 @@ class DBTransaction : public DBPayment {
             return szStatement;
         }
 
+        void validate() override;
         void afterInsert() override;
         void beforeUpdate() override;
         void afterRemove() override;

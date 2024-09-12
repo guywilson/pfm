@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <sqlite3.h>
 
+#include "pfm_error.h"
 #include "logger.h"
 
 using namespace std;
@@ -28,6 +29,18 @@ class DBColumn {
     private:
         string name;
         string value;
+
+        static bool isCharPermitted(char ch) {
+            const char * permittedCharset = " -0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz:;.,";
+
+            for (int i = 0;i < strlen(permittedCharset);i++) {
+                if (ch == permittedCharset[i]) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
     public:
         DBColumn(const char * name, const char * value) {
@@ -67,6 +80,34 @@ class DBColumn {
 
         pfm_id_t getIDValue() {
             return strtoll(value.c_str(), NULL, 10);
+        }
+
+        static void validateStringValue(const string & value) {
+            for (int i = 0;i < value.length();i++) {
+                if (!isCharPermitted(value[i])) {
+                    throw pfm_error(pfm_error::buildMsg("Invalid char '%c' in value '%s'", value[i], value.c_str()));
+                }
+            }
+        }
+
+        static string encrypt(string & value, string & key) {
+            string out = value;
+
+            int j = 0;
+
+            for (int i = 0;i < value.length();i++) {
+                if (j == key.length()) {
+                    j = 0;
+                }
+                
+                out[i] = value[i] ^ key[j++];
+            }
+
+            return out;
+        }
+
+        static string decrypt(string & value, string & key) {
+            return encrypt(value, key);
         }
 };
 

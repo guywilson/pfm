@@ -176,6 +176,13 @@ int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, St
     return CHARGE_NOT_DUE;
 }
 
+void DBTransaction::validate() {
+    DBColumn::validateStringValue(description);
+    DBColumn::validateStringValue(reference);
+    DBColumn::validateStringValue(date.shortDate());
+    DBColumn::validateStringValue(amount.getRawStringValue());
+}
+
 void DBTransaction::afterInsert() {
     Logger & log = Logger::getInstance();
     log.logEntry("DBTransaction::afterInsert()");
