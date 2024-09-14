@@ -84,13 +84,16 @@ int main(int argc, char ** argv) {
     PFM_DB & db = PFM_DB::getInstance();
     db.open(pszDatabase);
 
-    // selectedAccount.set(chooseAccount("HSBC"));
-    // exit(0);
+    EncryptionTest::run();
+    cout << endl << endl;
+    exit(0);
 
 #ifdef PFM_TEST_SUITE_ENABLED
     MoneyTest::run();
     cout << endl << endl;
     StrDateTest::run();
+    cout << endl << endl;
+    EncryptionTest::run();
     cout << endl << endl;
     testAccount();
     exit(0);

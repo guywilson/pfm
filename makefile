@@ -45,7 +45,7 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP)/$*.Td
 
 # Libraries
 STDLIBS = 
-EXTLIBS = -lreadline -lsqlite3
+EXTLIBS = -lreadline -lsqlite3 -lgcrypt
 
 COMPILE.cpp = $(CPP) $(CPPFLAGS) $(DEPFLAGS) -o $@
 COMPILE.c = $(C) $(CFLAGS) $(DEPFLAGS) -o $@

@@ -1,5 +1,7 @@
+#include <iostream>
 #include <string>
 #include <vector>
+#include <stdio.h>
 #include <stdint.h>
 
 #include <pthread.h>
@@ -7,6 +9,7 @@
 
 #include "pfm_error.h"
 #include "logger.h"
+#include "keymgr.h"
 
 using namespace std;
 
@@ -25,21 +28,29 @@ db_sort_t;
 
 typedef sqlite3_int64 pfm_id_t;
 
+static const char * permittedCharset = " !#$&()[]{}*+-/0123456789:;.,<=>?@^_|~ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
 class DBColumn {
     private:
         string name;
         string value;
 
-        static bool isCharPermitted(char ch) {
-            const char * permittedCharset = " -0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz:;.,";
-
+        static uint8_t encodeCharFromASCII(char ch) {
             for (int i = 0;i < strlen(permittedCharset);i++) {
                 if (ch == permittedCharset[i]) {
-                    return true;
+                    return i;
                 }
             }
 
-            return false;
+            throw pfm_validation_error(pfm_error::buildMsg("Cannot encode char [0x%02X]'%c' as it is not a permitted character", ch, ch));
+        }
+
+        static char decodeCharToASCII(uint8_t ch) {
+            return permittedCharset[ch];
+        }
+        
+        static void isCharPermitted(char ch) {
+            encodeCharFromASCII(ch);
         }
 
     public:
@@ -84,30 +95,63 @@ class DBColumn {
 
         static void validateStringValue(const string & value) {
             for (int i = 0;i < value.length();i++) {
-                if (!isCharPermitted(value[i])) {
-                    throw pfm_error(pfm_error::buildMsg("Invalid char '%c' in value '%s'", value[i], value.c_str()));
+                try {
+                    isCharPermitted(value[i]);
+                }
+                catch (pfm_validation_error & e) {
+                    throw pfm_error(pfm_error::buildMsg("Invalid char '%c' in value '%s' at index %d", value[i], value.c_str(), i));
                 }
             }
         }
 
-        static string encrypt(string & value, string & key) {
+        static string encrypt(string & value) {
             string out = value;
 
-            int j = 0;
+            cout << "Encrypting string '" << value << "'" << endl;
+
+            Key & key = Key::getInstance();
 
             for (int i = 0;i < value.length();i++) {
-                if (j == key.length()) {
-                    j = 0;
+                int encodedChar = (int)DBColumn::encodeCharFromASCII(value[i]);
+                int keyBits = key.getBits(i);
+
+                int encryptedChar = encodedChar + keyBits;
+
+                if (encryptedChar >= strlen(permittedCharset)) {
+                    encryptedChar = encryptedChar % strlen(permittedCharset);
                 }
-                
-                out[i] = value[i] ^ key[j++];
+
+                out[i] = decodeCharToASCII((char)encryptedChar);
+
+                printf("Encrypted '%c' encoded to 0x%02X with key bits 0x%02X to '%c'\n", value[i], (uint8_t)encodedChar, (uint8_t)keyBits, out[i]);
             }
 
             return out;
         }
 
-        static string decrypt(string & value, string & key) {
-            return encrypt(value, key);
+        static string decrypt(string & value) {
+            string out = value;
+
+            cout << "Decrypting string '" << value << "'" << endl;
+
+            Key & key = Key::getInstance();
+
+            for (int i = 0;i < value.length();i++) {   
+                int encodedChar = (int)DBColumn::encodeCharFromASCII(value[i]);
+                int keyBits = key.getBits(i);
+
+                int decryptedChar = encodedChar - keyBits;
+
+                while (decryptedChar < 0) {
+                    decryptedChar += strlen(permittedCharset);
+                }
+
+                out[i] = decodeCharToASCII((char)decryptedChar);
+
+                printf("Decrypted '%c' encoded to 0x%02X with key bits 0x%02X to '%c'\n", value[i], (uint8_t)encodedChar, (uint8_t)keyBits, out[i]);
+            }
+
+            return out;
         }
 };
 
@@ -179,6 +223,46 @@ class PFM_DB {
         void begin();
         void commit();
         void rollback();
+};
+
+class EncryptionTest {
+    private:
+        static void test1() {
+            string plainText = "This is a description!";
+
+            string cipherText = DBColumn::encrypt(plainText);
+            string decryptedText = DBColumn::decrypt(cipherText);
+
+            cout << "'" << plainText << "' > '" << cipherText << "' > '" << decryptedText << "'" << endl;
+            
+            if (decryptedText.compare(plainText) != 0) {
+                throw pfm_error("test1(): Test failed");
+            }
+            else {
+                cout << "test1(): Test passed" << endl;
+            }
+        }
+
+    public:
+        static void run() {
+            Key & key = Key::getInstance();
+            
+            key.generate("The quick brown fox jumped over the lazy dog");
+
+            int numTestsPassed = 0;
+            int numTestsFailed = 0;
+
+            try {
+                test1();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            cout << "Tests passed: " << numTestsPassed << ", tests failed: " << numTestsFailed << endl;
+        }
 };
 
 #endif
