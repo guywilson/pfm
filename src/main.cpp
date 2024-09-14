@@ -7,6 +7,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef _WIN32
+#include <conio.h>
+#else
+#include <termios.h>
+#endif
+
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -37,6 +43,56 @@ static void printUsage(void) {
 
 static void printVersion(void) {
     cout << "PFM version '" << getVersion() << "' - built [" << getBuildDate() << "]" << endl << endl;
+}
+
+int __getch(void) {
+	int		ch;
+
+#ifndef _WIN32
+	struct termios current;
+	struct termios original;
+
+	tcgetattr(fileno(stdin), &original); /* grab old terminal i/o settings */
+	current = original; /* make new settings same as old settings */
+	current.c_lflag &= ~ICANON; /* disable buffered i/o */
+	current.c_lflag &= ~ECHO; /* set echo mode */
+	tcsetattr(fileno(stdin), TCSANOW, &current); /* use these new terminal i/o settings now */
+#endif
+
+#ifdef _WIN32
+    ch = _getch();
+#else
+    ch = getchar();
+#endif
+
+#ifndef _WIN32
+	tcsetattr(0, TCSANOW, &original);
+#endif
+
+    return ch;
+}
+
+string getPassword() {
+    printf("Enter password: ");
+
+    string password;
+	int	ch = 0;
+
+    while (ch != '\n') {
+        ch = __getch();
+
+        if (ch != '\n' && ch != '\r') {
+            putchar('*');
+            fflush(stdout);
+
+            password += (char)ch;
+        }
+    }
+
+    putchar('\n');
+    fflush(stdout);
+
+    return password;
 }
 
 int main(int argc, char ** argv) {
@@ -84,9 +140,6 @@ int main(int argc, char ** argv) {
 
     PFM_DB & db = PFM_DB::getInstance();
     db.open(pszDatabase);
-
-    Key & key = Key::getInstance();
-    key.generate("The quick brown fox jumped over the lazy dog");
     
 #ifdef PFM_TEST_SUITE_ENABLED
     MoneyTest::run();
@@ -98,6 +151,11 @@ int main(int argc, char ** argv) {
     testAccount();
     exit(0);
 #endif
+
+    Key & key = Key::getInstance();
+    string password = getPassword();
+    
+    key.generate(password.c_str());
 
     while (loop) {
         pszCommand = readline("pfm > ");
