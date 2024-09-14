@@ -25,7 +25,7 @@ class Key {
     public:
         ~Key();
 
-        void generate(const char * password);
+        void generate(const string & password);
         uint8_t getBits(int index);
 };
 

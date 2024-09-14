@@ -153,9 +153,7 @@ int main(int argc, char ** argv) {
 #endif
 
     Key & key = Key::getInstance();
-    string password = getPassword();
-    
-    key.generate(password.c_str());
+    key.generate(getPassword());
 
     while (loop) {
         pszCommand = readline("pfm > ");

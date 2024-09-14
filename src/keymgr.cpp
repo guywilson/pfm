@@ -64,8 +64,8 @@ void Key::wipeKey() {
     }
 }
 
-void Key::generate(const char * password) {
-    gcry_md_hash_buffer(GCRY_MD_SHA3_512, keyBuffer, password, strlen(password));
+void Key::generate(const string & password) {
+    gcry_md_hash_buffer(GCRY_MD_SHA3_512, keyBuffer, password.c_str(), password.length());
 #ifdef PFM_TEST_SUITE_ENABLED
     hexDump(keyBuffer, KEY_BUFFER_LENGTH);
 #endif
