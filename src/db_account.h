@@ -37,14 +37,14 @@ class DBAccount : public DBEntity {
                         "current_balance," \
                         "created," \
                         "updated) " \
-                        "VALUES ('%s', '%s', %s, %s, '%s', '%s');";
+                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE account SET " \
                         "name = '%s'," \
                         "code = '%s'," \
-                        "opening_balance = %s," \
-                        "current_balance = %s," \
+                        "opening_balance = '%s'," \
+                        "current_balance = '%s'," \
                         "updated = '%s' " \
                         "WHERE id = %lld;";
 

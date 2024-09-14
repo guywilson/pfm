@@ -53,7 +53,7 @@ class DBRecurringCharge : public DBPayment {
                         "created," \
                         "updated) " \
                         "VALUES (%lld, %lld, %lld, '%s', '%s'," \
-                        "'%s', %s, '%s', '%s', '%s');";
+                        "'%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE recurring_charge " \
@@ -62,7 +62,7 @@ class DBRecurringCharge : public DBPayment {
                         "date = '%s'," \
                         "end_date = '%s'," \
                         "description = '%s'," \
-                        "amount = %s," \
+                        "amount = '%s'," \
                         "frequency = '%s'," \
                         "updated = '%s' " \
                         "WHERE id = %lld;";
@@ -111,31 +111,13 @@ class DBRecurringCharge : public DBPayment {
         }
 
         void assignColumn(DBColumn & column) override {
-            DBEntity::assignColumn(column);
+            DBPayment::assignColumn(column);
             
-            if (column.getName() == "account_id") {
-                accountId = column.getIDValue();
-            }
-            else if (column.getName() == "category_id") {
-                categoryId = column.getIDValue();
-            }
-            else if (column.getName() == "payee_id") {
-                payeeId = column.getIDValue();
-            }
-            else if (column.getName() == "date") {
-                date = column.getValue();
-            }
-            else if (column.getName() == "end_date") {
-                endDate = column.getValue();
-            }
-            else if (column.getName() == "description") {
-                description = column.getValue();
-            }
-            else if (column.getName() == "amount") {
-                amount = column.getDoubleValue();
+            if (column.getName() == "end_date") {
+                endDate = column.getDecryptedValue();
             }
             else if (column.getName() == "frequency") {
-                frequency = column.getValue();
+                frequency = column.getDecryptedValue();
             }
         }
 
@@ -176,10 +158,10 @@ class DBRecurringCharge : public DBPayment {
                 categoryId,
                 payeeId,
                 date.shortDate().c_str(),
-                endDate.shortDate().c_str(),
-                description.c_str(),
-                amount.getRawStringValue().c_str(),
-                frequency.c_str(),
+                encryptField(endDate.shortDate()).c_str(),
+                encryptField(description).c_str(),
+                encryptField(amount.getRawStringValue()).c_str(),
+                encryptField(frequency).c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -198,10 +180,10 @@ class DBRecurringCharge : public DBPayment {
                 categoryId,
                 payeeId,
                 date.shortDate().c_str(),
-                endDate.shortDate().c_str(),
-                description.c_str(),
-                amount.getRawStringValue().c_str(),
-                frequency.c_str(),
+                encryptField(endDate.shortDate()).c_str(),
+                encryptField(description).c_str(),
+                encryptField(amount.getRawStringValue()).c_str(),
+                encryptField(frequency).c_str(),
                 now.c_str(),
                 id);
 

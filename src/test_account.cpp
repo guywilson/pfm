@@ -110,35 +110,56 @@ void testAccount() {
 #endif
     StrDate today;
 
+    Logger & log = Logger::getInstance();
+
     DBRecurringCharge charge1;
-    charge1.accountId = accountId;
-    charge1.amount = 126.58;
-    charge1.date.set(today.year(), 1, 1);
-    charge1.description = "Energy bill";
-    charge1.frequency = "1m";
-    charge1.categoryId = getCategoryId("UTILS");
-    charge1.payeeId = getPayeeId("EDF");
-    charge1.save();
-
     DBRecurringCharge charge2;
-    charge2.accountId = accountId;
-    charge2.amount = 9.98;
-    charge2.date.set(today.year(), 2, 16);
-    charge2.description = "Adobe Creative Cloud";
-    charge2.frequency = "1m";
-    charge2.categoryId = getCategoryId("HHOLD");
-    charge2.payeeId = getPayeeId("ADOBE");
-    charge2.save();
-
     DBRecurringCharge charge3;
-    charge3.accountId = accountId;
-    charge3.amount = 5.00;
-    charge3.date.set(today.year(), 3, 25);
-    charge3.description = "RNLI Contribution";
-    charge3.frequency = "1m";
-    charge3.categoryId = getCategoryId("CHARY");
-    charge3.payeeId = getPayeeId("RNLI");
-    charge3.save();
+
+    try {
+        charge1.accountId = accountId;
+        charge1.amount = 126.58;
+        charge1.date.set(today.year(), 1, 1);
+        charge1.description = "Energy bill";
+        charge1.frequency = "1m";
+        charge1.categoryId = getCategoryId("UTILS");
+        charge1.payeeId = getPayeeId("EDF");
+        charge1.save();
+    }
+    catch (pfm_error & e) {
+        log.logError("testAccount(): Failed to create charge1: '%s'", e.what());
+        throw e;
+    }
+
+    try {
+        charge2.accountId = accountId;
+        charge2.amount = 9.98;
+        charge2.date.set(today.year(), 2, 16);
+        charge2.description = "Adobe Creative Cloud";
+        charge2.frequency = "1m";
+        charge2.categoryId = getCategoryId("HHOLD");
+        charge2.payeeId = getPayeeId("ADOBE");
+        charge2.save();
+    }
+    catch (pfm_error & e) {
+        log.logError("testAccount(): Failed to create charge2: '%s'", e.what());
+        throw e;
+    }
+
+    try {
+        charge3.accountId = accountId;
+        charge3.amount = 5.00;
+        charge3.date.set(today.year(), 3, 25);
+        charge3.description = "RNLI Contribution";
+        charge3.frequency = "1m";
+        charge3.categoryId = getCategoryId("CHARY");
+        charge3.payeeId = getPayeeId("RNLI");
+        charge3.save();
+    }
+    catch (pfm_error & e) {
+        log.logError("testAccount(): Failed to create charge3: '%s'", e.what());
+        throw e;
+    }
 
     chooseAccount("HSBC");
 

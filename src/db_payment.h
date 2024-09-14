@@ -89,6 +89,29 @@ class DBPayment : public DBEntity {
             cout << "DBPayee (encapsulated object):" << endl;
             payee.print();
         }
+
+        void assignColumn(DBColumn & column) override {
+            DBEntity::assignColumn(column);
+            
+            if (column.getName() == "account_id") {
+                accountId = column.getIDValue();
+            }
+            else if (column.getName() == "category_id") {
+                categoryId = column.getIDValue();
+            }
+            else if (column.getName() == "payee_id") {
+                payeeId = column.getIDValue();
+            }
+            else if (column.getName() == "date") {
+                date = column.getValue();
+            }
+            else if (column.getName() == "description") {
+                description = column.getDecryptedValue();
+            }
+            else if (column.getName() == "amount") {
+                amount = column.getDecryptedDoubleValue();
+            }
+        }
 };
 
 #endif

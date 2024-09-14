@@ -131,7 +131,7 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated) " \
                         "VALUES (%lld, %lld, %lld, %lld, '%s', '%s', " \
-                        "'%s', '%s', %s, '%s', '%s', '%s');";
+                        "'%s', '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE account_transaction " \
@@ -142,7 +142,7 @@ class DBTransaction : public DBPayment {
                         "reference = '%s'," \
                         "description = '%s'," \
                         "credit_debit = '%s'," \
-                        "amount = %s," \
+                        "amount = '%s'," \
                         "is_reconciled = '%s'," \
                         "updated = '%s' " \
                         "WHERE id = %lld;";
@@ -204,34 +204,16 @@ class DBTransaction : public DBPayment {
         }
 
         void assignColumn(DBColumn & column) override {
-            DBEntity::assignColumn(column);
+            DBPayment::assignColumn(column);
             
-            if (column.getName() == "account_id") {
-                accountId = column.getIDValue();
-            }
-            else if (column.getName() == "category_id") {
-                categoryId = column.getIDValue();
-            }
-            else if (column.getName() == "payee_id") {
-                payeeId = column.getIDValue();
-            }
-            else if (column.getName() == "recurring_charge_id") {
+            if (column.getName() == "recurring_charge_id") {
                 recurringChargeId = column.getIDValue();
             }
-            else if (column.getName() == "date") {
-                date = column.getValue();
-            }
             else if (column.getName() == "reference") {
-                reference = column.getValue();
-            }
-            else if (column.getName() == "description") {
-                description = column.getValue();
-            }
-            else if (column.getName() == "amount") {
-                amount = column.getDoubleValue();
+                reference = column.getDecryptedValue();
             }
             else if (column.getName() == "credit_debit") {
-                isCredit = column.getBoolValue();
+                isCredit = getIsCredit(column.getDecryptedValue());
             }
             else if (column.getName() == "is_reconciled") {
                 isReconciled = column.getBoolValue();
@@ -253,7 +235,7 @@ class DBTransaction : public DBPayment {
             return (isCredit ? "CR" : "DB");
         }
 
-        bool getIsCredit(string & value) {
+        bool getIsCredit(const string & value) {
             if (value == "CR") {
                 return true;
             }
@@ -291,10 +273,10 @@ class DBTransaction : public DBPayment {
                 payeeId,
                 recurringChargeId,
                 date.shortDate().c_str(),
-                reference.c_str(),
-                description.c_str(),
-                getCreditDebitValue().c_str(),
-                amount.getRawStringValue().c_str(),
+                encryptField(reference).c_str(),
+                encryptField(description).c_str(),
+                encryptField(getCreditDebitValue()).c_str(),
+                encryptField(amount.getRawStringValue()).c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
                 now.c_str());
@@ -315,10 +297,10 @@ class DBTransaction : public DBPayment {
                 payeeId,
                 recurringChargeId,
                 date.shortDate().c_str(),
-                reference.c_str(),
-                description.c_str(),
-                getCreditDebitValue().c_str(),
-                amount.getRawStringValue().c_str(),
+                encryptField(reference).c_str(),
+                encryptField(description).c_str(),
+                encryptField(getCreditDebitValue()).c_str(),
+                encryptField(amount.getRawStringValue()).c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
                 id);

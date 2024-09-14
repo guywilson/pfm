@@ -60,7 +60,7 @@ class DBBudget : public DBEntity {
             "updated)" \
             "VALUES (" \
             "'%s', '%s', '%s', '%s', '%s'," \
-            "%.2f, %.2f, '%s', '%s');";
+            "'%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
             "UPDATE budget SET " \
@@ -69,8 +69,8 @@ class DBBudget : public DBEntity {
             "category_code = '%s'," \
             "payee_code = '%s'," \
             "description = '%s'," \
-            "min_budget = %.2f," \
-            "max_budget = %.2f," \
+            "min_budget = '%s'," \
+            "max_budget = '%s'," \
             "updated = '%s' " \
             "WHERE id = %lld;";
 
@@ -134,25 +134,25 @@ class DBBudget : public DBEntity {
             DBEntity::assignColumn(column);
             
             if (column.getName() == "payee_code") {
-                payeeCode = column.getValue();
+                payeeCode = column.getDecryptedValue();
             }
             else if (column.getName() == "category_code") {
-                categoryCode = column.getValue();
+                categoryCode = column.getDecryptedValue();
             }
             else if (column.getName() == "start_date") {
-                startDate = column.getValue();
+                startDate = column.getDecryptedValue();
             }
             else if (column.getName() == "end_date") {
-                endDate = column.getValue();
+                endDate = column.getDecryptedValue();
             }
             else if (column.getName() == "description") {
                 description = column.getValue();
             }
             else if (column.getName() == "min_budget") {
-                minimumBudget = column.getDoubleValue();
+                minimumBudget = column.getDecryptedDoubleValue();
             }
             else if (column.getName() == "max_budget") {
-                maximumBudget = column.getDoubleValue();
+                maximumBudget = column.getDecryptedDoubleValue();
             }
         }
 
@@ -173,13 +173,13 @@ class DBBudget : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                startDate.shortDate().c_str(),
-                endDate.shortDate().c_str(),
-                categoryCode.c_str(),
-                payeeCode.c_str(),
-                description.c_str(),
-                minimumBudget.getDoubleValue(),
-                maximumBudget.getDoubleValue(),
+                encryptField(startDate.shortDate()).c_str(),
+                encryptField(endDate.shortDate()).c_str(),
+                encryptField(categoryCode).c_str(),
+                encryptField(payeeCode).c_str(),
+                encryptField(description).c_str(),
+                encryptField(minimumBudget.getRawStringValue()).c_str(),
+                encryptField(maximumBudget.getRawStringValue()).c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -195,13 +195,13 @@ class DBBudget : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
-                startDate.shortDate().c_str(),
-                endDate.shortDate().c_str(),
-                categoryCode.c_str(),
-                payeeCode.c_str(),
-                description.c_str(),
-                minimumBudget.getDoubleValue(),
-                maximumBudget.getDoubleValue(),
+                encryptField(startDate.shortDate()).c_str(),
+                encryptField(endDate.shortDate()).c_str(),
+                encryptField(categoryCode).c_str(),
+                encryptField(payeeCode).c_str(),
+                encryptField(description).c_str(),
+                encryptField(minimumBudget.getRawStringValue()).c_str(),
+                encryptField(maximumBudget.getRawStringValue()).c_str(),
                 now.c_str(),
                 id);
 

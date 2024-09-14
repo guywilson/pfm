@@ -62,14 +62,14 @@ class DBCarriedOver : public DBEntity {
                         "balance," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, '%s', '%s', %s, '%s', '%s');";
+                        "VALUES (%lld, '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE carried_over_log SET " \
                         "account_id = %lld," \
                         "date = '%s'," \
                         "description = '%s'," \
-                        "balance = %s," \
+                        "balance = '%s'," \
                         "updated = '%s' " \
                         "WHERE id = %lld;";
 
@@ -134,8 +134,8 @@ class DBCarriedOver : public DBEntity {
                 sqlInsert,
                 accountId,
                 date.shortDate().c_str(),
-                description.c_str(),
-                balance.getRawStringValue().c_str(),
+                encryptField(description).c_str(),
+                encryptField(balance.getRawStringValue()).c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -153,8 +153,8 @@ class DBCarriedOver : public DBEntity {
                 sqlUpdate,
                 accountId,
                 date.shortDate().c_str(),
-                description.c_str(),
-                balance.getRawStringValue().c_str(),
+                encryptField(description).c_str(),
+                encryptField(balance.getRawStringValue()).c_str(),
                 now.c_str(),
                 id);
 
@@ -185,10 +185,10 @@ class DBCarriedOver : public DBEntity {
                 date = column.getValue();
             }
             else if (column.getName() == "description") {
-                description = column.getValue();
+                description = column.getDecryptedValue();
             }
             else if (column.getName() == "balance") {
-                balance = column.getValue();
+                balance = column.getDecryptedDoubleValue();
             }
         }
 

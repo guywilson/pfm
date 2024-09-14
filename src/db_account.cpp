@@ -26,7 +26,7 @@ void DBAccount::retrieveByCode(string & code) {
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByCode, 
-        code.c_str());
+        encryptField(code).c_str());
 
     int rowsRetrievedCount = result.retrieve(szStatement);
 

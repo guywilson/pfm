@@ -59,13 +59,13 @@ class DBBudgetTrack : public DBEntity {
             "created," \
             "updated)" \
             "VALUES (" \
-            "%lld, '%s', %.2f, '%s', '%s');";
+            "%lld, '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
             "UPDATE period_budget_track SET " \
             "budget_id = %lld," \
             "date = '%s'," \
-            "balance = %.2f," \
+            "balance = '%s'," \
             "updated = '%s' " \
             "WHERE id = %lld;";
 
@@ -119,7 +119,7 @@ class DBBudgetTrack : public DBEntity {
                 date = column.getValue();
             }
             else if (column.getName() == "balance") {
-                balance = column.getDoubleValue();
+                balance = column.getDecryptedDoubleValue();
             }
         }
 
@@ -138,7 +138,7 @@ class DBBudgetTrack : public DBEntity {
                 sqlInsert,
                 budgetId,
                 date.shortDate().c_str(),
-                balance.getDoubleValue(),
+                encryptField(balance.getRawStringValue()).c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -156,7 +156,7 @@ class DBBudgetTrack : public DBEntity {
                 sqlUpdate,
                 budgetId,
                 date.shortDate().c_str(),
-                balance.getDoubleValue(),
+                encryptField(balance.getRawStringValue()).c_str(),
                 now.c_str(),
                 id);
 
