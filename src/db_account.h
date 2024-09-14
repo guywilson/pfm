@@ -54,38 +54,6 @@ class DBAccount : public DBEntity {
         void createRecurringTransactions();
         void createCarriedOverLogs();
 
-        string encryptName() {
-            return DBColumn::encrypt(name);
-        }
-
-        void decryptName(const string & name) {
-            this->name = DBColumn::decrypt(name);
-        }
-
-        string encryptCode() {
-            return DBColumn::encrypt(code);
-        }
-
-        void decryptCode(const string & code) {
-            this->code = DBColumn::decrypt(code);
-        }
-
-        string encryptOpeningBalance() {
-            return DBColumn::encrypt(openingBalance.getRawStringValue());
-        }
-
-        void decryptOpeningBalance(const string & openingBalance) {
-            this->openingBalance = strtod(DBColumn::decrypt(openingBalance).c_str(), NULL);
-        }
-
-        string encryptCurrentBalance() {
-            return DBColumn::encrypt(currentBalance.getRawStringValue());
-        }
-
-        void decryptCurrentBalance(const string & currentBalance) {
-            this->currentBalance = strtod(DBColumn::decrypt(currentBalance).c_str(), NULL);
-        }
-
     public:
         string                  name;
         string                  code;
@@ -118,16 +86,16 @@ class DBAccount : public DBEntity {
             DBEntity::assignColumn(column);
             
             if (column.getName() == "name") {
-                decryptName(column.getValue());
+                name = column.getDecryptedValue();
             }
             else if (column.getName() == "code") {
-                decryptCode(column.getValue());
+                code = column.getDecryptedValue();
             }
             else if (column.getName() == "opening_balance") {
-                decryptOpeningBalance(column.getValue());
+                openingBalance = column.getDecryptedDoubleValue();
             }
             else if (column.getName() == "current_balance") {
-                decryptCurrentBalance(column.getValue());
+                openingBalance = column.getDecryptedDoubleValue();
             }
         }
 
@@ -155,10 +123,10 @@ class DBAccount : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                encryptName().c_str(),
-                encryptCode().c_str(),
-                encryptOpeningBalance().c_str(),
-                encryptCurrentBalance().c_str(),
+                encryptField(name).c_str(),
+                encryptField(code).c_str(),
+                encryptField(openingBalance.getRawStringValue()).c_str(),
+                encryptField(currentBalance.getRawStringValue()).c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -174,10 +142,10 @@ class DBAccount : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
-                encryptName().c_str(),
-                encryptCode().c_str(),
-                encryptOpeningBalance().c_str(),
-                encryptCurrentBalance().c_str(),
+                encryptField(name).c_str(),
+                encryptField(code).c_str(),
+                encryptField(openingBalance.getRawStringValue()).c_str(),
+                encryptField(currentBalance.getRawStringValue()).c_str(),
                 now.c_str(),
                 id);
 

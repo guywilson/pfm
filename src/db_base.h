@@ -137,6 +137,14 @@ class DBEntity {
             return;
         }
 
+        virtual string encryptField(const string & value) {
+            return DBColumn::encrypt(value);
+        }
+
+        virtual string decryptField(const string & value) {
+            return DBColumn::decrypt(value);
+        }
+
         void print() {
             cout << "ID: " << id << endl;
             cout << "Sequence: " << sequence << endl;

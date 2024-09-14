@@ -104,15 +104,15 @@ class DBColumn {
         }
 
         double getDoubleValue() {
-            return strtod(value.c_str(), NULL);
+            return strtod(getValue().c_str(), NULL);
         }
 
         long getIntValue() {
-            return strtol(value.c_str(), NULL, 10);
+            return strtol(getValue().c_str(), NULL, 10);
         }
 
         unsigned long getUnsignedIntValue() {
-            return strtoul(value.c_str(), NULL, 10);
+            return strtoul(getValue().c_str(), NULL, 10);
         }
 
         bool getBoolValue() {
@@ -120,7 +120,23 @@ class DBColumn {
         }
 
         pfm_id_t getIDValue() {
-            return strtoll(value.c_str(), NULL, 10);
+            return strtoll(getValue().c_str(), NULL, 10);
+        }
+
+        string getDecryptedValue() {
+            return DBColumn::decrypt(getValue());
+        }
+
+        double getDecryptedDoubleValue() {
+            return strtod(getDecryptedValue().c_str(), NULL);
+        }
+
+        long getDecryptedIntValue() {
+            return strtol(getDecryptedValue().c_str(), NULL, 10);
+        }
+
+        unsigned long getDecryptedUnsignedIntValue() {
+            return strtoul(getDecryptedValue().c_str(), NULL, 10);
         }
 
         static void validateStringValue(const string & value) {

@@ -12,6 +12,7 @@
 
 #include "db.h"
 #include "logger.h"
+#include "keymgr.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
@@ -84,6 +85,9 @@ int main(int argc, char ** argv) {
     PFM_DB & db = PFM_DB::getInstance();
     db.open(pszDatabase);
 
+    Key & key = Key::getInstance();
+    key.generate("The quick brown fox jumped over the lazy dog");
+    
 #ifdef PFM_TEST_SUITE_ENABLED
     MoneyTest::run();
     cout << endl << endl;
