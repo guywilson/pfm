@@ -134,7 +134,7 @@ class DBColumn {
             }
         }
 
-        static string encrypt(string & value) {
+        static string encrypt(const string & value) {
             string out = value;
 
             Key & key = Key::getInstance();
@@ -146,7 +146,7 @@ class DBColumn {
             return out;
         }
 
-        static string decrypt(string & value) {
+        static string decrypt(const string & value) {
             string out = value;
 
             Key & key = Key::getInstance();
@@ -312,6 +312,70 @@ class EncryptionTest {
             }
         }
 
+        static void test6() {
+            string plainText = "285.23";
+
+            string cipherText = DBColumn::encrypt(plainText);
+            string decryptedText = DBColumn::decrypt(cipherText);
+
+            cout << "'" << plainText << "' > '" << cipherText << "' > '" << decryptedText << "'" << endl;
+            
+            if (decryptedText.compare(plainText) != 0) {
+                throw pfm_error("test6(): Test failed");
+            }
+            else {
+                cout << "test6(): Test passed" << endl;
+            }
+        }
+
+        static void test7() {
+            string plainText = "-252.78";
+
+            string cipherText = DBColumn::encrypt(plainText);
+            string decryptedText = DBColumn::decrypt(cipherText);
+
+            cout << "'" << plainText << "' > '" << cipherText << "' > '" << decryptedText << "'" << endl;
+            
+            if (decryptedText.compare(plainText) != 0) {
+                throw pfm_error("test7(): Test failed");
+            }
+            else {
+                cout << "test7(): Test passed" << endl;
+            }
+        }
+
+        static void test8() {
+            string plainText = "2024-08-16";
+
+            string cipherText = DBColumn::encrypt(plainText);
+            string decryptedText = DBColumn::decrypt(cipherText);
+
+            cout << "'" << plainText << "' > '" << cipherText << "' > '" << decryptedText << "'" << endl;
+            
+            if (decryptedText.compare(plainText) != 0) {
+                throw pfm_error("test8(): Test failed");
+            }
+            else {
+                cout << "test8(): Test passed" << endl;
+            }
+        }
+
+        static void test9() {
+            string plainText = "2024-08-16 16:04:32";
+
+            string cipherText = DBColumn::encrypt(plainText);
+            string decryptedText = DBColumn::decrypt(cipherText);
+
+            cout << "'" << plainText << "' > '" << cipherText << "' > '" << decryptedText << "'" << endl;
+            
+            if (decryptedText.compare(plainText) != 0) {
+                throw pfm_error("test9(): Test failed");
+            }
+            else {
+                cout << "test9(): Test passed" << endl;
+            }
+        }
+
     public:
         static void run() {
             Key & key = Key::getInstance();
@@ -359,6 +423,42 @@ class EncryptionTest {
 
             try {
                 test5();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                test6();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                test7();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                test8();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                test9();
                 numTestsPassed++;
             }
             catch (pfm_error & e) {

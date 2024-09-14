@@ -41,8 +41,8 @@ class DBAccount : public DBEntity {
 
         const char * sqlUpdate = 
                         "UPDATE account SET " \
-                        "code = '%s'," \
                         "name = '%s'," \
+                        "code = '%s'," \
                         "opening_balance = %s," \
                         "current_balance = %s," \
                         "updated = '%s' " \
@@ -53,6 +53,38 @@ class DBAccount : public DBEntity {
 
         void createRecurringTransactions();
         void createCarriedOverLogs();
+
+        string encryptName() {
+            return DBColumn::encrypt(name);
+        }
+
+        void decryptName(const string & name) {
+            this->name = DBColumn::decrypt(name);
+        }
+
+        string encryptCode() {
+            return DBColumn::encrypt(code);
+        }
+
+        void decryptCode(const string & code) {
+            this->code = DBColumn::decrypt(code);
+        }
+
+        string encryptOpeningBalance() {
+            return DBColumn::encrypt(openingBalance.getRawStringValue());
+        }
+
+        void decryptOpeningBalance(const string & openingBalance) {
+            this->openingBalance = strtod(DBColumn::decrypt(openingBalance).c_str(), NULL);
+        }
+
+        string encryptCurrentBalance() {
+            return DBColumn::encrypt(currentBalance.getRawStringValue());
+        }
+
+        void decryptCurrentBalance(const string & currentBalance) {
+            this->currentBalance = strtod(DBColumn::decrypt(currentBalance).c_str(), NULL);
+        }
 
     public:
         string                  name;
@@ -86,16 +118,16 @@ class DBAccount : public DBEntity {
             DBEntity::assignColumn(column);
             
             if (column.getName() == "name") {
-                name = column.getValue();
+                decryptName(column.getValue());
             }
             else if (column.getName() == "code") {
-                code = column.getValue();
+                decryptCode(column.getValue());
             }
             else if (column.getName() == "opening_balance") {
-                openingBalance = column.getDoubleValue();
+                decryptOpeningBalance(column.getValue());
             }
             else if (column.getName() == "current_balance") {
-                currentBalance = column.getDoubleValue();
+                decryptCurrentBalance(column.getValue());
             }
         }
 
@@ -123,10 +155,10 @@ class DBAccount : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                name.c_str(),
-                code.c_str(),
-                openingBalance.getRawStringValue().c_str(),
-                currentBalance.getRawStringValue().c_str(),
+                encryptName().c_str(),
+                encryptCode().c_str(),
+                encryptOpeningBalance().c_str(),
+                encryptCurrentBalance().c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -142,10 +174,10 @@ class DBAccount : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
-                code.c_str(),
-                name.c_str(),
-                openingBalance.getRawStringValue().c_str(),
-                currentBalance.getRawStringValue().c_str(),
+                encryptName().c_str(),
+                encryptCode().c_str(),
+                encryptOpeningBalance().c_str(),
+                encryptCurrentBalance().c_str(),
                 now.c_str(),
                 id);
 
