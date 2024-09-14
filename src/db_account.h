@@ -123,7 +123,7 @@ class DBAccount : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                DBColumn::encrypt(name).c_str(),
+                name.c_str(),
                 code.c_str(),
                 openingBalance.getRawStringValue().c_str(),
                 currentBalance.getRawStringValue().c_str(),

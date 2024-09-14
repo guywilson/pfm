@@ -84,10 +84,6 @@ int main(int argc, char ** argv) {
     PFM_DB & db = PFM_DB::getInstance();
     db.open(pszDatabase);
 
-    EncryptionTest::run();
-    cout << endl << endl;
-    exit(0);
-
 #ifdef PFM_TEST_SUITE_ENABLED
     MoneyTest::run();
     cout << endl << endl;

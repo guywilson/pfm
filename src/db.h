@@ -53,6 +53,36 @@ class DBColumn {
             encodeCharFromASCII(ch);
         }
 
+        static char encryptChar(char ch, int keyBits) {
+            int encodedChar = (int)DBColumn::encodeCharFromASCII(ch);
+            int encryptedChar = encodedChar + keyBits;
+
+            if (encryptedChar >= strlen(permittedCharset)) {
+                encryptedChar = encryptedChar % strlen(permittedCharset);
+            }
+
+            char out = decodeCharToASCII((char)encryptedChar);
+
+            // printf("Encrypted '%c' encoded to 0x%02X with key bits 0x%02X to '%c'\n", ch, (uint8_t)encodedChar, (uint8_t)keyBits, out);
+
+            return out;
+        }
+
+        static char decryptChar(char ch, int keyBits) {
+            int encodedChar = (int)DBColumn::encodeCharFromASCII(ch);
+            int decryptedChar = encodedChar - keyBits;
+
+            while (decryptedChar < 0) {
+                decryptedChar += strlen(permittedCharset);
+            }
+
+            char out = decodeCharToASCII((char)decryptedChar);
+
+            // printf("Decrypted '%c' encoded to 0x%02X with key bits 0x%02X to '%c'\n", ch, (uint8_t)encodedChar, (uint8_t)keyBits, out);
+
+            return out;
+        }
+
     public:
         DBColumn(const char * name, const char * value) {
             this->name = name;
@@ -107,23 +137,10 @@ class DBColumn {
         static string encrypt(string & value) {
             string out = value;
 
-            cout << "Encrypting string '" << value << "'" << endl;
-
             Key & key = Key::getInstance();
 
             for (int i = 0;i < value.length();i++) {
-                int encodedChar = (int)DBColumn::encodeCharFromASCII(value[i]);
-                int keyBits = key.getBits(i);
-
-                int encryptedChar = encodedChar + keyBits;
-
-                if (encryptedChar >= strlen(permittedCharset)) {
-                    encryptedChar = encryptedChar % strlen(permittedCharset);
-                }
-
-                out[i] = decodeCharToASCII((char)encryptedChar);
-
-                printf("Encrypted '%c' encoded to 0x%02X with key bits 0x%02X to '%c'\n", value[i], (uint8_t)encodedChar, (uint8_t)keyBits, out[i]);
+                out[i] = encryptChar(value[i], (int)key.getBits(i));
             }
 
             return out;
@@ -132,23 +149,10 @@ class DBColumn {
         static string decrypt(string & value) {
             string out = value;
 
-            cout << "Decrypting string '" << value << "'" << endl;
-
             Key & key = Key::getInstance();
 
             for (int i = 0;i < value.length();i++) {   
-                int encodedChar = (int)DBColumn::encodeCharFromASCII(value[i]);
-                int keyBits = key.getBits(i);
-
-                int decryptedChar = encodedChar - keyBits;
-
-                while (decryptedChar < 0) {
-                    decryptedChar += strlen(permittedCharset);
-                }
-
-                out[i] = decodeCharToASCII((char)decryptedChar);
-
-                printf("Decrypted '%c' encoded to 0x%02X with key bits 0x%02X to '%c'\n", value[i], (uint8_t)encodedChar, (uint8_t)keyBits, out[i]);
+                out[i] = decryptChar(value[i], (int)key.getBits(i));
             }
 
             return out;
@@ -225,6 +229,7 @@ class PFM_DB {
         void rollback();
 };
 
+#ifdef PFM_TEST_SUITE_ENABLED
 class EncryptionTest {
     private:
         static void test1() {
@@ -240,6 +245,70 @@ class EncryptionTest {
             }
             else {
                 cout << "test1(): Test passed" << endl;
+            }
+        }
+
+        static void test2() {
+            string plainText = "    AAAAZZZZzzzz99990";
+
+            string cipherText = DBColumn::encrypt(plainText);
+            string decryptedText = DBColumn::decrypt(cipherText);
+
+            cout << "'" << plainText << "' > '" << cipherText << "' > '" << decryptedText << "'" << endl;
+            
+            if (decryptedText.compare(plainText) != 0) {
+                throw pfm_error("test2(): Test failed");
+            }
+            else {
+                cout << "test2(): Test passed" << endl;
+            }
+        }
+
+        static void test3() {
+            string plainText = " !#$&()[]{}*+-/0123456789:;.,<=>?@^_|~ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+            string cipherText = DBColumn::encrypt(plainText);
+            string decryptedText = DBColumn::decrypt(cipherText);
+
+            cout << "'" << plainText << "' > '" << cipherText << "' > '" << decryptedText << "'" << endl;
+            
+            if (decryptedText.compare(plainText) != 0) {
+                throw pfm_error("test3(): Test failed");
+            }
+            else {
+                cout << "test3(): Test passed" << endl;
+            }
+        }
+
+        static void test4() {
+            string plainText = "The quick brown fox jumped over the lazy dog";
+
+            string cipherText = DBColumn::encrypt(plainText);
+            string decryptedText = DBColumn::decrypt(cipherText);
+
+            cout << "'" << plainText << "' > '" << cipherText << "' > '" << decryptedText << "'" << endl;
+            
+            if (decryptedText.compare(plainText) != 0) {
+                throw pfm_error("test4(): Test failed");
+            }
+            else {
+                cout << "test4(): Test passed" << endl;
+            }
+        }
+
+        static void test5() {
+            string plainText = "a";
+
+            string cipherText = DBColumn::encrypt(plainText);
+            string decryptedText = DBColumn::decrypt(cipherText);
+
+            cout << "'" << plainText << "' > '" << cipherText << "' > '" << decryptedText << "'" << endl;
+            
+            if (decryptedText.compare(plainText) != 0) {
+                throw pfm_error("test5(): Test failed");
+            }
+            else {
+                cout << "test5(): Test passed" << endl;
             }
         }
 
@@ -261,8 +330,44 @@ class EncryptionTest {
                 numTestsFailed++;
             }
 
+            try {
+                test2();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                test3();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                test4();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
+            try {
+                test5();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                cout << e.what() << endl;
+                numTestsFailed++;
+            }
+
             cout << "Tests passed: " << numTestsPassed << ", tests failed: " << numTestsFailed << endl;
         }
 };
-
+#endif
 #endif
