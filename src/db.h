@@ -396,7 +396,8 @@ class EncryptionTest {
         static void run() {
             Key & key = Key::getInstance();
             
-            key.generate("The quick brown fox jumped over the lazy dog");
+            string password = "The quick brown fox jumped over the lazy dog";
+            key.generate(password);
 
             int numTestsPassed = 0;
             int numTestsFailed = 0;

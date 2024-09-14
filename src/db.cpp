@@ -206,6 +206,7 @@ void PFM_DB::createSchema() {
     log.logEntry("PFM_DB::createSchema()");
 
     try {
+        createTable(pszCreateUserTable);
         createTable(pszCreateConfigTable);
         createTable(pszCreateCurrencyTable);
         createTable(pszCreateAccountTable);

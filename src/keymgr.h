@@ -26,6 +26,8 @@ class Key {
         ~Key();
 
         void generate(const string & password);
+        void checkPassword(const string & password);
+
         uint8_t getBits(int index);
 };
 

@@ -228,6 +228,14 @@ const char * currencies[][3] = {
     {"ZWL", "Zimbabwe Dollar", "$"}
 };
 
+const char * pszCreateUserTable = 
+    "CREATE TABLE user (" \
+    "id INTEGER PRIMARY KEY," \
+    "user_name TEXT NOT NULL," \
+    "password TEXT," \
+    "has_password TEXT NOT NULL," \
+    "UNIQUE(user_name) ON CONFLICT ROLLBACK);";
+
 const char * pszCreateConfigTable =
     "CREATE TABLE config (" \
     "id INTEGER PRIMARY KEY," \

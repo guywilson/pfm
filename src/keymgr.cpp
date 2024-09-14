@@ -71,6 +71,18 @@ void Key::generate(const string & password) {
 #endif
 }
 
+void Key::checkPassword(const string & password) {
+    uint8_t key[KEY_BUFFER_LENGTH];
+
+    gcry_md_hash_buffer(GCRY_MD_SHA3_512, key, password.c_str(), password.length());
+
+    for (int i = 0;i < KEY_BUFFER_LENGTH;i++) {
+        if (key[i] != keyBuffer[i]) {
+            throw pfm_error("Invalid user name or password");
+        }
+    }
+}
+
 uint8_t Key::getBits(int index) {
     uint8_t result = 0;
 
