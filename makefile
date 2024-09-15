@@ -35,7 +35,7 @@ CFLAGS_BASE=-c -Wall -pedantic $(GLOBAL_DEF)
 CFLAGS_REL=$(CFLAGS_BASE) -O2
 CFLAGS_DBG=$(CFLAGS_BASE) -g
 
-CPPFLAGS_BASE = -c -Wall -pedantic -std=c++17 $(GLOBAL_DEF)
+CPPFLAGS_BASE = -c -Wall -pedantic -std=c++20 $(GLOBAL_DEF)
 CPPFLAGS_REL=$(CPPFLAGS_BASE) -O2
 CPPFLAGS_DBG=$(CPPFLAGS_BASE) -g
 
@@ -45,7 +45,7 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP)/$*.Td
 
 # Libraries
 STDLIBS = 
-EXTLIBS = -lreadline -lsqlite3 -lgcrypt
+EXTLIBS = -lreadline -lsqlite3 -lgcrypt -lbase64pp
 
 COMPILE.cpp = $(CPP) $(CPPFLAGS) $(DEPFLAGS) -o $@
 COMPILE.c = $(C) $(CFLAGS) $(DEPFLAGS) -o $@

@@ -17,6 +17,9 @@ using namespace std;
 #define MAX_PROMPT_LENGTH                      128
 #define AMOUNT_FIELD_STRING_LEN                 16
 
+void                addUser();
+void                login();
+
 void                addAccount();
 void                listAccounts();
 DBAccount           chooseAccount(const char * szAccountCode);

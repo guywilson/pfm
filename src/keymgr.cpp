@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include <gcrypt.h>
+#include <base64pp/base64pp.h>
 
 #include "pfm_error.h"
 #include "keymgr.h"
@@ -46,6 +47,7 @@ void hexDump(void * buffer, uint32_t bufferLen) {
 
 Key::Key() {
     wipeKey();
+    hasPassword = false;
 }
 
 Key::~Key() {
@@ -64,11 +66,19 @@ void Key::wipeKey() {
     }
 }
 
+bool Key::getHasPassword() {
+    return hasPassword;
+}
+
 void Key::generate(const string & password) {
+    wipeKey();
+
     gcry_md_hash_buffer(GCRY_MD_SHA3_512, keyBuffer, password.c_str(), password.length());
+
 #ifdef PFM_TEST_SUITE_ENABLED
     hexDump(keyBuffer, KEY_BUFFER_LENGTH);
 #endif
+    hasPassword = true;
 }
 
 void Key::checkPassword(const string & password) {
@@ -81,6 +91,16 @@ void Key::checkPassword(const string & password) {
             throw pfm_error("Invalid user name or password");
         }
     }
+}
+
+string Key::getBase64Key() {
+    vector<uint8_t> bytes;
+
+    for (int i = 0;i < KEY_BUFFER_LENGTH;i++) {
+        bytes.push_back(keyBuffer[i]);
+    }
+
+    return base64pp::encode({begin(bytes), end(bytes)});
 }
 
 uint8_t Key::getBits(int index) {

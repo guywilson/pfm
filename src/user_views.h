@@ -18,7 +18,7 @@ class AddUserView : public CLIView {
         CLITextField userNameField = CLITextField("User name: ");
 
     public:
-        AddUserView() : AddUserView("Add payee") {}
+        AddUserView() : AddUserView("Add user") {}
 
         AddUserView(const char * title) : CLIView(title) {
             userNameField.setLengthLimit(FIELD_STRING_LEN);

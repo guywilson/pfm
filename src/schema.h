@@ -234,6 +234,8 @@ const char * pszCreateUserTable =
     "user_name TEXT NOT NULL," \
     "password TEXT," \
     "has_password TEXT NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
     "UNIQUE(user_name) ON CONFLICT ROLLBACK);";
 
 const char * pszCreateConfigTable =

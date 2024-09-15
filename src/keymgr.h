@@ -17,6 +17,7 @@ class Key {
         }
 
     private:
+        bool hasPassword;
         uint8_t keyBuffer[KEY_BUFFER_LENGTH];
 
         Key();
@@ -25,8 +26,10 @@ class Key {
     public:
         ~Key();
 
+        bool getHasPassword();
         void generate(const string & password);
         void checkPassword(const string & password);
+        string getBase64Key();
 
         uint8_t getBits(int index);
 };

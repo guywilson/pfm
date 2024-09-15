@@ -1,3 +1,4 @@
+#include "user_views.h"
 #include "account_views.h"
 #include "category_views.h"
 #include "payee_views.h"

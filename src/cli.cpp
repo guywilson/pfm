@@ -4,10 +4,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+#include <conio.h>
+#else
+#include <termios.h>
+#endif
+
 #include <sqlite3.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include "keymgr.h"
 #include "db.h"
 #include "cache.h"
 #include "cli.h"
@@ -21,6 +28,56 @@
 
 using namespace std;
 
+int __getch(void) {
+	int		ch;
+
+#ifndef _WIN32
+	struct termios current;
+	struct termios original;
+
+	tcgetattr(fileno(stdin), &original); /* grab old terminal i/o settings */
+	current = original; /* make new settings same as old settings */
+	current.c_lflag &= ~ICANON; /* disable buffered i/o */
+	current.c_lflag &= ~ECHO; /* set echo mode */
+	tcsetattr(fileno(stdin), TCSANOW, &current); /* use these new terminal i/o settings now */
+#endif
+
+#ifdef _WIN32
+    ch = _getch();
+#else
+    ch = getchar();
+#endif
+
+#ifndef _WIN32
+	tcsetattr(0, TCSANOW, &original);
+#endif
+
+    return ch;
+}
+
+string getPassword() {
+    printf("Enter password: ");
+
+    string password;
+	int	ch = 0;
+
+    while (ch != '\n') {
+        ch = __getch();
+
+        if (ch != '\n' && ch != '\r') {
+            putchar('*');
+            fflush(stdout);
+
+            password += (char)ch;
+        }
+    }
+
+    putchar('\n');
+    fflush(stdout);
+
+    return password;
+}
+
 bool validateCreditDebit(const char * pszCD) {
     if (strlen(pszCD) != 2) {
         return false;
@@ -30,6 +87,55 @@ bool validateCreditDebit(const char * pszCD) {
     }
     else {
         return true;
+    }
+}
+
+void addUser() {
+    AddUserView view;
+    view.show();
+
+    Key & key = Key::getInstance();
+    string password = getPassword();
+
+    DBUser user = view.getUser();
+
+    if (password.length() > 0) {
+        key.generate(password);
+        user.password = key.getBase64Key();
+        user.hasPassword = true;
+    }
+    else {
+        user.hasPassword = false;
+    }
+
+    user.save();
+}
+
+void login() {
+    DBResult<DBUser> userResult;
+    int numUsers = userResult.retrieveAll();
+    userResult.clear();
+
+    Key & key = Key::getInstance();
+
+    if (numUsers == 0) {
+        addUser();
+    }
+    else {
+        LoginView view;
+        view.show();
+
+        string userName = view.getUserName();
+
+        DBUser user;
+        user.retrieveByUser(userName);
+
+        if (user.hasPassword) {
+            key.generate(getPassword());
+            string base64Key = key.getBase64Key();
+
+            user.checkPassword(base64Key);
+        }
     }
 }
 

@@ -29,6 +29,6 @@ void DBUser::retrieveByUser(string & user) {
         set(result.getResultAt(0));
     }
     else {
-        throw pfm_error("Invalid user name or password");
+        throw pfm_error(getValidationErrorMsg());
     }
 }
