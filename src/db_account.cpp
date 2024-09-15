@@ -84,6 +84,21 @@ void DBAccount::createRecurringTransactions() {
     }
 }
 
+void DBAccount::beforeUpdate() {
+    DBAccount account;
+    account.retrieveByCode(code);
+
+    if (openingBalance != account.openingBalance) {
+        DBCarriedOver co;
+        DBResult<DBCarriedOver> coResult = co.retrieveByAccountId(id);
+
+        for (int i = 0;i < coResult.getNumRows();i++) {
+            DBCarriedOver carriedOver = coResult.getResultAt(i);
+            carriedOver.remove();
+        }
+    }
+}
+
 void DBAccount::createCarriedOverLogs() {
     StrDate dateToday;
     StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
@@ -104,7 +119,10 @@ void DBAccount::createCarriedOverLogs() {
                 return;
             }
             
-            co.date = result.getResultAt(0).date;
+            StrDate latestTransactionDate = result.getResultAt(0).date;
+
+            co.date = StrDate(latestTransactionDate.year(), latestTransactionDate.month(), 1);
+            co.balance = openingBalance;
         }
 
         while (co.date < periodStartDate) {

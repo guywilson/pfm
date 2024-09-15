@@ -180,8 +180,8 @@ class DBAccount : public DBEntity {
             createCarriedOverLogs();
         }
 
+        void beforeUpdate() override;
         Money calculateBalanceAfterBills();
-
         void retrieveByCode(string & code);
 };
 
