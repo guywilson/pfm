@@ -413,6 +413,11 @@ class CLIListColumn : public CLIField {
                 v = v.substr(1);
             }
 
+            if (width < v.length()) {
+                v = v.substr(0, width - 3);
+                v = v.append("...");
+            }
+
             switch (getAlignment()) {
                 case CLIListColumn::leftAligned:
                     cout << left << setw(width) << v;
