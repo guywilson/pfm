@@ -155,7 +155,7 @@ class DBColumn {
 
             Key & key = Key::getInstance();
 
-            if (key.getHasPassword()) {
+            if (key.hasPassword) {
                 for (int i = 0;i < value.length();i++) {
                     out[i] = encryptChar(value[i], (int)key.getBits(i));
                 }
@@ -169,7 +169,7 @@ class DBColumn {
 
             Key & key = Key::getInstance();
 
-            if (key.getHasPassword()) {
+            if (key.hasPassword) {
                 for (int i = 0;i < value.length();i++) {   
                     out[i] = decryptChar(value[i], (int)key.getBits(i));
                 }

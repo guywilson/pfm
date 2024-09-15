@@ -25,6 +25,7 @@
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
 #include "db_budget.h"
+#include "db_user.h"
 
 using namespace std;
 
@@ -90,7 +91,7 @@ bool validateCreditDebit(const char * pszCD) {
     }
 }
 
-void addUser() {
+DBUser addUser() {
     AddUserView view;
     view.show();
 
@@ -100,26 +101,32 @@ void addUser() {
     DBUser user = view.getUser();
 
     if (password.length() > 0) {
+        key.hasPassword = true;
         key.generate(password);
         user.password = key.getBase64Key();
         user.hasPassword = true;
     }
     else {
+        key.hasPassword = false;
         user.hasPassword = false;
     }
 
     user.save();
+
+    return user;
 }
 
-void login() {
+DBUser login() {
     DBResult<DBUser> userResult;
     int numUsers = userResult.retrieveAll();
     userResult.clear();
 
     Key & key = Key::getInstance();
 
+    DBUser user;
+
     if (numUsers == 0) {
-        addUser();
+        user = addUser();
     }
     else {
         LoginView view;
@@ -127,23 +134,26 @@ void login() {
 
         string userName = view.getUserName();
 
-        DBUser user;
         user.retrieveByUser(userName);
 
         if (user.hasPassword) {
+            key.hasPassword = true;
             key.generate(getPassword());
             string base64Key = key.getBase64Key();
 
             user.checkPassword(base64Key);
         }
     }
+
+    return user;
 }
 
-void addAccount() {
+void addAccount(DBUser & user) {
     AddAccountView view;
     view.show();
 
     DBAccount account = view.getAccount();
+    account.userId = user.id;
     account.save();
 
     cout << "Created account with ID " << account.id << endl;

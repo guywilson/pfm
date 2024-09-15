@@ -17,16 +17,16 @@ class Key {
         }
 
     private:
-        bool hasPassword;
         uint8_t keyBuffer[KEY_BUFFER_LENGTH];
 
         Key();
         void wipeKey();
 
     public:
+        bool hasPassword;
+
         ~Key();
 
-        bool getHasPassword();
         void generate(const string & password);
         void checkPassword(const string & password);
         string getBase64Key();

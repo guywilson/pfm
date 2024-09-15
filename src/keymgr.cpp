@@ -66,10 +66,6 @@ void Key::wipeKey() {
     }
 }
 
-bool Key::getHasPassword() {
-    return hasPassword;
-}
-
 void Key::generate(const string & password) {
     wipeKey();
 
@@ -78,7 +74,6 @@ void Key::generate(const string & password) {
 #ifdef PFM_TEST_SUITE_ENABLED
     hexDump(keyBuffer, KEY_BUFFER_LENGTH);
 #endif
-    hasPassword = true;
 }
 
 void Key::checkPassword(const string & password) {

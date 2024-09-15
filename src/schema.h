@@ -17,19 +17,19 @@ const char * defaultCategories[][2] = {
     {"INCME", "Income"},
     {"UTILS", "Utility bills"},
     {"GROCS", "Food & groceries"},
-    {"RENT ", "Rent payments"},
-    {"MTGE ", "Mortgage payments"},
-    {"FUEL ", "Vehicle fuel"},
-    {"CARD ", "Credit card payments"},
-    {"LOAN ", "Loan repayments"},
-    {"BUSE ", "Business expenses"},
-    {"PETS ", "Pets food and supplies"},
-    {"HOME ", "Home and DIY"},
-    {"FOOD ", "Eating out & take-away"},
-    {"CASH ", "ATM withdrawal"},
-    {"CARM ", "Car maintenance"},
-    {"GIFT ", "Gifts & presents"},
-    {"INTE ", "Interest & bank charges"},
+    {"RENT", "Rent payments"},
+    {"MTGE", "Mortgage payments"},
+    {"FUEL", "Vehicle fuel"},
+    {"CARD", "Credit card payments"},
+    {"LOAN", "Loan repayments"},
+    {"BUSE", "Business expenses"},
+    {"PETS", "Pets food and supplies"},
+    {"HOME", "Home and DIY"},
+    {"FOOD", "Eating out & take-away"},
+    {"CASH", "ATM withdrawal"},
+    {"CARM", "Car maintenance"},
+    {"GIFT", "Gifts & presents"},
+    {"INTE", "Interest & bank charges"},
     {"HHOLD", "Household expenses"},
     {"HEALT", "Health expenses"},
     {"INSUR", "Insurance payments"},
@@ -261,6 +261,7 @@ const char * pszCreateCurrencyTable =
 const char * pszCreateAccountTable = 
     "CREATE TABLE account (" \
     "id INTEGER PRIMARY KEY," \
+    "user_id INTEGER," \
     "name TEXT NOT NULL," \
     "code TEXT NOT NULL," \
     "opening_balance NUMERIC NOT NULL," \
@@ -269,6 +270,7 @@ const char * pszCreateAccountTable =
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
     "UNIQUE(code) ON CONFLICT ROLLBACK," \
+    "FOREIGN KEY(user_id) REFERENCES user(id)," \
     "FOREIGN KEY(currency_id) REFERENCES currency(id));";
 
 const char * pszCreateCategoryTable = 

@@ -7,6 +7,7 @@
 #include "db_payee.h"
 #include "db_transaction.h"
 #include "db_budget.h"
+#include "db_user.h"
 
 using namespace std;
 
@@ -17,10 +18,10 @@ using namespace std;
 #define MAX_PROMPT_LENGTH                      128
 #define AMOUNT_FIELD_STRING_LEN                 16
 
-void                addUser();
-void                login();
+DBUser              addUser();
+DBUser              login();
 
-void                addAccount();
+void                addAccount(DBUser & user);
 void                listAccounts();
 DBAccount           chooseAccount(const char * szAccountCode);
 void                updateAccount(DBAccount & account);

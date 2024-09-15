@@ -45,6 +45,7 @@ int main(int argc, char ** argv) {
     char *          pszDatabase = NULL;
     bool            loop = true;
     DBAccount       selectedAccount;
+    DBUser          loggedInUser;
 
     rl_bind_key('\t', rl_complete);
 
@@ -96,8 +97,7 @@ int main(int argc, char ** argv) {
     exit(0);
 #endif
 
-    Key & key = Key::getInstance();
-    login();
+    loggedInUser = login();
 
     while (loop) {
         pszCommand = readline("pfm > ");
@@ -116,7 +116,7 @@ int main(int argc, char ** argv) {
                     printVersion();
                 }
                 else if (strncmp(pszCommand, "add account", 11) == 0 || strncmp(pszCommand, "aa", 2) == 0) {
-                    addAccount();
+                    addAccount(loggedInUser);
                 }
                 else if (strncmp(pszCommand, "list accounts", 14) == 0 || strncmp(pszCommand, "la", 2) == 0) {
                     listAccounts();

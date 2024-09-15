@@ -20,6 +20,7 @@ class DBAccount : public DBEntity {
     private:
         const char * sqlSelectByCode = 
                         "SELECT id," \
+                        "user_id," \
                         "name," \
                         "code," \
                         "opening_balance," \
@@ -31,13 +32,14 @@ class DBAccount : public DBEntity {
 
         const char * sqlInsert = 
                         "INSERT INTO account (" \
+                        "user_id," \
                         "name," \
                         "code," \
                         "opening_balance," \
                         "current_balance," \
                         "created," \
                         "updated) " \
-                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');";
+                        "VALUES (%lld, '%s', '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE account SET " \
@@ -55,6 +57,7 @@ class DBAccount : public DBEntity {
         void createCarriedOverLogs();
 
     public:
+        pfm_id_t                userId;
         string                  name;
         string                  code;
         Money                   openingBalance;
@@ -67,6 +70,7 @@ class DBAccount : public DBEntity {
         void clear() {
             DBEntity::clear();
 
+            this->userId = 0;
             this->name = "";
             this->code = "";
             this->openingBalance = 0.0;
@@ -76,6 +80,7 @@ class DBAccount : public DBEntity {
         void set(const DBAccount & src) {
             DBEntity::set(src);
 
+            this->userId =          src.userId;
             this->name =            src.name;
             this->code =            src.code;
             this->openingBalance =  src.openingBalance;
@@ -85,7 +90,10 @@ class DBAccount : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "name") {
+            if (column.getName() == "user_id") {
+                userId = column.getIDValue();
+            }
+            else if (column.getName() == "name") {
                 name = column.getDecryptedValue();
             }
             else if (column.getName() == "code") {
@@ -95,7 +103,7 @@ class DBAccount : public DBEntity {
                 openingBalance = column.getDecryptedDoubleValue();
             }
             else if (column.getName() == "current_balance") {
-                openingBalance = column.getDecryptedDoubleValue();
+                currentBalance = column.getDecryptedDoubleValue();
             }
         }
 
@@ -123,6 +131,7 @@ class DBAccount : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
+                userId,
                 encryptField(name).c_str(),
                 encryptField(code).c_str(),
                 encryptField(openingBalance.getRawStringValue()).c_str(),
