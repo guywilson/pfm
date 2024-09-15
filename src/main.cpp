@@ -414,6 +414,12 @@ int main(int argc, char ** argv) {
 
                     deleteBudget(b);
                 }
+                else if (strncmp(pszCommand, "list carried over logs", 22) == 0) {
+                    listCarriedOverLogs(selectedAccount);
+                }
+                else if (strncmp(pszCommand, "list budget track records", 25) == 0) {
+                    listBudgetTracks();
+                }
             }
             catch (pfm_fatal & f) {
                 fprintf(stderr, "Fatal error: %s\n", f.what());

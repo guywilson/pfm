@@ -7,3 +7,4 @@ pfm
 ~$data.xlsx
 *.log
 *.sqbpro
+.pfm-journal

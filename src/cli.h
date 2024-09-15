@@ -8,6 +8,8 @@
 #include "db_transaction.h"
 #include "db_budget.h"
 #include "db_user.h"
+#include "db_carried_over.h"
+#include "db_budget_track.h"
 
 using namespace std;
 
@@ -57,6 +59,9 @@ void                listBudgets();
 DBBudget            getBudget(int sequence);
 void                updateBudget(DBBudget & budget);
 void                deleteBudget(DBBudget & budget);
+
+void                listCarriedOverLogs(DBAccount & account);
+void                listBudgetTracks();
 
 void                testAccount(const char * accountCode);
 

@@ -26,6 +26,8 @@
 #include "db_transaction.h"
 #include "db_budget.h"
 #include "db_user.h"
+#include "db_carried_over.h"
+#include "db_v_budget_track.h"
 
 using namespace std;
 
@@ -530,4 +532,22 @@ void updateBudget(DBBudget & budget) {
 
 void deleteBudget(DBBudget & budget) {
     budget.remove();
+}
+
+void listCarriedOverLogs(DBAccount & account) {
+    DBResult<DBCarriedOver> result;
+    result.retrieveAll();
+
+    CarriedOverListView view;
+    view.addResults(result);
+    view.show();
+}
+
+void listBudgetTracks() {
+    DBResult<DBBudgetTrackView> result;
+    result.retrieveAll();
+
+    BudgetTrackView view;
+    view.addResults(result);
+    view.show();
 }
