@@ -175,6 +175,7 @@ class DBBudgetTrack : public DBEntity {
             return szStatement;
         }
 
+        void validate() override;
         DBResult<DBBudgetTrack> retrieveByBudgetId(pfm_id_t budgetId);
         DBResult<DBBudgetTrack> retrieveByBudgetIdAfterDate(pfm_id_t budgetId, StrDate & date);
         int retrieveLatestByBudgetId(pfm_id_t budgetId);

@@ -62,3 +62,8 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
 
     return result;
 }
+
+void DBCarriedOver::validate() {
+    DBColumn::validateStringValue(description);
+    DBColumn::validateStringValue(balance.getRawStringValue());
+}

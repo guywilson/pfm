@@ -84,6 +84,13 @@ void DBAccount::createRecurringTransactions() {
     }
 }
 
+void DBAccount::validate() {
+    DBColumn::validateStringValue(name);
+    DBColumn::validateStringValue(code);
+    DBColumn::validateStringValue(openingBalance.getRawStringValue());
+    DBColumn::validateStringValue(currentBalance.getRawStringValue());
+}
+
 void DBAccount::beforeUpdate() {
     DBAccount account;
     account.retrieveByCode(code);

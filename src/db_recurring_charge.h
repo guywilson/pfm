@@ -204,6 +204,7 @@ class DBRecurringCharge : public DBPayment {
             return szStatement;
         }
 
+        void validate() override;
         DBResult<DBRecurringCharge> retrieveByAccountID(pfm_id_t accountId);
 };
 
