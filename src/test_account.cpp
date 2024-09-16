@@ -7,8 +7,8 @@
 #include "pfm_error.h"
 #include "db.h"
 #include "cache.h"
-#include "cli.h"
 #include "strdate.h"
+#include "command.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
@@ -161,8 +161,9 @@ void testAccount() {
         throw e;
     }
 
-    chooseAccount("HSBC");
-
+    Command command = Command("use HSBC");
+    command.process();
+    
     /*
     ** Check that we have the right number of transactions created...
     */
