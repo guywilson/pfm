@@ -170,6 +170,10 @@ void Command::listAccounts() {
 }
 
 void Command::chooseAccount(string & accountCode) {
+    log.logEntry("Command::chooseAccount()");
+
+    log.logDebug("Choose account with code '%s'", accountCode.c_str());
+
     if (accountCode.length() == 0) {
         ChooseAccountView view;
         view.show();
@@ -184,6 +188,8 @@ void Command::chooseAccount(string & accountCode) {
     showAccountBalances(account);
     
     selectedAccount = account;
+
+    log.logExit("Command::chooseAccount()");
 }
 
 void Command::updateAccount() {
@@ -563,7 +569,9 @@ void Command::listBudgetTracks() {
     view.show();
 }
 
-Command::pfm_cmd_t Command::getCommandCode() {
+Command::pfm_cmd_t Command::getCommandCode(string & command) {
+    this->command = command;
+
     if (isCommand("exit") || isCommand("quit") || isCommand("q")) {
         return pfm_cmd_exit;
     }
@@ -668,8 +676,8 @@ Command::pfm_cmd_t Command::getCommandCode() {
     }
 }
 
-bool Command::process() {
-    Command::pfm_cmd_t cmd = getCommandCode();
+bool Command::process(string & command) {
+    Command::pfm_cmd_t cmd = getCommandCode(command);
 
     if (cmd == pfm_cmd_exit) {
         return false;

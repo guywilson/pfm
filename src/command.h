@@ -1,6 +1,7 @@
 #include <string>
 #include <string.h>
 
+#include "logger.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
@@ -58,8 +59,12 @@ class Command {
         DBAccount selectedAccount;
         DBUser loggedInUser;
 
+        Logger & log = Logger::getInstance();
+
         bool isCommand(const char * compareTo) {
-            return (this->command.compare(compareTo) == 0 ? true : false);
+            string commandNoParameters = command.substr(0, command.find_first_of(' '));
+
+            return (commandNoParameters.compare(compareTo) == 0 ? true : false);
         }
 
         string getCommandParameter() {
@@ -119,15 +124,9 @@ class Command {
         void listBudgetTracks();
 
         bool isCommandValid();
-        pfm_cmd_t getCommandCode();
+        pfm_cmd_t getCommandCode(string & command);
 
     public:
-        Command(const char * command) {
-            this->command = command;
-        }
-
-        Command(const string & command) : Command(command.c_str()) {}
-
         void setLoggedInUser(DBUser & user) {
             this->loggedInUser = user;
         }
@@ -136,7 +135,7 @@ class Command {
         static void version();
 
         static DBUser login();
-        bool process();
+        bool process(string & command);
 };
 
 #endif

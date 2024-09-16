@@ -161,9 +161,11 @@ void testAccount() {
         throw e;
     }
 
-    Command command = Command("use HSBC");
-    command.process();
-    
+    Command command;
+
+    string cmdString = "use HSBC";
+    command.process(cmdString);
+
     /*
     ** Check that we have the right number of transactions created...
     */

@@ -93,17 +93,18 @@ int main(int argc, char ** argv) {
 
     loggedInUser = Command::login();
 
+    Command command;
+
     while (loop) {
         string cmdString = readline("pfm > ");
 
         if (cmdString.length()) {
             add_history(cmdString.c_str());
 
-            Command command = Command(cmdString);
             command.setLoggedInUser(loggedInUser);
 
             try {
-                if (command.process() == false) {
+                if (command.process(cmdString) == false) {
                     loop = false;
                 }
             }
