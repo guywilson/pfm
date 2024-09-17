@@ -94,6 +94,7 @@ int main(int argc, char ** argv) {
     loggedInUser = Command::login();
 
     Command command;
+    command.setLoggedInUser(loggedInUser);
 
     while (loop) {
         string cmdString = readline("pfm > ");
@@ -101,12 +102,8 @@ int main(int argc, char ** argv) {
         if (cmdString.length()) {
             add_history(cmdString.c_str());
 
-            command.setLoggedInUser(loggedInUser);
-
             try {
-                if (command.process(cmdString) == false) {
-                    loop = false;
-                }
+                loop = command.process(cmdString);
             }
             catch (pfm_fatal & f) {
                 fprintf(stderr, "Fatal error: %s\n", f.what());
