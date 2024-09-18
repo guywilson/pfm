@@ -2,8 +2,11 @@
 #include <iomanip>
 #include <string>
 #include <string.h>
+#include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
+#include <locale>
+#include <ctype.h>
 
 #include "pfm_error.h"
 #include "strdate.h"
@@ -50,6 +53,107 @@ StrDate::StrDate(int year, int month, int day) {
         day);
 
     this->set(dateStr);
+}
+
+bool StrDate::isYear(string & part) {
+    StrDate today;
+
+    if (part.length() == 4) {
+        for (int i = 0;i < part.length();i++) {
+            if (!isdigit(part[i])) {
+                throw pfm_validation_error("Invalid date format");
+            }
+        }
+
+        long yearCandidate = strtol(part.c_str(), NULL, 10);
+
+        if (yearCandidate < 1970 || yearCandidate > today.year()) {
+            throw pfm_validation_error("Invalid date format");
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool StrDate::isMonth(string & part) {
+    long monthCandidate = strtol(part.c_str(), NULL, 10);
+
+    if (monthCandidate > 12) {
+        return false;
+    }
+
+    return true;
+}
+
+/*
+** Accepted formats:
+**
+** yyyy-mm-dd
+** dd-mm-yyyy
+** As above but with / rather than -
+*/
+StrDate StrDate::parseDate(const char * dateStr) {
+    StrDate parsedDate;
+
+    size_t dateLength = strlen(dateStr);
+
+    if (dateLength > 0) {
+        char * pszDate = (char *)malloc(dateLength + 1);
+
+        if (pszDate == NULL) {
+            throw pfm_error("Failed to allocate memory for date string");
+        }
+
+        strncpy(pszDate, dateStr, dateLength);
+
+        string part1 = strtok_r(pszDate, "-/", &pszDate);
+        string part2 = strtok_r(NULL, "-/", &pszDate);
+        string part3 = strtok_r(NULL, "-/", &pszDate);
+
+        free(pszDate);
+
+        if (strtok_r(NULL, "-/", &pszDate) != NULL) {
+            throw pfm_validation_error("Invalid date format");
+        }
+
+        int year = 0;
+        int month = 0;
+        int day = 0;
+
+        if (isYear(part1)) {
+            year = atoi(part1.c_str());
+        }
+        else {
+            day = atoi(part1.c_str());
+        }
+
+        if (isMonth(part2)) {
+            month = atoi(part2.c_str());
+        }
+        else {
+            throw pfm_validation_error("Invalid date format");
+        }
+
+        if (year) {
+            day = atoi(part3.c_str());
+        }
+        else if (isYear(part3)) {
+            year = atoi(part3.c_str());
+        }
+
+        parsedDate.set(year, month, day);
+
+        return parsedDate;
+    }
+    else {
+        return parsedDate;
+    }
+}
+
+StrDate StrDate::parseDate(string & dateStr) {
+    return parseDate(dateStr.c_str());
 }
 
 string StrDate::today() {

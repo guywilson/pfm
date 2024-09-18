@@ -27,6 +27,9 @@ class StrDate {
 
         void validateDateString(const string & date);
 
+        static bool isYear(string & part);
+        static bool isMonth(string & part);
+
         static bool isLeapYear(int year);
         static string getTimestamp(bool includems);
 
@@ -43,6 +46,9 @@ class StrDate {
 
         void clear();
 
+        static StrDate parseDate(string & dateStr);
+        static StrDate parseDate(const char * dateStr);
+        
         static string today();
         static string getTimestamp();
         static string getTimestampToMicrosecond();
