@@ -91,10 +91,6 @@ int main(int argc, char ** argv) {
     exit(0);
 #endif
 
-    StrDate testDate = StrDate::parseDate("4/3/1996");
-    cout << testDate.shortDate() << endl;
-    exit(0);
-
     loggedInUser = Command::login();
 
     Command command;
