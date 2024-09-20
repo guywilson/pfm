@@ -3,6 +3,7 @@
 /.vscode
 pfm
 *.db
+*.json
 .pfm
 ~$data.xlsx
 *.log

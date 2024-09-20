@@ -32,6 +32,7 @@ class Command {
             pfm_cmd_category_list,
             pfm_cmd_category_update,
             pfm_cmd_category_delete,
+            pfm_cmd_category_import,
             pfm_cmd_payee_add,
             pfm_cmd_payee_list,
             pfm_cmd_payee_update,
@@ -94,6 +95,7 @@ class Command {
         DBCategory getCategory(string & categoryCode);
         void updateCategory(DBCategory & category);
         void deleteCategory(DBCategory & category);
+        void importCategories(string & jsonFileName);
 
         void addPayee();
         void listPayees();

@@ -1,8 +1,11 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
+#include <unordered_map>
 
 #ifdef _WIN32
 #include <conio.h>
@@ -13,6 +16,7 @@
 #include <sqlite3.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <nlohmann/json.hpp>
 
 #include "pfm_error.h"
 #include "keymgr.h"
@@ -32,6 +36,10 @@
 #include "command.h"
 
 using namespace std;
+using json = nlohmann::json;
+
+using object_t = std::map<std::string, std::string>;
+using objects_t = std::vector<object_t>;
 
 static int __getch(void) {
 	int		ch;
@@ -255,6 +263,53 @@ void Command::updateCategory(DBCategory & category) {
 void Command::deleteCategory(DBCategory & category) {
     category.remove();
     category.clear();
+}
+
+void Command::importCategories(string & jsonFileName) {
+    ifstream fstream(jsonFileName.c_str());
+    json data = json::parse(fstream);
+    fstream.close();
+
+    auto elements = data.template get<unordered_map<string, json>>();
+
+    for (auto& i : elements) {
+        if (i.first.compare("className") == 0) {
+            string className = i.second;
+
+            if (className.compare("DBCategory") != 0) {
+                throw pfm_validation_error(
+                            pfm_error::buildMsg(
+                                "Error importing categories, invalid className '%s'", 
+                                className.c_str()));
+            }
+        }
+        else if (i.first.compare("categories") == 0) {
+            auto categories{ data.at("categories").get<objects_t>() };
+
+            for (auto& categoryMap : categories) {
+                DBCategory category;
+
+                for (const auto& [key, value] : categoryMap) {
+                    std::cout << '[' << key << "] = " << value << "; " << endl;
+
+                    if (key.compare("code") == 0) {
+                        category.code = value;
+                    }
+                    else if (key.compare("description") == 0) {
+                        category.description = value;
+                    }
+                }
+
+                category.save();
+            }
+        }
+        else {
+            throw pfm_validation_error(
+                            pfm_error::buildMsg(
+                                "Error importing categories, invalid element '%s'", 
+                                i.first.c_str()));
+        }
+    }
 }
 
 void Command::addPayee() {
@@ -611,17 +666,20 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
     else if (isCommand("delete category") || isCommand("dc")) {
         return pfm_cmd_category_delete;
     }
+    else if (isCommand("import categories") || isCommand("ic")) {
+        return pfm_cmd_category_import;
+    }
     else if (isCommand("add payee") || isCommand("ap")) {
-        return pfm_cmd_category_add;
+        return pfm_cmd_payee_add;
     }
     else if (isCommand("list payees") || isCommand("lp")) {
-        return pfm_cmd_category_list;
+        return pfm_cmd_payee_list;
     }
     else if (isCommand("update payee") || isCommand("up")) {
-        return pfm_cmd_category_update;
+        return pfm_cmd_payee_update;
     }
     else if (isCommand("delete payee") || isCommand("dp")) {
-        return pfm_cmd_category_delete;
+        return pfm_cmd_payee_delete;
     }
     else if (isCommand("add recurring charge") || isCommand("arc")) {
         return pfm_cmd_charge_add;
@@ -724,6 +782,10 @@ bool Command::process(string & command) {
         DBCategory category = getCategory(categoryCode);
 
         deleteCategory(category);
+    }
+    else if (cmd == pfm_cmd_category_import) {
+        string filename = getCommandParameter();
+        importCategories(filename);
     }
     else if (cmd == pfm_cmd_payee_add) {
         addPayee();
