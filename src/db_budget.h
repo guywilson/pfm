@@ -7,6 +7,7 @@
 #include "db_base.h"
 #include "strdate.h"
 #include "money.h"
+#include "jfile.h"
 #include "db_category.h"
 #include "db_payee.h"
 
@@ -116,6 +117,16 @@ class DBBudget : public DBEntity {
             this->description = src.description;
             this->minimumBudget = src.minimumBudget;
             this->maximumBudget = src.maximumBudget;
+        }
+
+        void set(JRecord & record) {
+            this->startDate = StrDate::parseDate(record.get("startDate"));
+            this->endDate = StrDate::parseDate(record.get("endDate"));
+            this->payeeCode = record.get("payeeCode");
+            this->categoryCode = record.get("categoryCode");
+            this->description = record.get("description");
+            this->minimumBudget = record.get("minimumBudget");
+            this->maximumBudget = record.get("maximumBudget");
         }
 
         void print() {

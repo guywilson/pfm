@@ -9,6 +9,7 @@
 #include <sqlite3.h>
 
 #include "db.h"
+#include "jfile.h"
 #include "logger.h"
 #include "pfm_error.h"
 

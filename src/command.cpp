@@ -607,6 +607,19 @@ void Command::deleteBudget(DBBudget & budget) {
     budget.clear();
 }
 
+void Command::importBudgets(string & jsonFileName) {
+    JFile jfile = JFile(jsonFileName, "DBBudget");
+
+    vector<JRecord> records = jfile.readRecords("budgets");
+
+    for (JRecord & record : records) {
+        DBBudget budget;
+
+        budget.set(record);
+        budget.save();
+    }
+}
+
 void Command::listCarriedOverLogs() {
     DBResult<DBCarriedOver> result;
     result.retrieveAll();
@@ -682,6 +695,9 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
     else if (isCommand("delete payee") || isCommand("dp")) {
         return pfm_cmd_payee_delete;
     }
+    else if (isCommand("import payees") || isCommand("ip")) {
+        return pfm_cmd_payee_import;
+    }
     else if (isCommand("add recurring charge") || isCommand("arc")) {
         return pfm_cmd_charge_add;
     }
@@ -693,6 +709,9 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
     }
     else if (isCommand("delete recurring charge") || isCommand("drc")) {
         return pfm_cmd_charge_delete;
+    }
+    else if (isCommand("import recurring charges") || isCommand("irc")) {
+        return pfm_cmd_charge_import;
     }
     else if (isCommand("add transaction") || isCommand("at")) {
         return pfm_cmd_transaction_add;
@@ -709,6 +728,9 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
     else if (isCommand("delete transaction") || isCommand("dt")) {
         return pfm_cmd_transaction_delete;
     }
+    else if (isCommand("import transactions") || isCommand("it")) {
+        return pfm_cmd_transaction_import;
+    }
     else if (isCommand("add budget") || isCommand("ab")) {
         return pfm_cmd_budget_add;
     }
@@ -720,6 +742,9 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
     }
     else if (isCommand("delete budget") || isCommand("db")) {
         return pfm_cmd_budget_delete;
+    }
+    else if (isCommand("import budgets") || isCommand("ib")) {
+        return pfm_cmd_budget_import;
     }
     else if (isCommand("list carried over logs") || isCommand("lco")) {
         return pfm_cmd_debug_carried_over;
@@ -806,6 +831,10 @@ bool Command::process(string & command) {
 
         deletePayee(payee);
     }
+    else if (cmd == pfm_cmd_payee_import) {
+        string filename = getCommandParameter();
+        importPayees(filename);
+    }
     else if (cmd == pfm_cmd_charge_add) {
         addRecurringCharge();
     }
@@ -823,6 +852,10 @@ bool Command::process(string & command) {
 
         DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
         deleteRecurringCharge(charge);
+    }
+    else if (cmd == pfm_cmd_charge_import) {
+        string filename = getCommandParameter();
+        importRecurringCharges(filename);
     }
     else if (cmd == pfm_cmd_transaction_add) {
         addTransaction();
@@ -845,6 +878,10 @@ bool Command::process(string & command) {
         DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
         deleteTransaction(transaction);
     }
+    else if (cmd == pfm_cmd_transaction_import) {
+        string filename = getCommandParameter();
+        importTransactions(filename);
+    }
     else if (cmd == pfm_cmd_budget_add) {
         addBudget();
     }
@@ -862,6 +899,10 @@ bool Command::process(string & command) {
 
         DBBudget budget = getBudget(atoi(sequence.c_str()));
         deleteBudget(budget);
+    }
+    else if (cmd == pfm_cmd_budget_import) {
+        string filename = getCommandParameter();
+        importBudgets(filename);
     }
     else if (cmd == pfm_cmd_debug_carried_over) {
         listCarriedOverLogs();

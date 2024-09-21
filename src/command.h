@@ -37,19 +37,23 @@ class Command {
             pfm_cmd_payee_list,
             pfm_cmd_payee_update,
             pfm_cmd_payee_delete,
+            pfm_cmd_payee_import,
             pfm_cmd_charge_add,
             pfm_cmd_charge_list,
             pfm_cmd_charge_update,
             pfm_cmd_charge_delete,
+            pfm_cmd_charge_import,
             pfm_cmd_transaction_add,
             pfm_cmd_transaction_list,
             pfm_cmd_transaction_find,
             pfm_cmd_transaction_update,
             pfm_cmd_transaction_delete,
+            pfm_cmd_transaction_import,
             pfm_cmd_budget_add,
             pfm_cmd_budget_list,
             pfm_cmd_budget_update,
             pfm_cmd_budget_delete,
+            pfm_cmd_budget_import,
             pfm_cmd_debug_carried_over,
             pfm_cmd_debug_budget_track
         }
@@ -124,6 +128,7 @@ class Command {
         DBBudget getBudget(int sequence);
         void updateBudget(DBBudget & budget);
         void deleteBudget(DBBudget & budget);
+        void importBudgets(string & jsonFileName);
 
         void listCarriedOverLogs();
         void listBudgetTracks();
