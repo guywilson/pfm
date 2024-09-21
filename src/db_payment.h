@@ -6,11 +6,13 @@
 
 #include <sqlite3.h>
 
+#include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
 #include "db.h"
 #include "db_base.h"
 #include "strdate.h"
+#include "jfile.h"
 #include "money.h"
 
 using namespace std;
@@ -68,6 +70,27 @@ class DBPayment : public DBEntity {
 
             this->category.set(src.category);
             this->payee.set(src.payee);
+        }
+
+        void set(JRecord & record) {
+            DBAccount account;
+            string accountCode = record.get("accountCode");
+            account.retrieveByCode(accountCode);
+
+            DBCategory category;
+            string categoryCode = record.get("categoryCode");
+            category.retrieveByCode(categoryCode);
+
+            DBPayee payee;
+            string payeeCode = record.get("payeeCode");
+            payee.retrieveByCode(payeeCode);
+
+            this->accountId = account.id;
+            this->categoryId = category.id;
+            this->payeeId = payee.id;
+            this->amount = record.get("amount");
+            this->date = record.get("date");
+            this->description = record.get("description");
         }
 
         void print() {

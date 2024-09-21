@@ -117,6 +117,7 @@ class Command {
         DBTransaction getTransaction(int sequence);
         void updateTransaction(DBTransaction & transaction);
         void deleteTransaction(DBTransaction & transaction);
+        void importTransactions(string & jsonFileName);
 
         void addBudget();
         void listBudgets();

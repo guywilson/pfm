@@ -6,6 +6,7 @@
 
 #include "db.h"
 #include "db_base.h"
+#include "jfile.h"
 #include "strdate.h"
 
 using namespace std;
@@ -47,6 +48,11 @@ class DBCategory : public DBEntity {
 
             this->description = src.description;
             this->code = src.code;
+        }
+
+        void set(JRecord & record) {
+            this->code = record.get("code");
+            this->description = record.get("description");
         }
 
         void print() {

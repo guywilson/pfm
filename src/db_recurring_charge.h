@@ -9,9 +9,9 @@
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_payment.h"
-#include "strdate.h"
 #include "db.h"
 #include "db_base.h"
+#include "jfile.h"
 #include "strdate.h"
 
 using namespace std;
@@ -100,6 +100,13 @@ class DBRecurringCharge : public DBPayment {
             this->nextPaymentDate = src.nextPaymentDate;
             this->frequency = src.frequency;
             this->endDate = src.endDate;
+        }
+
+        void set(JRecord & record) {
+            DBPayment::set(record);
+
+            this->frequency = record.get("frequency");
+            this->endDate = record.get("endDate");
         }
 
         void print() {

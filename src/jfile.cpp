@@ -10,7 +10,7 @@
 #include <nlohmann/json.hpp>
 
 #include "pfm_error.h"
-#include "json_entity.h"
+#include "jfile.h"
 
 using namespace std;
 using json = nlohmann::json;

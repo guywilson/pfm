@@ -12,6 +12,7 @@
 #include "db_payment.h"
 #include "db.h"
 #include "db_base.h"
+#include "jfile.h"
 #include "strdate.h"
 
 using namespace std;
@@ -178,6 +179,14 @@ class DBTransaction : public DBPayment {
             this->reference = src.reference;
             this->isCredit = src.isCredit;
             this->isReconciled = src.isReconciled;
+        }
+
+        void set(JRecord & record) {
+            DBPayment::set(record);
+
+            this->reference = record.get("reference");
+            this->isCredit = getIsCredit(record.get("creditDebit"));
+            this->isReconciled = (record.get("isReconciled").compare("Y") ? true : false);
         }
 
         void createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {

@@ -32,7 +32,7 @@
 #include "db_user.h"
 #include "db_carried_over.h"
 #include "db_v_budget_track.h"
-#include "json_entity.h"
+#include "jfile.h"
 #include "command.h"
 
 using namespace std;
@@ -269,9 +269,7 @@ void Command::importCategories(string & jsonFileName) {
     for (JRecord & record : records) {
         DBCategory category;
 
-        category.code = record.get("code");
-        category.description = record.get("description");
-
+        category.set(record);
         category.save();
     }
 }
@@ -330,9 +328,7 @@ void Command::importPayees(string & jsonFileName) {
     for (JRecord & record : records) {
         DBPayee payee;
 
-        payee.code = record.get("code");
-        payee.name = record.get("name");
-
+        payee.set(record);
         payee.save();
     }
 }
@@ -409,31 +405,10 @@ void Command::importRecurringCharges(string & jsonFileName) {
 
     vector<JRecord> records = jfile.readRecords("charges");
 
-    DBAccount account;
-    DBCategory category;
-    DBPayee payee;
-
     for (JRecord & record : records) {
-        string accountCode = record.get("accountCode");
-        account.retrieveByCode(accountCode);
-
-        string categoryCode = record.get("categoryCode");
-        category.retrieveByCode(categoryCode);
-
-        string payeeCode = record.get("payeeCode");
-        payee.retrieveByCode(payeeCode);
-
         DBRecurringCharge charge;
 
-        charge.accountId = account.id;
-        charge.amount = record.get("amount");
-        charge.categoryId = category.id;
-        charge.payeeId = payee.id;
-        charge.date = record.get("date");
-        charge.description = record.get("description");
-        charge.endDate = record.get("endDate");
-        charge.frequency = record.get("frequency");
-
+        charge.set(record);
         charge.save();
     }
 }
@@ -559,6 +534,19 @@ void Command::updateTransaction(DBTransaction & transaction) {
 
 void Command::deleteTransaction(DBTransaction & transaction) {
     transaction.remove();
+}
+
+void Command::importTransactions(string & jsonFileName) {
+    JFile jfile = JFile(jsonFileName, "DBTransaction");
+
+    vector<JRecord> records = jfile.readRecords("transactions");
+
+    for (JRecord & record : records) {
+        DBTransaction transaction;
+
+        transaction.set(record);
+        transaction.save();
+    }
 }
 
 void Command::addBudget() {
