@@ -1,6 +1,8 @@
 #include <string>
 #include <string.h>
 
+#include <nlohmann/json.hpp>
+
 #include "logger.h"
 #include "db_account.h"
 #include "db_category.h"
@@ -12,6 +14,7 @@
 #include "db_budget_track.h"
 
 using namespace std;
+using json = nlohmann::json;
 
 #ifndef __INCL_COMMAND
 #define __INCL_COMMAND
@@ -82,6 +85,9 @@ class Command {
             }
         }
 
+        json getJson(string & filename);
+        void validateJsonClass(json & data, const char * expectedClassName);
+
         static DBUser addUser();
 
         void addAccount(DBUser & user);
@@ -102,12 +108,14 @@ class Command {
         DBPayee getPayee(string & payeeCode);
         void updatePayee(DBPayee & payee);
         void deletePayee(DBPayee & payee);
+        void importPayees(string & jsonFileName);
 
         void addRecurringCharge();
         void listRecurringCharges();
         DBRecurringCharge getRecurringCharge(int sequence);
         void updateRecurringCharge(DBRecurringCharge & charge);
         void deleteRecurringCharge(DBRecurringCharge & charge);
+        // void importRecurringCharges(string & jsonFileName);
 
         void addTransaction();
         void listTransactions();

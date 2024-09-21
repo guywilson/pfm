@@ -99,6 +99,34 @@ void Command::version() {
     cout << "PFM version '" << getVersion() << "' - built [" << getBuildDate() << "]" << endl << endl;
 }
 
+json Command::getJson(string & filename) {
+    ifstream fstream(filename.c_str());
+    json data = json::parse(fstream);
+    fstream.close();
+
+    return data;
+}
+
+void Command::validateJsonClass(json & data, const char * expectedClassName) {
+    unordered_map<string, json> elements = data.template get<unordered_map<string, json>>();
+
+    for (auto& i : elements) {
+        if (i.first.compare("className") == 0) {
+            string className = i.second;
+
+            if (className.compare(expectedClassName) != 0) {
+                throw pfm_validation_error(
+                            pfm_error::buildMsg(
+                                "Error importing categories, invalid className '%s', expected '%s'", 
+                                className.c_str(),
+                                expectedClassName));
+            }
+
+            break;
+        }
+    }
+}
+
 DBUser Command::addUser() {
     AddUserView view;
     view.show();
@@ -266,49 +294,18 @@ void Command::deleteCategory(DBCategory & category) {
 }
 
 void Command::importCategories(string & jsonFileName) {
-    ifstream fstream(jsonFileName.c_str());
-    json data = json::parse(fstream);
-    fstream.close();
+    json data = getJson(jsonFileName);
+    validateJsonClass(data, "DBCategory");
 
-    auto elements = data.template get<unordered_map<string, json>>();
+    objects_t categories = data.at("categories").get<objects_t>();
 
-    for (auto& i : elements) {
-        if (i.first.compare("className") == 0) {
-            string className = i.second;
+    for (object_t& categoryMap : categories) {
+        DBCategory category;
 
-            if (className.compare("DBCategory") != 0) {
-                throw pfm_validation_error(
-                            pfm_error::buildMsg(
-                                "Error importing categories, invalid className '%s'", 
-                                className.c_str()));
-            }
-        }
-        else if (i.first.compare("categories") == 0) {
-            auto categories{ data.at("categories").get<objects_t>() };
+        category.code = categoryMap["code"];
+        category.description = categoryMap["description"];
 
-            for (auto& categoryMap : categories) {
-                DBCategory category;
-
-                for (const auto& [key, value] : categoryMap) {
-                    std::cout << '[' << key << "] = " << value << "; " << endl;
-
-                    if (key.compare("code") == 0) {
-                        category.code = value;
-                    }
-                    else if (key.compare("description") == 0) {
-                        category.description = value;
-                    }
-                }
-
-                category.save();
-            }
-        }
-        else {
-            throw pfm_validation_error(
-                            pfm_error::buildMsg(
-                                "Error importing categories, invalid element '%s'", 
-                                i.first.c_str()));
-        }
+        category.save();
     }
 }
 
@@ -356,6 +353,22 @@ void Command::updatePayee(DBPayee & payee) {
 void Command::deletePayee(DBPayee & payee) {
     payee.remove();
     payee.clear();
+}
+
+void Command::importPayees(string & jsonFileName) {
+    json data = getJson(jsonFileName);
+    validateJsonClass(data, "DBPayee");
+
+    objects_t payees = data.at("payees").get<objects_t>();
+
+    for (object_t& payeeMap : payees) {
+        DBPayee payee;
+
+        payee.code = payeeMap["code"];
+        payee.name = payeeMap["name"];
+
+        payee.save();
+    }
 }
 
 void Command::addRecurringCharge() {
@@ -424,6 +437,24 @@ void Command::deleteRecurringCharge(DBRecurringCharge & charge) {
     charge.remove();
     charge.clear();
 }
+
+// void Command::importRecurringCharges(string & jsonFileName) {
+//     json data = getJson(jsonFileName);
+//     validateJsonClass(data, "DBRecuringCharge");
+
+//     objects_t charges = data.at("recurringCharges").get<objects_t>();
+
+
+//     for (object_t& chargeMap : charges) {
+//         DBRecurringCharge charge;
+
+//         charge.accountId = chargeMap["accountId"];
+//         payee.code = payeeMap["code"];
+//         payee.name = payeeMap["name"];
+
+//         payee.save();
+//     }
+// }
 
 void Command::addTransaction() {
     checkAccountSelected();
