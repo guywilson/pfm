@@ -109,7 +109,7 @@ class Command {
         DBRecurringCharge getRecurringCharge(int sequence);
         void updateRecurringCharge(DBRecurringCharge & charge);
         void deleteRecurringCharge(DBRecurringCharge & charge);
-        // void importRecurringCharges(string & jsonFileName);
+        void importRecurringCharges(string & jsonFileName);
 
         void addTransaction();
         void listTransactions();

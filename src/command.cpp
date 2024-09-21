@@ -264,11 +264,9 @@ void Command::deleteCategory(DBCategory & category) {
 void Command::importCategories(string & jsonFileName) {
     JFile jfile = JFile(jsonFileName, "DBCategory");
 
-    jfile.readRecords("categories");
+    vector<JRecord> records = jfile.readRecords("categories");
 
-    for (int i = 0;i < jfile.getNumRecords();i++) {
-        JRecord record = jfile.getRecordAt(i);
-
+    for (JRecord & record : records) {
         DBCategory category;
 
         category.code = record.get("code");
@@ -327,11 +325,9 @@ void Command::deletePayee(DBPayee & payee) {
 void Command::importPayees(string & jsonFileName) {
     JFile jfile = JFile(jsonFileName, "DBPayee");
 
-    jfile.readRecords("payees");
+    vector<JRecord> records = jfile.readRecords("payees");
 
-    for (int i = 0;i < jfile.getNumRecords();i++) {
-        JRecord record = jfile.getRecordAt(i);
-
+    for (JRecord & record : records) {
         DBPayee payee;
 
         payee.code = record.get("code");
@@ -408,23 +404,39 @@ void Command::deleteRecurringCharge(DBRecurringCharge & charge) {
     charge.clear();
 }
 
-// void Command::importRecurringCharges(string & jsonFileName) {
-//     json data = getJson(jsonFileName);
-//     validateJsonClass(data, "DBRecuringCharge");
+void Command::importRecurringCharges(string & jsonFileName) {
+    JFile jfile = JFile(jsonFileName, "DBRecurringCharge");
 
-//     objects_t charges = data.at("recurringCharges").get<objects_t>();
+    vector<JRecord> records = jfile.readRecords("charges");
 
+    DBAccount account;
+    DBCategory category;
+    DBPayee payee;
 
-//     for (object_t& chargeMap : charges) {
-//         DBRecurringCharge charge;
+    for (JRecord & record : records) {
+        string accountCode = record.get("accountCode");
+        account.retrieveByCode(accountCode);
 
-//         charge.accountId = chargeMap["accountId"];
-//         payee.code = payeeMap["code"];
-//         payee.name = payeeMap["name"];
+        string categoryCode = record.get("categoryCode");
+        category.retrieveByCode(categoryCode);
 
-//         payee.save();
-//     }
-// }
+        string payeeCode = record.get("payeeCode");
+        payee.retrieveByCode(payeeCode);
+
+        DBRecurringCharge charge;
+
+        charge.accountId = account.id;
+        charge.amount = record.get("amount");
+        charge.categoryId = category.id;
+        charge.payeeId = payee.id;
+        charge.date = record.get("date");
+        charge.description = record.get("description");
+        charge.endDate = record.get("endDate");
+        charge.frequency = record.get("frequency");
+
+        charge.save();
+    }
+}
 
 void Command::addTransaction() {
     checkAccountSelected();

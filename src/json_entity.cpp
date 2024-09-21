@@ -61,33 +61,17 @@ JFile::JFile(string & filename, const char * className) {
     fstream.close();
 
     validate();
-
-    numRecords = 0;
 }
 
-void JFile::readRecords(const char * name) {
+vector<JRecord> JFile::readRecords(const char * name) {
+    vector<JRecord> records;
+
     objects_t rows = j.at(name).get<objects_t>();
 
     for (object_t & row : rows) {
         JRecord record = JRecord(row);
-        this->records.push_back(record);
-
-        this->numRecords++;
-    }
-}
-
-int JFile::getNumRecords() {
-    return this->numRecords;
-}
-
-JRecord JFile::getRecordAt(int i) {
-    if (i >= numRecords) {
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "JFile::getRecordAt(): Index out of range [%d], max records = %d", 
-                    i, 
-                    numRecords));
+        records.push_back(record);
     }
 
-    return records[i];
+    return records;
 }

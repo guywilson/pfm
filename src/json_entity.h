@@ -35,18 +35,12 @@ class JFile {
         const char * className;
         json j;
 
-        vector<JRecord> records;
-        int numRecords;
-
         void validate();
 
     public:
         JFile(string & filename, const char * className);
 
-        void readRecords(const char * name);
-
-        int getNumRecords();
-        JRecord getRecordAt(int i);
+        vector<JRecord> readRecords(const char * name);
 };
 
 #endif
