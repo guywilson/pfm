@@ -46,7 +46,7 @@ class StrDate {
 
         void clear();
 
-        static StrDate parseDate(string & dateStr);
+        static StrDate parseDate(const string & dateStr);
         static StrDate parseDate(const char * dateStr);
         
         static string today();

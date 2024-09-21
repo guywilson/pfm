@@ -89,7 +89,7 @@ class DBPayment : public DBEntity {
             this->categoryId = category.id;
             this->payeeId = payee.id;
             this->amount = record.get("amount");
-            this->date = record.get("date");
+            this->date = StrDate::parseDate(record.get("date"));
             this->description = record.get("description");
         }
 

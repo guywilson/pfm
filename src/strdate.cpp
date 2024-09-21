@@ -152,7 +152,7 @@ StrDate StrDate::parseDate(const char * dateStr) {
     }
 }
 
-StrDate StrDate::parseDate(string & dateStr) {
+StrDate StrDate::parseDate(const string & dateStr) {
     return parseDate(dateStr.c_str());
 }
 
