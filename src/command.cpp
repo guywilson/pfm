@@ -16,7 +16,6 @@
 #include <sqlite3.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-#include <nlohmann/json.hpp>
 
 #include "pfm_error.h"
 #include "keymgr.h"
@@ -33,13 +32,10 @@
 #include "db_user.h"
 #include "db_carried_over.h"
 #include "db_v_budget_track.h"
+#include "json_entity.h"
 #include "command.h"
 
 using namespace std;
-using json = nlohmann::json;
-
-using object_t = std::map<std::string, std::string>;
-using objects_t = std::vector<object_t>;
 
 static int __getch(void) {
 	int		ch;
@@ -97,34 +93,6 @@ void Command::help() {
 
 void Command::version() {
     cout << "PFM version '" << getVersion() << "' - built [" << getBuildDate() << "]" << endl << endl;
-}
-
-json Command::getJson(string & filename) {
-    ifstream fstream(filename.c_str());
-    json data = json::parse(fstream);
-    fstream.close();
-
-    return data;
-}
-
-void Command::validateJsonClass(json & data, const char * expectedClassName) {
-    unordered_map<string, json> elements = data.template get<unordered_map<string, json>>();
-
-    for (auto& i : elements) {
-        if (i.first.compare("className") == 0) {
-            string className = i.second;
-
-            if (className.compare(expectedClassName) != 0) {
-                throw pfm_validation_error(
-                            pfm_error::buildMsg(
-                                "Error importing categories, invalid className '%s', expected '%s'", 
-                                className.c_str(),
-                                expectedClassName));
-            }
-
-            break;
-        }
-    }
 }
 
 DBUser Command::addUser() {
@@ -294,16 +262,17 @@ void Command::deleteCategory(DBCategory & category) {
 }
 
 void Command::importCategories(string & jsonFileName) {
-    json data = getJson(jsonFileName);
-    validateJsonClass(data, "DBCategory");
+    JFile jfile = JFile(jsonFileName, "DBCategory");
 
-    objects_t categories = data.at("categories").get<objects_t>();
+    jfile.readRecords("categories");
 
-    for (object_t& categoryMap : categories) {
+    for (int i = 0;i < jfile.getNumRecords();i++) {
+        JRecord record = jfile.getRecordAt(i);
+
         DBCategory category;
 
-        category.code = categoryMap["code"];
-        category.description = categoryMap["description"];
+        category.code = record.get("code");
+        category.description = record.get("description");
 
         category.save();
     }
@@ -356,16 +325,17 @@ void Command::deletePayee(DBPayee & payee) {
 }
 
 void Command::importPayees(string & jsonFileName) {
-    json data = getJson(jsonFileName);
-    validateJsonClass(data, "DBPayee");
+    JFile jfile = JFile(jsonFileName, "DBPayee");
 
-    objects_t payees = data.at("payees").get<objects_t>();
+    jfile.readRecords("payees");
 
-    for (object_t& payeeMap : payees) {
+    for (int i = 0;i < jfile.getNumRecords();i++) {
+        JRecord record = jfile.getRecordAt(i);
+
         DBPayee payee;
 
-        payee.code = payeeMap["code"];
-        payee.name = payeeMap["name"];
+        payee.code = record.get("code");
+        payee.name = record.get("name");
 
         payee.save();
     }

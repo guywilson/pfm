@@ -1,8 +1,6 @@
 #include <string>
 #include <string.h>
 
-#include <nlohmann/json.hpp>
-
 #include "logger.h"
 #include "db_account.h"
 #include "db_category.h"
@@ -14,7 +12,6 @@
 #include "db_budget_track.h"
 
 using namespace std;
-using json = nlohmann::json;
 
 #ifndef __INCL_COMMAND
 #define __INCL_COMMAND
@@ -84,9 +81,6 @@ class Command {
                 throw pfm_error(getNoAccountSelectedMsg());
             }
         }
-
-        json getJson(string & filename);
-        void validateJsonClass(json & data, const char * expectedClassName);
 
         static DBUser addUser();
 
