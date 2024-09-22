@@ -11,7 +11,9 @@
 #include "db_base.h"
 #include "db_account.h"
 #include "db_recurring_charge.h"
+#include "db_v_recurring_charge.h"
 #include "db_transaction.h"
+#include "db_v_transaction.h"
 #include "db_carried_over.h"
 #include "db.h"
 #include "strdate.h"
@@ -49,11 +51,11 @@ void DBAccount::createRecurringTransactions() {
     try {
         db.begin();
 
-        DBRecurringCharge ch;
-        DBResult<DBRecurringCharge> chargeResult = ch.retrieveByAccountID(this->id);
+        DBRecurringChargeView ch;
+        DBResult<DBRecurringChargeView> chargeResult = ch.retrieveByAccountID(this->id);
 
         for (int i = 0;i < chargeResult.getNumRows();i++) {
-            DBRecurringCharge charge = chargeResult.getResultAt(i);
+            DBRecurringChargeView charge = chargeResult.getResultAt(i);
 
             if (charge.date >= this->openingDate) {
                 DBTransaction transaction;
@@ -114,8 +116,8 @@ void DBAccount::createCarriedOverLogs() {
         int hasCO = co.retrieveLatestByAccountId(this->id);
 
         if (!hasCO) {
-            DBTransaction transaction;
-            DBResult<DBTransaction> result = transaction.retrieveByAccountID(this->id, sort_ascending, 1);
+            DBTransactionView transaction;
+            DBResult<DBTransactionView> result = transaction.retrieveByAccountID(this->id, sort_ascending, 1);
 
             if (result.getNumRows() == 0) {
                 return;
@@ -133,8 +135,8 @@ void DBAccount::createCarriedOverLogs() {
             StrDate firstDate(co.date.year(), co.date.month(), 1);
             StrDate secondDate(co.date.year(), co.date.month(), co.date.daysInMonth());
 
-            DBTransaction tr;
-            DBResult<DBTransaction> transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, firstDate, secondDate);
+            DBTransactionView tr;
+            DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, firstDate, secondDate);
 
             for (int i = 0;i < transactionResult.getNumRows();i++) {
                 DBTransaction transaction = transactionResult.getResultAt(i);
@@ -181,8 +183,8 @@ Money DBAccount::calculateBalanceAfterBills() {
         StrDate dateToday;
         StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
 
-        DBTransaction tr;
-        DBResult<DBTransaction> transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, periodStartDate, dateToday);
+        DBTransactionView tr;
+        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, periodStartDate, dateToday);
 
         for (int i = 0;i < transactionResult.getNumRows();i++) {
             DBTransaction transaction = transactionResult.getResultAt(i);
@@ -192,8 +194,8 @@ Money DBAccount::calculateBalanceAfterBills() {
             }
         }
 
-        DBRecurringCharge ch;
-        DBResult<DBRecurringCharge> chargeResult = ch.retrieveByAccountID(this->id);
+        DBRecurringChargeView ch;
+        DBResult<DBRecurringChargeView> chargeResult = ch.retrieveByAccountID(this->id);
 
         for (int i = 0;i < chargeResult.getNumRows();i++) {
             DBRecurringCharge charge = chargeResult.getResultAt(i);
