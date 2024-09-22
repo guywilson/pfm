@@ -4,7 +4,7 @@
 #include <vector>
 #include <stdint.h>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "db_recurring_charge.h"
 #include "db_category.h"
@@ -60,31 +60,24 @@ class DBBudgetTrackView : public DBEntity {
             DBEntity::assignColumn(column);
             
             if (column.getName() == "payee_code") {
-                payeeCode = column.getDecryptedValue();
+                payeeCode = column.getValue();
             }
             else if (column.getName() == "category_code") {
-                categoryCode = column.getDecryptedValue();
+                categoryCode = column.getValue();
             }
             else if (column.getName() == "description") {
-                description = column.getDecryptedValue();
+                description = column.getValue();
             }
             else if (column.getName() == "date") {
                 date = column.getValue();
             }
             else if (column.getName() == "balance") {
-                balance = column.getDecryptedDoubleValue();
+                balance = column.getDoubleValue();
             }
         }
 
         const char * getTableName() override {
             return "v_budget_track";
-        }
-
-        void validate() override {
-            DBColumn::validateStringValue(payeeCode);
-            DBColumn::validateStringValue(categoryCode);
-            DBColumn::validateStringValue(description);
-            DBColumn::validateStringValue(balance.getRawStringValue());
         }
 };
 

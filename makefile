@@ -8,7 +8,7 @@
 
 # Version number for pfm
 MAJOR_VERSION = 0
-MINOR_VERSION = 2
+MINOR_VERSION = 3
 
 # Directories
 SOURCE = src
@@ -31,11 +31,11 @@ POSTCOMPILE = @ mv -f $(DEP)/$*.Td $(DEP)/$*.d
 
 #GLOBAL_DEF=-DPFM_TEST_SUITE_ENABLED
 
-CFLAGS_BASE=-c -Wall -pedantic $(GLOBAL_DEF)
+CFLAGS_BASE=-c -Wall -pedantic -DSQLITE_HAS_CODEC $(GLOBAL_DEF)
 CFLAGS_REL=$(CFLAGS_BASE) -O2
 CFLAGS_DBG=$(CFLAGS_BASE) -g
 
-CPPFLAGS_BASE = -c -Wall -pedantic -std=c++20 $(GLOBAL_DEF)
+CPPFLAGS_BASE = -c -Wall -pedantic -std=c++20 -DSQLITE_HAS_CODEC $(GLOBAL_DEF)
 CPPFLAGS_REL=$(CPPFLAGS_BASE) -O2
 CPPFLAGS_DBG=$(CPPFLAGS_BASE) -g
 
@@ -45,7 +45,7 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP)/$*.Td
 
 # Libraries
 STDLIBS = 
-EXTLIBS = -lreadline -lsqlite3 -lgcrypt -lbase64pp
+EXTLIBS = -lreadline -lsqlcipher -lgcrypt -lbase64pp
 
 COMPILE.cpp = $(CPP) $(CPPFLAGS) $(DEPFLAGS) -o $@
 COMPILE.c = $(C) $(CFLAGS) $(DEPFLAGS) -o $@

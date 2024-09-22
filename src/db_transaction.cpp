@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "logger.h"
 #include "pfm_error.h"
@@ -174,13 +174,6 @@ int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, St
     }
 
     return CHARGE_NOT_DUE;
-}
-
-void DBTransaction::validate() {
-    DBColumn::validateStringValue(description);
-    DBColumn::validateStringValue(reference);
-    DBColumn::validateStringValue(date.shortDate());
-    DBColumn::validateStringValue(amount.getRawStringValue());
 }
 
 void DBTransaction::afterInsert() {

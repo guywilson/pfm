@@ -20,7 +20,7 @@ DBResult<DBBudget> DBBudget::retrieveByPayeeCode(string & code) {
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByPayeeCode, 
-        encryptField(code).c_str());
+        code.c_str());
 
     result.retrieve(szStatement);
 
@@ -35,7 +35,7 @@ DBResult<DBBudget> DBBudget::retrieveByCategoryCode(string & code) {
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByCategoryCode, 
-        encryptField(code).c_str());
+        code.c_str());
 
     result.retrieve(szStatement);
 

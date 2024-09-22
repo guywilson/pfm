@@ -7,7 +7,6 @@
 #include "db_payee.h"
 #include "db_transaction.h"
 #include "db_budget.h"
-#include "db_user.h"
 #include "db_carried_over.h"
 #include "db_budget_track.h"
 
@@ -62,12 +61,11 @@ class Command {
     private:
         string command;
         DBAccount selectedAccount;
-        DBUser loggedInUser;
 
         Logger & log = Logger::getInstance();
 
         bool isCommand(const char * compareTo) {
-            string commandNoParameters = command.substr(0, command.find_first_of(' '));
+            string commandNoParameters = command.substr(0, command.find_last_of(' '));
 
             return (commandNoParameters.compare(compareTo) == 0 ? true : false);
         }
@@ -86,9 +84,7 @@ class Command {
             }
         }
 
-        static DBUser addUser();
-
-        void addAccount(DBUser & user);
+        void addAccount();
         void listAccounts();
         void chooseAccount(string & accountCode);
         void updateAccount();
@@ -137,14 +133,9 @@ class Command {
         pfm_cmd_t getCommandCode(string & command);
 
     public:
-        void setLoggedInUser(DBUser & user) {
-            this->loggedInUser = user;
-        }
-
         static void help();
         static void version();
 
-        static DBUser login();
         bool process(string & command);
 };
 

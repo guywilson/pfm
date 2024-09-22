@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <stdint.h>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
 #include "db_account.h"

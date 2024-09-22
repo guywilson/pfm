@@ -4,7 +4,7 @@
 #include <vector>
 #include <stdint.h>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "db.h"
 #include "db_base.h"

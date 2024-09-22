@@ -12,7 +12,6 @@
 
 #include "db.h"
 #include "logger.h"
-#include "keymgr.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
@@ -39,7 +38,6 @@ int main(int argc, char ** argv) {
     int             i;
     char *          pszDatabase = NULL;
     bool            loop = true;
-    DBUser          loggedInUser;
 
     rl_bind_key('\t', rl_complete);
 
@@ -91,10 +89,10 @@ int main(int argc, char ** argv) {
     exit(0);
 #endif
 
-    loggedInUser = Command::login();
+    // loggedInUser = Command::login();
 
     Command command;
-    command.setLoggedInUser(loggedInUser);
+    // command.setLoggedInUser(loggedInUser);
 
     while (loop) {
         string cmdString = readline("pfm > ");

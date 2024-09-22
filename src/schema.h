@@ -228,16 +228,6 @@ const char * currencies[][3] = {
     {"ZWL", "Zimbabwe Dollar", "$"}
 };
 
-const char * pszCreateUserTable = 
-    "CREATE TABLE user (" \
-    "id INTEGER PRIMARY KEY," \
-    "user_name TEXT NOT NULL," \
-    "password TEXT," \
-    "has_password TEXT NOT NULL," \
-    "created TEXT NOT NULL," \
-    "updated TEXT NOT NULL," \
-    "UNIQUE(user_name) ON CONFLICT ROLLBACK);";
-
 const char * pszCreateConfigTable =
     "CREATE TABLE config (" \
     "id INTEGER PRIMARY KEY," \
@@ -261,7 +251,6 @@ const char * pszCreateCurrencyTable =
 const char * pszCreateAccountTable = 
     "CREATE TABLE account (" \
     "id INTEGER PRIMARY KEY," \
-    "user_id INTEGER," \
     "name TEXT NOT NULL," \
     "code TEXT NOT NULL," \
     "opening_date TEXT NOT NULL," \
@@ -271,7 +260,6 @@ const char * pszCreateAccountTable =
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
     "UNIQUE(code) ON CONFLICT ROLLBACK," \
-    "FOREIGN KEY(user_id) REFERENCES user(id)," \
     "FOREIGN KEY(currency_id) REFERENCES currency(id));";
 
 const char * pszCreateCategoryTable = 

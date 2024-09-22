@@ -119,7 +119,7 @@ class DBBudgetTrack : public DBEntity {
                 date = column.getValue();
             }
             else if (column.getName() == "balance") {
-                balance = column.getDecryptedDoubleValue();
+                balance = column.getDoubleValue();
             }
         }
 
@@ -138,7 +138,7 @@ class DBBudgetTrack : public DBEntity {
                 sqlInsert,
                 budgetId,
                 date.shortDate().c_str(),
-                encryptField(balance.getRawStringValue()).c_str(),
+                balance.getRawStringValue().c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -156,7 +156,7 @@ class DBBudgetTrack : public DBEntity {
                 sqlUpdate,
                 budgetId,
                 date.shortDate().c_str(),
-                encryptField(balance.getRawStringValue()).c_str(),
+                balance.getRawStringValue().c_str(),
                 now.c_str(),
                 id);
 
@@ -175,7 +175,6 @@ class DBBudgetTrack : public DBEntity {
             return szStatement;
         }
 
-        void validate() override;
         DBResult<DBBudgetTrack> retrieveByBudgetId(pfm_id_t budgetId);
         DBResult<DBBudgetTrack> retrieveByBudgetIdAfterDate(pfm_id_t budgetId, StrDate & date);
         int retrieveLatestByBudgetId(pfm_id_t budgetId);

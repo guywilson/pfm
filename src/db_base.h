@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <stdint.h>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "db.h"
 #include "jfile.h"
@@ -47,10 +47,6 @@ class DBEntity {
         }
 
         virtual void afterRemove() {
-            return;
-        }
-
-        virtual void validate() {
             return;
         }
 
@@ -136,14 +132,6 @@ class DBEntity {
 
         virtual void onRowComplete(int sequence) {
             return;
-        }
-
-        virtual string encryptField(const string & value) {
-            return DBColumn::encrypt(value);
-        }
-
-        virtual string decryptField(const string & value) {
-            return DBColumn::decrypt(value);
         }
 
         void print() {

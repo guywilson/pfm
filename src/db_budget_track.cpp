@@ -58,7 +58,3 @@ int DBBudgetTrack::retrieveLatestByBudgetId(pfm_id_t budgetId) {
 
     return rowsRetrievedCount;
 }
-
-void DBBudgetTrack::validate() {
-    DBColumn::validateStringValue(balance.getRawStringValue());
-}

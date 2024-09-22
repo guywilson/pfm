@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
 #include "db_base.h"
@@ -20,7 +20,6 @@ class DBAccount : public DBEntity {
     private:
         const char * sqlSelectByCode = 
                         "SELECT id," \
-                        "user_id," \
                         "name," \
                         "code," \
                         "opening_date," \
@@ -33,7 +32,6 @@ class DBAccount : public DBEntity {
 
         const char * sqlInsert = 
                         "INSERT INTO account (" \
-                        "user_id," \
                         "name," \
                         "code," \
                         "opening_date," \
@@ -41,7 +39,7 @@ class DBAccount : public DBEntity {
                         "current_balance," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, '%s', '%s', '%s', '%s', '%s', '%s', '%s');";
+                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE account SET " \
@@ -60,7 +58,6 @@ class DBAccount : public DBEntity {
         void createCarriedOverLogs();
 
     public:
-        pfm_id_t                userId;
         string                  name;
         string                  code;
         StrDate                 openingDate;
@@ -74,7 +71,6 @@ class DBAccount : public DBEntity {
         void clear() {
             DBEntity::clear();
 
-            this->userId = 0;
             this->name = "";
             this->code = "";
             this->openingDate.clear();
@@ -85,7 +81,6 @@ class DBAccount : public DBEntity {
         void set(const DBAccount & src) {
             DBEntity::set(src);
 
-            this->userId =          src.userId;
             this->name =            src.name;
             this->code =            src.code;
             this->openingDate =     src.openingDate;
@@ -96,23 +91,20 @@ class DBAccount : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "user_id") {
-                userId = column.getIDValue();
-            }
-            else if (column.getName() == "name") {
-                name = column.getDecryptedValue();
+            if (column.getName() == "name") {
+                name = column.getValue();
             }
             else if (column.getName() == "code") {
-                code = column.getDecryptedValue();
+                code = column.getValue();
             }
             else if (column.getName() == "opening_date") {
-                openingDate = column.getDecryptedValue();
+                openingDate = column.getValue();
             }
             else if (column.getName() == "opening_balance") {
-                openingBalance = column.getDecryptedDoubleValue();
+                openingBalance = column.getDoubleValue();
             }
             else if (column.getName() == "current_balance") {
-                currentBalance = column.getDecryptedDoubleValue();
+                currentBalance = column.getDoubleValue();
             }
         }
 
@@ -141,12 +133,11 @@ class DBAccount : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                userId,
-                encryptField(name).c_str(),
-                encryptField(code).c_str(),
-                encryptField(openingDate.shortDate()).c_str(),
-                encryptField(openingBalance.getRawStringValue()).c_str(),
-                encryptField(currentBalance.getRawStringValue()).c_str(),
+                name.c_str(),
+                code.c_str(),
+                openingDate.shortDate().c_str(),
+                openingBalance.getRawStringValue().c_str(),
+                currentBalance.getRawStringValue().c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -162,11 +153,11 @@ class DBAccount : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
-                encryptField(name).c_str(),
-                encryptField(code).c_str(),
-                encryptField(openingDate.shortDate()).c_str(),
-                encryptField(openingBalance.getRawStringValue()).c_str(),
-                encryptField(currentBalance.getRawStringValue()).c_str(),
+                name.c_str(),
+                code.c_str(),
+                openingDate.shortDate().c_str(),
+                openingBalance.getRawStringValue().c_str(),
+                currentBalance.getRawStringValue().c_str(),
                 now.c_str(),
                 id);
 
@@ -192,7 +183,6 @@ class DBAccount : public DBEntity {
             createCarriedOverLogs();
         }
 
-        void validate() override;
         void beforeUpdate() override;
         Money calculateBalanceAfterBills();
         void retrieveByCode(string & code);

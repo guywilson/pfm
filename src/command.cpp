@@ -7,18 +7,11 @@
 #include <vector>
 #include <unordered_map>
 
-#ifdef _WIN32
-#include <conio.h>
-#else
-#include <termios.h>
-#endif
-
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
 #include "pfm_error.h"
-#include "keymgr.h"
 #include "db.h"
 #include "cache.h"
 #include "strdate.h"
@@ -29,63 +22,12 @@
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
 #include "db_budget.h"
-#include "db_user.h"
 #include "db_carried_over.h"
 #include "db_v_budget_track.h"
 #include "jfile.h"
 #include "command.h"
 
 using namespace std;
-
-static int __getch(void) {
-	int		ch;
-
-#ifndef _WIN32
-	struct termios current;
-	struct termios original;
-
-	tcgetattr(fileno(stdin), &original); /* grab old terminal i/o settings */
-	current = original; /* make new settings same as old settings */
-	current.c_lflag &= ~ICANON; /* disable buffered i/o */
-	current.c_lflag &= ~ECHO; /* set echo mode */
-	tcsetattr(fileno(stdin), TCSANOW, &current); /* use these new terminal i/o settings now */
-#endif
-
-#ifdef _WIN32
-    ch = _getch();
-#else
-    ch = getchar();
-#endif
-
-#ifndef _WIN32
-	tcsetattr(0, TCSANOW, &original);
-#endif
-
-    return ch;
-}
-
-static string getPassword() {
-    printf("Enter password: ");
-
-    string password;
-	int	ch = 0;
-
-    while (ch != '\n') {
-        ch = __getch();
-
-        if (ch != '\n' && ch != '\r') {
-            putchar('*');
-            fflush(stdout);
-
-            password += (char)ch;
-        }
-    }
-
-    putchar('\n');
-    fflush(stdout);
-
-    return password;
-}
 
 void Command::help() {
 
@@ -95,69 +37,11 @@ void Command::version() {
     cout << "PFM version '" << getVersion() << "' - built [" << getBuildDate() << "]" << endl << endl;
 }
 
-DBUser Command::addUser() {
-    AddUserView view;
-    view.show();
-
-    Key & key = Key::getInstance();
-    string password = getPassword();
-
-    DBUser user = view.getUser();
-
-    if (password.length() > 0) {
-        key.hasPassword = true;
-        key.generate(password);
-        user.password = key.getBase64Key();
-        user.hasPassword = true;
-    }
-    else {
-        key.hasPassword = false;
-        user.hasPassword = false;
-    }
-
-    user.save();
-
-    return user;
-}
-
-DBUser Command::login() {
-    DBResult<DBUser> userResult;
-    int numUsers = userResult.retrieveAll();
-    userResult.clear();
-
-    Key & key = Key::getInstance();
-
-    DBUser user;
-
-    if (numUsers == 0) {
-        user = addUser();
-    }
-    else {
-        LoginView view;
-        view.show();
-
-        string userName = view.getUserName();
-
-        user.retrieveByUser(userName);
-
-        if (user.hasPassword) {
-            key.hasPassword = true;
-            key.generate(getPassword());
-            string base64Key = key.getBase64Key();
-
-            user.checkPassword(base64Key);
-        }
-    }
-
-    return user;
-}
-
-void Command::addAccount(DBUser & user) {
+void Command::addAccount() {
     AddAccountView view;
     view.show();
 
     DBAccount account = view.getAccount();
-    account.userId = user.id;
     account.save();
 
     cout << "Created account with ID " << account.id << endl;
@@ -773,7 +657,7 @@ bool Command::process(string & command) {
         Command::version();
     }
     else if (cmd == pfm_cmd_account_add) {
-        addAccount(loggedInUser);
+        addAccount();
     }
     else if (cmd == pfm_cmd_account_use) {
         string accountCode = getCommandParameter();

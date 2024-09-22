@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <vector>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
 #include "db_base.h"
@@ -26,7 +26,7 @@ void DBAccount::retrieveByCode(string & code) {
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByCode, 
-        encryptField(code).c_str());
+        code.c_str());
 
     int rowsRetrievedCount = result.retrieve(szStatement);
 
@@ -84,13 +84,6 @@ void DBAccount::createRecurringTransactions() {
 
         throw e;
     }
-}
-
-void DBAccount::validate() {
-    DBColumn::validateStringValue(name);
-    DBColumn::validateStringValue(code);
-    DBColumn::validateStringValue(openingBalance.getRawStringValue());
-    DBColumn::validateStringValue(currentBalance.getRawStringValue());
 }
 
 void DBAccount::beforeUpdate() {

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
 #include "db_base.h"
@@ -134,8 +134,8 @@ class DBCarriedOver : public DBEntity {
                 sqlInsert,
                 accountId,
                 date.shortDate().c_str(),
-                encryptField(description).c_str(),
-                encryptField(balance.getRawStringValue()).c_str(),
+                description.c_str(),
+                balance.getRawStringValue().c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -153,8 +153,8 @@ class DBCarriedOver : public DBEntity {
                 sqlUpdate,
                 accountId,
                 date.shortDate().c_str(),
-                encryptField(description).c_str(),
-                encryptField(balance.getRawStringValue()).c_str(),
+                description.c_str(),
+                balance.getRawStringValue().c_str(),
                 now.c_str(),
                 id);
 
@@ -185,14 +185,13 @@ class DBCarriedOver : public DBEntity {
                 date = column.getValue();
             }
             else if (column.getName() == "description") {
-                description = column.getDecryptedValue();
+                description = column.getValue();
             }
             else if (column.getName() == "balance") {
-                balance = column.getDecryptedDoubleValue();
+                balance = column.getDoubleValue();
             }
         }
 
-        void validate() override;
         int retrieveLatestByAccountId(pfm_id_t accountId);
         DBResult<DBCarriedOver> retrieveByAccountId(pfm_id_t accountId);
         DBResult<DBCarriedOver> retrieveByAccountIdAfterDate(pfm_id_t accountId, StrDate & after);

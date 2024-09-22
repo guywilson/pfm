@@ -4,7 +4,7 @@
 #include <vector>
 #include <stdint.h>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "strdate.h"
 #include "db.h"
@@ -119,8 +119,6 @@ void DBEntity::save() {
     PFM_DB & db = PFM_DB::getInstance();
 
     try {
-        validate();
-        
         db.begin();
 
         if (id == 0) {

@@ -4,7 +4,7 @@
 #include <vector>
 #include <stdint.h>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "db_category.h"
 #include "db_payee.h"
@@ -219,10 +219,10 @@ class DBTransaction : public DBPayment {
                 recurringChargeId = column.getIDValue();
             }
             else if (column.getName() == "reference") {
-                reference = column.getDecryptedValue();
+                reference = column.getValue();
             }
             else if (column.getName() == "credit_debit") {
-                isCredit = getIsCredit(column.getDecryptedValue());
+                isCredit = getIsCredit(column.getValue());
             }
             else if (column.getName() == "is_reconciled") {
                 isReconciled = column.getBoolValue();
@@ -282,10 +282,10 @@ class DBTransaction : public DBPayment {
                 payeeId,
                 recurringChargeId,
                 date.shortDate().c_str(),
-                encryptField(reference).c_str(),
-                encryptField(description).c_str(),
-                encryptField(getCreditDebitValue()).c_str(),
-                encryptField(amount.getRawStringValue()).c_str(),
+                reference.c_str(),
+                description.c_str(),
+                getCreditDebitValue().c_str(),
+                amount.getRawStringValue().c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
                 now.c_str());
@@ -306,10 +306,10 @@ class DBTransaction : public DBPayment {
                 payeeId,
                 recurringChargeId,
                 date.shortDate().c_str(),
-                encryptField(reference).c_str(),
-                encryptField(description).c_str(),
-                encryptField(getCreditDebitValue()).c_str(),
-                encryptField(amount.getRawStringValue()).c_str(),
+                reference.c_str(),
+                description.c_str(),
+                getCreditDebitValue().c_str(),
+                amount.getRawStringValue().c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
                 id);
@@ -331,7 +331,6 @@ class DBTransaction : public DBPayment {
             return szStatement;
         }
 
-        void validate() override;
         void afterInsert() override;
         void beforeUpdate() override;
         void afterRemove() override;

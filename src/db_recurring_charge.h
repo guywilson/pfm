@@ -4,7 +4,7 @@
 #include <vector>
 #include <stdint.h>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "db_category.h"
 #include "db_payee.h"
@@ -121,10 +121,10 @@ class DBRecurringCharge : public DBPayment {
             DBPayment::assignColumn(column);
             
             if (column.getName() == "end_date") {
-                endDate = column.getDecryptedValue();
+                endDate = column.getValue();
             }
             else if (column.getName() == "frequency") {
-                frequency = column.getDecryptedValue();
+                frequency = column.getValue();
             }
         }
 
@@ -165,10 +165,10 @@ class DBRecurringCharge : public DBPayment {
                 categoryId,
                 payeeId,
                 date.shortDate().c_str(),
-                encryptField(endDate.shortDate()).c_str(),
-                encryptField(description).c_str(),
-                encryptField(amount.getRawStringValue()).c_str(),
-                encryptField(frequency).c_str(),
+                endDate.shortDate().c_str(),
+                description.c_str(),
+                amount.getRawStringValue().c_str(),
+                frequency.c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -187,10 +187,10 @@ class DBRecurringCharge : public DBPayment {
                 categoryId,
                 payeeId,
                 date.shortDate().c_str(),
-                encryptField(endDate.shortDate()).c_str(),
-                encryptField(description).c_str(),
-                encryptField(amount.getRawStringValue()).c_str(),
-                encryptField(frequency).c_str(),
+                endDate.shortDate().c_str(),
+                description.c_str(),
+                amount.getRawStringValue().c_str(),
+                frequency.c_str(),
                 now.c_str(),
                 id);
 
@@ -211,7 +211,6 @@ class DBRecurringCharge : public DBPayment {
             return szStatement;
         }
 
-        void validate() override;
         DBResult<DBRecurringCharge> retrieveByAccountID(pfm_id_t accountId);
 };
 

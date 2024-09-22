@@ -4,7 +4,7 @@
 #include <vector>
 #include <stdint.h>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "db_account.h"
 #include "db_category.h"
@@ -129,10 +129,10 @@ class DBPayment : public DBEntity {
                 date = column.getValue();
             }
             else if (column.getName() == "description") {
-                description = column.getDecryptedValue();
+                description = column.getValue();
             }
             else if (column.getName() == "amount") {
-                amount = column.getDecryptedDoubleValue();
+                amount = column.getDoubleValue();
             }
         }
 };

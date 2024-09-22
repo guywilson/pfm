@@ -5,11 +5,10 @@
 #include <stdint.h>
 
 #include <pthread.h>
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
 #include "logger.h"
-#include "keymgr.h"
 
 using namespace std;
 
@@ -28,60 +27,10 @@ db_sort_t;
 
 typedef sqlite3_int64 pfm_id_t;
 
-static const char * permittedCharset = " !#$&()[]{}*+-/0123456789:;.,<=>?@^_|~ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
 class DBColumn {
     private:
         string name;
         string value;
-
-        static uint8_t encodeCharFromASCII(char ch) {
-            for (int i = 0;i < strlen(permittedCharset);i++) {
-                if (ch == permittedCharset[i]) {
-                    return i;
-                }
-            }
-
-            throw pfm_validation_error(pfm_error::buildMsg("Cannot encode char [0x%02X]'%c' as it is not a permitted character", ch, ch));
-        }
-
-        static char decodeCharToASCII(uint8_t ch) {
-            return permittedCharset[ch];
-        }
-        
-        static void isCharPermitted(char ch) {
-            encodeCharFromASCII(ch);
-        }
-
-        static char encryptChar(char ch, int keyBits) {
-            int encodedChar = (int)DBColumn::encodeCharFromASCII(ch);
-            int encryptedChar = encodedChar + keyBits;
-
-            if (encryptedChar >= strlen(permittedCharset)) {
-                encryptedChar = encryptedChar % strlen(permittedCharset);
-            }
-
-            char out = decodeCharToASCII((char)encryptedChar);
-
-            // printf("Encrypted '%c' encoded to 0x%02X with key bits 0x%02X to '%c'\n", ch, (uint8_t)encodedChar, (uint8_t)keyBits, out);
-
-            return out;
-        }
-
-        static char decryptChar(char ch, int keyBits) {
-            int encodedChar = (int)DBColumn::encodeCharFromASCII(ch);
-            int decryptedChar = encodedChar - keyBits;
-
-            while (decryptedChar < 0) {
-                decryptedChar += strlen(permittedCharset);
-            }
-
-            char out = decodeCharToASCII((char)decryptedChar);
-
-            // printf("Decrypted '%c' encoded to 0x%02X with key bits 0x%02X to '%c'\n", ch, (uint8_t)encodedChar, (uint8_t)keyBits, out);
-
-            return out;
-        }
 
     public:
         DBColumn(const char * name, const char * value) {
@@ -121,61 +70,6 @@ class DBColumn {
 
         pfm_id_t getIDValue() {
             return strtoll(getValue().c_str(), NULL, 10);
-        }
-
-        string getDecryptedValue() {
-            return DBColumn::decrypt(getValue());
-        }
-
-        double getDecryptedDoubleValue() {
-            return strtod(getDecryptedValue().c_str(), NULL);
-        }
-
-        long getDecryptedIntValue() {
-            return strtol(getDecryptedValue().c_str(), NULL, 10);
-        }
-
-        unsigned long getDecryptedUnsignedIntValue() {
-            return strtoul(getDecryptedValue().c_str(), NULL, 10);
-        }
-
-        static void validateStringValue(const string & value) {
-            for (int i = 0;i < value.length();i++) {
-                try {
-                    isCharPermitted(value[i]);
-                }
-                catch (pfm_validation_error & e) {
-                    throw pfm_error(pfm_error::buildMsg("Invalid char '%c' in value '%s' at index %d", value[i], value.c_str(), i));
-                }
-            }
-        }
-
-        static string encrypt(const string & value) {
-            string out = value;
-
-            Key & key = Key::getInstance();
-
-            if (key.hasPassword) {
-                for (int i = 0;i < value.length();i++) {
-                    out[i] = encryptChar(value[i], (int)key.getBits(i));
-                }
-            }
-
-            return out;
-        }
-
-        static string decrypt(const string & value) {
-            string out = value;
-
-            Key & key = Key::getInstance();
-
-            if (key.hasPassword) {
-                for (int i = 0;i < value.length();i++) {   
-                    out[i] = decryptChar(value[i], (int)key.getBits(i));
-                }
-            }
-
-            return out;
         }
 };
 

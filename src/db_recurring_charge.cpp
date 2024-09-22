@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
 #include "db_base.h"
@@ -158,11 +158,4 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
 
 void DBRecurringCharge::setNextPaymentDate() {
     this->nextPaymentDate = calculateNextPaymentDate();
-}
-
-void DBRecurringCharge::validate() {
-    DBColumn::validateStringValue(endDate.shortDate());
-    DBColumn::validateStringValue(description);
-    DBColumn::validateStringValue(amount.getRawStringValue());
-    DBColumn::validateStringValue(frequency);
 }

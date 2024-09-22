@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include <sqlite3.h>
+#include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
 #include "db_base.h"
@@ -61,9 +61,4 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
     result.retrieve(szStatement);
 
     return result;
-}
-
-void DBCarriedOver::validate() {
-    DBColumn::validateStringValue(description);
-    DBColumn::validateStringValue(balance.getRawStringValue());
 }
