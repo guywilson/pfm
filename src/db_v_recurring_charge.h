@@ -26,7 +26,9 @@ class DBRecurringChargeView : public DBRecurringCharge {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "category_id," \
                         "category_code," \
+                        "payee_id," \
                         "payee_code," \
                         "date," \
                         "end_date," \

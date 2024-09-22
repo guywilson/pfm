@@ -17,6 +17,7 @@ class AddAccountView : public CLIView {
     private:
         CLITextField nameField = CLITextField("Name: ");
         CLITextField codeField = CLITextField("Code (max. 5 chars): ");
+        CLITextField openingDateField = CLITextField("Opening date: ");
         CLITextField openingBalanceField = CLITextField("Opening balance [0.00]: ");
 
     public:
@@ -25,7 +26,9 @@ class AddAccountView : public CLIView {
         AddAccountView(const char * title) : CLIView(title) {
             nameField.setLengthLimit(FIELD_STRING_LEN);
             codeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
+            openingDateField.setLengthLimit(DATE_FIELD_LENGTH);
 
+            openingDateField.setDefaultValue(StrDate::today());
             openingBalanceField.setDefaultValue("0.00");
             openingBalanceField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
         }
@@ -35,6 +38,7 @@ class AddAccountView : public CLIView {
 
             nameField.show();
             codeField.show();
+            openingDateField.show();
             openingBalanceField.show();
         }
 
@@ -43,7 +47,7 @@ class AddAccountView : public CLIView {
 
             account.name = nameField.getValue();
             account.code = codeField.getValue();
-            account.openingDate = StrDate::today();
+            account.openingDate = openingDateField.getValue();
             account.openingBalance = openingBalanceField.getValue();
             account.currentBalance = openingBalanceField.getValue();
 
