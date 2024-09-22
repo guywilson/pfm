@@ -43,6 +43,7 @@ class AddAccountView : public CLIView {
 
             account.name = nameField.getValue();
             account.code = codeField.getValue();
+            account.openingDate = StrDate::today();
             account.openingBalance = openingBalanceField.getValue();
             account.currentBalance = openingBalanceField.getValue();
 

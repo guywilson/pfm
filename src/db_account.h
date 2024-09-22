@@ -23,6 +23,7 @@ class DBAccount : public DBEntity {
                         "user_id," \
                         "name," \
                         "code," \
+                        "opening_date," \
                         "opening_balance," \
                         "current_balance," \
                         "created," \
@@ -35,16 +36,18 @@ class DBAccount : public DBEntity {
                         "user_id," \
                         "name," \
                         "code," \
+                        "opening_date," \
                         "opening_balance," \
                         "current_balance," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, '%s', '%s', '%s', '%s', '%s', '%s');";
+                        "VALUES (%lld, '%s', '%s', '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE account SET " \
                         "name = '%s'," \
                         "code = '%s'," \
+                        "opening_date = '%s'," \
                         "opening_balance = '%s'," \
                         "current_balance = '%s'," \
                         "updated = '%s' " \
@@ -60,6 +63,7 @@ class DBAccount : public DBEntity {
         pfm_id_t                userId;
         string                  name;
         string                  code;
+        StrDate                 openingDate;
         Money                   openingBalance;
         Money                   currentBalance;
 
@@ -73,6 +77,7 @@ class DBAccount : public DBEntity {
             this->userId = 0;
             this->name = "";
             this->code = "";
+            this->openingDate.clear();
             this->openingBalance = 0.0;
             this->currentBalance = 0.0;
         }
@@ -83,6 +88,7 @@ class DBAccount : public DBEntity {
             this->userId =          src.userId;
             this->name =            src.name;
             this->code =            src.code;
+            this->openingDate =     src.openingDate;
             this->openingBalance =  src.openingBalance;
             this->currentBalance =  src.currentBalance;
         }
@@ -99,6 +105,9 @@ class DBAccount : public DBEntity {
             else if (column.getName() == "code") {
                 code = column.getDecryptedValue();
             }
+            else if (column.getName() == "opening_date") {
+                openingDate = column.getDecryptedValue();
+            }
             else if (column.getName() == "opening_balance") {
                 openingBalance = column.getDecryptedDoubleValue();
             }
@@ -112,6 +121,7 @@ class DBAccount : public DBEntity {
 
             cout << "Name: '" << name << "'" << endl;
             cout << "Code: '" << code << "'" << endl;
+            cout << "Opening date: '" <<  openingDate.shortDate() << "'" << endl;
 
             cout << fixed << setprecision(2);
             cout << "Opening balance: " << openingBalance.getFormattedStringValue() << endl;
@@ -134,6 +144,7 @@ class DBAccount : public DBEntity {
                 userId,
                 encryptField(name).c_str(),
                 encryptField(code).c_str(),
+                encryptField(openingDate.shortDate()).c_str(),
                 encryptField(openingBalance.getRawStringValue()).c_str(),
                 encryptField(currentBalance.getRawStringValue()).c_str(),
                 now.c_str(),
@@ -153,6 +164,7 @@ class DBAccount : public DBEntity {
                 sqlUpdate,
                 encryptField(name).c_str(),
                 encryptField(code).c_str(),
+                encryptField(openingDate.shortDate()).c_str(),
                 encryptField(openingBalance.getRawStringValue()).c_str(),
                 encryptField(currentBalance.getRawStringValue()).c_str(),
                 now.c_str(),
