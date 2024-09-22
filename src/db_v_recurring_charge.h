@@ -58,7 +58,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
         }
 
         void set(const DBRecurringChargeView & src) {
-            DBPayment::set(src);
+            DBRecurringCharge::set(src);
 
             this->payeeCode = src.payeeCode;
             this->categoryCode = src.categoryCode;

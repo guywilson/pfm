@@ -534,106 +534,106 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
     else if (isCommand("help")) {
         return pfm_cmd_help;
     }
-    else if (isCommand("add account") || isCommand("aa")) {
+    else if (isCommand("add-account") || isCommand("aa")) {
         return pfm_cmd_account_add;
     }
-    else if (isCommand("list accounts") || isCommand("la")) {
+    else if (isCommand("list-accounts") || isCommand("la")) {
         return pfm_cmd_account_list;
     }
     else if (isCommand("use")) {
         return pfm_cmd_account_use;
     }
-    else if (isCommand("update account") || isCommand("ua")) {
+    else if (isCommand("update-account") || isCommand("ua")) {
         return pfm_cmd_account_update;
     }
-    else if (isCommand("delete account") || isCommand("da")) {
+    else if (isCommand("delete-account") || isCommand("da")) {
         return pfm_cmd_account_delete;
     }
-    else if (isCommand("show balance") || isCommand("sb")) {
+    else if (isCommand("show-balance") || isCommand("sb")) {
         return pfm_cmd_account_balance;
     }
-    else if (isCommand("add category") || isCommand("ac")) {
+    else if (isCommand("add-category") || isCommand("ac")) {
         return pfm_cmd_category_add;
     }
-    else if (isCommand("list categories") || isCommand("lc")) {
+    else if (isCommand("list-categories") || isCommand("lc")) {
         return pfm_cmd_category_list;
     }
-    else if (isCommand("update category") || isCommand("uc")) {
+    else if (isCommand("update-category") || isCommand("uc")) {
         return pfm_cmd_category_update;
     }
-    else if (isCommand("delete category") || isCommand("dc")) {
+    else if (isCommand("delete-category") || isCommand("dc")) {
         return pfm_cmd_category_delete;
     }
-    else if (isCommand("import categories") || isCommand("ic")) {
+    else if (isCommand("import-categories") || isCommand("ic")) {
         return pfm_cmd_category_import;
     }
-    else if (isCommand("add payee") || isCommand("ap")) {
+    else if (isCommand("add-payee") || isCommand("ap")) {
         return pfm_cmd_payee_add;
     }
-    else if (isCommand("list payees") || isCommand("lp")) {
+    else if (isCommand("list-payees") || isCommand("lp")) {
         return pfm_cmd_payee_list;
     }
-    else if (isCommand("update payee") || isCommand("up")) {
+    else if (isCommand("update-payee") || isCommand("up")) {
         return pfm_cmd_payee_update;
     }
-    else if (isCommand("delete payee") || isCommand("dp")) {
+    else if (isCommand("delete-payee") || isCommand("dp")) {
         return pfm_cmd_payee_delete;
     }
-    else if (isCommand("import payees") || isCommand("ip")) {
+    else if (isCommand("import-payees") || isCommand("ip")) {
         return pfm_cmd_payee_import;
     }
-    else if (isCommand("add recurring charge") || isCommand("arc")) {
+    else if (isCommand("add-recurring-charge") || isCommand("arc")) {
         return pfm_cmd_charge_add;
     }
-    else if (isCommand("list recurring charges") || isCommand("lrc")) {
+    else if (isCommand("list-recurring-charges") || isCommand("lrc")) {
         return pfm_cmd_charge_list;
     }
-    else if (isCommand("update recurring charge") || isCommand("urc")) {
+    else if (isCommand("update-recurring-charge") || isCommand("urc")) {
         return pfm_cmd_charge_update;
     }
-    else if (isCommand("delete recurring charge") || isCommand("drc")) {
+    else if (isCommand("delete-recurring-charge") || isCommand("drc")) {
         return pfm_cmd_charge_delete;
     }
-    else if (isCommand("import recurring charges") || isCommand("irc")) {
+    else if (isCommand("import-recurring-charges") || isCommand("irc")) {
         return pfm_cmd_charge_import;
     }
-    else if (isCommand("add transaction") || isCommand("at")) {
+    else if (isCommand("add-transaction") || isCommand("at")) {
         return pfm_cmd_transaction_add;
     }
-    else if (isCommand("list transactions") || isCommand("lt")) {
+    else if (isCommand("list-transactions") || isCommand("lt")) {
         return pfm_cmd_transaction_list;
     }
-    else if (isCommand("find transactions") || isCommand("find")) {
+    else if (isCommand("find-transactions") || isCommand("find")) {
         return pfm_cmd_transaction_find;
     }
-    else if (isCommand("update transaction") || isCommand("ut")) {
+    else if (isCommand("update-transaction") || isCommand("ut")) {
         return pfm_cmd_transaction_update;
     }
-    else if (isCommand("delete transaction") || isCommand("dt")) {
+    else if (isCommand("delete-transaction") || isCommand("dt")) {
         return pfm_cmd_transaction_delete;
     }
-    else if (isCommand("import transactions") || isCommand("it")) {
+    else if (isCommand("import-transactions") || isCommand("it")) {
         return pfm_cmd_transaction_import;
     }
-    else if (isCommand("add budget") || isCommand("ab")) {
+    else if (isCommand("add-budget") || isCommand("ab")) {
         return pfm_cmd_budget_add;
     }
-    else if (isCommand("list budgets") || isCommand("lb")) {
+    else if (isCommand("list-budgets") || isCommand("lb")) {
         return pfm_cmd_budget_list;
     }
-    else if (isCommand("update budget") || isCommand("ub")) {
+    else if (isCommand("update-budget") || isCommand("ub")) {
         return pfm_cmd_budget_update;
     }
-    else if (isCommand("delete budget") || isCommand("db")) {
+    else if (isCommand("delete-budget") || isCommand("db")) {
         return pfm_cmd_budget_delete;
     }
-    else if (isCommand("import budgets") || isCommand("ib")) {
+    else if (isCommand("import-budgets") || isCommand("ib")) {
         return pfm_cmd_budget_import;
     }
-    else if (isCommand("list carried over logs") || isCommand("lco")) {
+    else if (isCommand("list-carried-over-logs") || isCommand("lco")) {
         return pfm_cmd_debug_carried_over;
     }
-    else if (isCommand("list budget track records") || isCommand("lbt")) {
+    else if (isCommand("list-budget-track-records") || isCommand("lbt")) {
         return pfm_cmd_debug_budget_track;
     }
     else {

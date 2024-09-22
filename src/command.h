@@ -71,7 +71,7 @@ class Command {
         }
 
         string getCommandParameter() {
-            return command.substr(command.find_first_of(' ') + 1);
+            return command.substr(command.find_last_of(' ') + 1);
         }
 
         const char * getNoAccountSelectedMsg() {

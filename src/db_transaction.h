@@ -9,6 +9,7 @@
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_recurring_charge.h"
+#include "db_v_recurring_charge.h"
 #include "db_payment.h"
 #include "db.h"
 #include "db_base.h"
@@ -190,6 +191,20 @@ class DBTransaction : public DBPayment {
         }
 
         void createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {
+            DBPayment::set(src);
+
+            // We want to create (insert) a record, so clear the ID...
+            this->id = 0;
+
+            this->date = transactionDate;
+            this->recurringChargeId = src.id;
+            this->isCredit = false;
+            this->isReconciled = false;
+
+            this->save();
+        }
+
+        void createFromRecurringChargeAndDate(const DBRecurringChargeView & src, StrDate & transactionDate) {
             DBPayment::set(src);
 
             // We want to create (insert) a record, so clear the ID...
