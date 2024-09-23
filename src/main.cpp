@@ -77,6 +77,7 @@ int main(int argc, char ** argv) {
 
     PFM_DB & db = PFM_DB::getInstance();
     db.open(pszDatabase);
+    free(pszDatabase);
     
 #ifdef PFM_TEST_SUITE_ENABLED
     MoneyTest::run();
