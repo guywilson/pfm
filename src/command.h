@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include <string.h>
 
 #include "logger.h"
@@ -60,6 +61,7 @@ class Command {
 
     private:
         string command;
+        vector<string> commandHistory;
         DBAccount selectedAccount;
 
         Logger & log = Logger::getInstance();

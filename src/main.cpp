@@ -99,8 +99,6 @@ int main(int argc, char ** argv) {
         string cmdString = readline("pfm > ");
 
         if (cmdString.length()) {
-            add_history(cmdString.c_str());
-
             try {
                 loop = command.process(cmdString);
             }

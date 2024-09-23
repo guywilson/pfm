@@ -647,8 +647,12 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
 bool Command::process(string & command) {
     Command::pfm_cmd_t cmd = getCommandCode(command);
 
+    commandHistory.push_back(command);
+
+    bool isContinue = true;
+
     if (cmd == pfm_cmd_exit) {
-        return false;
+        isContinue = false;
     }
     else if (cmd == pfm_cmd_help) {
         Command::help();
@@ -795,5 +799,11 @@ bool Command::process(string & command) {
         listBudgetTracks();
     }
 
-    return true;
+    if (isContinue) {
+        for (string & cmd : commandHistory) {
+            add_history(cmd.c_str());
+        }
+    }
+
+    return isContinue;
 }
