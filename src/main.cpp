@@ -40,7 +40,6 @@ int main(int argc, char ** argv) {
     bool            loop = true;
 
     rl_bind_key('\t', rl_complete);
-
     using_history();
 
 	if (argc > 1) {
@@ -78,7 +77,7 @@ int main(int argc, char ** argv) {
     PFM_DB & db = PFM_DB::getInstance();
     db.open(pszDatabase);
     free(pszDatabase);
-    
+
 #ifdef PFM_TEST_SUITE_ENABLED
     MoneyTest::run();
     cout << endl << endl;
@@ -90,10 +89,7 @@ int main(int argc, char ** argv) {
     exit(0);
 #endif
 
-    // loggedInUser = Command::login();
-
     Command command;
-    // command.setLoggedInUser(loggedInUser);
 
     while (loop) {
         string cmdString = readline("pfm > ");
