@@ -34,6 +34,17 @@ static void printUsage(void) {
 
 }
 
+#ifdef PFM_TEST_SUITE_ENABLED
+void test() {
+    MoneyTest::run();
+    cout << endl << endl;
+    StrDateTest::run();
+    cout << endl << endl;
+    testAccount();
+    exit(0);
+}
+#endif
+
 int main(int argc, char ** argv) {
     int             i;
     char *          pszDatabase = NULL;
@@ -79,14 +90,7 @@ int main(int argc, char ** argv) {
     free(pszDatabase);
 
 #ifdef PFM_TEST_SUITE_ENABLED
-    MoneyTest::run();
-    cout << endl << endl;
-    StrDateTest::run();
-    cout << endl << endl;
-    EncryptionTest::run();
-    cout << endl << endl;
-    testAccount();
-    exit(0);
+    test();
 #endif
 
     Command command;
