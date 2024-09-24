@@ -106,7 +106,7 @@ class DBRecurringCharge : public DBPayment {
             DBPayment::set(record);
 
             this->frequency = record.get("frequency");
-            this->endDate = StrDate::parseDate(record.get("endDate"));
+            this->endDate = record.get("endDate");
         }
 
         void print() {

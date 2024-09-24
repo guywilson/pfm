@@ -12,10 +12,24 @@ using namespace std;
 
 #define TIME_STAMP_BUFFER_LEN               32
 #define DATE_STAMP_BUFFER_LEN               12
+#define DATE_STRING_LENGTH                  10
 
 class StrDate {
     private:
         string _date;
+
+        class YMD {
+            public:
+                unsigned int year;
+                unsigned int month;
+                unsigned int day;
+
+                YMD() {
+                    year = 0;
+                    month = 0;
+                    day = 0;
+                }
+        };
 
         /*
         ** Calculates the number of seconds since Jan 1, 1970
@@ -25,8 +39,12 @@ class StrDate {
 
         int daysInMonth(int year, int month);
 
-        void validateDateString(const string & date);
+        YMD splitDate(const string & date);
 
+        void validateDateString(const string & date, StrDate::YMD & dateComponents);
+
+        void set(YMD & date);
+        
         static bool isYear(string & part);
         static bool isMonth(string & part);
 
@@ -45,9 +63,6 @@ class StrDate {
         void set(int year, int month, int day);
 
         void clear();
-
-        static StrDate parseDate(const string & dateStr);
-        static StrDate parseDate(const char * dateStr);
         
         static string today();
         static string getTimestamp();

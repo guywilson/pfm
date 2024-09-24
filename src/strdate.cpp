@@ -94,90 +94,85 @@ bool StrDate::isMonth(string & part) {
 ** dd-mm-yyyy
 ** As above but with / rather than -
 */
-StrDate StrDate::parseDate(const char * dateStr) {
-    StrDate parsedDate;
+StrDate::YMD StrDate::splitDate(const string & date) {
+    if (date.length() != DATE_STRING_LENGTH) {
+        throw pfm_validation_error(
+                pfm_error::buildMsg(
+                    "Invalid date '%s': Invalid date length, date must be in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'",
+                    date.c_str()),
+                __FILE__,
+                __LINE__);
+    }
 
-    size_t dateLength = strlen(dateStr);
+    char dateBuffer[DATE_STAMP_BUFFER_LEN];
+    char * pszDate = dateBuffer;
 
-    if (dateLength > 0) {
-        char * pszDate = (char *)malloc(dateLength + 1);
+    strncpy(dateBuffer, date.c_str(), DATE_STRING_LENGTH);
 
-        if (pszDate == NULL) {
-            throw pfm_error("Failed to allocate memory for date string");
-        }
+    string part1 = strtok_r(dateBuffer, "-/", &pszDate);
+    string part2 = strtok_r(NULL, "-/", &pszDate);
+    string part3 = strtok_r(NULL, "-/", &pszDate);
 
-        strncpy(pszDate, dateStr, dateLength);
+    if (strtok_r(NULL, "-/", &pszDate) != NULL) {
+        throw pfm_validation_error(
+                pfm_error::buildMsg(
+                    "Invalid date '%s': Invalid date length, date must be in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'",
+                    date.c_str()),
+                __FILE__,
+                __LINE__);
+    }
 
-        string part1 = strtok_r(pszDate, "-/", &pszDate);
-        string part2 = strtok_r(NULL, "-/", &pszDate);
-        string part3 = strtok_r(NULL, "-/", &pszDate);
+    StrDate::YMD dateComponents;
 
-        free(pszDate);
-
-        if (strtok_r(NULL, "-/", &pszDate) != NULL) {
-            throw pfm_validation_error("Invalid date format");
-        }
-
-        int year = 0;
-        int month = 0;
-        int day = 0;
-
-        if (isYear(part1)) {
-            year = atoi(part1.c_str());
-        }
-        else {
-            day = atoi(part1.c_str());
-        }
-
-        if (isMonth(part2)) {
-            month = atoi(part2.c_str());
-        }
-        else {
-            throw pfm_validation_error("Invalid date format");
-        }
-
-        if (year) {
-            day = atoi(part3.c_str());
-        }
-        else if (isYear(part3)) {
-            year = atoi(part3.c_str());
-        }
-
-        parsedDate.set(year, month, day);
-
-        return parsedDate;
+    if (isYear(part1)) {
+        dateComponents.year = (unsigned int)atoi(part1.c_str());
     }
     else {
-        return parsedDate;
+        dateComponents.day = (unsigned int)atoi(part1.c_str());
     }
-}
 
-StrDate StrDate::parseDate(const string & dateStr) {
-    return parseDate(dateStr.c_str());
+    if (isMonth(part2)) {
+        dateComponents.month = (unsigned int)atoi(part2.c_str());
+    }
+    else {
+        throw pfm_validation_error(
+                pfm_error::buildMsg(
+                    "Invalid date '%s': Invalid date length, date must be in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'",
+                    date.c_str()),
+                __FILE__,
+                __LINE__);
+    }
+
+    if (dateComponents.year != 0) {
+        dateComponents.day = (unsigned int)atoi(part3.c_str());
+    }
+    else if (isYear(part3)) {
+        dateComponents.year = (unsigned int)atoi(part3.c_str());
+    }
+
+    return dateComponents;
 }
 
 string StrDate::today() {
-    char * today = (char *)malloc(DATE_STAMP_BUFFER_LEN);
+    char today[DATE_STAMP_BUFFER_LEN];
 
-    if (today != NULL) {
 #ifndef PFM_TEST_SUITE_ENABLED
-        struct timeval tv;
+    struct timeval tv;
 
-        gettimeofday(&tv, NULL);
-        time_t t = tv.tv_sec;
-        struct tm * localTime = localtime(&t);
+    gettimeofday(&tv, NULL);
+    time_t t = tv.tv_sec;
+    struct tm * localTime = localtime(&t);
 
-        snprintf(
-            today, 
-            DATE_STAMP_BUFFER_LEN, 
-            "%d-%02d-%02d", 
-            localTime->tm_year + 1900, 
-            localTime->tm_mon + 1, 
-            localTime->tm_mday);
+    snprintf(
+        today, 
+        DATE_STAMP_BUFFER_LEN, 
+        "%d-%02d-%02d", 
+        localTime->tm_year + 1900, 
+        localTime->tm_mon + 1, 
+        localTime->tm_mday);
 #else
-        strncpy(today, _todayTestDate, DATE_STAMP_BUFFER_LEN);
+    strncpy(today, _todayTestDate, DATE_STAMP_BUFFER_LEN);
 #endif
-    }
 
     return string(today);
 }
@@ -191,40 +186,38 @@ string StrDate::getTimestampToMicrosecond() {
 }
 
 string StrDate::getTimestamp(bool includeus) {
-    char * now = (char *)malloc(TIME_STAMP_BUFFER_LEN);
+    char now[TIME_STAMP_BUFFER_LEN];
 
-    if (now != NULL) {
-        struct timeval tv;
+    struct timeval tv;
 
-        gettimeofday(&tv, NULL);
-        time_t t = tv.tv_sec;
-        struct tm * localTime = localtime(&t);
+    gettimeofday(&tv, NULL);
+    time_t t = tv.tv_sec;
+    struct tm * localTime = localtime(&t);
 
-        if (includeus) {
-            snprintf(
-                now, 
-                TIME_STAMP_BUFFER_LEN, 
-                "%d-%02d-%02d %02d:%02d:%02d.%d", 
-                localTime->tm_year + 1900, 
-                localTime->tm_mon + 1, 
-                localTime->tm_mday,
-                localTime->tm_hour,
-                localTime->tm_min,
-                localTime->tm_sec,
-                tv.tv_usec);
-        }
-        else {
-            snprintf(
-                now, 
-                TIME_STAMP_BUFFER_LEN, 
-                "%d-%02d-%02d %02d:%02d:%02d", 
-                localTime->tm_year + 1900, 
-                localTime->tm_mon + 1, 
-                localTime->tm_mday,
-                localTime->tm_hour,
-                localTime->tm_min,
-                localTime->tm_sec);
-        }
+    if (includeus) {
+        snprintf(
+            now, 
+            TIME_STAMP_BUFFER_LEN, 
+            "%d-%02d-%02d %02d:%02d:%02d.%d", 
+            localTime->tm_year + 1900, 
+            localTime->tm_mon + 1, 
+            localTime->tm_mday,
+            localTime->tm_hour,
+            localTime->tm_min,
+            localTime->tm_sec,
+            tv.tv_usec);
+    }
+    else {
+        snprintf(
+            now, 
+            TIME_STAMP_BUFFER_LEN, 
+            "%d-%02d-%02d %02d:%02d:%02d", 
+            localTime->tm_year + 1900, 
+            localTime->tm_mon + 1, 
+            localTime->tm_mday,
+            localTime->tm_hour,
+            localTime->tm_min,
+            localTime->tm_sec);
     }
 
     return string(now);
@@ -233,7 +226,6 @@ string StrDate::getTimestamp(bool includeus) {
 bool StrDate::isDateValid(const string & date) {
     try {
         StrDate d(date);
-        d.validateDateString(d.shortDate());
     }
     catch (pfm_validation_error & e) {
         return false;
@@ -242,33 +234,16 @@ bool StrDate::isDateValid(const string & date) {
     return true;
 }
 
-void StrDate::validateDateString(const string & date) {
-    int                 day;
-    int                 month;
-    int                 year;
-
+void StrDate::validateDateString(const string & date, StrDate::YMD & dateComponents) {
     if (date == "N/A") {
         return;
     }
 
-    if (date.length() < 10) {
-        throw pfm_validation_error(
-                pfm_error::buildMsg(
-                    "Invalid date '%s': Invalid date length, date must be in the format 'yyyy-mm-dd'",
-                    date.c_str()),
-                __FILE__,
-                __LINE__);
-    }
-
     /*
-    ** Valid date in the format 'yyyy-mm-dd'
-    ** e.g. 2024-07-04
+    ** Valid date in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'
+    ** e.g. 2024-07-04 or 04-07-2024
     */
-    year = atoi(date.substr(0, 4).c_str());
-    month = atoi(date.substr(5, 2).c_str());
-    day = atoi(date.substr(8, 2).c_str());
-
-    if (year < EPOCH_YEAR) {
+    if (dateComponents.year < EPOCH_YEAR) {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
                     "Invalid date '%s': Date must be greater than '1970-01-01'",
@@ -276,7 +251,7 @@ void StrDate::validateDateString(const string & date) {
                 __FILE__,
                 __LINE__);
     }
-    if (month < 1 || month > 12) {
+    if (dateComponents.month < 1 || dateComponents.month > 12) {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
                     "Invalid date '%s': Invalid month, must be between 1 and 12",
@@ -284,7 +259,7 @@ void StrDate::validateDateString(const string & date) {
                 __FILE__,
                 __LINE__);
     }
-    if (day < 0 || day > 31) {
+    if (dateComponents.day < 0 || dateComponents.day > 31) {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
                     "Invalid date '%s': Invalid day, must be between 1 and 31",
@@ -292,7 +267,7 @@ void StrDate::validateDateString(const string & date) {
                 __FILE__,
                 __LINE__);
     }
-    if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+    if ((dateComponents.month == 4 || dateComponents.month == 6 || dateComponents.month == 9 || dateComponents.month == 11) && dateComponents.day > 30) {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
                     "Invalid date '%s': Supplied month has 30 days",
@@ -300,9 +275,9 @@ void StrDate::validateDateString(const string & date) {
                 __FILE__,
                 __LINE__);
     }
-    if (month == 2) {
-        if (isLeapYear(year)) {
-            if (day > 29) {
+    if (dateComponents.month == 2) {
+        if (isLeapYear(dateComponents.year)) {
+            if (dateComponents.day > 29) {
                 throw pfm_validation_error(
                         pfm_error::buildMsg(
                             "Invalid date '%s': February has max 29 days in a leap year",
@@ -312,7 +287,7 @@ void StrDate::validateDateString(const string & date) {
             }
         }
         else {
-            if (day > 28) {
+            if (dateComponents.day > 28) {
                 throw pfm_validation_error(
                         pfm_error::buildMsg(
                             "Invalid date '%s': February has max 28 days in a non-leap year",
@@ -346,8 +321,10 @@ void StrDate::set(const char * date) {
         clear();
     }
     else if (strlen(date) > 0) {
-        validateDateString(date);
-        this->_date = date;
+        StrDate::YMD dateComponents = splitDate(date);
+
+        validateDateString(date, dateComponents);
+        this->set(dateComponents);
     }
     else {
         clear();
@@ -365,7 +342,11 @@ void StrDate::set(int year, int month, int day) {
         month, 
         day);
 
-    this->set(dateStr);
+    this->_date = dateStr;
+}
+
+void StrDate::set(StrDate::YMD & date) {
+    set(date.year, date.month, date.day);
 }
 
 void StrDate::clear() {

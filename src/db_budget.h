@@ -120,8 +120,8 @@ class DBBudget : public DBEntity {
         }
 
         void set(JRecord & record) {
-            this->startDate = StrDate::parseDate(record.get("startDate"));
-            this->endDate = StrDate::parseDate(record.get("endDate"));
+            this->startDate = record.get("startDate");
+            this->endDate = record.get("endDate");
             this->payeeCode = record.get("payeeCode");
             this->categoryCode = record.get("categoryCode");
             this->description = record.get("description");
