@@ -98,12 +98,41 @@ class DateField : public CLITextField {
     private:
         const int maxAttemps = 5;
 
+        void buildHistoryDateItem(int year, int month) {
+            char historyDateBuffer[DATE_STAMP_BUFFER_LEN];
+
+            snprintf(historyDateBuffer, DATE_STAMP_BUFFER_LEN, "%d-%02d-", year, month);
+            add_history(historyDateBuffer);
+        }
+
+        void populateDateHistory() {
+            clear_history();
+
+            StrDate today;
+            int year = today.year();
+            int month = today.month() + 1;
+
+            int monthCounter = 0;
+
+            while (monthCounter < 12) {
+                if (month > 12) {
+                    month = 1;
+                }
+
+                buildHistoryDateItem(year, month++);
+
+                monthCounter++;
+            }
+        }
+
     public:
         DateField() : CLITextField() {}
         DateField(string & label) : CLITextField(label) {}
         DateField(const char * label) : CLITextField(label) {}
 
         void show() override {
+            populateDateHistory();
+
             setLengthLimit(DATE_FIELD_LENGTH);
 
             bool isDateValid = false;
@@ -121,14 +150,14 @@ class DateField : public CLITextField {
                 _setValue(line);
             }
             else {
-                throw pfm_validation_error(
-                                pfm_error::buildMsg(
-                                    "Invalid date '%s', must be of the form 'yyyy-mm-dd'",
-                                    line.c_str()
-                                ),
-                                __FILE__,
-                                __LINE__);
+                /*
+                ** Set the date, will throw an error as the
+                ** date is invalid...
+                */
+                StrDate errorDate(line);
             }
+
+            clear_history();
         }
 };
 
