@@ -40,6 +40,24 @@ class DBRecurringChargeView : public DBRecurringCharge {
                         "FROM v_recurring_charge_list " \
                         "WHERE account_id = %lld;";
 
+        const char * sqlSelectByAccountIDBetweenDates = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "end_date," \
+                        "description," \
+                        "amount," \
+                        "frequency," \
+                        "created," \
+                        "updated " \
+                        "FROM v_recurring_charge_list " \
+                        "WHERE account_id = %lld " \
+                        "AND date >= '%s' " \
+                        "AND date < '%s';";
+
     public:
         string payeeCode;
         string categoryCode;
@@ -95,6 +113,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
         }
 
         DBResult<DBRecurringChargeView> retrieveByAccountID(pfm_id_t accountId);
+        DBResult<DBRecurringChargeView> retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & dateAfter, StrDate & dateBefore);
 };
 
 #endif

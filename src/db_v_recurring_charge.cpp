@@ -27,3 +27,20 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_i
 
     return result;
 }
+
+DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & dateAfter, StrDate & dateBefore) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBRecurringChargeView> result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlSelectByAccountIDBetweenDates, 
+        accountId,
+        dateAfter.shortDate().c_str(),
+        dateBefore.shortDate().c_str());
+
+    result.retrieve(szStatement);
+
+    return result;
+}

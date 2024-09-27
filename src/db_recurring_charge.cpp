@@ -29,6 +29,23 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t acco
     return result;
 }
 
+DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & dateAfter, StrDate & dateBefore) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBRecurringCharge> result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlSelectByAccountIDBetweenDates, 
+        accountId,
+        dateAfter.shortDate().c_str(),
+        dateBefore.shortDate().c_str());
+
+    result.retrieve(szStatement);
+
+    return result;
+}
+
 int DBRecurringCharge::getFrequencyValue() {
     return atoi(frequency.substr(0, frequency.length() - 1).c_str());
 }
@@ -49,50 +66,38 @@ bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
     return false;
 }
 
-bool DBRecurringCharge::isChargeDueThisPeriod() {
-    StrDate dateToday;
-    StrDate chargeStartDate(this->date);
+bool DBRecurringCharge::isChargeDueThisPeriod(int year, int month) {
+    StrDate periodStart(year, month, 1);
+    StrDate periodEnd(year, month, StrDate::getDaysInMonth(year, month));
 
     char frequencyValue = this->getFrequencyValue();
     char frequencyUnit = this->getFrequencyUnit();
 
-    if (this->date <= dateToday) {
+    if (this->date <= periodEnd) {
         StrDate nextPaymentDate = this->date;
 
         switch (frequencyUnit) {
             case 'y':
-                nextPaymentDate.addYears(frequencyValue * (dateToday.year() - nextPaymentDate.year()));
-
-                if (isDateWithinCurrentPeriod(nextPaymentDate)) {
-                    return true;
-                }
+                nextPaymentDate.addYears(frequencyValue * (periodStart.year() - nextPaymentDate.year()));
                 break;
 
             case 'm':
-                nextPaymentDate.addMonths(frequencyValue * (dateToday.month() - nextPaymentDate.month()));
-
-                if (isDateWithinCurrentPeriod(nextPaymentDate)) {
-                    return true;
-                }
+                nextPaymentDate.addMonths(frequencyValue * (periodStart.month() - nextPaymentDate.month()));
                 break;
 
             case 'w':
-                nextPaymentDate.addWeeks(frequencyValue * ((dateToday.day() - nextPaymentDate.day()) / 7));
-
-                if (isDateWithinCurrentPeriod(nextPaymentDate)) {
-                    return true;
-                }
+                nextPaymentDate.addWeeks(frequencyValue * ((periodStart.day() - nextPaymentDate.day()) / 7));
                 break;
 
             case 'd':
-                while (nextPaymentDate.year() < dateToday.year() || nextPaymentDate.month() < dateToday.month()) {
+                while (nextPaymentDate.year() < periodEnd.year() || nextPaymentDate.month() < periodEnd.month()) {
                     nextPaymentDate.addDays(frequencyValue);
                 }
-
-                if (isDateWithinCurrentPeriod(nextPaymentDate)) {
-                    return true;
-                }
                 break;
+        }
+
+        if (nextPaymentDate <= periodEnd && nextPaymentDate >= periodStart) {
+            return true;
         }
     }
 
@@ -151,6 +156,33 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
                             __LINE__);
                 break;
         }
+    }
+
+    return nextPaymentDate;
+}
+
+StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) {
+    char frequencyValue = getFrequencyValue();
+    char frequencyUnit = getFrequencyUnit();
+
+    StrDate nextPaymentDate = startDate;
+
+    switch (frequencyUnit) {
+        case 'y':
+            nextPaymentDate.addYears(frequencyValue);
+            break;
+
+        case 'm':
+            nextPaymentDate.addMonths(frequencyValue);
+            break;
+
+        case 'w':
+            nextPaymentDate.addWeeks(frequencyValue);
+            break;
+
+        case 'd':
+            nextPaymentDate.addDays(frequencyValue);
+            break;
     }
 
     return nextPaymentDate;

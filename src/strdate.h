@@ -67,6 +67,7 @@ class StrDate {
         static string today();
         static string getTimestamp();
         static string getTimestampToMicrosecond();
+        static int getDaysInMonth(int year, int month);
         static bool isDateValid(const string & date);
         
         string shortDate() const;

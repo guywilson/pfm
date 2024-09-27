@@ -44,7 +44,7 @@ void DBAccount::retrieveByCode(string & code) {
 
 void DBAccount::createRecurringTransactions() {
     StrDate dateToday;
-    StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
+    StrDate transactionDate;
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -57,23 +57,28 @@ void DBAccount::createRecurringTransactions() {
         for (int i = 0;i < chargeResult.getNumRows();i++) {
             DBRecurringChargeView charge = chargeResult.getResultAt(i);
 
-            if (charge.date >= this->openingDate) {
-                DBTransaction transaction;
-                transaction.date = charge.date;
+            DBTransaction transaction;
+            int numRows = transaction.findLatestByRecurringChargeID(charge.id);
 
-                int chargeStatus = CHARGE_OK;
-                int numRows = 0;
+            if (numRows == 0) {
+                if (charge.date < openingDate) {
+                    transactionDate = charge.date;
 
-                while (transaction.date < periodStartDate && chargeStatus == CHARGE_OK) {
-                    numRows = transaction.findLatestByRecurringChargeID(charge.id);
-
-                    if (numRows == 0) {
-                        transaction.createFromRecurringChargeAndDate(charge, charge.date);
-                    }
-                    else {
-                        chargeStatus = transaction.createNextTransactionForCharge(charge, transaction.date);
+                    while (transactionDate < openingDate) {
+                        transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
                     }
                 }
+                else {
+                    transactionDate = charge.date;
+                }
+            }
+            else {
+                transactionDate = transaction.date;
+            }
+
+            while (transactionDate <= dateToday) {
+                transaction.createFromRecurringChargeAndDate(charge, transactionDate);
+                transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
             }
         }
 
@@ -200,7 +205,7 @@ Money DBAccount::calculateBalanceAfterBills() {
         for (int i = 0;i < chargeResult.getNumRows();i++) {
             DBRecurringCharge charge = chargeResult.getResultAt(i);
 
-            if (charge.isChargeDueThisPeriod()) {
+            if (charge.isChargeDueThisPeriod(dateToday.year(), dateToday.month())) {
                 balance -= charge.amount;
             }
         }

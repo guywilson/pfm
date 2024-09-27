@@ -131,9 +131,9 @@ class DateField : public CLITextField {
         DateField(const char * label) : CLITextField(label) {}
 
         void show() override {
-            populateDateHistory();
-
             setLengthLimit(DATE_FIELD_LENGTH);
+
+            populateDateHistory();
 
             bool isDateValid = false;
             int attempts = 0;

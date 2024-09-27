@@ -67,7 +67,7 @@ bool StrDate::isYear(string & part) {
 
         long yearCandidate = strtol(part.c_str(), NULL, 10);
 
-        if (yearCandidate < 1970 || yearCandidate > today.year()) {
+        if (yearCandidate < 1970) {
             throw pfm_validation_error("Invalid date format");
         }
 
@@ -221,6 +221,11 @@ string StrDate::getTimestamp(bool includeus) {
     }
 
     return string(now);
+}
+
+int StrDate::getDaysInMonth(int year, int month) {
+    StrDate d;
+    return d.daysInMonth(year, month);
 }
 
 bool StrDate::isDateValid(const string & date) {

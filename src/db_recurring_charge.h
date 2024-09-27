@@ -40,6 +40,24 @@ class DBRecurringCharge : public DBPayment {
                         "FROM recurring_charge " \
                         "WHERE account_id = %lld;";
 
+        const char * sqlSelectByAccountIDBetweenDates = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "end_date," \
+                        "description," \
+                        "amount," \
+                        "frequency," \
+                        "created," \
+                        "updated " \
+                        "FROM recurring_charge " \
+                        "WHERE account_id = %lld " \
+                        "AND date >= '%s' " \
+                        "AND date < '%s';";
+
         const char * sqlInsert = 
                         "INSERT INTO recurring_charge (" \
                         "account_id," \
@@ -144,9 +162,10 @@ class DBRecurringCharge : public DBPayment {
         int getFrequencyValue();
         char getFrequencyUnit();
 
-        bool isChargeDueThisPeriod();
+        bool isChargeDueThisPeriod(int year, int month);
         StrDate calculateNextPaymentDate();
         void setNextPaymentDate();
+        StrDate getNextRecurringTransactionDate(StrDate & startDate);
 
         const char * getTableName() override {
             return "recurring_charge";
@@ -212,6 +231,7 @@ class DBRecurringCharge : public DBPayment {
         }
 
         DBResult<DBRecurringCharge> retrieveByAccountID(pfm_id_t accountId);
+        DBResult<DBRecurringCharge> retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & dateAfter, StrDate & dateBefore);
 };
 
 #endif
