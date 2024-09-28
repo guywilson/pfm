@@ -80,6 +80,14 @@ void Logger::setLogLevel(int logLevel) {
     this->loggingLevel = logLevel;
 }
 
+void Logger::addLogLevel(int logLevel) {
+    this->loggingLevel |= logLevel;
+}
+
+void Logger::clearLogLevel(int logLevel) {
+    this->loggingLevel &= ~logLevel;
+}
+
 bool Logger::isLogLevel(int logLevel) {
     return ((this->loggingLevel & logLevel) == logLevel ? true : false);
 }

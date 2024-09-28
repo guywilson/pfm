@@ -41,7 +41,7 @@ class StrDate {
 
         YMD splitDate(const string & date);
 
-        void validateDateString(const string & date, StrDate::YMD & dateComponents);
+        void validateDateString(const string & date);
 
         void set(YMD & date);
         

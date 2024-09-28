@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <string>
@@ -113,14 +114,14 @@ StrDate::YMD StrDate::splitDate(const string & date) {
     string part2 = strtok_r(NULL, "-/", &pszDate);
     string part3 = strtok_r(NULL, "-/", &pszDate);
 
-    if (strtok_r(NULL, "-/", &pszDate) != NULL) {
-        throw pfm_validation_error(
-                pfm_error::buildMsg(
-                    "Invalid date '%s': Invalid date length, date must be in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'",
-                    date.c_str()),
-                __FILE__,
-                __LINE__);
-    }
+    // if (strtok_r(NULL, "-/", &pszDate) != NULL) {
+    //     throw pfm_validation_error(
+    //             pfm_error::buildMsg(
+    //                 "Invalid date '%s': Invalid date length, date must be in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'",
+    //                 date.c_str()),
+    //             __FILE__,
+    //             __LINE__);
+    // }
 
     StrDate::YMD dateComponents;
 
@@ -239,10 +240,12 @@ bool StrDate::isDateValid(const string & date) {
     return true;
 }
 
-void StrDate::validateDateString(const string & date, StrDate::YMD & dateComponents) {
+void StrDate::validateDateString(const string & date) {
     if (date == "N/A") {
         return;
     }
+
+    StrDate::YMD dateComponents = splitDate(date);
 
     /*
     ** Valid date in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'
@@ -326,9 +329,9 @@ void StrDate::set(const char * date) {
         clear();
     }
     else if (strlen(date) > 0) {
-        StrDate::YMD dateComponents = splitDate(date);
+        validateDateString(date);
 
-        validateDateString(date, dateComponents);
+        StrDate::YMD dateComponents = splitDate(date);
         this->set(dateComponents);
     }
     else {

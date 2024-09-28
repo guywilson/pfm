@@ -55,7 +55,9 @@ class Command {
             pfm_cmd_budget_delete,
             pfm_cmd_budget_import,
             pfm_cmd_debug_carried_over,
-            pfm_cmd_debug_budget_track
+            pfm_cmd_debug_budget_track,
+            pfm_cmd_logging_level_set,
+            pfm_cmd_logging_level_clear
         }
         pfm_cmd_t;
 
@@ -130,6 +132,10 @@ class Command {
 
         void listCarriedOverLogs();
         void listBudgetTracks();
+
+        int getLogLevelParameter(string & level);
+        void setLoggingLevel(string & level);
+        void clearLoggingLevel(string & level);
 
         bool isCommandValid();
         pfm_cmd_t getCommandCode(string & command);

@@ -53,6 +53,8 @@ class Logger {
         void closeLogger();
 
         void setLogLevel(int logLevel);
+        void addLogLevel(int logLevel);
+        void clearLogLevel(int logLevel);
         bool isLogLevel(int logLevel);
 
         void newline();

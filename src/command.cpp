@@ -522,6 +522,53 @@ void Command::listBudgetTracks() {
     view.show();
 }
 
+int Command::getLogLevelParameter(string & level) {
+    int levelID = 0;
+
+    if (level.compare("entry") == 0) {
+        levelID = LOG_LEVEL_ENTRY;
+    }
+    else if (level.compare("exit") == 0) {
+        levelID = LOG_LEVEL_EXIT;
+    }
+    else if (level.compare("debug") == 0) {
+        levelID = LOG_LEVEL_DEBUG;
+    }
+    else if (level.compare("status") == 0) {
+        levelID = LOG_LEVEL_STATUS;
+    }
+    else if (level.compare("info") == 0) {
+        levelID = LOG_LEVEL_INFO;
+    }
+    else if (level.compare("error") == 0) {
+        levelID = LOG_LEVEL_ERROR;
+    }
+    else if (level.compare("fatal") == 0) {
+        levelID = LOG_LEVEL_FATAL;
+    }
+    else if (level.compare("all") == 0) {
+        levelID = LOG_LEVEL_ALL;
+    }
+    else {
+        throw pfm_validation_error(
+                    pfm_error::buildMsg(
+                        "Invalid logging level identifier '%s'", 
+                        level.c_str()), 
+                    __FILE__, 
+                    __LINE__);
+    }
+
+    return levelID;
+}
+
+void Command::setLoggingLevel(string & level) {
+    log.addLogLevel(getLogLevelParameter(level));
+}
+
+void Command::clearLoggingLevel(string & level) {
+    log.clearLogLevel(getLogLevelParameter(level));
+}
+
 Command::pfm_cmd_t Command::getCommandCode(string & command) {
     this->command = command;
 
@@ -635,6 +682,12 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
     }
     else if (isCommand("list-budget-track-records") || isCommand("lbt")) {
         return pfm_cmd_debug_budget_track;
+    }
+    else if (isCommand("set-logging-level")) {
+        return pfm_cmd_logging_level_set;
+    }
+    else if (isCommand("clear-logging-level")) {
+        return pfm_cmd_logging_level_clear;
     }
     else {
         throw pfm_validation_error(
@@ -797,6 +850,14 @@ bool Command::process(string & command) {
     }
     else if (cmd == pfm_cmd_debug_budget_track) {
         listBudgetTracks();
+    }
+    else if (cmd == pfm_cmd_logging_level_set) {
+        string logLevel = getCommandParameter();
+        setLoggingLevel(logLevel);
+    }
+    else if (cmd == pfm_cmd_logging_level_clear) {
+        string logLevel = getCommandParameter();
+        clearLoggingLevel(logLevel);
     }
 
     if (isContinue) {
