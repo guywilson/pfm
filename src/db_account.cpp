@@ -43,6 +43,9 @@ void DBAccount::retrieveByCode(string & code) {
 }
 
 void DBAccount::createRecurringTransactions() {
+    Logger & log = Logger::getInstance();
+    log.logEntry("DBAccount::createRecurringTransactions()");
+
     StrDate dateToday;
     StrDate transactionDate;
 
@@ -83,11 +86,13 @@ void DBAccount::createRecurringTransactions() {
         }
 
         db.commit();
+
+        log.logExit("DBAccount::createRecurringTransactions()");
     }
     catch (pfm_error & e) {
         db.rollback();
 
-        fprintf(stderr, "DBAccount.createRecurringTransactions() - caught exception: %s\n", e.what());
+        log.logError("DBAccount.createRecurringTransactions() - caught exception: %s", e.what());
 
         throw e;
     }
@@ -109,6 +114,9 @@ void DBAccount::beforeUpdate() {
 }
 
 void DBAccount::createCarriedOverLogs() {
+    Logger & log = Logger::getInstance();
+    log.logEntry("DBAccount::createCarriedOverLogs()");
+
     StrDate dateToday;
     StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
 
@@ -164,17 +172,22 @@ void DBAccount::createCarriedOverLogs() {
         }
 
         db.commit();
+        
+        log.logExit("DBAccount::createCarriedOverLogs()");
     }
     catch (pfm_error & e) {
         db.rollback();
 
-        fprintf(stderr, "DBAccount.createCarriedOverLogs() - caught exception: %s\n", e.what());
+        log.logError("DBAccount.createCarriedOverLogs() - caught exception: %s", e.what());
 
         throw e;
     }
 }
 
 Money DBAccount::calculateBalanceAfterBills() {
+    Logger & log = Logger::getInstance();
+    log.logEntry("DBAccount::calculateBalanceAfterBills()");
+
     DBCarriedOver co;
     co.retrieveLatestByAccountId(this->id);
 
@@ -199,23 +212,29 @@ Money DBAccount::calculateBalanceAfterBills() {
         DBRecurringChargeView ch;
         DBResult<DBRecurringChargeView> chargeResult = ch.retrieveByAccountID(this->id);
 
-        // cout << "Identified charges due this period:" << endl;
+        if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
+            cout << "Identified charges due this period:" << endl;
+        }
 
         for (int i = 0;i < chargeResult.getNumRows();i++) {
             DBRecurringCharge charge = chargeResult.getResultAt(i);
 
             if (charge.isChargeDueThisPeriod(dateToday.year(), dateToday.month())) {
-                // cout << "| " << charge.date.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;
+                if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
+                    cout << "| " << charge.date.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;
+                }
                 balance -= charge.amount;
             }
         }
 
         db.commit();
+
+        log.logExit("DBAccount::calculateBalanceAfterBills()");
     }
     catch (pfm_error & e) {
         db.rollback();
 
-        fprintf(stderr, "DBAccount.calculateBalanceAfterBills() - caught exception: %s\n", e.what());
+        log.logError("DBAccount.calculateBalanceAfterBills() - caught exception: %s", e.what());
 
         throw e;
     }
