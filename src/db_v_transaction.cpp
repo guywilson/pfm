@@ -93,7 +93,7 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransactionView> result;
 
@@ -101,6 +101,23 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDBetweenDates(p
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIDBetweenDates, 
+        accountId,
+        firstDate.shortDate().c_str(),
+        secondDate.shortDate().c_str());
+
+    result.retrieve(szStatement);
+
+    return result;
+}
+
+DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBTransactionView> result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlSelectNonRecurringByAccountIDBetweenDates, 
         accountId,
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());

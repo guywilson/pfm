@@ -141,7 +141,7 @@ void DBAccount::createCarriedOverLogs() {
             StrDate secondDate(co.date.year(), co.date.month(), co.date.daysInMonth());
 
             DBTransactionView tr;
-            DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, firstDate, secondDate);
+            DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, firstDate, secondDate);
 
             for (int i = 0;i < transactionResult.getNumRows();i++) {
                 DBTransaction transaction = transactionResult.getResultAt(i);
@@ -189,23 +189,23 @@ Money DBAccount::calculateBalanceAfterBills() {
         StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
 
         DBTransactionView tr;
-        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDBetweenDates(this->id, periodStartDate, dateToday);
+        DBResult<DBTransactionView> transactionResult = tr.retrieveNonRecurringByAccountIDForPeriod(this->id, periodStartDate, dateToday);
 
         for (int i = 0;i < transactionResult.getNumRows();i++) {
             DBTransaction transaction = transactionResult.getResultAt(i);
-
-            if (transaction.recurringChargeId == 0) {
-                balance += transaction.getSignedAmount();
-            }
+            balance += transaction.getSignedAmount();
         }
 
         DBRecurringChargeView ch;
         DBResult<DBRecurringChargeView> chargeResult = ch.retrieveByAccountID(this->id);
 
+        // cout << "Identified charges due this period:" << endl;
+
         for (int i = 0;i < chargeResult.getNumRows();i++) {
             DBRecurringCharge charge = chargeResult.getResultAt(i);
 
             if (charge.isChargeDueThisPeriod(dateToday.year(), dateToday.month())) {
+                // cout << "| " << charge.date.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;
                 balance -= charge.amount;
             }
         }

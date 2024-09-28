@@ -77,6 +77,27 @@ class DBTransaction : public DBPayment {
                         "updated " \
                         "FROM account_transaction " \
                         "WHERE account_id = %lld " \
+                        "AND recurring_charge_id = 0 " \
+                        "AND date >= '%s' " \
+                        "AND date <= '%s';";
+
+        const char * sqlSelectNonRecurringByAccountIDBetweenDates = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "date," \
+                        "reference," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM account_transaction " \
+                        "WHERE account_id = %lld " \
+                        "AND recurring_charge_id = 0 " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 
@@ -356,7 +377,8 @@ class DBTransaction : public DBPayment {
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
         DBResult<DBTransaction> retrieveByRecurringChargeID(pfm_id_t recurringChargeId);
-        DBResult<DBTransaction> retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransaction> retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransaction> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransaction> findTransactionsForAccountID(pfm_id_t accountId, string & criteria);
 };
 
