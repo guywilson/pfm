@@ -57,6 +57,8 @@ void DBAccount::createRecurringTransactions() {
         DBRecurringChargeView ch;
         DBResult<DBRecurringChargeView> chargeResult = ch.retrieveByAccountID(this->id);
 
+        cout << "Creating recurring transactions for account '" << this->code << "': " << endl;
+
         for (int i = 0;i < chargeResult.getNumRows();i++) {
             DBRecurringChargeView charge = chargeResult.getResultAt(i);
 
@@ -64,6 +66,8 @@ void DBAccount::createRecurringTransactions() {
             int numRows = transaction.findLatestByRecurringChargeID(charge.id);
 
             if (numRows == 0) {
+                log.logDebug("Found no exisiting transactions for charge %lld", charge.id);
+
                 if (charge.date < openingDate) {
                     transactionDate = charge.date;
 
@@ -76,10 +80,13 @@ void DBAccount::createRecurringTransactions() {
                 }
             }
             else {
-                transactionDate = transaction.date;
+                log.logDebug("Found latest transactions for charge %lld with date '%s'", charge.id, transaction.date.shortDate().c_str());
+                
+                transactionDate = charge.getNextRecurringTransactionDate(transaction.date);
             }
 
             while (transactionDate <= dateToday) {
+                cout << "| " << transactionDate.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;
                 transaction.createFromRecurringChargeAndDate(charge, transactionDate);
                 transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
             }
