@@ -60,7 +60,7 @@ bool StrDate::isYear(string & part) {
     StrDate today;
 
     if (part.length() == 4) {
-        for (int i = 0;i < part.length();i++) {
+        for (int i = 0;i < (int)part.length();i++) {
             if (!isdigit(part[i])) {
                 throw pfm_validation_error("Invalid date format");
             }
@@ -206,7 +206,7 @@ string StrDate::getTimestamp(bool includeus) {
             localTime->tm_hour,
             localTime->tm_min,
             localTime->tm_sec,
-            tv.tv_usec);
+            (int)tv.tv_usec);
     }
     else {
         snprintf(

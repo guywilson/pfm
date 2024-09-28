@@ -30,7 +30,7 @@ Money::Money(const char * amount) {
 int Money::findDecimalPointPos(const char * amount) {
     int decimalPointPos = DECIMAL_POINT_NOT_FOUND_VALUE;
 
-    for (int i = 0;i < strlen(amount);i++) {
+    for (int i = 0;i < (int)strlen(amount);i++) {
         if (amount[i] == '.') {
             decimalPointPos = i;
             break;
@@ -55,7 +55,7 @@ void Money::copyAfterDecimalPoint(char * targetBuffer, const char * amount, int 
     int decimalPointPos = findDecimalPointPos(amount);
 
     int j = 0;
-    for (int i = decimalPointPos + 1;i < strlen(amount) && j < (targetBufferLen - 1);i++) {
+    for (int i = decimalPointPos + 1;i < (int)strlen(amount) && j < (targetBufferLen - 1);i++) {
         targetBuffer[j++] = amount[i];
     }
 

@@ -51,7 +51,7 @@ class CLIField : public CLIWidget {
         string label;
 
         string makeUpperCase(string s) {
-            for (int i = 0;i < s.length();i++) {
+            for (int i = 0;i < (int)s.length();i++) {
                 s[i] = (char)toupper(s.at(i));
             }
 
@@ -273,7 +273,7 @@ class CLISpinTextField : public CLITextField {
             clear();
 
             if (items.size() > 0) {
-                for (int i = 0;i < items.size();i++) {
+                for (int i = 0;i < (int)items.size();i++) {
                     add_history(items[i].c_str());
                 }
             }
@@ -376,7 +376,7 @@ class CLIListColumn : public CLIField {
             this->width = width;
             this->align = align;
 
-            if ((width + 2) < strlen(name)) {
+            if ((width + 2) < (int)strlen(name)) {
                 throw pfm_error("Column name is too long for specified width");
             }
         }
@@ -385,7 +385,7 @@ class CLIListColumn : public CLIField {
             this->width = width;
             this->align = align;
 
-            if ((width + 2) < name.length()) {
+            if ((width + 2) < (int)name.length()) {
                 throw pfm_error("Column name is too long for specified width");
             }
         }
@@ -413,7 +413,7 @@ class CLIListColumn : public CLIField {
                 v = v.substr(1);
             }
 
-            if (width < v.length()) {
+            if (width < (int)v.length()) {
                 v = v.substr(0, width - 3);
                 v = v.append("...");
             }
@@ -628,7 +628,7 @@ class CLIListView : public CLIView {
 
             headerRow.showHeaderRow();
 
-            for (int i = 0;i < dataRows.size();i++) {
+            for (int i = 0;i < (int)dataRows.size();i++) {
                 dataRows[i].show();
             }
 
