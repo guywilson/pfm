@@ -150,13 +150,13 @@ void DBAccount::createCarriedOverLogs() {
         }
 
         while (co.date < periodStartDate) {
-            DBCarriedOver newCO(co);
-
             StrDate firstDate(co.date.year(), co.date.month(), 1);
             StrDate secondDate(co.date.year(), co.date.month(), co.date.daysInMonth());
 
             DBTransactionView tr;
             DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, firstDate, secondDate);
+
+            DBCarriedOver newCO(co);
 
             for (int i = 0;i < transactionResult.getNumRows();i++) {
                 DBTransaction transaction = transactionResult.getResultAt(i);
