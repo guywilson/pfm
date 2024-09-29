@@ -30,7 +30,18 @@
 using namespace std;
 
 void Command::help() {
+    const char * helpText = 
+        "PFM supports the following commands, each command also has a short version\n" \
+        "which you can use for convenience:\n" \
+        "\tadd-account, aa\n" \
+        "\tlist-accounts, la\n" \
+        "\tupdate-account <account code>, ua <account code>\n" \
+        "\tdelete-account <account code>, da <account code>\n" \
+        "\timport-accounts <filename (JSON)>\n" \
+        "\t\n" \
+        "\n";
 
+    cout << helpText;
 }
 
 void Command::version() {
@@ -97,6 +108,19 @@ void Command::showAccountBalances(DBAccount & account) {
 
     cout << "Current balance:     " << right << setw(13) << account.currentBalance.getFormattedStringValue() << endl;
     cout << "Balance after bills: " << right << setw(13) << balanceAfterBills.getFormattedStringValue() << endl;
+}
+
+void Command::importAccounts(string & jsonFileName) {
+    JFile jfile = JFile(jsonFileName, "DBAccount");
+
+    vector<JRecord> records = jfile.readRecords("accounts");
+
+    for (JRecord & record : records) {
+        DBAccount account;
+
+        account.set(record);
+        account.save();
+    }
 }
 
 void Command::addCategory() {
@@ -599,6 +623,9 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
     else if (isCommand("show-balance") || isCommand("sb")) {
         return pfm_cmd_account_balance;
     }
+    else if (isCommand("import-accounts") || isCommand("ia")) {
+        return pfm_cmd_account_import;
+    }
     else if (isCommand("add-category") || isCommand("ac")) {
         return pfm_cmd_category_add;
     }
@@ -731,6 +758,10 @@ bool Command::process(string & command) {
 
         selectedAccount.remove();
         selectedAccount.clear();
+    }
+    else if (cmd == pfm_cmd_account_import) {
+        string filename = getCommandParameter();
+        importAccounts(filename);
     }
     else if (cmd == pfm_cmd_category_add) {
         addCategory();

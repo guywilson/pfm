@@ -88,6 +88,14 @@ class DBAccount : public DBEntity {
             this->currentBalance =  src.currentBalance;
         }
 
+        void set(JRecord & record) {
+            this->code = record.get("code");
+            this->name = record.get("name");
+            this->openingDate = record.get("openingDate");
+            this->openingBalance = record.get("openingBalance");
+            this->currentBalance = record.get("currentBalance");
+        }
+
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             

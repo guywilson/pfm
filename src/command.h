@@ -28,6 +28,7 @@ class Command {
             pfm_cmd_account_update,
             pfm_cmd_account_delete,
             pfm_cmd_account_balance,
+            pfm_cmd_account_import,
             pfm_cmd_category_add,
             pfm_cmd_category_list,
             pfm_cmd_category_update,
@@ -93,6 +94,7 @@ class Command {
         void chooseAccount(string & accountCode);
         void updateAccount();
         void showAccountBalances(DBAccount & account);
+        void importAccounts(string & jsonFileName);
 
         void addCategory();
         void listCategories();
