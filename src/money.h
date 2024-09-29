@@ -10,7 +10,7 @@ using namespace std;
 #define __INCL_MONEY
 
 #define DECIMAL_POINT_NOT_FOUND_VALUE               -1
-#define AMOUNT_BUFFER_LENGTH                        16
+#define AMOUNT_BUFFER_LENGTH                        64
 
 typedef int32_t money_t;
 

@@ -18,6 +18,8 @@ using namespace std;
 #ifndef __INCL_DB_BASE
 #define __INCL_DB_BASE
 
+#define LIMIT_BUFFER_LEN                    32
+
 template <class T> class DBResult;
 
 class DBEntity {

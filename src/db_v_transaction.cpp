@@ -47,9 +47,9 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t acco
         (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
 
     if (rowLimit > 0) {
-        char szLimit[16];
+        char szLimit[LIMIT_BUFFER_LEN];
 
-        snprintf(szLimit, 16, " LIMIT %d;", rowLimit);
+        snprintf(szLimit, LIMIT_BUFFER_LEN, " LIMIT %d;", rowLimit);
         strcat(szStatement, szLimit);
     }
     else {

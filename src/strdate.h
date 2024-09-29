@@ -10,8 +10,8 @@ using namespace std;
 #ifndef __INCL_STRDATE
 #define __INCL_STRDATE
 
-#define TIME_STAMP_BUFFER_LEN               32
-#define DATE_STAMP_BUFFER_LEN               12
+#define TIME_STAMP_BUFFER_LEN               64
+#define DATE_STAMP_BUFFER_LEN               32
 #define DATE_STRING_LENGTH                  10
 
 class StrDate {

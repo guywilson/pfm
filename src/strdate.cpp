@@ -199,7 +199,7 @@ string StrDate::getTimestamp(bool includeus) {
         snprintf(
             now, 
             TIME_STAMP_BUFFER_LEN, 
-            "%d-%02d-%02d %02d:%02d:%02d.%d", 
+            "%04d-%02d-%02d %02d:%02d:%02d.%d", 
             localTime->tm_year + 1900, 
             localTime->tm_mon + 1, 
             localTime->tm_mday,
@@ -212,7 +212,7 @@ string StrDate::getTimestamp(bool includeus) {
         snprintf(
             now, 
             TIME_STAMP_BUFFER_LEN, 
-            "%d-%02d-%02d %02d:%02d:%02d", 
+            "%04d-%02d-%02d %02d:%02d:%02d", 
             localTime->tm_year + 1900, 
             localTime->tm_mon + 1, 
             localTime->tm_mday,
