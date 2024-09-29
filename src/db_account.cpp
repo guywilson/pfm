@@ -133,7 +133,7 @@ void DBAccount::beforeUpdate() {
             DBResult<DBTransaction> trResult = tr.retrieveByRecurringChargeID(charge.id);
 
             for (int j = 0;j < trResult.getNumRows();j++) {
-                DBTransaction transaction = trResult.getResultAt(i);
+                DBTransaction transaction = trResult.getResultAt(j);
                 transaction.remove();
             }
         }
