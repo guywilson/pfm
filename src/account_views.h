@@ -169,8 +169,8 @@ class UpdateAccountView : public CLIView {
 
             account.name = nameField.getValue();
             account.code = codeField.getValue();
+            account.openingDate = openingDateField.getValue();
             account.openingBalance = openingBalanceField.getValue();
-            account.currentBalance = openingBalanceField.getValue();
 
             if (account.code.length() == 0) {
                 throw pfm_error("Account code must have a value");

@@ -101,6 +101,8 @@ void Command::updateAccount() {
     DBAccount updatedAccount = view.getAccount();
 
     updatedAccount.save();
+
+    selectedAccount = updatedAccount;
 }
 
 void Command::showAccountBalances(DBAccount & account) {
