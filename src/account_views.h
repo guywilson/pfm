@@ -120,8 +120,8 @@ class UpdateAccountView : public CLIView {
 
         CLITextField nameField;
         CLITextField codeField;
+        DateField openingDateField;
         CLICurrencyField openingBalanceField;
-        CLICurrencyField currentBalanceField;
 
     public:
         UpdateAccountView() : UpdateAccountView("Update account") {}
@@ -143,13 +143,14 @@ class UpdateAccountView : public CLIView {
             codeField.setDefaultValue(account.code);
             codeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
 
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening date ['%s']: ", account.openingDate.shortDate().c_str());
+            openingDateField.setLabel(szPrompt);
+            openingDateField.setDefaultValue(account.openingDate.shortDate());
+            openingDateField.setLengthLimit(DATE_FIELD_LENGTH);
+
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%s]: ", account.openingBalance.getRawStringValue().c_str());
             openingBalanceField.setLabel(szPrompt);
             openingBalanceField.setDefaultValue(account.openingBalance.getRawStringValue());
-
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Current balance [%s]: ", account.currentBalance.getRawStringValue().c_str());
-            currentBalanceField.setLabel(szPrompt);
-            currentBalanceField.setDefaultValue(account.currentBalance.getRawStringValue());
         }
 
         void show() override {
@@ -157,8 +158,8 @@ class UpdateAccountView : public CLIView {
 
             nameField.show();
             codeField.show();
+            openingDateField.show();
             openingBalanceField.show();
-            currentBalanceField.show();
         }
 
         DBAccount getAccount() {

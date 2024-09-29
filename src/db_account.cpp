@@ -91,7 +91,7 @@ void DBAccount::createRecurringTransactions() {
                 if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
                     cout << "| " << transactionDate.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;
                 }
-                
+
                 transaction.createFromRecurringChargeAndDate(charge, transactionDate);
                 transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
             }
@@ -122,6 +122,23 @@ void DBAccount::beforeUpdate() {
             DBCarriedOver carriedOver = coResult.getResultAt(i);
             carriedOver.remove();
         }
+
+        DBRecurringChargeView ch;
+        DBResult<DBRecurringChargeView> chResult = ch.retrieveByAccountID(id);
+
+        for (int i = 0;i < chResult.getNumRows();i++) {
+            DBRecurringCharge charge = chResult.getResultAt(i);
+
+            DBTransaction tr;
+            DBResult<DBTransaction> trResult = tr.retrieveByRecurringChargeID(charge.id);
+
+            for (int j = 0;j < trResult.getNumRows();j++) {
+                DBTransaction transaction = trResult.getResultAt(i);
+                transaction.remove();
+            }
+        }
+
+        currentBalance = openingBalance;
     }
 }
 
