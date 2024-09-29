@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdint.h>
 
+#include "logger.h"
 #include "money.h"
 
 using namespace std;
@@ -43,12 +44,16 @@ int Money::findDecimalPointPos(const char * amount) {
 void Money::copyToDecimalPoint(char * targetBuffer, const char * amount, int targetBufferLen) {
     int decimalPointPos = findDecimalPointPos(amount);
 
+    if (decimalPointPos > (targetBufferLen - 1)) {
+        decimalPointPos = (targetBufferLen - 1);
+    }
+
     int i;
-    for (i = 0;i < decimalPointPos && i < (targetBufferLen - 1);i++) {
+    for (i = 0;i < decimalPointPos;i++) {
         targetBuffer[i] = amount[i];
     }
 
-    targetBuffer[i + 1] = 0;
+    targetBuffer[i] = 0;
 }
 
 void Money::copyAfterDecimalPoint(char * targetBuffer, const char * amount, int targetBufferLen) {
@@ -90,6 +95,8 @@ money_t Money::_getValue() const {
 money_t Money::getWholeValueFromString(const char * amount) {
     int decimalPointPos = findDecimalPointPos(amount);
 
+    log.logInfo("Money::getWholeValue(%s), decimal index %d", amount, decimalPointPos);
+    
     money_t whole;
 
     if (decimalPointPos == DECIMAL_POINT_NOT_FOUND_VALUE) {
@@ -99,8 +106,11 @@ money_t Money::getWholeValueFromString(const char * amount) {
         char buffer[AMOUNT_BUFFER_LENGTH];
 
         copyToDecimalPoint(buffer, amount, AMOUNT_BUFFER_LENGTH);
+        log.logInfo("Got whole number buffer '%s'", buffer);
         whole = (money_t)strtol(buffer, NULL, 10);
     }
+
+    log.logInfo("Money::getWholeValue() = %u", whole);
 
     return whole;
 }
@@ -108,6 +118,8 @@ money_t Money::getWholeValueFromString(const char * amount) {
 money_t Money::getDecimalValueFromString(const char * amount) {
     int decimalPointPos = findDecimalPointPos(amount);
 
+    log.logDebug("Money::getDecimalValue(%s), decimal index %d", amount, decimalPointPos);
+    
     money_t decimal;
 
     if (decimalPointPos == DECIMAL_POINT_NOT_FOUND_VALUE) {
@@ -119,6 +131,8 @@ money_t Money::getDecimalValueFromString(const char * amount) {
         copyAfterDecimalPoint(buffer, amount, AMOUNT_BUFFER_LENGTH);
         decimal = (money_t)strtol(buffer, NULL, 10);
     }
+
+    log.logDebug("Money::getDecimalValue() = %u", decimal);
 
     return decimal;
 }

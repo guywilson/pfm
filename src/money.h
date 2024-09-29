@@ -2,6 +2,7 @@
 #include <string>
 #include <stdint.h>
 
+#include "logger.h"
 #include "pfm_error.h"
 
 using namespace std;
@@ -23,6 +24,8 @@ class Money {
     private:
         money_t representedValue;
 
+        Logger & log = Logger::getInstance();
+        
         int findDecimalPointPos(const char * amount);
         void copyToDecimalPoint(char * targetBuffer, const char * amount, int targetBufferLen);
         void copyAfterDecimalPoint(char * targetBuffer, const char * amount, int tragetBufferLen);

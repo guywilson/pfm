@@ -3,6 +3,7 @@
 #include <time.h>
 #include <sys/time.h>
 
+#include "logger.h"
 #include "pfm_error.h"
 
 using namespace std;
@@ -18,6 +19,8 @@ class StrDate {
     private:
         string _date;
 
+        Logger & log = Logger::getInstance();
+        
         class YMD {
             public:
                 unsigned int year;
