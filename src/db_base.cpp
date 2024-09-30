@@ -111,6 +111,27 @@ void DBEntity::remove() {
     log.logExit("DBEntity::remove()");
 }
 
+void DBEntity::remove(const char * statement) {
+    Logger & log = Logger::getInstance();
+    
+    log.logEntry("DBEntity::remove()");
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    db.begin();
+
+    beforeRemove();
+
+    log.logDebug("Executing DELETE statement '%s'", statement);
+    db.executeDelete(statement);
+
+    afterRemove();
+
+    db.commit();
+
+    log.logExit("DBEntity::remove()");
+}
+
 void DBEntity::save() {
     Logger & log = Logger::getInstance();
     

@@ -173,6 +173,9 @@ class DBTransaction : public DBPayment {
         const char * sqlDelete = 
                         "DELETE FROM account_transaction WHERE id = %lld;";
 
+        const char * sqlDeleteByRecurringCharge = 
+                        "DELETE FROM account_transaction WHERE recurringCharge_id = %lld;";
+
         DBResult<DBTransaction> retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
     public:
@@ -373,6 +376,8 @@ class DBTransaction : public DBPayment {
 
         int findLatestByRecurringChargeID(pfm_id_t chargeId);
         int createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate);
+
+        void deleteByRecurringChargeId(pfm_id_t recurringChargeId);
 
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);

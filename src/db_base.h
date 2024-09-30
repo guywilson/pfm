@@ -102,6 +102,7 @@ class DBEntity {
         }
 
         void remove();
+        void remove(const char * statement);
         void save();
         void retrieve();
         void retrieve(pfm_id_t id);

@@ -132,12 +132,7 @@ void DBAccount::beforeUpdate() {
             DBRecurringCharge charge = chResult.getResultAt(i);
 
             DBTransaction tr;
-            DBResult<DBTransaction> trResult = tr.retrieveByRecurringChargeID(charge.id);
-
-            for (int j = 0;j < trResult.getNumRows();j++) {
-                DBTransaction transaction = trResult.getResultAt(j);
-                transaction.remove();
-            }
+            tr.deleteByRecurringChargeId(charge.id);
         }
 
         currentBalance = openingBalance;

@@ -323,3 +323,15 @@ void DBTransaction::afterRemove() {
 
     log.logExit("DBTransaction::afterRemove()");
 }
+
+void DBTransaction::deleteByRecurringChargeId(pfm_id_t recurringChargeId) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlDeleteByRecurringCharge, 
+        recurringChargeId);
+
+    remove(szStatement);
+}
