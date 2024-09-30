@@ -18,9 +18,10 @@ using namespace std;
 class StrDate {
     private:
         string _date;
+        const string _nullDate = "N/A";
 
         Logger & log = Logger::getInstance();
-        
+
         class YMD {
             public:
                 unsigned int year;
@@ -67,6 +68,8 @@ class StrDate {
 
         void clear();
         
+        bool isNull();
+
         static string today();
         static string getTimestamp();
         static string getTimestampToMicrosecond();

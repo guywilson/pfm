@@ -73,7 +73,7 @@ class CLIField : public CLIWidget {
         }
 
         bool containsUpdate(string & fieldValue) {
-            return doesExistInString(fieldValue, "UPDATE ");
+            return doesExistInString(fieldValue, " UPDATE ");
         }
 
         bool containsDelete(string & fieldValue) {
@@ -81,19 +81,19 @@ class CLIField : public CLIWidget {
         }
 
         bool containsJoin(string & fieldValue) {
-            return doesExistInString(fieldValue, "JOIN ");
+            return doesExistInString(fieldValue, " JOIN ");
         }
 
         bool containsOr(string & fieldValue) {
-            return doesExistInString(fieldValue, "OR ");
+            return doesExistInString(fieldValue, " OR ");
         }
 
         bool containsDrop(string & fieldValue) {
-            return doesExistInString(fieldValue, "DROP ");
+            return doesExistInString(fieldValue, " DROP ");
         }
 
         bool containsAlter(string & fieldValue) {
-            return doesExistInString(fieldValue, "ALTER ");
+            return doesExistInString(fieldValue, " ALTER ");
         }
 
     protected:

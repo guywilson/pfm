@@ -159,6 +159,14 @@ class DBRecurringCharge : public DBPayment {
             setNextPaymentDate();
         }
 
+        bool isActive() {
+            StrDate today;
+
+            return (endDate.isNull() || (!endDate.isNull() && endDate >= today));
+        }
+
+        void beforeUpdate() override;
+        
         int getFrequencyValue();
         char getFrequencyUnit();
 

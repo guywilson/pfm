@@ -64,36 +64,38 @@ void DBAccount::createRecurringTransactions() {
         for (int i = 0;i < chargeResult.getNumRows();i++) {
             DBRecurringChargeView charge = chargeResult.getResultAt(i);
 
-            DBTransaction transaction;
-            int numRows = transaction.findLatestByRecurringChargeID(charge.id);
+            if (charge.isActive()) {
+                DBTransaction transaction;
+                int numRows = transaction.findLatestByRecurringChargeID(charge.id);
 
-            if (numRows == 0) {
-                log.logDebug("Found no exisiting transactions for charge %lld", charge.id);
+                if (numRows == 0) {
+                    log.logDebug("Found no exisiting transactions for charge %lld", charge.id);
 
-                if (charge.date < openingDate) {
-                    transactionDate = charge.date;
+                    if (charge.date < openingDate) {
+                        transactionDate = charge.date;
 
-                    while (transactionDate < openingDate) {
-                        transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
+                        while (transactionDate < openingDate) {
+                            transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
+                        }
+                    }
+                    else {
+                        transactionDate = charge.date;
                     }
                 }
                 else {
-                    transactionDate = charge.date;
-                }
-            }
-            else {
-                log.logDebug("Found latest transactions for charge %lld with date '%s'", charge.id, transaction.date.shortDate().c_str());
-                
-                transactionDate = charge.getNextRecurringTransactionDate(transaction.date);
-            }
-
-            while (transactionDate <= dateToday) {
-                if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
-                    cout << "| " << transactionDate.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;
+                    log.logDebug("Found latest transactions for charge %lld with date '%s'", charge.id, transaction.date.shortDate().c_str());
+                    
+                    transactionDate = charge.getNextRecurringTransactionDate(transaction.date);
                 }
 
-                transaction.createFromRecurringChargeAndDate(charge, transactionDate);
-                transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
+                while (transactionDate <= dateToday) {
+                    if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
+                        cout << "| " << transactionDate.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;
+                    }
+
+                    transaction.createFromRecurringChargeAndDate(charge, transactionDate);
+                    transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
+                }
             }
         }
 

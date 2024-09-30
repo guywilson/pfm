@@ -326,7 +326,7 @@ void StrDate::set(const string & date) {
 }
 
 void StrDate::set(const char * date) {
-    if (strncmp(date, "N/A", 3) == 0) {
+    if (strncmp(date, _nullDate.c_str(), 3) == 0) {
         clear();
     }
     else if (strlen(date) > 0) {
@@ -361,7 +361,11 @@ void StrDate::set(StrDate::YMD & date) {
 }
 
 void StrDate::clear() {
-    set(EPOCH_YEAR, EPOCH_MONTH, EPOCH_DAY);
+    this->_date = _nullDate;
+}
+
+bool StrDate::isNull() {
+    return (_date.compare(_nullDate) == 0 ? true : false);
 }
 
 time_t StrDate::epoch() {

@@ -191,3 +191,27 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
 void DBRecurringCharge::setNextPaymentDate() {
     this->nextPaymentDate = calculateNextPaymentDate();
 }
+
+void DBRecurringCharge::beforeUpdate() {
+    DBRecurringCharge currentCharge;
+    currentCharge.id = this->id;
+    currentCharge.retrieve();
+
+    if (this->description.compare(currentCharge.description) || 
+        this->categoryId != currentCharge.categoryId ||
+        this->payeeId != currentCharge.payeeId)
+    {
+        DBTransaction tr;
+        DBResult<DBTransaction> trResult = tr.retrieveByRecurringChargeID(id);
+
+        for (int i = 0;i < trResult.getNumRows();i++) {
+            DBTransaction transaction = trResult.getResultAt(i);
+
+            transaction.description = this->description;
+            transaction.categoryId = this->categoryId;
+            transaction.payeeId = this->payeeId;
+
+            transaction.save();
+        }
+    }
+}
