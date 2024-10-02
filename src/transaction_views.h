@@ -211,7 +211,7 @@ class UpdateTransactionView : public CLIView {
             char szPrompt[MAX_PROMPT_LENGTH];
 
             transaction.retrieve();
-            
+
             transactionId = transaction.id;
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category ['%s']: ", transaction.category.code.c_str());
@@ -283,6 +283,7 @@ class FindTransactionByPayeeView : public CLIFindView {
         PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
         DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+        CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
 
     public:
         FindTransactionByPayeeView() : FindTransactionByPayeeView("Find transaction (by payee)") {}
@@ -298,6 +299,7 @@ class FindTransactionByPayeeView : public CLIFindView {
             payeeField.show();
             afterDateField.show();
             beforeDateField.show();
+            recurringIncludeType.show();
         }
 
         string getCriteria() override {
@@ -316,6 +318,23 @@ class FindTransactionByPayeeView : public CLIFindView {
             if (beforeDateField.getValue().length() > 0) {
                 criteria += " AND date <= '" + beforeDateField.getValue() + "'";
             }
+
+            if (recurringIncludeType.getValue().length() > 0) {
+                if (recurringIncludeType.getValue().compare("only") == 0) {
+                    criteria += " AND recurring_charge_id <> 0";
+                }
+                else if (recurringIncludeType.getValue().compare("no") == 0) {
+                    criteria += " AND recurring_charge_id = 0";
+                }
+                else if (recurringIncludeType.getValue().compare("yes") == 0) {
+                }
+                else {
+                    throw pfm_validation_error(
+                                pfm_error::buildMsg(
+                                    "Invalid recurring include type '%s'", 
+                                    recurringIncludeType.getValue().c_str()));
+                }
+            }
             
             return criteria;
         }
@@ -326,6 +345,7 @@ class FindTransactionByCategoryView : public CLIFindView {
         CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
         DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+        CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
 
     public:
         FindTransactionByCategoryView() : FindTransactionByCategoryView("Find transaction (by category)") {}
@@ -341,6 +361,7 @@ class FindTransactionByCategoryView : public CLIFindView {
             categoryField.show();
             afterDateField.show();
             beforeDateField.show();
+            recurringIncludeType.show();
         }
 
         string getCriteria() override {
@@ -360,6 +381,23 @@ class FindTransactionByCategoryView : public CLIFindView {
                 criteria += " AND date <= '" + beforeDateField.getValue() + "'";
             }
 
+            if (recurringIncludeType.getValue().length() > 0) {
+                if (recurringIncludeType.getValue().compare("only") == 0) {
+                    criteria += " AND recurring_charge_id <> 0";
+                }
+                else if (recurringIncludeType.getValue().compare("no") == 0) {
+                    criteria += " AND recurring_charge_id = 0";
+                }
+                else if (recurringIncludeType.getValue().compare("yes") == 0) {
+                }
+                else {
+                    throw pfm_validation_error(
+                                pfm_error::buildMsg(
+                                    "Invalid recurring include type '%s'", 
+                                    recurringIncludeType.getValue().c_str()));
+                }
+            }
+            
             return criteria;
         }
 };
@@ -369,6 +407,7 @@ class FindTransactionByDescriptionView : public CLIFindView {
         CLITextField descriptionField = CLITextField("Transaction description: ");
         DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+        CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
 
     public:
         FindTransactionByDescriptionView() : FindTransactionByDescriptionView("Find transaction (by description)") {}
@@ -384,6 +423,7 @@ class FindTransactionByDescriptionView : public CLIFindView {
             descriptionField.show();
             afterDateField.show();
             beforeDateField.show();
+            recurringIncludeType.show();
         }
 
         string getCriteria() override {
@@ -401,6 +441,23 @@ class FindTransactionByDescriptionView : public CLIFindView {
                 criteria += " AND date <= '" + beforeDateField.getValue() + "'";
             }
             
+            if (recurringIncludeType.getValue().length() > 0) {
+                if (recurringIncludeType.getValue().compare("only") == 0) {
+                    criteria += " AND recurring_charge_id <> 0";
+                }
+                else if (recurringIncludeType.getValue().compare("no") == 0) {
+                    criteria += " AND recurring_charge_id = 0";
+                }
+                else if (recurringIncludeType.getValue().compare("yes") == 0) {
+                }
+                else {
+                    throw pfm_validation_error(
+                                pfm_error::buildMsg(
+                                    "Invalid recurring include type '%s'", 
+                                    recurringIncludeType.getValue().c_str()));
+                }
+            }
+            
             return criteria;
         }
 };
@@ -409,6 +466,7 @@ class FindTransactionByDateView : public CLIFindView {
     private:
         DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+        CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
 
     public:
         FindTransactionByDateView() : FindTransactionByDateView("Find transaction (by date)") {}
@@ -423,6 +481,7 @@ class FindTransactionByDateView : public CLIFindView {
 
             afterDateField.show();
             beforeDateField.show();
+            recurringIncludeType.show();
         }
 
         string getCriteria() override {
@@ -440,6 +499,23 @@ class FindTransactionByDateView : public CLIFindView {
                 criteria += " date <= '" + beforeDateField.getValue() + "'";
             }
 
+            if (recurringIncludeType.getValue().length() > 0) {
+                if (recurringIncludeType.getValue().compare("only") == 0) {
+                    criteria += " AND recurring_charge_id <> 0";
+                }
+                else if (recurringIncludeType.getValue().compare("no") == 0) {
+                    criteria += " AND recurring_charge_id = 0";
+                }
+                else if (recurringIncludeType.getValue().compare("yes") == 0) {
+                }
+                else {
+                    throw pfm_validation_error(
+                                pfm_error::buildMsg(
+                                    "Invalid recurring include type '%s'", 
+                                    recurringIncludeType.getValue().c_str()));
+                }
+            }
+            
             return criteria;
         }
 };
