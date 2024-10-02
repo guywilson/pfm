@@ -210,6 +210,8 @@ class UpdateTransactionView : public CLIView {
         void setTransaction(DBTransaction & transaction) {
             char szPrompt[MAX_PROMPT_LENGTH];
 
+            transaction.retrieve();
+            
             transactionId = transaction.id;
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category ['%s']: ", transaction.category.code.c_str());

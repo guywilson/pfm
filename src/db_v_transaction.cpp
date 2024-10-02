@@ -47,9 +47,35 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t acco
         (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
 
     if (rowLimit > 0) {
-        char szLimit[LIMIT_BUFFER_LEN];
+        char szLimit[LIMIT_CLAUSE_BUFFER_LEN];
 
-        snprintf(szLimit, LIMIT_BUFFER_LEN, " LIMIT %d;", rowLimit);
+        snprintf(szLimit, LIMIT_CLAUSE_BUFFER_LEN, " LIMIT %d;", rowLimit);
+        strcat(szStatement, szLimit);
+    }
+    else {
+        strcat(szStatement, ";");
+    }
+
+    result.retrieve(szStatement);
+
+    return result;
+}
+
+DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBTransactionView> result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlSelectNonRecurringByAccountIDSortedByDate, 
+        accountId,
+        (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
+
+    if (rowLimit > 0) {
+        char szLimit[LIMIT_CLAUSE_BUFFER_LEN];
+
+        snprintf(szLimit, LIMIT_CLAUSE_BUFFER_LEN, " LIMIT %d;", rowLimit);
         strcat(szStatement, szLimit);
     }
     else {

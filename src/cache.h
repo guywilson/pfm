@@ -34,6 +34,18 @@ class CacheMgr {
     public:
         ~CacheMgr() {}
 
+        void clearRecurringCharges() {
+            recurringChargeBySequence.clear();
+        }
+
+        void clearTransactions() {
+            transactionBySequence.clear();
+        }
+
+        void clearBudgets() {
+            budgetBySequence.clear();
+        }
+
         void addRecurringCharge(int sequence, DBRecurringCharge & charge) {
             recurringChargeBySequence.insert({sequence, charge});
         }

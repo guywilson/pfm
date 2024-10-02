@@ -334,17 +334,26 @@ void Command::addTransaction() {
     transaction.save();
 }
 
-void Command::listTransactions() {
+void Command::listTransactions(bool isOnlyNonRecurring) {
     checkAccountSelected();
 
     DBTransactionView transactionInstance;
-    DBResult<DBTransactionView> result = transactionInstance.retrieveByAccountID(selectedAccount.id, sort_ascending, 0);
+    DBResult<DBTransactionView> result;
+
+    if (isOnlyNonRecurring) {
+        result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sort_descending, 0);
+    }
+    else {
+        result = transactionInstance.retrieveByAccountID(selectedAccount.id, sort_descending, 0);
+    }
 
     TransactionListView view;
     view.addResults(result, selectedAccount.code);
     view.show();
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    cacheMgr.clearTransactions();
 
     for (int i = 0;i < result.getNumRows();i++) {
         DBTransaction transaction = result.getResultAt(i);
@@ -407,6 +416,8 @@ void Command::findTransactions() {
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
+    cacheMgr.clearTransactions();
+    
     for (int i = 0;i < result.getNumRows();i++) {
         DBTransaction transaction = result.getResultAt(i);
         cacheMgr.addTransaction(transaction.sequence, transaction);
@@ -835,7 +846,8 @@ bool Command::process(string & command) {
         addTransaction();
     }
     else if (cmd == pfm_cmd_transaction_list) {
-        listTransactions();
+        string nonRecurringTransactions = getCommandParameter();
+        listTransactions(nonRecurringTransactions.compare("nrt") == 0 ? true : false);
     }
     else if (cmd == pfm_cmd_transaction_find) {
         findTransactions();

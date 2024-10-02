@@ -118,7 +118,7 @@ class Command {
         void importRecurringCharges(string & jsonFileName);
 
         void addTransaction();
-        void listTransactions();
+        void listTransactions(bool isOnlyNonRecurring);
         void findTransactions();
         DBTransaction getTransaction(int sequence);
         void updateTransaction(DBTransaction & transaction);

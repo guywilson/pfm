@@ -55,13 +55,33 @@ class DBTransactionView : public DBTransaction {
                         "WHERE account_id = %lld " \
                         "ORDER BY date %s";
 
+        const char * sqlSelectNonRecurringByAccountIDSortedByDate = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_code," \
+                        "payee_code," \
+                        "recurring_charge_id," \
+                        "date," \
+                        "reference," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM v_transaction_list " \
+                        "WHERE account_id = %lld " \
+                        "AND recurring_charge_id = 0 " \
+                        "ORDER BY date %s";
+
         const char * sqlSelectByAccountIDBetweenDates = 
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "recurring_charge_id," \
                         "category_code," \
                         "payee_code," \
+                        "recurring_charge_id," \
                         "date," \
                         "reference," \
                         "description," \
@@ -81,6 +101,7 @@ class DBTransactionView : public DBTransaction {
                         "account_id," \
                         "category_code," \
                         "payee_code," \
+                        "recurring_charge_id," \
                         "date," \
                         "reference," \
                         "description," \
@@ -147,6 +168,7 @@ class DBTransactionView : public DBTransaction {
 
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
+        DBResult<DBTransactionView> retrieveNonRecurringByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
         DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t accountId, string & criteria);
