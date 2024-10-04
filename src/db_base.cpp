@@ -97,16 +97,24 @@ void DBEntity::remove() {
 
     PFM_DB & db = PFM_DB::getInstance();
 
-    db.begin();
+    try {
+        db.begin();
 
-    beforeRemove();
+        beforeRemove();
 
-    log.logDebug("Executing DELETE statement '%s'", statement);
-    db.executeDelete(statement);
+        log.logDebug("Executing DELETE statement '%s'", statement);
+        db.executeDelete(statement);
 
-    afterRemove();
+        afterRemove();
 
-    db.commit();
+        db.commit();
+    }
+    catch (pfm_error & e) {
+        db.rollback();
+        log.logError("Failed to remove entity with id: %lld", id);
+
+        throw e;
+    }
 
     log.logExit("DBEntity::remove()");
 }
@@ -118,12 +126,20 @@ void DBEntity::remove(const char * statement) {
 
     PFM_DB & db = PFM_DB::getInstance();
 
-    db.begin();
+    try {
+        db.begin();
 
-    log.logDebug("Executing DELETE statement '%s'", statement);
-    db.executeDelete(statement);
+        log.logDebug("Executing DELETE statement '%s'", statement);
+        db.executeDelete(statement);
 
-    db.commit();
+        db.commit();
+    }
+    catch (pfm_error & e) {
+        db.rollback();
+        log.logError("Failed to remove entities with sql statement '%s'", statement);
+
+        throw e;
+    }
 
     log.logExit("DBEntity::remove()");
 }
