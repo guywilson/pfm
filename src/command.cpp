@@ -323,6 +323,13 @@ void Command::importRecurringCharges(string & jsonFileName) {
     }
 }
 
+void Command::clearRecurringTransactions() {
+    checkAccountSelected();
+
+    DBTransaction tr;
+    tr.deleteAllRecurringTransactionsForAccount(selectedAccount.id);
+}
+
 void Command::addTransaction() {
     checkAccountSelected();
 
@@ -723,6 +730,9 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
     else if (isCommand("list-budget-track-records") || isCommand("lbt")) {
         return pfm_cmd_debug_budget_track;
     }
+    else if (isCommand("clear-recurring-transactions")) {
+        return pfm_cmd_util_clear_recurring_transactions;
+    }
     else if (isCommand("set-logging-level")) {
         return pfm_cmd_logging_level_set;
     }
@@ -895,6 +905,9 @@ bool Command::process(string & command) {
     }
     else if (cmd == pfm_cmd_debug_budget_track) {
         listBudgetTracks();
+    }
+    else if (cmd == pfm_cmd_util_clear_recurring_transactions) {
+        clearRecurringTransactions();
     }
     else if (cmd == pfm_cmd_logging_level_set) {
         string logLevel = getCommandParameter();

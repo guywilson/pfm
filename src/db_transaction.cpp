@@ -335,3 +335,15 @@ void DBTransaction::deleteByRecurringChargeId(pfm_id_t recurringChargeId) {
 
     remove(szStatement);
 }
+
+void DBTransaction::deleteAllRecurringTransactionsForAccount(pfm_id_t accountId) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlDeleteAllRecurringForAccount, 
+        accountId);
+
+    remove(szStatement);
+}

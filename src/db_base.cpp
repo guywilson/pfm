@@ -120,12 +120,8 @@ void DBEntity::remove(const char * statement) {
 
     db.begin();
 
-    beforeRemove();
-
     log.logDebug("Executing DELETE statement '%s'", statement);
     db.executeDelete(statement);
-
-    afterRemove();
 
     db.commit();
 

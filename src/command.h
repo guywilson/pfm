@@ -57,6 +57,7 @@ class Command {
             pfm_cmd_budget_import,
             pfm_cmd_debug_carried_over,
             pfm_cmd_debug_budget_track,
+            pfm_cmd_util_clear_recurring_transactions,
             pfm_cmd_logging_level_set,
             pfm_cmd_logging_level_clear
         }
@@ -116,6 +117,7 @@ class Command {
         void updateRecurringCharge(DBRecurringCharge & charge);
         void deleteRecurringCharge(DBRecurringCharge & charge);
         void importRecurringCharges(string & jsonFileName);
+        void clearRecurringTransactions();
 
         void addTransaction();
         void listTransactions(bool isOnlyNonRecurring);
