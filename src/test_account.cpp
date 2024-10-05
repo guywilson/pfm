@@ -90,7 +90,6 @@ static pfm_id_t createAccount() {
     DBAccount account;
     account.code = "HSBC";
     account.name = "HSBC Current Account";
-    account.currentBalance = 4238.72;
     account.openingBalance = 4238.72;
     account.save();
 

@@ -24,7 +24,6 @@ class DBAccount : public DBEntity {
                         "code," \
                         "opening_date," \
                         "opening_balance," \
-                        "current_balance," \
                         "created," \
                         "updated " \
                         "FROM account " \
@@ -36,10 +35,9 @@ class DBAccount : public DBEntity {
                         "code," \
                         "opening_date," \
                         "opening_balance," \
-                        "current_balance," \
                         "created," \
                         "updated) " \
-                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');";
+                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE account SET " \
@@ -47,7 +45,6 @@ class DBAccount : public DBEntity {
                         "code = '%s'," \
                         "opening_date = '%s'," \
                         "opening_balance = '%s'," \
-                        "current_balance = '%s'," \
                         "updated = '%s' " \
                         "WHERE id = %lld;";
 
@@ -62,7 +59,6 @@ class DBAccount : public DBEntity {
         string                  code;
         StrDate                 openingDate;
         Money                   openingBalance;
-        Money                   currentBalance;
 
         DBAccount() : DBEntity() {
             clear();
@@ -75,7 +71,6 @@ class DBAccount : public DBEntity {
             this->code = "";
             this->openingDate.clear();
             this->openingBalance = 0.0;
-            this->currentBalance = 0.0;
         }
 
         void set(const DBAccount & src) {
@@ -85,7 +80,6 @@ class DBAccount : public DBEntity {
             this->code =            src.code;
             this->openingDate =     src.openingDate;
             this->openingBalance =  src.openingBalance;
-            this->currentBalance =  src.currentBalance;
         }
 
         void set(JRecord & record) {
@@ -93,7 +87,6 @@ class DBAccount : public DBEntity {
             this->name = record.get("name");
             this->openingDate = record.get("openingDate");
             this->openingBalance = record.get("openingBalance");
-            this->currentBalance = record.get("currentBalance");
         }
 
         void assignColumn(DBColumn & column) override {
@@ -111,9 +104,6 @@ class DBAccount : public DBEntity {
             else if (column.getName() == "opening_balance") {
                 openingBalance = column.getDoubleValue();
             }
-            else if (column.getName() == "current_balance") {
-                currentBalance = column.getDoubleValue();
-            }
         }
 
         void print() {
@@ -125,7 +115,6 @@ class DBAccount : public DBEntity {
 
             cout << fixed << setprecision(2);
             cout << "Opening balance: " << openingBalance.getFormattedStringValue() << endl;
-            cout << "Current balance: " << currentBalance.getFormattedStringValue() << endl;
         }
 
         const char * getTableName() override {
@@ -145,7 +134,6 @@ class DBAccount : public DBEntity {
                 code.c_str(),
                 openingDate.shortDate().c_str(),
                 openingBalance.getRawStringValue().c_str(),
-                currentBalance.getRawStringValue().c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -165,7 +153,6 @@ class DBAccount : public DBEntity {
                 code.c_str(),
                 openingDate.shortDate().c_str(),
                 openingBalance.getRawStringValue().c_str(),
-                currentBalance.getRawStringValue().c_str(),
                 now.c_str(),
                 id);
 

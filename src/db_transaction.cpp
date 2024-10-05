@@ -197,12 +197,6 @@ void DBTransaction::afterInsert() {
     Logger & log = Logger::getInstance();
     log.logEntry("DBTransaction::afterInsert()");
 
-    DBAccount account;
-    account.retrieve(accountId);
-
-    account.currentBalance += this->getSignedAmount();
-    account.save();
-
     DBCarriedOver co;
     DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
 
@@ -243,14 +237,6 @@ void DBTransaction::beforeUpdate() {
     ** current balance...
     */
     if (this->getSignedAmount() != transaction.getSignedAmount()) {
-        DBAccount account;
-        account.retrieve(transaction.accountId);
-
-        account.currentBalance -= transaction.getSignedAmount();
-        account.currentBalance += this->getSignedAmount();
-
-        account.save();
-
         DBCarriedOver co;
         DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
 
@@ -288,11 +274,6 @@ void DBTransaction::beforeUpdate() {
 void DBTransaction::afterRemove() {
     Logger & log = Logger::getInstance();
     log.logEntry("DBTransaction::afterRemove()");
-
-    DBAccount account;
-    account.retrieve(accountId);
-    account.currentBalance -= getSignedAmount();
-    account.save();
 
     DBCarriedOver co;
     DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);

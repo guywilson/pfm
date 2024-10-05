@@ -134,8 +134,6 @@ void DBAccount::beforeUpdate() {
             DBTransaction tr;
             tr.deleteByRecurringChargeId(charge.id);
         }
-
-        currentBalance = openingBalance;
     }
 }
 

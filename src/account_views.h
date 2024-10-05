@@ -49,7 +49,6 @@ class AddAccountView : public CLIView {
             account.code = codeField.getValue();
             account.openingDate = openingDateField.getValue();
             account.openingBalance = openingBalanceField.getValue();
-            account.currentBalance = openingBalanceField.getValue();
 
             return account;
         }
@@ -105,9 +104,11 @@ class AccountListView : public CLIListView {
 
                 CLIListRow row(headerRow);
 
+                Money currentBalance = account.calculateCurrentBalance();
+
                 row.addCellValue(account.code);
                 row.addCellValue(account.name);
-                row.addCellValue(account.currentBalance);
+                row.addCellValue(currentBalance);
 
                 addRow(row);
             }
