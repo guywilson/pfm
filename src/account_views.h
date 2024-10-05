@@ -97,6 +97,9 @@ class AccountListView : public CLIListView {
             CLIListColumn column3 = CLIListColumn("Balance", 16, CLIListColumn::rightAligned);
             headerRow.addColumn(column3);
 
+            CLIListColumn column4 = CLIListColumn("After Bills", 16, CLIListColumn::rightAligned);
+            headerRow.addColumn(column4);
+
             addHeaderRow(headerRow);
 
             for (int i = 0;i < result.getNumRows();i++) {
@@ -105,10 +108,12 @@ class AccountListView : public CLIListView {
                 CLIListRow row(headerRow);
 
                 Money currentBalance = account.calculateCurrentBalance();
+                Money balanceAfterBills = account.calculateBalanceAfterBills();
 
                 row.addCellValue(account.code);
                 row.addCellValue(account.name);
                 row.addCellValue(currentBalance);
+                row.addCellValue(balanceAfterBills);
 
                 addRow(row);
             }

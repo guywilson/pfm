@@ -84,8 +84,6 @@ void Command::chooseAccount(string & accountCode) {
     account.retrieveByCode(accountCode);
     account.onUseAccountTrigger();
     
-    showAccountBalances(account);
-    
     selectedAccount = account;
 
     log.logExit("Command::chooseAccount()");
