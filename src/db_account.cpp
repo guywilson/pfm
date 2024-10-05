@@ -139,12 +139,32 @@ void DBAccount::beforeUpdate() {
     }
 }
 
+/*
+** This current implementation is just plain wrong:
+**
+** 1. We're trying to get the latest transaction date (although we're actually
+** getting the earliest), but why?
+** 
+** 2. We then go-ahead and set the balance to the account.openingBalance anyhow
+**
+** What we should be doing (I think):
+**
+** 1. Get the earliest transaction, use it's date to form a start & end date for
+** a transaction retrieve, e.g. (date.year, date.month, 1) to (date.year, date.month, days in month)
+**
+** 2. Take the account.openingBalance and add all the retrieved transactions to it and create the
+** first carriedOverLog from that.
+**
+** 3. Add a month while we're still before today, and create the next carriedOverLog.
+*/
 void DBAccount::createCarriedOverLogs() {
     Logger & log = Logger::getInstance();
     log.logEntry("DBAccount::createCarriedOverLogs()");
 
     StrDate dateToday;
-    StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
+    
+    dateToday.addMonths(-1);
+    StrDate periodEndDate = StrDate(dateToday.year(), dateToday.month(), dateToday.daysInMonth());
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -162,13 +182,13 @@ void DBAccount::createCarriedOverLogs() {
                 return;
             }
             
-            StrDate latestTransactionDate = result.getResultAt(0).date;
+            DBTransaction firstTransaction = result.getResultAt(0);
 
-            co.date = StrDate(latestTransactionDate.year(), latestTransactionDate.month(), 1);
+            co.date = firstTransaction.date;
             co.balance = openingBalance;
         }
 
-        while (co.date < periodStartDate) {
+        while (co.date <= periodEndDate) {
             StrDate firstDate(co.date.year(), co.date.month(), 1);
             StrDate secondDate(co.date.year(), co.date.month(), co.date.daysInMonth());
 
@@ -179,7 +199,6 @@ void DBAccount::createCarriedOverLogs() {
 
             for (int i = 0;i < transactionResult.getNumRows();i++) {
                 DBTransaction transaction = transactionResult.getResultAt(i);
-
                 newCO.balance += transaction.getSignedAmount();
             }
 
@@ -189,10 +208,12 @@ void DBAccount::createCarriedOverLogs() {
             newCO.id = 0;
 
             newCO.accountId = this->id;
-            newCO.date.addMonths(1);
+            newCO.date = secondDate;
             newCO.description = "Carried over (" + newCO.date.shortDate() + ")";
 
             co = newCO;
+            co.date.addMonths(1);
+            co.date = StrDate(co.date.year(), co.date.month(), co.date.daysInMonth());
 
             newCO.save();
         }
@@ -210,6 +231,38 @@ void DBAccount::createCarriedOverLogs() {
     }
 }
 
+Money DBAccount::calculateCurrentBalance() {
+    Logger & log = Logger::getInstance();
+    log.logEntry("DBAccount::calculateCurrentBalance()");
+
+    DBCarriedOver co;
+    co.retrieveLatestByAccountId(this->id);
+
+    Money balance = co.balance;
+
+    try {
+        StrDate dateToday;
+        StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
+
+        DBTransactionView tr;
+        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, periodStartDate, dateToday);
+
+        for (int i = 0;i < transactionResult.getNumRows();i++) {
+            DBTransaction transaction = transactionResult.getResultAt(i);
+            balance += transaction.getSignedAmount();
+        }
+
+        log.logExit("DBAccount::calculateCurrentBalance()");
+    }
+    catch (pfm_error & e) {
+        log.logError("DBAccount.calculateCurrentBalance() - caught exception: %s", e.what());
+
+        throw e;
+    }
+
+    return balance;
+}
+
 Money DBAccount::calculateBalanceAfterBills() {
     Logger & log = Logger::getInstance();
     log.logEntry("DBAccount::calculateBalanceAfterBills()");
@@ -219,11 +272,7 @@ Money DBAccount::calculateBalanceAfterBills() {
 
     Money balance = co.balance;
 
-    PFM_DB & db = PFM_DB::getInstance();
-
     try {
-        db.begin();
-
         StrDate dateToday;
         StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
 
@@ -253,13 +302,9 @@ Money DBAccount::calculateBalanceAfterBills() {
             }
         }
 
-        db.commit();
-
         log.logExit("DBAccount::calculateBalanceAfterBills()");
     }
     catch (pfm_error & e) {
-        db.rollback();
-
         log.logError("DBAccount.calculateBalanceAfterBills() - caught exception: %s", e.what());
 
         throw e;

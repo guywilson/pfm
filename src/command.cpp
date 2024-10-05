@@ -106,9 +106,10 @@ void Command::updateAccount() {
 }
 
 void Command::showAccountBalances(DBAccount & account) {
+    Money currentBalance = account.calculateCurrentBalance();
     Money balanceAfterBills = account.calculateBalanceAfterBills();
 
-    cout << "Current balance:     " << right << setw(13) << account.currentBalance.getFormattedStringValue() << endl;
+    cout << "Current balance:     " << right << setw(13) << currentBalance.getFormattedStringValue() << endl;
     cout << "Balance after bills: " << right << setw(13) << balanceAfterBills.getFormattedStringValue() << endl;
 }
 
@@ -613,7 +614,7 @@ void Command::clearLoggingLevel(string & level) {
     log.clearLogLevel(getLogLevelParameter(level));
 }
 
-Command::pfm_cmd_t Command::getCommandCode(string & command) {
+Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     this->command = command;
 
     if (isCommand("exit") || isCommand("quit") || isCommand("q")) {
@@ -747,7 +748,7 @@ Command::pfm_cmd_t Command::getCommandCode(string & command) {
     }
 }
 
-bool Command::process(string & command) {
+bool Command::process(const string & command) {
     Command::pfm_cmd_t cmd = getCommandCode(command);
 
     commandHistory.push_back(command);

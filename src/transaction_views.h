@@ -303,7 +303,7 @@ class FindTransactionByPayeeView : public CLIFindView {
         }
 
         string getCriteria() override {
-            static string criteria;
+            string criteria;
 
             DBPayee payee = payeeField.getPayee();
 
@@ -312,11 +312,13 @@ class FindTransactionByPayeeView : public CLIFindView {
             criteria = buffer;
 
             if (afterDateField.getValue().length() > 0) {
-                criteria += " AND date > '" + afterDateField.getValue() + "'";
+                StrDate earliestDate = afterDateField.getValue();
+                criteria += " AND date > '" + earliestDate.shortDate() + "'";
             }
 
             if (beforeDateField.getValue().length() > 0) {
-                criteria += " AND date <= '" + beforeDateField.getValue() + "'";
+                StrDate latestDate = beforeDateField.getValue();
+                criteria += " AND date <= '" + latestDate.shortDate() + "'";
             }
 
             if (recurringIncludeType.getValue().length() > 0) {
@@ -365,7 +367,7 @@ class FindTransactionByCategoryView : public CLIFindView {
         }
 
         string getCriteria() override {
-            static string criteria;
+            string criteria;
 
             DBCategory category = categoryField.getCategory();
 
@@ -374,11 +376,13 @@ class FindTransactionByCategoryView : public CLIFindView {
             criteria = buffer;
 
             if (afterDateField.getValue().length() > 0) {
-                criteria += " AND date > '" + afterDateField.getValue() + "'";
+                StrDate earliestDate = afterDateField.getValue();
+                criteria += " AND date > '" + earliestDate.shortDate() + "'";
             }
 
             if (beforeDateField.getValue().length() > 0) {
-                criteria += " AND date <= '" + beforeDateField.getValue() + "'";
+                StrDate latestDate = beforeDateField.getValue();
+                criteria += " AND date <= '" + latestDate.shortDate() + "'";
             }
 
             if (recurringIncludeType.getValue().length() > 0) {
@@ -427,18 +431,20 @@ class FindTransactionByDescriptionView : public CLIFindView {
         }
 
         string getCriteria() override {
-            static string criteria;
+            string criteria;
 
             string description = descriptionField.getValue();
 
             criteria = "description LIKE '%" + description + "%'";
 
             if (afterDateField.getValue().length() > 0) {
-                criteria += " AND date > '" + afterDateField.getValue() + "'";
+                StrDate earliestDate = afterDateField.getValue();
+                criteria += " AND date > '" + earliestDate.shortDate() + "'";
             }
 
             if (beforeDateField.getValue().length() > 0) {
-                criteria += " AND date <= '" + beforeDateField.getValue() + "'";
+                StrDate latestDate = beforeDateField.getValue();
+                criteria += " AND date <= '" + latestDate.shortDate() + "'";
             }
             
             if (recurringIncludeType.getValue().length() > 0) {
@@ -464,8 +470,8 @@ class FindTransactionByDescriptionView : public CLIFindView {
 
 class FindTransactionByDateView : public CLIFindView {
     private:
-        DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
-        DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+        DateField afterDateField = DateField("Earliest date (yyyy-mm-dd): ");
+        DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
         CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
 
     public:
@@ -485,18 +491,21 @@ class FindTransactionByDateView : public CLIFindView {
         }
 
         string getCriteria() override {
-            static string criteria;
+            string criteria;
 
             if (afterDateField.getValue().length() > 0) {
-                criteria += " date > '" + afterDateField.getValue() + "'";
+                StrDate earliestDate = afterDateField.getValue();
+                criteria += " date > '" + earliestDate.shortDate() + "'";
             }
 
             if (beforeDateField.getValue().length() > 0) {
+                StrDate latestDate = beforeDateField.getValue();
+
                 if (afterDateField.getValue().length() > 0) {
                     criteria += " AND";
                 }
 
-                criteria += " date <= '" + beforeDateField.getValue() + "'";
+                criteria += " date <= '" + latestDate.shortDate() + "'";
             }
 
             if (recurringIncludeType.getValue().length() > 0) {

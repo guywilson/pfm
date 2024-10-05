@@ -142,13 +142,13 @@ class Command {
         void clearLoggingLevel(string & level);
 
         bool isCommandValid();
-        pfm_cmd_t getCommandCode(string & command);
+        pfm_cmd_t getCommandCode(const string & command);
 
     public:
         static void help();
         static void version();
 
-        bool process(string & command);
+        bool process(const string & command);
 };
 
 #endif

@@ -192,6 +192,7 @@ class DBAccount : public DBEntity {
         }
 
         void beforeUpdate() override;
+        Money calculateCurrentBalance();
         Money calculateBalanceAfterBills();
         void retrieveByCode(string & code);
 };

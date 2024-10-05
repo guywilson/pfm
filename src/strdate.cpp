@@ -491,8 +491,8 @@ void StrDate::addMonths(int months) {
         }
     }
 
-    if (d > daysInMonth()) {
-        d = daysInMonth();
+    if (d > StrDate::daysInMonth(y, m)) {
+        d = daysInMonth(y, m);
     }
     
     set(y, m, d);
