@@ -19,13 +19,7 @@ using namespace std;
 #define EPOCH_MONTH                    1
 #define EPOCH_DAY                      1
 
-#ifdef PFM_TEST_SUITE_ENABLED
-static char _todayTestDate[DATE_STAMP_BUFFER_LEN];
-
-void setTodayTestDate(const char * date) {
-    strncpy(_todayTestDate, date, DATE_STAMP_BUFFER_LEN);
-}
-#endif
+static string _todayTestDate;
 
 StrDate::StrDate() {
     this->_date = StrDate::today();
@@ -55,6 +49,14 @@ StrDate::StrDate(int year, int month, int day) {
         day);
 
     this->set(dateStr);
+}
+
+void StrDate::setToday(const string & today) {
+    _todayTestDate = today;
+}
+
+void StrDate::clearToday() {
+    _todayTestDate.clear();
 }
 
 bool StrDate::isYear(string & part) {
@@ -158,23 +160,24 @@ StrDate::YMD StrDate::splitDate(const string & date) {
 string StrDate::today() {
     char today[DATE_STAMP_BUFFER_LEN];
 
-#ifndef PFM_TEST_SUITE_ENABLED
-    struct timeval tv;
+    if (_todayTestDate.length() == 0) {
+        struct timeval tv;
 
-    gettimeofday(&tv, NULL);
-    time_t t = tv.tv_sec;
-    struct tm * localTime = localtime(&t);
+        gettimeofday(&tv, NULL);
+        time_t t = tv.tv_sec;
+        struct tm * localTime = localtime(&t);
 
-    snprintf(
-        today, 
-        DATE_STAMP_BUFFER_LEN, 
-        "%d-%02d-%02d", 
-        localTime->tm_year + 1900, 
-        localTime->tm_mon + 1, 
-        localTime->tm_mday);
-#else
-    strncpy(today, _todayTestDate, DATE_STAMP_BUFFER_LEN);
-#endif
+        snprintf(
+            today, 
+            DATE_STAMP_BUFFER_LEN, 
+            "%d-%02d-%02d", 
+            localTime->tm_year + 1900, 
+            localTime->tm_mon + 1, 
+            localTime->tm_mday);
+    }
+    else {
+        strncpy(today, _todayTestDate.c_str(), _todayTestDate.length());
+    }
 
     return string(today);
 }
@@ -436,6 +439,16 @@ int StrDate::daysInMonth() {
     return daysInMonth(year(), month());
 }
 
+StrDate StrDate::firstDayInMonth() {
+    StrDate newDate(year(), month(), 1);
+    return newDate;
+}
+
+StrDate StrDate::lastDayInMonth() {
+    StrDate newDate(year(), month(), daysInMonth());
+    return newDate;
+}
+
 int StrDate::year() const {
     return atoi(_date.substr(0, 4).c_str());
 }
@@ -452,7 +465,7 @@ bool StrDate::isEpoch() const {
     return (year() == EPOCH_YEAR && month() == EPOCH_MONTH && day() == EPOCH_DAY);
 }
 
-void StrDate::addYears(int years) {
+StrDate StrDate::addYears(int years) {
     int y = year();
     int m = month();
     int d = day();
@@ -463,10 +476,12 @@ void StrDate::addYears(int years) {
         d = 28;
     }
     
-    set(newYear, m, d);
+    StrDate newDate(newYear, m, d);
+
+    return newDate;
 }
 
-void StrDate::addMonths(int months) {
+StrDate StrDate::addMonths(int months) {
     int y = year();
     int m = month();
     int d = day();
@@ -495,14 +510,16 @@ void StrDate::addMonths(int months) {
         d = daysInMonth(y, m);
     }
     
-    set(y, m, d);
+    StrDate newDate(y, m, d);
+
+    return newDate;
 }
 
-void StrDate::addWeeks(int weeks) {
-    addDays(weeks * 7);
+StrDate StrDate::addWeeks(int weeks) {
+    return addDays(weeks * 7);
 }
 
-void StrDate::addDays(int days) {
+StrDate StrDate::addDays(int days) {
     int y = year();
     int m = month();
     int d = day();
@@ -537,7 +554,9 @@ void StrDate::addDays(int days) {
         }
     }
     
-    set(y, m, d);
+    StrDate newDate(y, m, d);
+
+    return newDate;
 }
 
 StrDate & StrDate::operator=(const StrDate & rhs) {

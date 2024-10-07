@@ -70,6 +70,9 @@ class StrDate {
         
         bool isNull();
 
+        static void setToday(const string & today);
+        static void clearToday();
+
         static string today();
         static string getTimestamp();
         static string getTimestampToMicrosecond();
@@ -86,11 +89,13 @@ class StrDate {
         bool isEpoch() const;
 
         int daysInMonth();
+        StrDate firstDayInMonth();
+        StrDate lastDayInMonth();
 
-        void addYears(int years);
-        void addMonths(int months);
-        void addWeeks(int weeks);
-        void addDays(int days);
+        StrDate addYears(int years);
+        StrDate addMonths(int months);
+        StrDate addWeeks(int weeks);
+        StrDate addDays(int days);
 
         StrDate & operator=(const StrDate & rhs);
         StrDate & operator=(const string & rhs);

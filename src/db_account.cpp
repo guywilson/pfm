@@ -137,32 +137,12 @@ void DBAccount::beforeUpdate() {
     }
 }
 
-/*
-** This current implementation is just plain wrong:
-**
-** 1. We're trying to get the latest transaction date (although we're actually
-** getting the earliest), but why?
-** 
-** 2. We then go-ahead and set the balance to the account.openingBalance anyhow
-**
-** What we should be doing (I think):
-**
-** 1. Get the earliest transaction, use it's date to form a start & end date for
-** a transaction retrieve, e.g. (date.year, date.month, 1) to (date.year, date.month, days in month)
-**
-** 2. Take the account.openingBalance and add all the retrieved transactions to it and create the
-** first carriedOverLog from that.
-**
-** 3. Add a month while we're still before today, and create the next carriedOverLog.
-*/
 void DBAccount::createCarriedOverLogs() {
     Logger & log = Logger::getInstance();
     log.logEntry("DBAccount::createCarriedOverLogs()");
 
     StrDate dateToday;
-    
-    dateToday.addMonths(-1);
-    StrDate periodEndDate = StrDate(dateToday.year(), dateToday.month(), dateToday.daysInMonth());
+    StrDate periodEndDate = dateToday.addMonths(-1).firstDayInMonth();
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -182,38 +162,26 @@ void DBAccount::createCarriedOverLogs() {
             
             DBTransaction firstTransaction = result.getResultAt(0);
 
-            co.date = firstTransaction.date;
-            co.balance = openingBalance;
+            StrDate firstDate = firstTransaction.date.firstDayInMonth();
+            StrDate secondDate = firstTransaction.date.lastDayInMonth();
+
+            DBCarriedOver newCo;
+            newCo.createForPeriod(this->id, firstDate, secondDate);
+            newCo.balance = openingBalance;
+
+            co = newCo;
         }
 
-        while (co.date <= periodEndDate) {
-            StrDate firstDate(co.date.year(), co.date.month(), 1);
-            StrDate secondDate(co.date.year(), co.date.month(), co.date.daysInMonth());
+        while (co.date < periodEndDate) {
+            co.date = co.date.addMonths(1);
 
-            DBTransactionView tr;
-            DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, firstDate, secondDate);
+            StrDate firstDate = co.date.firstDayInMonth();
+            StrDate secondDate = co.date.lastDayInMonth();
 
-            DBCarriedOver newCO(co);
+            DBCarriedOver newCo;
+            newCo.createForPeriod(this->id, firstDate, secondDate);
 
-            for (int i = 0;i < transactionResult.getNumRows();i++) {
-                DBTransaction transaction = transactionResult.getResultAt(i);
-                newCO.balance += transaction.getSignedAmount();
-            }
-
-            /*
-            ** Clear the ID so we insert a new record in save()...
-            */
-            newCO.id = 0;
-
-            newCO.accountId = this->id;
-            newCO.date = secondDate;
-            newCO.description = "Carried over (" + newCO.date.shortDate() + ")";
-
-            co = newCO;
-            co.date.addMonths(1);
-            co.date = StrDate(co.date.year(), co.date.month(), co.date.daysInMonth());
-
-            newCO.save();
+            co = newCo;
         }
 
         db.commit();

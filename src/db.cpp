@@ -103,6 +103,7 @@ bool PFM_DB::open(string dbName) {
 
     if (error == SQLITE_OK) {
         string password = getPassword();
+        // string password = "Cal14rnia";
         sqlite3_key(this->dbHandle, password.c_str(), password.length());
     }
     else {

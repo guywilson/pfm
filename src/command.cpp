@@ -729,6 +729,12 @@ Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     else if (isCommand("list-budget-track-records") || isCommand("lbt")) {
         return pfm_cmd_debug_budget_track;
     }
+    else if (isCommand("set-today")) {
+        return pfm_cmd_debug_set_today;
+    }
+    else if (isCommand("clear-today")) {
+        return pfm_cmd_debug_clear_today;
+    }
     else if (isCommand("clear-recurring-transactions")) {
         return pfm_cmd_util_clear_recurring_transactions;
     }
@@ -904,6 +910,13 @@ bool Command::process(const string & command) {
     }
     else if (cmd == pfm_cmd_debug_budget_track) {
         listBudgetTracks();
+    }
+    else if (cmd == pfm_cmd_debug_set_today) {
+        string today = getCommandParameter();
+        StrDate::setToday(today);
+    }
+    else if (cmd == pfm_cmd_debug_clear_today) {
+        StrDate::clearToday();
     }
     else if (cmd == pfm_cmd_util_clear_recurring_transactions) {
         clearRecurringTransactions();

@@ -120,30 +120,30 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
 
         switch (frequencyUnit) {
             case 'y':
-                nextPaymentDate.addYears(frequencyValue * (dateToday.year() - nextPaymentDate.year()));
+                nextPaymentDate = nextPaymentDate.addYears(frequencyValue * (dateToday.year() - nextPaymentDate.year()));
 
                 if (nextPaymentDate.month() <= dateToday.month() && 
                     nextPaymentDate.day() <= dateToday.day())
                 {
-                    nextPaymentDate.addYears(1);
+                    nextPaymentDate = nextPaymentDate.addYears(1);
                 }
                 break;
 
             case 'm':
-                nextPaymentDate.addMonths(frequencyValue * (dateToday.month() - nextPaymentDate.month()));
+                nextPaymentDate = nextPaymentDate.addMonths(frequencyValue * (dateToday.month() - nextPaymentDate.month()));
 
                 if (nextPaymentDate.day() <= dateToday.day()) {
-                    nextPaymentDate.addMonths(1);
+                    nextPaymentDate = nextPaymentDate.addMonths(1);
                 }
                 break;
 
             case 'w':
-                nextPaymentDate.addWeeks(frequencyValue * ((dateToday.day() - nextPaymentDate.day()) / 7));
+                nextPaymentDate = nextPaymentDate.addWeeks(frequencyValue * ((dateToday.day() - nextPaymentDate.day()) / 7));
                 break;
 
             case 'd':
                 while (nextPaymentDate.year() < dateToday.year() || nextPaymentDate.month() < dateToday.month()) {
-                    nextPaymentDate.addDays(frequencyValue);
+                    nextPaymentDate = nextPaymentDate.addDays(frequencyValue);
                 }
                 break;
 
@@ -169,19 +169,19 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
 
     switch (frequencyUnit) {
         case 'y':
-            nextPaymentDate.addYears(frequencyValue);
+            nextPaymentDate = nextPaymentDate.addYears(frequencyValue);
             break;
 
         case 'm':
-            nextPaymentDate.addMonths(frequencyValue);
+            nextPaymentDate = nextPaymentDate.addMonths(frequencyValue);
             break;
 
         case 'w':
-            nextPaymentDate.addWeeks(frequencyValue);
+            nextPaymentDate = nextPaymentDate.addWeeks(frequencyValue);
             break;
 
         case 'd':
-            nextPaymentDate.addDays(frequencyValue);
+            nextPaymentDate = nextPaymentDate.addDays(frequencyValue);
             break;
     }
 

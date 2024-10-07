@@ -57,6 +57,8 @@ class Command {
             pfm_cmd_budget_import,
             pfm_cmd_debug_carried_over,
             pfm_cmd_debug_budget_track,
+            pfm_cmd_debug_set_today,
+            pfm_cmd_debug_clear_today,
             pfm_cmd_util_clear_recurring_transactions,
             pfm_cmd_logging_level_set,
             pfm_cmd_logging_level_clear
