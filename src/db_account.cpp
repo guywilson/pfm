@@ -166,8 +166,8 @@ void DBAccount::createCarriedOverLogs() {
             StrDate secondDate = firstTransaction.date.lastDayInMonth();
 
             DBCarriedOver newCo;
-            newCo.createForPeriod(this->id, firstDate, secondDate);
             newCo.balance = openingBalance;
+            newCo.createForPeriod(this->id, firstDate, secondDate);
 
             co = newCo;
         }
@@ -179,6 +179,7 @@ void DBAccount::createCarriedOverLogs() {
             StrDate secondDate = co.date.lastDayInMonth();
 
             DBCarriedOver newCo;
+            newCo.balance = co.balance;
             newCo.createForPeriod(this->id, firstDate, secondDate);
 
             co = newCo;
@@ -237,10 +238,12 @@ Money DBAccount::calculateBalanceAfterBills() {
     co.retrieveLatestByAccountId(this->id);
 
     Money balance = co.balance;
+    Money transactionBalance = 0.0;
+    Money chargeBalance = 0.0;
 
     try {
         StrDate dateToday;
-        StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
+        StrDate periodStartDate = dateToday.firstDayInMonth();
 
         DBTransactionView tr;
         DBResult<DBTransactionView> transactionResult = tr.retrieveNonRecurringByAccountIDForPeriod(this->id, periodStartDate, dateToday);
@@ -248,6 +251,7 @@ Money DBAccount::calculateBalanceAfterBills() {
         for (int i = 0;i < transactionResult.getNumRows();i++) {
             DBTransaction transaction = transactionResult.getResultAt(i);
             balance += transaction.getSignedAmount();
+            transactionBalance += transaction.getSignedAmount();
         }
 
         DBRecurringChargeView ch;
@@ -260,12 +264,15 @@ Money DBAccount::calculateBalanceAfterBills() {
         for (int i = 0;i < chargeResult.getNumRows();i++) {
             DBRecurringCharge charge = chargeResult.getResultAt(i);
 
-            if (charge.isChargeDueThisPeriod(dateToday.year(), dateToday.month())) {
-                if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
-                    cout << "| " << charge.date.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;
-                }
+            if (charge.isChargeDueThisPeriod(dateToday)) {
                 balance -= charge.amount;
+                chargeBalance -= charge.amount;
             }
+        }
+
+        if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
+            cout << "Total transaction balance = " << transactionBalance.getFormattedStringValue() << endl;
+            cout << "Total charge balance = " << chargeBalance.getFormattedStringValue() << endl;
         }
 
         log.logExit("DBAccount::calculateBalanceAfterBills()");

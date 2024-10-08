@@ -10,6 +10,7 @@
 #include "db_transaction.h"
 #include "db_recurring_charge.h"
 #include "db.h"
+#include "logger.h"
 #include "strdate.h"
 
 using namespace std;
@@ -66,9 +67,11 @@ bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
     return false;
 }
 
-bool DBRecurringCharge::isChargeDueThisPeriod(int year, int month) {
-    StrDate periodStart(year, month, 1);
-    StrDate periodEnd(year, month, StrDate::getDaysInMonth(year, month));
+bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
+    Logger & log = Logger::getInstance();
+
+    StrDate periodStart = referenceDate.firstDayInMonth();
+    StrDate periodEnd = referenceDate.lastDayInMonth();
 
     char frequencyValue = this->getFrequencyValue();
     char frequencyUnit = this->getFrequencyUnit();
@@ -78,25 +81,28 @@ bool DBRecurringCharge::isChargeDueThisPeriod(int year, int month) {
 
         switch (frequencyUnit) {
             case 'y':
-                nextPaymentDate.addYears(frequencyValue * (periodStart.year() - nextPaymentDate.year()));
+                nextPaymentDate = nextPaymentDate.addYears(frequencyValue * (periodStart.year() - nextPaymentDate.year()));
                 break;
 
             case 'm':
-                nextPaymentDate.addMonths(frequencyValue * (periodStart.month() - nextPaymentDate.month()));
+                nextPaymentDate = nextPaymentDate.addMonths(frequencyValue * (periodStart.month() - nextPaymentDate.month()));
                 break;
 
             case 'w':
-                nextPaymentDate.addWeeks(frequencyValue * ((periodStart.day() - nextPaymentDate.day()) / 7));
+                nextPaymentDate = nextPaymentDate.addWeeks(frequencyValue * ((periodStart.day() - nextPaymentDate.day()) / 7));
                 break;
 
             case 'd':
                 while (nextPaymentDate.year() < periodEnd.year() || nextPaymentDate.month() < periodEnd.month()) {
-                    nextPaymentDate.addDays(frequencyValue);
+                    nextPaymentDate = nextPaymentDate.addDays(frequencyValue);
                 }
                 break;
         }
 
         if (nextPaymentDate <= periodEnd && nextPaymentDate >= periodStart) {
+            if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
+                cout << "| " << nextPaymentDate.shortDate() << " | " << frequency << " | " << setw(16) << right << amount.getFormattedStringValue() << " | " << description << endl;
+            }
             return true;
         }
     }
@@ -143,7 +149,7 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
 
             case 'd':
                 while (nextPaymentDate.year() < dateToday.year() || nextPaymentDate.month() < dateToday.month()) {
-                    nextPaymentDate = nextPaymentDate.addDays(frequencyValue);
+                    nextPaymentDate =   nextPaymentDate.addDays(frequencyValue);
                 }
                 break;
 

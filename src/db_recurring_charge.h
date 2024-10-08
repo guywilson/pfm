@@ -170,7 +170,7 @@ class DBRecurringCharge : public DBPayment {
         int getFrequencyValue();
         char getFrequencyUnit();
 
-        bool isChargeDueThisPeriod(int year, int month);
+        bool isChargeDueThisPeriod(StrDate & referenceDate);
         StrDate calculateNextPaymentDate();
         void setNextPaymentDate();
         StrDate getNextRecurringTransactionDate(StrDate & startDate);
