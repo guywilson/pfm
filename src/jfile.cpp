@@ -18,6 +18,9 @@ using json = nlohmann::json;
 using object_t = std::map<std::string, std::string>;
 using objects_t = std::vector<object_t>;
 
+JRecord::JRecord() {
+}
+
 JRecord::JRecord(object_t & o) {
     this->record = o;
 }
@@ -33,7 +36,15 @@ string JRecord::get(const char * name) {
     return record[name];
 }
 
-void JFile::validate() {
+object_t JRecord::getObject() {
+    return this->record;
+}
+
+void JRecord::add(const char * name, const string & value) {
+    record[name] = value;
+}
+
+void JFileReader::validate() {
     unordered_map<string, json> elements = j.template get<unordered_map<string, json>>();
 
     for (auto& i : elements) {
@@ -53,7 +64,7 @@ void JFile::validate() {
     }
 }
 
-JFile::JFile(string & filename, const char * className) {
+JFileReader::JFileReader(string & filename, const char * className) {
     this->className = className;
 
     ifstream fstream(filename.c_str());
@@ -63,7 +74,7 @@ JFile::JFile(string & filename, const char * className) {
     validate();
 }
 
-vector<JRecord> JFile::read(const char * name) {
+vector<JRecord> JFileReader::read(const char * name) {
     vector<JRecord> records;
 
     objects_t rows = j.at(name).get<objects_t>();
@@ -74,4 +85,27 @@ vector<JRecord> JFile::read(const char * name) {
     }
 
     return records;
+}
+
+JFileWriter::JFileWriter(string & filename, const char * className) {
+    this->className = className;
+    this->fstream.open(filename);
+}
+
+JFileWriter::~JFileWriter() {
+    this->fstream.close();
+}
+
+void JFileWriter::write(vector<JRecord> & records, const char * name) {
+    json array;
+
+    for (JRecord record : records) {
+        array.push_back(record.getObject());
+    }
+
+    json j;
+    j["className"] = this->className;
+    j[name] = array;
+
+    this->fstream << j.dump(4) << endl;
 }

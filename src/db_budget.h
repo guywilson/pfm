@@ -126,6 +126,20 @@ class DBBudget : public DBEntity {
             this->maximumBudget = record.get("maximumBudget");
         }
 
+        JRecord getRecord() {
+            JRecord r;
+
+            r.add("startDate", this->startDate.shortDate());
+            r.add("endDate", this->endDate.shortDate());
+            r.add("payeeCode", this->payeeCode);
+            r.add("categoryCode", this->categoryCode);
+            r.add("description", this->description);
+            r.add("minimumBudget", this->minimumBudget.getRawStringValue());
+            r.add("maximumBudget", this->maximumBudget.getRawStringValue());
+
+            return r;
+        }
+
         void print() {
             DBEntity::print();
 

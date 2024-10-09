@@ -29,32 +29,38 @@ class Command {
             pfm_cmd_account_delete,
             pfm_cmd_account_balance,
             pfm_cmd_account_import,
+            pfm_cmd_account_export,
             pfm_cmd_category_add,
             pfm_cmd_category_list,
             pfm_cmd_category_update,
             pfm_cmd_category_delete,
             pfm_cmd_category_import,
+            pfm_cmd_category_export,
             pfm_cmd_payee_add,
             pfm_cmd_payee_list,
             pfm_cmd_payee_update,
             pfm_cmd_payee_delete,
             pfm_cmd_payee_import,
+            pfm_cmd_payee_export,
             pfm_cmd_charge_add,
             pfm_cmd_charge_list,
             pfm_cmd_charge_update,
             pfm_cmd_charge_delete,
             pfm_cmd_charge_import,
+            pfm_cmd_charge_export,
             pfm_cmd_transaction_add,
             pfm_cmd_transaction_list,
             pfm_cmd_transaction_find,
             pfm_cmd_transaction_update,
             pfm_cmd_transaction_delete,
             pfm_cmd_transaction_import,
+            pfm_cmd_transaction_export,
             pfm_cmd_budget_add,
             pfm_cmd_budget_list,
             pfm_cmd_budget_update,
             pfm_cmd_budget_delete,
             pfm_cmd_budget_import,
+            pfm_cmd_budget_export,
             pfm_cmd_debug_carried_over,
             pfm_cmd_debug_budget_track,
             pfm_cmd_debug_set_today,
@@ -99,6 +105,7 @@ class Command {
         void updateAccount();
         void showAccountBalances(DBAccount & account);
         void importAccounts(string & jsonFileName);
+        void exportAccounts(string & jsonFileName);
 
         void addCategory();
         void listCategories();
@@ -106,6 +113,7 @@ class Command {
         void updateCategory(DBCategory & category);
         void deleteCategory(DBCategory & category);
         void importCategories(string & jsonFileName);
+        void exportCategories(string & jsonFileName);
         void clearCategories();
 
         void addPayee();
@@ -114,6 +122,7 @@ class Command {
         void updatePayee(DBPayee & payee);
         void deletePayee(DBPayee & payee);
         void importPayees(string & jsonFileName);
+        void exportPayees(string & jsonFileName);
 
         void addRecurringCharge();
         void listRecurringCharges();
@@ -121,6 +130,7 @@ class Command {
         void updateRecurringCharge(DBRecurringCharge & charge);
         void deleteRecurringCharge(DBRecurringCharge & charge);
         void importRecurringCharges(string & jsonFileName);
+        void exportRecurringCharges(string & jsonFileName);
         void clearRecurringTransactions();
 
         void addTransaction();
@@ -130,6 +140,7 @@ class Command {
         void updateTransaction(DBTransaction & transaction);
         void deleteTransaction(DBTransaction & transaction);
         void importTransactions(string & jsonFileName);
+        void exportTransactions(string & jsonFileName);
 
         void addBudget();
         void listBudgets();
@@ -137,6 +148,7 @@ class Command {
         void updateBudget(DBBudget & budget);
         void deleteBudget(DBBudget & budget);
         void importBudgets(string & jsonFileName);
+        void exportBudgets(string & jsonFileName);
 
         void listCarriedOverLogs();
         void listBudgetTracks();

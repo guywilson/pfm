@@ -214,6 +214,16 @@ class DBTransaction : public DBPayment {
             this->isReconciled = (record.get("isReconciled").compare("Y") ? true : false);
         }
 
+        JRecord getRecord() {
+            JRecord r = DBPayment::getRecord();
+
+            r.add("reference", this->reference);
+            r.add("creditDebit", this->getCreditDebitValue());
+            r.add("isReconciled", this->getIsReconciledValue());
+
+            return r;
+        }
+
         void createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {
             DBPayment::set(src);
 

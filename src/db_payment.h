@@ -93,6 +93,22 @@ class DBPayment : public DBEntity {
             this->description = record.get("description");
         }
 
+        JRecord getRecord() {
+            JRecord r;
+
+            DBAccount account;
+            account.retrieve(this->accountId);
+
+            r.add("code", account.code);
+            r.add("categoryCode", this->category.code);
+            r.add("payeeCode", this->payee.code);
+            r.add("date", this->date.shortDate());
+            r.add("description", this->description);
+            r.add("amount", this->amount.getRawStringValue());
+
+            return r;
+        }
+
         void print() {
             DBEntity::print();
 

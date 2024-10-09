@@ -25,12 +25,16 @@ class JRecord {
         object_t record;
 
     public:
+        JRecord();
         JRecord(object_t & o);
 
         string get(const char * name);
+
+        object_t getObject();
+        void add(const char * name, const string & value);
 };
 
-class JFile {
+class JFileReader {
     private:
         const char * className;
         json j;
@@ -38,9 +42,20 @@ class JFile {
         void validate();
 
     public:
-        JFile(string & filename, const char * className);
+        JFileReader(string & filename, const char * className);
 
         vector<JRecord> read(const char * name);
+};
+
+class JFileWriter {
+    private:
+        ofstream fstream;
+        const char * className;
+
+    public:
+        JFileWriter(string & filename, const char * className);
+        ~JFileWriter();
+
         void write(vector<JRecord> & records, const char * name);
 };
 

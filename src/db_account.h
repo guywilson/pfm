@@ -86,6 +86,17 @@ class DBAccount : public DBEntity {
             this->openingBalance = record.get("openingBalance");
         }
 
+        JRecord getRecord() {
+            JRecord r;
+
+            r.add("name", name);
+            r.add("code", code);
+            r.add("openingDate", openingDate.shortDate());
+            r.add("openingBalance", openingBalance.getRawStringValue());
+
+            return r;
+        }
+
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             

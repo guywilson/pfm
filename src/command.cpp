@@ -112,7 +112,7 @@ void Command::showAccountBalances(DBAccount & account) {
 }
 
 void Command::importAccounts(string & jsonFileName) {
-    JFile jfile = JFile(jsonFileName, "DBAccount");
+    JFileReader jfile = JFileReader(jsonFileName, "DBAccount");
 
     vector<JRecord> records = jfile.read("accounts");
 
@@ -122,6 +122,23 @@ void Command::importAccounts(string & jsonFileName) {
         account.set(record);
         account.save();
     }
+}
+
+void Command::exportAccounts(string & jsonFileName) {
+    DBResult<DBAccount> results;
+    results.retrieveAll();
+
+    vector<JRecord> records;
+
+    for (int i = 0;i < results.getNumRows();i++) {
+        DBAccount account = results.getResultAt(i);
+
+        JRecord r = account.getRecord();
+        records.push_back(r);
+    }
+    
+    JFileWriter jFile = JFileWriter(jsonFileName, "DBAccount");
+    jFile.write(records, "accounts");
 }
 
 void Command::addCategory() {
@@ -171,7 +188,7 @@ void Command::deleteCategory(DBCategory & category) {
 }
 
 void Command::importCategories(string & jsonFileName) {
-    JFile jfile = JFile(jsonFileName, "DBCategory");
+    JFileReader jfile = JFileReader(jsonFileName, "DBCategory");
 
     vector<JRecord> records = jfile.read("categories");
 
@@ -181,6 +198,23 @@ void Command::importCategories(string & jsonFileName) {
         category.set(record);
         category.save();
     }
+}
+
+void Command::exportCategories(string & jsonFileName) {
+    DBResult<DBCategory> results;
+    results.retrieveAll();
+
+    vector<JRecord> records;
+
+    for (int i = 0;i < results.getNumRows();i++) {
+        DBCategory category = results.getResultAt(i);
+
+        JRecord r = category.getRecord();
+        records.push_back(r);
+    }
+    
+    JFileWriter jFile = JFileWriter(jsonFileName, "DBCategory");
+    jFile.write(records, "categories");
 }
 
 void Command::clearCategories() {
@@ -235,7 +269,7 @@ void Command::deletePayee(DBPayee & payee) {
 }
 
 void Command::importPayees(string & jsonFileName) {
-    JFile jfile = JFile(jsonFileName, "DBPayee");
+    JFileReader jfile = JFileReader(jsonFileName, "DBPayee");
 
     vector<JRecord> records = jfile.read("payees");
 
@@ -245,6 +279,23 @@ void Command::importPayees(string & jsonFileName) {
         payee.set(record);
         payee.save();
     }
+}
+
+void Command::exportPayees(string & jsonFileName) {
+    DBResult<DBPayee> results;
+    results.retrieveAll();
+
+    vector<JRecord> records;
+
+    for (int i = 0;i < results.getNumRows();i++) {
+        DBPayee payee = results.getResultAt(i);
+
+        JRecord r = payee.getRecord();
+        records.push_back(r);
+    }
+    
+    JFileWriter jFile = JFileWriter(jsonFileName, "DBPayee");
+    jFile.write(records, "payees");
 }
 
 void Command::addRecurringCharge() {
@@ -315,7 +366,7 @@ void Command::deleteRecurringCharge(DBRecurringCharge & charge) {
 }
 
 void Command::importRecurringCharges(string & jsonFileName) {
-    JFile jfile = JFile(jsonFileName, "DBRecurringCharge");
+    JFileReader jfile = JFileReader(jsonFileName, "DBRecurringCharge");
 
     vector<JRecord> records = jfile.read("charges");
 
@@ -325,6 +376,23 @@ void Command::importRecurringCharges(string & jsonFileName) {
         charge.set(record);
         charge.save();
     }
+}
+
+void Command::exportRecurringCharges(string & jsonFileName) {
+    DBResult<DBRecurringCharge> results;
+    results.retrieveAll();
+
+    vector<JRecord> records;
+
+    for (int i = 0;i < results.getNumRows();i++) {
+        DBRecurringCharge charge = results.getResultAt(i);
+
+        JRecord r = charge.getRecord();
+        records.push_back(r);
+    }
+    
+    JFileWriter jFile = JFileWriter(jsonFileName, "DBRecurringCharge");
+    jFile.write(records, "charges");
 }
 
 void Command::clearRecurringTransactions() {
@@ -469,7 +537,7 @@ void Command::deleteTransaction(DBTransaction & transaction) {
 }
 
 void Command::importTransactions(string & jsonFileName) {
-    JFile jfile = JFile(jsonFileName, "DBTransaction");
+    JFileReader jfile = JFileReader(jsonFileName, "DBTransaction");
 
     vector<JRecord> records = jfile.read("transactions");
 
@@ -479,6 +547,23 @@ void Command::importTransactions(string & jsonFileName) {
         transaction.set(record);
         transaction.save();
     }
+}
+
+void Command::exportTransactions(string & jsonFileName) {
+    DBResult<DBTransaction> results;
+    results.retrieveAll();
+
+    vector<JRecord> records;
+
+    for (int i = 0;i < results.getNumRows();i++) {
+        DBTransaction transaction = results.getResultAt(i);
+
+        JRecord r = transaction.getRecord();
+        records.push_back(r);
+    }
+    
+    JFileWriter jFile = JFileWriter(jsonFileName, "DBTransaction");
+    jFile.write(records, "transactions");
 }
 
 void Command::addBudget() {
@@ -540,7 +625,7 @@ void Command::deleteBudget(DBBudget & budget) {
 }
 
 void Command::importBudgets(string & jsonFileName) {
-    JFile jfile = JFile(jsonFileName, "DBBudget");
+    JFileReader jfile = JFileReader(jsonFileName, "DBBudget");
 
     vector<JRecord> records = jfile.read("budgets");
 
@@ -550,6 +635,23 @@ void Command::importBudgets(string & jsonFileName) {
         budget.set(record);
         budget.save();
     }
+}
+
+void Command::exportBudgets(string & jsonFileName) {
+    DBResult<DBBudget> results;
+    results.retrieveAll();
+
+    vector<JRecord> records;
+
+    for (int i = 0;i < results.getNumRows();i++) {
+        DBBudget budget = results.getResultAt(i);
+
+        JRecord r = budget.getRecord();
+        records.push_back(r);
+    }
+    
+    JFileWriter jFile = JFileWriter(jsonFileName, "DBBudget");
+    jFile.write(records, "budgets");
 }
 
 void Command::listCarriedOverLogs() {
@@ -650,6 +752,9 @@ Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     else if (isCommand("import-accounts") || isCommand("ia")) {
         return pfm_cmd_account_import;
     }
+    else if (isCommand("export-accounts") || isCommand("xa")) {
+        return pfm_cmd_account_export;
+    }
     else if (isCommand("add-category") || isCommand("ac")) {
         return pfm_cmd_category_add;
     }
@@ -664,6 +769,9 @@ Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     }
     else if (isCommand("import-categories") || isCommand("ic")) {
         return pfm_cmd_category_import;
+    }
+    else if (isCommand("export-categories") || isCommand("xc")) {
+        return pfm_cmd_category_export;
     }
     else if (isCommand("clear-categories")) {
         return pfm_cmd_util_clear_categories;
@@ -683,6 +791,9 @@ Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     else if (isCommand("import-payees") || isCommand("ip")) {
         return pfm_cmd_payee_import;
     }
+    else if (isCommand("export-payees") || isCommand("xp")) {
+        return pfm_cmd_payee_export;
+    }
     else if (isCommand("add-recurring-charge") || isCommand("arc")) {
         return pfm_cmd_charge_add;
     }
@@ -697,6 +808,9 @@ Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     }
     else if (isCommand("import-recurring-charges") || isCommand("irc")) {
         return pfm_cmd_charge_import;
+    }
+    else if (isCommand("export-recurring-charges") || isCommand("xrc")) {
+        return pfm_cmd_charge_export;
     }
     else if (isCommand("add-transaction") || isCommand("at")) {
         return pfm_cmd_transaction_add;
@@ -716,6 +830,9 @@ Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     else if (isCommand("import-transactions") || isCommand("it")) {
         return pfm_cmd_transaction_import;
     }
+    else if (isCommand("export-transactions") || isCommand("xt")) {
+        return pfm_cmd_transaction_export;
+    }
     else if (isCommand("add-budget") || isCommand("ab")) {
         return pfm_cmd_budget_add;
     }
@@ -730,6 +847,9 @@ Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     }
     else if (isCommand("import-budgets") || isCommand("ib")) {
         return pfm_cmd_budget_import;
+    }
+    else if (isCommand("export-budgets") || isCommand("xb")) {
+        return pfm_cmd_budget_export;
     }
     else if (isCommand("list-carried-over-logs") || isCommand("lco")) {
         return pfm_cmd_debug_carried_over;
@@ -799,6 +919,10 @@ bool Command::process(const string & command) {
         string filename = getCommandParameter();
         importAccounts(filename);
     }
+    else if (cmd == pfm_cmd_account_export) {
+        string filename = getCommandParameter();
+        exportAccounts(filename);
+    }
     else if (cmd == pfm_cmd_category_add) {
         addCategory();
     }
@@ -820,6 +944,10 @@ bool Command::process(const string & command) {
     else if (cmd == pfm_cmd_category_import) {
         string filename = getCommandParameter();
         importCategories(filename);
+    }
+    else if (cmd == pfm_cmd_category_export) {
+        string filename = getCommandParameter();
+        exportCategories(filename);
     }
     else if (cmd == pfm_cmd_util_clear_categories) {
         clearCategories();
@@ -846,6 +974,10 @@ bool Command::process(const string & command) {
         string filename = getCommandParameter();
         importPayees(filename);
     }
+    else if (cmd == pfm_cmd_payee_export) {
+        string filename = getCommandParameter();
+        exportPayees(filename);
+    }
     else if (cmd == pfm_cmd_charge_add) {
         addRecurringCharge();
     }
@@ -867,6 +999,10 @@ bool Command::process(const string & command) {
     else if (cmd == pfm_cmd_charge_import) {
         string filename = getCommandParameter();
         importRecurringCharges(filename);
+    }
+    else if (cmd == pfm_cmd_charge_export) {
+        string filename = getCommandParameter();
+        exportRecurringCharges(filename);
     }
     else if (cmd == pfm_cmd_transaction_add) {
         addTransaction();
@@ -894,6 +1030,10 @@ bool Command::process(const string & command) {
         string filename = getCommandParameter();
         importTransactions(filename);
     }
+    else if (cmd == pfm_cmd_transaction_export) {
+        string filename = getCommandParameter();
+        exportTransactions(filename);
+    }
     else if (cmd == pfm_cmd_budget_add) {
         addBudget();
     }
@@ -915,6 +1055,10 @@ bool Command::process(const string & command) {
     else if (cmd == pfm_cmd_budget_import) {
         string filename = getCommandParameter();
         importBudgets(filename);
+    }
+    else if (cmd == pfm_cmd_budget_export) {
+        string filename = getCommandParameter();
+        exportBudgets(filename);
     }
     else if (cmd == pfm_cmd_debug_carried_over) {
         listCarriedOverLogs();

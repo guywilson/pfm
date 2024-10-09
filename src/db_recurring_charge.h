@@ -124,6 +124,15 @@ class DBRecurringCharge : public DBPayment {
             this->endDate = record.get("endDate");
         }
 
+        JRecord getRecord() {
+            JRecord r = DBPayment::getRecord();
+
+            r.add("endDate", this->endDate.shortDate());
+            r.add("frequency", this->frequency);
+
+            return r;
+        }
+
         void print() {
             DBPayment::print();
 

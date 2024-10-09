@@ -52,6 +52,15 @@ class DBPayee : public DBEntity {
             this->name = record.get("name");
         }
 
+        JRecord getRecord() {
+            JRecord r;
+
+            r.add("code", this->code);
+            r.add("name", this->name);
+
+            return r;
+        }
+
         void print() {
             DBEntity::print();
 

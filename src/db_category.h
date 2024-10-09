@@ -52,6 +52,15 @@ class DBCategory : public DBEntity {
             this->description = record.get("description");
         }
 
+        JRecord getRecord() {
+            JRecord r;
+
+            r.add("code", this->code);
+            r.add("description", this->description);
+
+            return r;
+        }
+
         void print() {
             DBEntity::print();
 
