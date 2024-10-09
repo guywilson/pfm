@@ -99,7 +99,7 @@ class DBPayment : public DBEntity {
             DBAccount account;
             account.retrieve(this->accountId);
 
-            r.add("code", account.code);
+            r.add("accountCode", account.code);
             r.add("categoryCode", this->category.code);
             r.add("payeeCode", this->payee.code);
             r.add("date", this->date.shortDate());
