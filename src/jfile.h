@@ -40,7 +40,8 @@ class JFile {
     public:
         JFile(string & filename, const char * className);
 
-        vector<JRecord> readRecords(const char * name);
+        vector<JRecord> read(const char * name);
+        void write(vector<JRecord> & records, const char * name);
 };
 
 #endif

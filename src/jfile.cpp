@@ -63,7 +63,7 @@ JFile::JFile(string & filename, const char * className) {
     validate();
 }
 
-vector<JRecord> JFile::readRecords(const char * name) {
+vector<JRecord> JFile::read(const char * name) {
     vector<JRecord> records;
 
     objects_t rows = j.at(name).get<objects_t>();

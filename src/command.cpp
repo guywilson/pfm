@@ -114,7 +114,7 @@ void Command::showAccountBalances(DBAccount & account) {
 void Command::importAccounts(string & jsonFileName) {
     JFile jfile = JFile(jsonFileName, "DBAccount");
 
-    vector<JRecord> records = jfile.readRecords("accounts");
+    vector<JRecord> records = jfile.read("accounts");
 
     for (JRecord & record : records) {
         DBAccount account;
@@ -173,7 +173,7 @@ void Command::deleteCategory(DBCategory & category) {
 void Command::importCategories(string & jsonFileName) {
     JFile jfile = JFile(jsonFileName, "DBCategory");
 
-    vector<JRecord> records = jfile.readRecords("categories");
+    vector<JRecord> records = jfile.read("categories");
 
     for (JRecord & record : records) {
         DBCategory category;
@@ -237,7 +237,7 @@ void Command::deletePayee(DBPayee & payee) {
 void Command::importPayees(string & jsonFileName) {
     JFile jfile = JFile(jsonFileName, "DBPayee");
 
-    vector<JRecord> records = jfile.readRecords("payees");
+    vector<JRecord> records = jfile.read("payees");
 
     for (JRecord & record : records) {
         DBPayee payee;
@@ -317,7 +317,7 @@ void Command::deleteRecurringCharge(DBRecurringCharge & charge) {
 void Command::importRecurringCharges(string & jsonFileName) {
     JFile jfile = JFile(jsonFileName, "DBRecurringCharge");
 
-    vector<JRecord> records = jfile.readRecords("charges");
+    vector<JRecord> records = jfile.read("charges");
 
     for (JRecord & record : records) {
         DBRecurringCharge charge;
@@ -471,7 +471,7 @@ void Command::deleteTransaction(DBTransaction & transaction) {
 void Command::importTransactions(string & jsonFileName) {
     JFile jfile = JFile(jsonFileName, "DBTransaction");
 
-    vector<JRecord> records = jfile.readRecords("transactions");
+    vector<JRecord> records = jfile.read("transactions");
 
     for (JRecord & record : records) {
         DBTransaction transaction;
@@ -542,7 +542,7 @@ void Command::deleteBudget(DBBudget & budget) {
 void Command::importBudgets(string & jsonFileName) {
     JFile jfile = JFile(jsonFileName, "DBBudget");
 
-    vector<JRecord> records = jfile.readRecords("budgets");
+    vector<JRecord> records = jfile.read("budgets");
 
     for (JRecord & record : records) {
         DBBudget budget;
