@@ -25,9 +25,6 @@ class DBPayee : public DBEntity {
         const char * sqlUpdate = 
                         "UPDATE payee SET code = '%s', name = '%s', updated = '%s' WHERE id = %lld;";
 
-        const char * sqlDelete = 
-                        "DELETE FROM payee WHERE id = %lld;";
-
     public:
         string                  name;
         string                  code;
@@ -106,20 +103,6 @@ class DBPayee : public DBEntity {
                 code.c_str(),
                 name.c_str(),
                 now.c_str(),
-                id);
-
-            return szStatement;
-        }
-
-        const char * getDeleteStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlDelete,
                 id);
 
             return szStatement;

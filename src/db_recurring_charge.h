@@ -85,9 +85,6 @@ class DBRecurringCharge : public DBPayment {
                         "updated = '%s' " \
                         "WHERE id = %lld;";
 
-        const char * sqlDelete = 
-                        "DELETE FROM recurring_charge WHERE id = %lld;";
-
         bool isDateWithinCurrentPeriod(StrDate & date);
 
     public:
@@ -219,20 +216,6 @@ class DBRecurringCharge : public DBPayment {
                 amount.getRawStringValue().c_str(),
                 frequency.c_str(),
                 now.c_str(),
-                id);
-
-            return szStatement;
-        }
-
-        const char * getDeleteStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlDelete,
                 id);
 
             return szStatement;

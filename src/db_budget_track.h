@@ -69,9 +69,6 @@ class DBBudgetTrack : public DBEntity {
             "updated = '%s' " \
             "WHERE id = %lld;";
 
-        const char * sqlDelete = 
-            "DELETE FROM period_budget_track WHERE id = %lld;";
-
     public:
         pfm_id_t budgetId;
         StrDate date;
@@ -158,18 +155,6 @@ class DBBudgetTrack : public DBEntity {
                 date.shortDate().c_str(),
                 balance.getRawStringValue().c_str(),
                 now.c_str(),
-                id);
-
-            return szStatement;
-        }
-
-        const char * getDeleteStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlDelete,
                 id);
 
             return szStatement;

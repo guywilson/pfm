@@ -75,9 +75,6 @@ class DBBudget : public DBEntity {
             "updated = '%s' " \
             "WHERE id = %lld;";
 
-        const char * sqlDelete = 
-            "DELETE FROM budget WHERE id = %lld;";
-
     public:
         StrDate startDate;
         StrDate endDate;
@@ -214,18 +211,6 @@ class DBBudget : public DBEntity {
                 minimumBudget.getRawStringValue().c_str(),
                 maximumBudget.getRawStringValue().c_str(),
                 now.c_str(),
-                id);
-
-            return szStatement;
-        }
-
-        const char * getDeleteStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlDelete,
                 id);
 
             return szStatement;

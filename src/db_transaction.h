@@ -170,9 +170,6 @@ class DBTransaction : public DBPayment {
                         "updated = '%s' " \
                         "WHERE id = %lld;";
 
-        const char * sqlDelete = 
-                        "DELETE FROM account_transaction WHERE id = %lld;";
-
         const char * sqlDeleteByRecurringCharge = 
                         "DELETE FROM account_transaction WHERE recurring_charge_id = %lld;";
 
@@ -354,20 +351,6 @@ class DBTransaction : public DBPayment {
                 amount.getRawStringValue().c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
-                id);
-
-            return szStatement;
-        }
-
-        const char * getDeleteStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlDelete,
                 id);
 
             return szStatement;

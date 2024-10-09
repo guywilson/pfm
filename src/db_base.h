@@ -76,19 +76,31 @@ class DBEntity {
         virtual const char * getSelectByIDStatement(pfm_id_t key) {
             static char statement[64];
 
-            snprintf(statement, 64, "SELECT * FROM %s WHERE id = %lld;", getTableName(), key);
- 
+            snprintf(statement, 64, "SELECT * FROM %s WHERE id = %lld;", getTableName(), key); 
             return statement;
         }
 
         virtual const char * getSelectAllStatement() {
             static char statement[64];
 
-            snprintf(statement, 64, "SELECT * FROM %s;", getTableName());
- 
+            snprintf(statement, 64, "SELECT * FROM %s;", getTableName()); 
             return statement;
         }
 
+        virtual const char * getDeleteByIDStatement(pfm_id_t key) {
+            static char statement[64];
+
+            snprintf(statement, 64, "DELETE FROM %s WHERE id = %lld;", getTableName(), key); 
+            return statement;
+        }
+
+        virtual const char * getDeleteAllStatement() {
+            static char statement[64];
+
+            snprintf(statement, 64, "DELETE FROM %s;", getTableName()); 
+            return statement;
+        }
+        
         virtual const char * getInsertStatement() {
             return "";
         }
@@ -103,6 +115,8 @@ class DBEntity {
 
         void remove();
         void remove(const char * statement);
+        void removeAll();
+
         void save();
         void retrieve();
         void retrieve(pfm_id_t id);

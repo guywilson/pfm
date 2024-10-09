@@ -183,6 +183,11 @@ void Command::importCategories(string & jsonFileName) {
     }
 }
 
+void Command::clearCategories() {
+    DBCategory category;
+    category.removeAll();
+}
+
 void Command::addPayee() {
     AddPayeeView view;
     view.show();
@@ -660,6 +665,9 @@ Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     else if (isCommand("import-categories") || isCommand("ic")) {
         return pfm_cmd_category_import;
     }
+    else if (isCommand("clear-categories")) {
+        return pfm_cmd_util_clear_categories;
+    }
     else if (isCommand("add-payee") || isCommand("ap")) {
         return pfm_cmd_payee_add;
     }
@@ -812,6 +820,9 @@ bool Command::process(const string & command) {
     else if (cmd == pfm_cmd_category_import) {
         string filename = getCommandParameter();
         importCategories(filename);
+    }
+    else if (cmd == pfm_cmd_util_clear_categories) {
+        clearCategories();
     }
     else if (cmd == pfm_cmd_payee_add) {
         addPayee();

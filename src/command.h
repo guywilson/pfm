@@ -60,6 +60,7 @@ class Command {
             pfm_cmd_debug_set_today,
             pfm_cmd_debug_clear_today,
             pfm_cmd_util_clear_recurring_transactions,
+            pfm_cmd_util_clear_categories,
             pfm_cmd_logging_level_set,
             pfm_cmd_logging_level_clear
         }
@@ -105,6 +106,7 @@ class Command {
         void updateCategory(DBCategory & category);
         void deleteCategory(DBCategory & category);
         void importCategories(string & jsonFileName);
+        void clearCategories();
 
         void addPayee();
         void listPayees();

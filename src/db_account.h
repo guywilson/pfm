@@ -48,9 +48,6 @@ class DBAccount : public DBEntity {
                         "updated = '%s' " \
                         "WHERE id = %lld;";
 
-        const char * sqlDelete = 
-                        "DELETE FROM account WHERE id = %lld;";
-
         void createRecurringTransactions();
         void createCarriedOverLogs();
 
@@ -154,20 +151,6 @@ class DBAccount : public DBEntity {
                 openingDate.shortDate().c_str(),
                 openingBalance.getRawStringValue().c_str(),
                 now.c_str(),
-                id);
-
-            return szStatement;
-        }
-
-        const char * getDeleteStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlDelete,
                 id);
 
             return szStatement;

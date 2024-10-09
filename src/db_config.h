@@ -24,9 +24,6 @@ class DBConfig : public DBEntity {
         const char * sqlUpdate = 
                         "UPDATE config SET key = '%s', value = '%s', description = '%s', updated = '%s' WHERE id = %lld;";
 
-        const char * sqlDelete = 
-                        "DELETE FROM config WHERE id = %lld;";
-
     public:
         string                  key;
         string                  value;
@@ -109,20 +106,6 @@ class DBConfig : public DBEntity {
                 value.c_str(),
                 description.c_str(),
                 now.c_str(),
-                id);
-
-            return szStatement;
-        }
-
-        const char * getDeleteStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlDelete,
                 id);
 
             return szStatement;

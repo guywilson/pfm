@@ -24,9 +24,6 @@ class DBCurrency : public DBEntity {
         const char * sqlUpdate = 
                         "UPDATE currency SET code = '%s', name = '%s', symbol = '%s', updated = '%s' WHERE id = %lld;";
 
-        const char * sqlDelete = 
-                        "DELETE FROM currency WHERE id = %lld;";
-
     public:
         string                  code;
         string                  name;
@@ -109,20 +106,6 @@ class DBCurrency : public DBEntity {
                 name.c_str(),
                 symbol.c_str(),
                 now.c_str(),
-                id);
-
-            return szStatement;
-        }
-
-        const char * getDeleteStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlDelete,
                 id);
 
             return szStatement;

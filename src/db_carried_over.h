@@ -73,9 +73,6 @@ class DBCarriedOver : public DBEntity {
                         "updated = '%s' " \
                         "WHERE id = %lld;";
 
-        const char * sqlDelete = 
-                        "DELETE FROM carried_over_log WHERE id = %lld;";
-
     public:
         pfm_id_t                accountId;
         StrDate                 date;
@@ -156,20 +153,6 @@ class DBCarriedOver : public DBEntity {
                 description.c_str(),
                 balance.getRawStringValue().c_str(),
                 now.c_str(),
-                id);
-
-            return szStatement;
-        }
-
-        const char * getDeleteStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlDelete,
                 id);
 
             return szStatement;

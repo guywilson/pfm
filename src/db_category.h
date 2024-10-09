@@ -25,9 +25,6 @@ class DBCategory : public DBEntity {
         const char * sqlUpdate = 
                         "UPDATE category SET code = '%s', description = '%s', updated = '%s' WHERE id = %lld;";
 
-        const char * sqlDelete = 
-                        "DELETE FROM category WHERE id = %lld;";
-
     public:
         string                  description;
         string                  code;
@@ -106,20 +103,6 @@ class DBCategory : public DBEntity {
                 code.c_str(),
                 description.c_str(),
                 now.c_str(),
-                id);
-
-            return szStatement;
-        }
-
-        const char * getDeleteStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
-
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlDelete,
                 id);
 
             return szStatement;
