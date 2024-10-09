@@ -211,7 +211,7 @@ class DBTransaction : public DBPayment {
 
             this->reference = record.get("reference");
             this->isCredit = getIsCredit(record.get("creditDebit"));
-            this->isReconciled = (record.get("isReconciled").compare("Y") ? true : false);
+            this->isReconciled = (record.get("isReconciled").compare("Y") == 0 ? true : false);
         }
 
         JRecord getRecord() {
