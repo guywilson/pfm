@@ -56,6 +56,17 @@ class StrDate {
         static string getTimestamp(bool includems);
 
     public:
+        typedef enum {
+            sd_sunday = 0,
+            sd_monday = 1,
+            sd_tuesday = 2,
+            sd_wednesday = 3,
+            sd_thursday = 4,
+            sd_friday = 5,
+            sd_saturday = 6
+        }
+        sd_weekday;
+
         StrDate();
         StrDate(const StrDate & sd);
         StrDate(const string & sd);
@@ -85,6 +96,12 @@ class StrDate {
         int year() const;
         int month() const;
         int day() const;
+        
+        sd_weekday dayOfTheWeek() const;
+
+        bool isSunday() const;
+        bool isSaturday() const;
+        bool isWeekend() const;
 
         bool isEpoch() const;
 

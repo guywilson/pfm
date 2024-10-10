@@ -461,6 +461,49 @@ int StrDate::day() const {
     return atoi(_date.substr(8, 2).c_str());
 }
 
+StrDate::sd_weekday StrDate::dayOfTheWeek() const {
+    time_t rawTime;
+
+    time(&rawTime);
+    struct tm * timeInfo = localtime(&rawTime);
+
+    timeInfo->tm_year = year() - 1900;
+    timeInfo->tm_mon = month() - 1;
+    timeInfo->tm_mday = day();
+
+    mktime(timeInfo);
+
+    return (StrDate::sd_weekday)(timeInfo->tm_wday);
+}
+
+bool StrDate::isSunday() const {
+    StrDate::sd_weekday weekDay = dayOfTheWeek();
+
+    if (weekDay == sd_sunday) {
+        return true;
+    }
+
+    return false;
+}
+
+bool StrDate::isSaturday() const {
+    StrDate::sd_weekday weekDay = dayOfTheWeek();
+
+    if (weekDay == sd_saturday) {
+        return true;
+    }
+
+    return false;
+}
+
+bool StrDate::isWeekend() const {
+    if (isSaturday() || isSunday()) {
+        return true;
+    }
+
+    return false;
+}
+
 bool StrDate::isEpoch() const {
     return (year() == EPOCH_YEAR && month() == EPOCH_MONTH && day() == EPOCH_DAY);
 }
