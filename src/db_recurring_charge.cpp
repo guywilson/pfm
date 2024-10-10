@@ -191,6 +191,13 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
             break;
     }
 
+    if (nextPaymentDate.isSaturday()) {
+        nextPaymentDate = nextPaymentDate.addDays(2);
+    }
+    else if (nextPaymentDate.isSunday()) {
+        nextPaymentDate = nextPaymentDate.addDays(1);
+    }
+    
     return nextPaymentDate;
 }
 
