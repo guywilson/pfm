@@ -81,6 +81,21 @@ int main(int argc, char ** argv) {
         pszDatabase = strdup(DEFAULT_DATABASE_NAME);
     }
 
+    Terminal & t = Terminal::getInstance();
+
+    if ((int)t.getWidth() < TERMINAL_MIN_WIDTH || (int)t.getHeight() < TERMINAL_MIN_HEIGHT) {
+        fprintf(
+            stderr, 
+            "Terminal size must be at least %d x %d to run this program. " \
+            "Current size is %d x %d\n\n", 
+            TERMINAL_MIN_WIDTH,
+            TERMINAL_MIN_HEIGHT,
+            (int)t.getWidth(), 
+            (int)t.getHeight());
+
+        exit(-1);
+    }
+
     string logFileName = "./pfm.log";
 
     Logger & log = Logger::getInstance();
@@ -93,9 +108,6 @@ int main(int argc, char ** argv) {
 #ifdef PFM_TEST_SUITE_ENABLED
     test();
 #endif
-
-    Terminal & t = Terminal::getInstance();
-    cout << "Terminal: width: " << t.getWidth() << " x height: " << t.getHeight() << endl;
 
     Command command;
     // command.process("use HSBC");
