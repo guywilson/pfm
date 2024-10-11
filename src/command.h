@@ -93,7 +93,11 @@ class Command {
         bool hasParameters() {
             return (this->parameters.size() > 0);
         }
-        
+
+        int getNumParameters() {
+            return this->parameters.size();
+        }
+
         string getParameter(int index) {
             if (parameters.size() == 0) {
                 throw pfm_error("Expected parameters but none were supplied");
@@ -155,7 +159,7 @@ class Command {
 
         void addTransaction();
         void addTransaction(string & categoryCode, string & description, Money & amount);
-        void listTransactions(bool isOnlyNonRecurring);
+        void listTransactions(uint32_t rowLimit, db_sort_t sortOrder, bool isOnlyNonRecurring);
         void findTransactions();
         DBTransaction getTransaction(int sequence);
         void updateTransaction(DBTransaction & transaction);

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <vector>
 #include <unordered_map>
 
@@ -436,17 +437,17 @@ void Command::addTransaction(string & categoryCode, string & description, Money 
     transaction.save();
 }
 
-void Command::listTransactions(bool isOnlyNonRecurring) {
+void Command::listTransactions(uint32_t rowLimit, db_sort_t sortOrder, bool isOnlyNonRecurring) {
     checkAccountSelected();
 
     DBTransactionView transactionInstance;
     DBResult<DBTransactionView> result;
 
     if (isOnlyNonRecurring) {
-        result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sort_descending, 0);
+        result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sortOrder, rowLimit);
     }
     else {
-        result = transactionInstance.retrieveByAccountID(selectedAccount.id, sort_descending, 0);
+        result = transactionInstance.retrieveByAccountID(selectedAccount.id, sortOrder, rowLimit);
     }
 
     TransactionListView view;
@@ -836,7 +837,7 @@ Command::pfm_cmd_t Command::getCommandCode() {
     else if (isCommand("add-transaction") || isCommand("at") || isCommand("add")) {
         return pfm_cmd_transaction_add;
     }
-    else if (isCommand("list-transactions") || isCommand("lt")) {
+    else if (isCommand("list-transactions") || isCommand("lt") || isCommand("list")) {
         return pfm_cmd_transaction_list;
     }
     else if (isCommand("find-transactions") || isCommand("find")) {
@@ -1065,13 +1066,31 @@ bool Command::process(const string & command) {
         }
     }
     else if (this->commandCode == pfm_cmd_transaction_list) {
-        string nonRecurringTransactions;
+        bool includeRecurringTransactions;
+        uint32_t rowLimit = 0;
+        db_sort_t sortOrder = sort_descending;
 
-        if (hasParameters()) {
-            nonRecurringTransactions = getParameter(0);
+        for (string & parameter : parameters) {
+            if (isdigit(parameter[0])) {
+                rowLimit = strtoul(parameter.c_str(), NULL, 10);
+            }
+            else {
+                if (parameter.compare("all") == 0) {
+                    includeRecurringTransactions = false;
+                }
+                else if (parameter.compare("nr") == 0) {
+                    includeRecurringTransactions = true;
+                }
+                else if (parameter.compare("asc") == 0) {
+                    sortOrder = sort_ascending;
+                }
+                else if (parameter.compare("desc") == 0) {
+                    sortOrder = sort_descending;
+                }
+            }
         }
 
-        listTransactions(nonRecurringTransactions.compare("nrt") == 0 ? true : false);
+        listTransactions(rowLimit, sortOrder, includeRecurringTransactions);
     }
     else if (this->commandCode == pfm_cmd_transaction_find) {
         findTransactions();
