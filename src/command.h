@@ -90,6 +90,10 @@ class Command {
             return (commandNoParameters.compare(compareTo) == 0 ? true : false);
         }
 
+        bool hasParameters() {
+            return (this->parameters.size() > 0);
+        }
+        
         string getParameter(int index) {
             if (parameters.size() == 0) {
                 throw pfm_error("Expected parameters but none were supplied");

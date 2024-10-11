@@ -413,6 +413,29 @@ void Command::addTransaction() {
     transaction.save();
 }
 
+void Command::addTransaction(string & categoryCode, string & description, Money & amount) {
+    checkAccountSelected();
+
+    DBTransaction transaction;
+
+    try {
+        DBCategory category;
+        category.retrieveByCode(categoryCode);
+        transaction.categoryId = category.id;
+    }
+    catch (pfm_error & e) {
+        transaction.categoryId = 0;
+    }
+
+    transaction.accountId = selectedAccount.id;
+    transaction.date = StrDate::today();
+    transaction.description = description;
+    transaction.amount = amount;
+    transaction.isCredit = false;
+
+    transaction.save();
+}
+
 void Command::listTransactions(bool isOnlyNonRecurring) {
     checkAccountSelected();
 
@@ -1029,15 +1052,25 @@ bool Command::process(const string & command) {
         string transactionParameters = getParameter(0);
 
         if (transactionParameters.length() > 0) {
+            string categoryCode = getParameter(0);
+            string description = getParameter(1);
+            string amountStr = getParameter(2);
 
-            addTransaction();
+            Money amount(amountStr);
+
+            addTransaction(categoryCode, description, amount);
         }
         else {
             addTransaction();
         }
     }
     else if (this->commandCode == pfm_cmd_transaction_list) {
-        string nonRecurringTransactions = getParameter(0);
+        string nonRecurringTransactions;
+
+        if (hasParameters()) {
+            nonRecurringTransactions = getParameter(0);
+        }
+
         listTransactions(nonRecurringTransactions.compare("nrt") == 0 ? true : false);
     }
     else if (this->commandCode == pfm_cmd_transaction_find) {
