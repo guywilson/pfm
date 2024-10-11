@@ -719,9 +719,7 @@ void Command::clearLoggingLevel(string & level) {
     log.clearLogLevel(getLogLevelParameter(level));
 }
 
-Command::pfm_cmd_t Command::getCommandCode(const string & command) {
-    this->command = command;
-
+Command::pfm_cmd_t Command::getCommandCode() {
     if (isCommand("exit") || isCommand("quit") || isCommand("q")) {
         return pfm_cmd_exit;
     }
@@ -812,7 +810,7 @@ Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     else if (isCommand("export-recurring-charges") || isCommand("xrc")) {
         return pfm_cmd_charge_export;
     }
-    else if (isCommand("add-transaction") || isCommand("at")) {
+    else if (isCommand("add-transaction") || isCommand("at") || isCommand("add")) {
         return pfm_cmd_transaction_add;
     }
     else if (isCommand("list-transactions") || isCommand("lt")) {
@@ -880,214 +878,251 @@ Command::pfm_cmd_t Command::getCommandCode(const string & command) {
     }
 }
 
+void Command::parse(const string & command) {
+    this->command.clear();
+    this->parameters.clear();
+    
+    char * cmdString = strdup(command.c_str());;
+
+    char * part = strtok(cmdString, " ");
+
+    int i = 0;
+    while (part != NULL) {
+        if (i == 0) {
+            this->command = part;
+            this->commandCode = getCommandCode();
+        }
+        else {
+            this->parameters.push_back(part);
+        }
+
+        part = strtok(NULL, "/");
+        i++;
+    }
+}
+
 bool Command::process(const string & command) {
-    Command::pfm_cmd_t cmd = getCommandCode(command);
+    parse(command);
+
+    cout << "Got command '" << this->command << "'" << endl;
+
+    for (string & p : this->parameters) {
+        cout << "Got parameter '" << p << "'" << endl;
+    }
 
     commandHistory.push_back(command);
 
     bool isContinue = true;
 
-    if (cmd == pfm_cmd_exit) {
+    if (this->commandCode == pfm_cmd_exit) {
         isContinue = false;
     }
-    else if (cmd == pfm_cmd_help) {
+    else if (this->commandCode == pfm_cmd_help) {
         Command::help();
     }
-    else if (cmd == pfm_cmd_version) {
+    else if (this->commandCode == pfm_cmd_version) {
         Command::version();
     }
-    else if (cmd == pfm_cmd_account_add) {
+    else if (this->commandCode == pfm_cmd_account_add) {
         addAccount();
     }
-    else if (cmd == pfm_cmd_account_use) {
-        string accountCode = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_account_use) {
+        string accountCode = getParameter(0);
         chooseAccount(accountCode);
     }
-    else if (cmd == pfm_cmd_account_list) {
+    else if (this->commandCode == pfm_cmd_account_list) {
         listAccounts();
     }
-    else if (cmd == pfm_cmd_account_update) {
+    else if (this->commandCode == pfm_cmd_account_update) {
         updateAccount();
     }
-    else if (cmd == pfm_cmd_account_delete) {
+    else if (this->commandCode == pfm_cmd_account_delete) {
         checkAccountSelected();
 
         selectedAccount.remove();
         selectedAccount.clear();
     }
-    else if (cmd == pfm_cmd_account_import) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_account_import) {
+        string filename = getParameter(0);
         importAccounts(filename);
     }
-    else if (cmd == pfm_cmd_account_export) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_account_export) {
+        string filename = getParameter(0);
         exportAccounts(filename);
     }
-    else if (cmd == pfm_cmd_category_add) {
+    else if (this->commandCode == pfm_cmd_category_add) {
         addCategory();
     }
-    else if (cmd == pfm_cmd_category_list) {
+    else if (this->commandCode == pfm_cmd_category_list) {
         listCategories();
     }
-    else if (cmd == pfm_cmd_category_update) {
-        string categoryCode = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_category_update) {
+        string categoryCode = getParameter(0);
         DBCategory category = getCategory(categoryCode);
 
         updateCategory(category);
     }
-    else if (cmd == pfm_cmd_category_delete) {
-        string categoryCode = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_category_delete) {
+        string categoryCode = getParameter(0);
         DBCategory category = getCategory(categoryCode);
 
         deleteCategory(category);
     }
-    else if (cmd == pfm_cmd_category_import) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_category_import) {
+        string filename = getParameter(0);
         importCategories(filename);
     }
-    else if (cmd == pfm_cmd_category_export) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_category_export) {
+        string filename = getParameter(0);
         exportCategories(filename);
     }
-    else if (cmd == pfm_cmd_util_clear_categories) {
+    else if (this->commandCode == pfm_cmd_util_clear_categories) {
         clearCategories();
     }
-    else if (cmd == pfm_cmd_payee_add) {
+    else if (this->commandCode == pfm_cmd_payee_add) {
         addPayee();
     }
-    else if (cmd == pfm_cmd_payee_list) {
+    else if (this->commandCode == pfm_cmd_payee_list) {
         listPayees();
     }
-    else if (cmd == pfm_cmd_payee_update) {
-        string payeeCode = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_payee_update) {
+        string payeeCode = getParameter(0);
         DBPayee payee = getPayee(payeeCode);
 
         updatePayee(payee);
     }
-    else if (cmd == pfm_cmd_payee_delete) {
-        string payeeCode = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_payee_delete) {
+        string payeeCode = getParameter(0);
         DBPayee payee = getPayee(payeeCode);
 
         deletePayee(payee);
     }
-    else if (cmd == pfm_cmd_payee_import) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_payee_import) {
+        string filename = getParameter(0);
         importPayees(filename);
     }
-    else if (cmd == pfm_cmd_payee_export) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_payee_export) {
+        string filename = getParameter(0);
         exportPayees(filename);
     }
-    else if (cmd == pfm_cmd_charge_add) {
+    else if (this->commandCode == pfm_cmd_charge_add) {
         addRecurringCharge();
     }
-    else if (cmd == pfm_cmd_charge_list) {
+    else if (this->commandCode == pfm_cmd_charge_list) {
         listRecurringCharges();
     }
-    else if (cmd == pfm_cmd_charge_update) {
-        string sequence = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_charge_update) {
+        string sequence = getParameter(0);
 
         DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
         updateRecurringCharge(charge);
     }
-    else if (cmd == pfm_cmd_charge_delete) {
-        string sequence = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_charge_delete) {
+        string sequence = getParameter(0);
 
         DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
         deleteRecurringCharge(charge);
     }
-    else if (cmd == pfm_cmd_charge_import) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_charge_import) {
+        string filename = getParameter(0);
         importRecurringCharges(filename);
     }
-    else if (cmd == pfm_cmd_charge_export) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_charge_export) {
+        string filename = getParameter(0);
         exportRecurringCharges(filename);
     }
-    else if (cmd == pfm_cmd_transaction_add) {
-        addTransaction();
+    else if (this->commandCode == pfm_cmd_transaction_add) {
+        string transactionParameters = getParameter(0);
+
+        if (transactionParameters.length() > 0) {
+
+            addTransaction();
+        }
+        else {
+            addTransaction();
+        }
     }
-    else if (cmd == pfm_cmd_transaction_list) {
-        string nonRecurringTransactions = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_transaction_list) {
+        string nonRecurringTransactions = getParameter(0);
         listTransactions(nonRecurringTransactions.compare("nrt") == 0 ? true : false);
     }
-    else if (cmd == pfm_cmd_transaction_find) {
+    else if (this->commandCode == pfm_cmd_transaction_find) {
         findTransactions();
     }
-    else if (cmd == pfm_cmd_transaction_update) {
-        string sequence = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_transaction_update) {
+        string sequence = getParameter(0);
 
         DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
         updateTransaction(transaction);
     }
-    else if (cmd == pfm_cmd_transaction_delete) {
-        string sequence = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_transaction_delete) {
+        string sequence = getParameter(0);
 
         DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
         deleteTransaction(transaction);
     }
-    else if (cmd == pfm_cmd_transaction_import) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_transaction_import) {
+        string filename = getParameter(0);
         importTransactions(filename);
     }
-    else if (cmd == pfm_cmd_transaction_export) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_transaction_export) {
+        string filename = getParameter(0);
         exportTransactions(filename);
     }
-    else if (cmd == pfm_cmd_budget_add) {
+    else if (this->commandCode == pfm_cmd_budget_add) {
         addBudget();
     }
-    else if (cmd == pfm_cmd_budget_list) {
+    else if (this->commandCode == pfm_cmd_budget_list) {
         listBudgets();
     }
-    else if (cmd == pfm_cmd_budget_update) {
-        string sequence = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_budget_update) {
+        string sequence = getParameter(0);
 
         DBBudget budget = getBudget(atoi(sequence.c_str()));
         updateBudget(budget);
     }
-    else if (cmd == pfm_cmd_budget_delete) {
-        string sequence = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_budget_delete) {
+        string sequence = getParameter(0);
 
         DBBudget budget = getBudget(atoi(sequence.c_str()));
         deleteBudget(budget);
     }
-    else if (cmd == pfm_cmd_budget_import) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_budget_import) {
+        string filename = getParameter(0);
         importBudgets(filename);
     }
-    else if (cmd == pfm_cmd_budget_export) {
-        string filename = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_budget_export) {
+        string filename = getParameter(0);
         exportBudgets(filename);
     }
-    else if (cmd == pfm_cmd_debug_carried_over) {
+    else if (this->commandCode == pfm_cmd_debug_carried_over) {
         listCarriedOverLogs();
     }
-    else if (cmd == pfm_cmd_debug_budget_track) {
+    else if (this->commandCode == pfm_cmd_debug_budget_track) {
         listBudgetTracks();
     }
-    else if (cmd == pfm_cmd_debug_set_today) {
-        string today = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_debug_set_today) {
+        string today = getParameter(0);
         StrDate::setToday(today);
     }
-    else if (cmd == pfm_cmd_debug_clear_today) {
+    else if (this->commandCode == pfm_cmd_debug_clear_today) {
         StrDate::clearToday();
     }
-    else if (cmd == pfm_cmd_util_clear_recurring_transactions) {
+    else if (this->commandCode == pfm_cmd_util_clear_recurring_transactions) {
         clearRecurringTransactions();
     }
-    else if (cmd == pfm_cmd_logging_level_set) {
-        string logLevel = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_logging_level_set) {
+        string logLevel = getParameter(0);
         setLoggingLevel(logLevel);
     }
-    else if (cmd == pfm_cmd_logging_level_clear) {
-        string logLevel = getCommandParameter();
+    else if (this->commandCode == pfm_cmd_logging_level_clear) {
+        string logLevel = getParameter(0);
         clearLoggingLevel(logLevel);
     }
 
     if (isContinue) {
-        for (string & cmd : commandHistory) {
-            add_history(cmd.c_str());
+        for (string & command : commandHistory) {
+            add_history(command.c_str());
         }
     }
 

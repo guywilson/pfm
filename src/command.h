@@ -74,19 +74,35 @@ class Command {
 
     private:
         string command;
+        pfm_cmd_t commandCode;
+        vector<string> parameters;
+
         vector<string> commandHistory;
         DBAccount selectedAccount;
 
         Logger & log = Logger::getInstance();
 
+        void parse(const string & command);
+        
         bool isCommand(const char * compareTo) {
             string commandNoParameters = command.substr(0, command.find_last_of(' '));
 
             return (commandNoParameters.compare(compareTo) == 0 ? true : false);
         }
 
-        string getCommandParameter() {
-            return command.substr(command.find_last_of(' ') + 1);
+        string getParameter(int index) {
+            if (parameters.size() == 0) {
+                throw pfm_error("Expected parameters but none were supplied");
+            }
+            else if (index >= parameters.size()) {
+                throw pfm_error(
+                        pfm_error::buildMsg(
+                            "Expecting at least %d parameters but only %d have been supplied", 
+                            index + 1, 
+                            parameters.size()));
+            }
+
+            return parameters[index];
         }
 
         const char * getNoAccountSelectedMsg() {
@@ -134,6 +150,7 @@ class Command {
         void clearRecurringTransactions();
 
         void addTransaction();
+        void addTransaction(string & categoryCode, string & description, Money & amount);
         void listTransactions(bool isOnlyNonRecurring);
         void findTransactions();
         DBTransaction getTransaction(int sequence);
@@ -158,7 +175,7 @@ class Command {
         void clearLoggingLevel(string & level);
 
         bool isCommandValid();
-        pfm_cmd_t getCommandCode(const string & command);
+        pfm_cmd_t getCommandCode();
 
     public:
         static void help();
