@@ -18,6 +18,7 @@
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
 #include "command.h"
+#include "terminal.h"
 #include "money.h"
 #include "strdate.h"
 #include "version.h"
@@ -92,6 +93,9 @@ int main(int argc, char ** argv) {
 #ifdef PFM_TEST_SUITE_ENABLED
     test();
 #endif
+
+    Terminal & t = Terminal::getInstance();
+    cout << "Terminal: width: " << t.getWidth() << " x height: " << t.getHeight() << endl;
 
     Command command;
     // command.process("use HSBC");
