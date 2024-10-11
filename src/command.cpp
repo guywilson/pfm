@@ -881,7 +881,7 @@ Command::pfm_cmd_t Command::getCommandCode() {
 void Command::parse(const string & command) {
     this->command.clear();
     this->parameters.clear();
-    
+
     char * cmdString = strdup(command.c_str());;
 
     char * part = strtok(cmdString, " ");
@@ -903,12 +903,6 @@ void Command::parse(const string & command) {
 
 bool Command::process(const string & command) {
     parse(command);
-
-    cout << "Got command '" << this->command << "'" << endl;
-
-    for (string & p : this->parameters) {
-        cout << "Got parameter '" << p << "'" << endl;
-    }
 
     commandHistory.push_back(command);
 
