@@ -207,6 +207,11 @@ Money & Money::operator=(const string & rhs) {
     return *this;
 }
 
+Money & Money::operator=(const char * rhs) {
+    this->_setValue(rhs);
+    return *this;
+}
+
 Money & Money::operator=(const double rhs) {
     this->_setValue(rhs);
     return *this;

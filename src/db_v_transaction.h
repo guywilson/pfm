@@ -171,7 +171,7 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> retrieveNonRecurringByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
         DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t accountId, string & criteria);
+        DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t accountId, const string & criteria);
 };
 
 #endif

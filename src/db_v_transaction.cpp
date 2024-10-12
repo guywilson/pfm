@@ -87,7 +87,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(p
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_id_t accountId, string & criteria) {
+DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_id_t accountId, const string & criteria) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     int sqlRowLimit = SQL_ROW_LIMIT;
     DBResult<DBTransactionView> result;

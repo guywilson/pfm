@@ -57,6 +57,7 @@ class Money {
 
         Money & operator=(const Money & rhs);
         Money & operator=(const string & rhs);
+        Money & operator=(const char * rhs);
         Money & operator=(const double rhs);
 
         const Money operator+(const Money & rhs);

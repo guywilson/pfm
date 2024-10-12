@@ -26,6 +26,7 @@
 #include "db_carried_over.h"
 #include "db_v_budget_track.h"
 #include "jfile.h"
+#include "transaction_criteria.h"
 #include "command.h"
 
 using namespace std;
@@ -510,6 +511,10 @@ void Command::findTransactions() {
 
     delete findView;
     
+    findTransactions(criteria);
+}
+
+void Command::findTransactions(const string & criteria) {
     DBTransactionView tr;
     DBResult<DBTransactionView> result = tr.findTransactionsForAccountID(selectedAccount.id, criteria);
 
@@ -903,6 +908,8 @@ Command::pfm_cmd_t Command::getCommandCode() {
 }
 
 void Command::parse(const string & command) {
+    const char * parameterDelimiters = ";|";
+
     this->command.clear();
     this->parameters.clear();
 
@@ -920,7 +927,7 @@ void Command::parse(const string & command) {
             this->parameters.push_back(part);
         }
 
-        part = strtok(NULL, "/");
+        part = strtok(NULL, parameterDelimiters);
         i++;
     }
 }
@@ -1093,7 +1100,13 @@ bool Command::process(const string & command) {
         listTransactions(rowLimit, sortOrder, includeRecurringTransactions);
     }
     else if (this->commandCode == pfm_cmd_transaction_find) {
-        findTransactions();
+        if (hasParameters()) {
+            FindTransactionCriteriaBuilder builder(this->parameters);
+            findTransactions(builder.getCriteria());
+        }
+        else {
+            findTransactions();
+        }
     }
     else if (this->commandCode == pfm_cmd_transaction_update) {
         string sequence = getParameter(0);

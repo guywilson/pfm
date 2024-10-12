@@ -80,14 +80,20 @@ class Command {
         vector<string> commandHistory;
         DBAccount selectedAccount;
 
+        typedef enum {
+            expect_criteria_type,
+            expect_string_value,
+            expect_numeric_value,
+            expect_date_value
+        }
+        find_state_t;
+
         Logger & log = Logger::getInstance();
 
         void parse(const string & command);
         
         bool isCommand(const char * compareTo) {
-            string commandNoParameters = command.substr(0, command.find_last_of(' '));
-
-            return (commandNoParameters.compare(compareTo) == 0 ? true : false);
+            return (command.compare(compareTo) == 0 ? true : false);
         }
 
         bool hasParameters() {
@@ -98,7 +104,7 @@ class Command {
             return this->parameters.size();
         }
 
-        string getParameter(int index) {
+        string getParameter(int index) const {
             if (parameters.size() == 0) {
                 throw pfm_error("Expected parameters but none were supplied");
             }
@@ -161,6 +167,8 @@ class Command {
         void addTransaction(string & categoryCode, string & description, Money & amount);
         void listTransactions(uint32_t rowLimit, db_sort_t sortOrder, bool isOnlyNonRecurring);
         void findTransactions();
+        void findTransactions(const string & criteria);
+        string buildFindTransactionCriteria();
         DBTransaction getTransaction(int sequence);
         void updateTransaction(DBTransaction & transaction);
         void deleteTransaction(DBTransaction & transaction);
