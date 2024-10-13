@@ -165,7 +165,7 @@ class Command {
 
         void addTransaction();
         void addTransaction(string & categoryCode, string & description, Money & amount);
-        void listTransactions(uint32_t rowLimit, db_sort_t sortOrder, bool isOnlyNonRecurring);
+        void listTransactions(uint32_t rowLimit, bool isOnlyNonRecurring);
         void findTransactions();
         void findTransactions(const string & criteria);
         string buildFindTransactionCriteria();

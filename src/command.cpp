@@ -438,17 +438,17 @@ void Command::addTransaction(string & categoryCode, string & description, Money 
     transaction.save();
 }
 
-void Command::listTransactions(uint32_t rowLimit, db_sort_t sortOrder, bool isOnlyNonRecurring) {
+void Command::listTransactions(uint32_t rowLimit, bool isOnlyNonRecurring) {
     checkAccountSelected();
 
     DBTransactionView transactionInstance;
     DBResult<DBTransactionView> result;
 
     if (isOnlyNonRecurring) {
-        result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sortOrder, rowLimit);
+        result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sort_descending, rowLimit);
     }
     else {
-        result = transactionInstance.retrieveByAccountID(selectedAccount.id, sortOrder, rowLimit);
+        result = transactionInstance.retrieveByAccountID(selectedAccount.id, sort_descending, rowLimit);
     }
 
     TransactionListView view;
@@ -1075,7 +1075,6 @@ bool Command::process(const string & command) {
     else if (this->commandCode == pfm_cmd_transaction_list) {
         bool includeRecurringTransactions;
         uint32_t rowLimit = 0;
-        db_sort_t sortOrder = sort_descending;
 
         for (string & parameter : parameters) {
             if (isdigit(parameter[0])) {
@@ -1088,16 +1087,10 @@ bool Command::process(const string & command) {
                 else if (parameter.compare("nr") == 0) {
                     includeRecurringTransactions = true;
                 }
-                else if (parameter.compare("asc") == 0) {
-                    sortOrder = sort_ascending;
-                }
-                else if (parameter.compare("desc") == 0) {
-                    sortOrder = sort_descending;
-                }
             }
         }
 
-        listTransactions(rowLimit, sortOrder, includeRecurringTransactions);
+        listTransactions(rowLimit, includeRecurringTransactions);
     }
     else if (this->commandCode == pfm_cmd_transaction_find) {
         if (hasParameters()) {
