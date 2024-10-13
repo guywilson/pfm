@@ -775,168 +775,6 @@ void Command::clearLoggingLevel(string & level) {
     log.clearLogLevel(getLogLevelParameter(level));
 }
 
-Command::pfm_cmd_t Command::getCommandCode() {
-    if (isCommand("exit") || isCommand("quit") || isCommand("q")) {
-        return pfm_cmd_exit;
-    }
-    else if (isCommand("version")) {
-        return pfm_cmd_version;
-    }
-    else if (isCommand("help")) {
-        return pfm_cmd_help;
-    }
-    else if (isCommand("add-account") || isCommand("aa")) {
-        return pfm_cmd_account_add;
-    }
-    else if (isCommand("list-accounts") || isCommand("la")) {
-        return pfm_cmd_account_list;
-    }
-    else if (isCommand("use")) {
-        return pfm_cmd_account_use;
-    }
-    else if (isCommand("update-account") || isCommand("ua")) {
-        return pfm_cmd_account_update;
-    }
-    else if (isCommand("delete-account") || isCommand("da")) {
-        return pfm_cmd_account_delete;
-    }
-    else if (isCommand("show-balance") || isCommand("sb")) {
-        return pfm_cmd_account_balance;
-    }
-    else if (isCommand("import-accounts") || isCommand("ia")) {
-        return pfm_cmd_account_import;
-    }
-    else if (isCommand("export-accounts") || isCommand("xa")) {
-        return pfm_cmd_account_export;
-    }
-    else if (isCommand("add-category") || isCommand("ac")) {
-        return pfm_cmd_category_add;
-    }
-    else if (isCommand("list-categories") || isCommand("lc")) {
-        return pfm_cmd_category_list;
-    }
-    else if (isCommand("update-category") || isCommand("uc")) {
-        return pfm_cmd_category_update;
-    }
-    else if (isCommand("delete-category") || isCommand("dc")) {
-        return pfm_cmd_category_delete;
-    }
-    else if (isCommand("import-categories") || isCommand("ic")) {
-        return pfm_cmd_category_import;
-    }
-    else if (isCommand("export-categories") || isCommand("xc")) {
-        return pfm_cmd_category_export;
-    }
-    else if (isCommand("clear-categories")) {
-        return pfm_cmd_util_clear_categories;
-    }
-    else if (isCommand("add-payee") || isCommand("ap")) {
-        return pfm_cmd_payee_add;
-    }
-    else if (isCommand("list-payees") || isCommand("lp")) {
-        return pfm_cmd_payee_list;
-    }
-    else if (isCommand("update-payee") || isCommand("up")) {
-        return pfm_cmd_payee_update;
-    }
-    else if (isCommand("delete-payee") || isCommand("dp")) {
-        return pfm_cmd_payee_delete;
-    }
-    else if (isCommand("import-payees") || isCommand("ip")) {
-        return pfm_cmd_payee_import;
-    }
-    else if (isCommand("export-payees") || isCommand("xp")) {
-        return pfm_cmd_payee_export;
-    }
-    else if (isCommand("add-recurring-charge") || isCommand("arc")) {
-        return pfm_cmd_charge_add;
-    }
-    else if (isCommand("list-recurring-charges") || isCommand("lrc")) {
-        return pfm_cmd_charge_list;
-    }
-    else if (isCommand("update-recurring-charge") || isCommand("urc")) {
-        return pfm_cmd_charge_update;
-    }
-    else if (isCommand("delete-recurring-charge") || isCommand("drc")) {
-        return pfm_cmd_charge_delete;
-    }
-    else if (isCommand("import-recurring-charges") || isCommand("irc")) {
-        return pfm_cmd_charge_import;
-    }
-    else if (isCommand("export-recurring-charges") || isCommand("xrc")) {
-        return pfm_cmd_charge_export;
-    }
-    else if (isCommand("add-transaction") || isCommand("at") || isCommand("add")) {
-        return pfm_cmd_transaction_add;
-    }
-    else if (isCommand("transfer-transaction") || isCommand("tr") || isCommand("transfer")) {
-        return pfm_cmd_transaction_transfer;
-    }
-    else if (isCommand("list-transactions") || isCommand("lt") || isCommand("list")) {
-        return pfm_cmd_transaction_list;
-    }
-    else if (isCommand("find-transactions") || isCommand("find")) {
-        return pfm_cmd_transaction_find;
-    }
-    else if (isCommand("update-transaction") || isCommand("ut")) {
-        return pfm_cmd_transaction_update;
-    }
-    else if (isCommand("delete-transaction") || isCommand("dt")) {
-        return pfm_cmd_transaction_delete;
-    }
-    else if (isCommand("import-transactions") || isCommand("it")) {
-        return pfm_cmd_transaction_import;
-    }
-    else if (isCommand("export-transactions") || isCommand("xt")) {
-        return pfm_cmd_transaction_export;
-    }
-    else if (isCommand("add-budget") || isCommand("ab")) {
-        return pfm_cmd_budget_add;
-    }
-    else if (isCommand("list-budgets") || isCommand("lb")) {
-        return pfm_cmd_budget_list;
-    }
-    else if (isCommand("update-budget") || isCommand("ub")) {
-        return pfm_cmd_budget_update;
-    }
-    else if (isCommand("delete-budget") || isCommand("db")) {
-        return pfm_cmd_budget_delete;
-    }
-    else if (isCommand("import-budgets") || isCommand("ib")) {
-        return pfm_cmd_budget_import;
-    }
-    else if (isCommand("export-budgets") || isCommand("xb")) {
-        return pfm_cmd_budget_export;
-    }
-    else if (isCommand("list-carried-over-logs") || isCommand("lco")) {
-        return pfm_cmd_debug_carried_over;
-    }
-    else if (isCommand("list-budget-track-records") || isCommand("lbt")) {
-        return pfm_cmd_debug_budget_track;
-    }
-    else if (isCommand("set-today")) {
-        return pfm_cmd_debug_set_today;
-    }
-    else if (isCommand("clear-today")) {
-        return pfm_cmd_debug_clear_today;
-    }
-    else if (isCommand("clear-recurring-transactions")) {
-        return pfm_cmd_util_clear_recurring_transactions;
-    }
-    else if (isCommand("set-logging-level")) {
-        return pfm_cmd_logging_level_set;
-    }
-    else if (isCommand("clear-logging-level")) {
-        return pfm_cmd_logging_level_clear;
-    }
-    else {
-        throw pfm_validation_error(
-                    pfm_error::buildMsg(
-                        "Sorry, I do not understand command '%s', type help to see the list of commands", 
-                        command.c_str()));
-    }
-}
-
 void Command::parse(const string & command) {
     const char * parameterDelimiters = ";|";
 
@@ -951,7 +789,6 @@ void Command::parse(const string & command) {
     while (part != NULL) {
         if (i == 0) {
             this->command = part;
-            this->commandCode = getCommandCode();
         }
         else {
             this->parameters.push_back(part);
@@ -969,124 +806,124 @@ bool Command::process(const string & command) {
 
     bool isContinue = true;
 
-    if (this->commandCode == pfm_cmd_exit) {
+    if (isCommand("exit") || isCommand("quit") || isCommand("q")) {
         isContinue = false;
     }
-    else if (this->commandCode == pfm_cmd_help) {
-        Command::help();
-    }
-    else if (this->commandCode == pfm_cmd_version) {
+    else if (isCommand("version")) {
         Command::version();
     }
-    else if (this->commandCode == pfm_cmd_account_add) {
+    else if (isCommand("help")) {
+        Command::help();
+    }
+    else if (isCommand("add-account") || isCommand("aa")) {
         addAccount();
     }
-    else if (this->commandCode == pfm_cmd_account_use) {
+    else if (isCommand("list-accounts") || isCommand("la")) {
+        listAccounts();
+    }
+    else if (isCommand("use")) {
         string accountCode = getParameter(0);
         chooseAccount(accountCode);
     }
-    else if (this->commandCode == pfm_cmd_account_list) {
-        listAccounts();
-    }
-    else if (this->commandCode == pfm_cmd_account_update) {
+    else if (isCommand("update-account") || isCommand("ua")) {
         updateAccount();
     }
-    else if (this->commandCode == pfm_cmd_account_delete) {
+    else if (isCommand("delete-account") || isCommand("da")) {
         checkAccountSelected();
 
         selectedAccount.remove();
         selectedAccount.clear();
     }
-    else if (this->commandCode == pfm_cmd_account_import) {
+    else if (isCommand("import-accounts") || isCommand("ia")) {
         string filename = getParameter(0);
         importAccounts(filename);
     }
-    else if (this->commandCode == pfm_cmd_account_export) {
+    else if (isCommand("export-accounts") || isCommand("xa")) {
         string filename = getParameter(0);
         exportAccounts(filename);
     }
-    else if (this->commandCode == pfm_cmd_category_add) {
+    else if (isCommand("add-category") || isCommand("ac")) {
         addCategory();
     }
-    else if (this->commandCode == pfm_cmd_category_list) {
+    else if (isCommand("list-categories") || isCommand("lc")) {
         listCategories();
     }
-    else if (this->commandCode == pfm_cmd_category_update) {
+    else if (isCommand("update-category") || isCommand("uc")) {
         string categoryCode = getParameter(0);
         DBCategory category = getCategory(categoryCode);
 
         updateCategory(category);
     }
-    else if (this->commandCode == pfm_cmd_category_delete) {
+    else if (isCommand("delete-category") || isCommand("dc")) {
         string categoryCode = getParameter(0);
         DBCategory category = getCategory(categoryCode);
 
         deleteCategory(category);
     }
-    else if (this->commandCode == pfm_cmd_category_import) {
+    else if (isCommand("import-categories") || isCommand("ic")) {
         string filename = getParameter(0);
         importCategories(filename);
     }
-    else if (this->commandCode == pfm_cmd_category_export) {
+    else if (isCommand("export-categories") || isCommand("xc")) {
         string filename = getParameter(0);
         exportCategories(filename);
     }
-    else if (this->commandCode == pfm_cmd_util_clear_categories) {
+    else if (isCommand("clear-categories")) {
         clearCategories();
     }
-    else if (this->commandCode == pfm_cmd_payee_add) {
+    else if (isCommand("add-payee") || isCommand("ap")) {
         addPayee();
     }
-    else if (this->commandCode == pfm_cmd_payee_list) {
+    else if (isCommand("list-payees") || isCommand("lp")) {
         listPayees();
     }
-    else if (this->commandCode == pfm_cmd_payee_update) {
+    else if (isCommand("update-payee") || isCommand("up")) {
         string payeeCode = getParameter(0);
         DBPayee payee = getPayee(payeeCode);
 
         updatePayee(payee);
     }
-    else if (this->commandCode == pfm_cmd_payee_delete) {
+    else if (isCommand("delete-payee") || isCommand("dp")) {
         string payeeCode = getParameter(0);
         DBPayee payee = getPayee(payeeCode);
 
         deletePayee(payee);
     }
-    else if (this->commandCode == pfm_cmd_payee_import) {
+    else if (isCommand("import-payees") || isCommand("ip")) {
         string filename = getParameter(0);
         importPayees(filename);
     }
-    else if (this->commandCode == pfm_cmd_payee_export) {
+    else if (isCommand("export-payees") || isCommand("xp")) {
         string filename = getParameter(0);
         exportPayees(filename);
     }
-    else if (this->commandCode == pfm_cmd_charge_add) {
+    else if (isCommand("add-recurring-charge") || isCommand("arc")) {
         addRecurringCharge();
     }
-    else if (this->commandCode == pfm_cmd_charge_list) {
+    else if (isCommand("list-recurring-charges") || isCommand("lrc")) {
         listRecurringCharges();
     }
-    else if (this->commandCode == pfm_cmd_charge_update) {
+    else if (isCommand("update-recurring-charge") || isCommand("urc")) {
         string sequence = getParameter(0);
 
         DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
         updateRecurringCharge(charge);
     }
-    else if (this->commandCode == pfm_cmd_charge_delete) {
+    else if (isCommand("delete-recurring-charge") || isCommand("drc")) {
         string sequence = getParameter(0);
 
         DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
         deleteRecurringCharge(charge);
     }
-    else if (this->commandCode == pfm_cmd_charge_import) {
+    else if (isCommand("import-recurring-charges") || isCommand("irc")) {
         string filename = getParameter(0);
         importRecurringCharges(filename);
     }
-    else if (this->commandCode == pfm_cmd_charge_export) {
+    else if (isCommand("export-recurring-charges") || isCommand("xrc")) {
         string filename = getParameter(0);
         exportRecurringCharges(filename);
     }
-    else if (this->commandCode == pfm_cmd_transaction_add) {
+    else if (isCommand("add-transaction") || isCommand("at") || isCommand("add")) {
         string transactionParameters = getParameter(0);
 
         if (transactionParameters.length() > 0) {
@@ -1102,10 +939,10 @@ bool Command::process(const string & command) {
             addTransaction();
         }
     }
-    else if (this->commandCode == pfm_cmd_transaction_transfer) {
+    else if (isCommand("transfer-transaction") || isCommand("tr") || isCommand("transfer")) {
         addTransferTransaction();
     }
-    else if (this->commandCode == pfm_cmd_transaction_list) {
+    else if (isCommand("list-transactions") || isCommand("lt") || isCommand("list")) {
         bool includeRecurringTransactions;
         uint32_t rowLimit = 0;
 
@@ -1125,7 +962,7 @@ bool Command::process(const string & command) {
 
         listTransactions(rowLimit, includeRecurringTransactions);
     }
-    else if (this->commandCode == pfm_cmd_transaction_find) {
+    else if (isCommand("find-transactions") || isCommand("find")) {
         if (hasParameters()) {
             FindTransactionCriteriaBuilder builder(this->parameters);
             findTransactions(builder.getCriteria());
@@ -1134,75 +971,81 @@ bool Command::process(const string & command) {
             findTransactions();
         }
     }
-    else if (this->commandCode == pfm_cmd_transaction_update) {
+    else if (isCommand("update-transaction") || isCommand("ut")) {
         string sequence = getParameter(0);
 
         DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
         updateTransaction(transaction);
     }
-    else if (this->commandCode == pfm_cmd_transaction_delete) {
+    else if (isCommand("delete-transaction") || isCommand("dt")) {
         string sequence = getParameter(0);
 
         DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
         deleteTransaction(transaction);
     }
-    else if (this->commandCode == pfm_cmd_transaction_import) {
+    else if (isCommand("import-transactions") || isCommand("it")) {
         string filename = getParameter(0);
         importTransactions(filename);
     }
-    else if (this->commandCode == pfm_cmd_transaction_export) {
+    else if (isCommand("export-transactions") || isCommand("xt")) {
         string filename = getParameter(0);
         exportTransactions(filename);
     }
-    else if (this->commandCode == pfm_cmd_budget_add) {
+    else if (isCommand("add-budget") || isCommand("ab")) {
         addBudget();
     }
-    else if (this->commandCode == pfm_cmd_budget_list) {
+    else if (isCommand("list-budgets") || isCommand("lb")) {
         listBudgets();
     }
-    else if (this->commandCode == pfm_cmd_budget_update) {
+    else if (isCommand("update-budget") || isCommand("ub")) {
         string sequence = getParameter(0);
 
         DBBudget budget = getBudget(atoi(sequence.c_str()));
         updateBudget(budget);
     }
-    else if (this->commandCode == pfm_cmd_budget_delete) {
+    else if (isCommand("delete-budget") || isCommand("db")) {
         string sequence = getParameter(0);
 
         DBBudget budget = getBudget(atoi(sequence.c_str()));
         deleteBudget(budget);
     }
-    else if (this->commandCode == pfm_cmd_budget_import) {
+    else if (isCommand("import-budgets") || isCommand("ib")) {
         string filename = getParameter(0);
         importBudgets(filename);
     }
-    else if (this->commandCode == pfm_cmd_budget_export) {
+    else if (isCommand("export-budgets") || isCommand("xb")) {
         string filename = getParameter(0);
         exportBudgets(filename);
     }
-    else if (this->commandCode == pfm_cmd_debug_carried_over) {
+    else if (isCommand("list-carried-over-logs") || isCommand("lco")) {
         listCarriedOverLogs();
     }
-    else if (this->commandCode == pfm_cmd_debug_budget_track) {
+    else if (isCommand("list-budget-track-records") || isCommand("lbt")) {
         listBudgetTracks();
     }
-    else if (this->commandCode == pfm_cmd_debug_set_today) {
+    else if (isCommand("set-today")) {
         string today = getParameter(0);
         StrDate::setToday(today);
     }
-    else if (this->commandCode == pfm_cmd_debug_clear_today) {
+    else if (isCommand("clear-today")) {
         StrDate::clearToday();
     }
-    else if (this->commandCode == pfm_cmd_util_clear_recurring_transactions) {
+    else if (isCommand("clear-recurring-transactions")) {
         clearRecurringTransactions();
     }
-    else if (this->commandCode == pfm_cmd_logging_level_set) {
+    else if (isCommand("set-logging-level")) {
         string logLevel = getParameter(0);
         setLoggingLevel(logLevel);
     }
-    else if (this->commandCode == pfm_cmd_logging_level_clear) {
+    else if (isCommand("clear-logging-level")) {
         string logLevel = getParameter(0);
         clearLoggingLevel(logLevel);
+    }
+    else {
+        throw pfm_validation_error(
+                    pfm_error::buildMsg(
+                        "Sorry, I do not understand command '%s', type help to see the list of commands", 
+                        command.c_str()));
     }
 
     if (isContinue) {

@@ -17,77 +17,12 @@ using namespace std;
 #define __INCL_COMMAND
 
 class Command {
-    public:
-        typedef enum {
-            pfm_cmd_exit,
-            pfm_cmd_help,
-            pfm_cmd_version,
-            pfm_cmd_account_add,
-            pfm_cmd_account_list,
-            pfm_cmd_account_use,
-            pfm_cmd_account_update,
-            pfm_cmd_account_delete,
-            pfm_cmd_account_balance,
-            pfm_cmd_account_import,
-            pfm_cmd_account_export,
-            pfm_cmd_category_add,
-            pfm_cmd_category_list,
-            pfm_cmd_category_update,
-            pfm_cmd_category_delete,
-            pfm_cmd_category_import,
-            pfm_cmd_category_export,
-            pfm_cmd_payee_add,
-            pfm_cmd_payee_list,
-            pfm_cmd_payee_update,
-            pfm_cmd_payee_delete,
-            pfm_cmd_payee_import,
-            pfm_cmd_payee_export,
-            pfm_cmd_charge_add,
-            pfm_cmd_charge_list,
-            pfm_cmd_charge_update,
-            pfm_cmd_charge_delete,
-            pfm_cmd_charge_import,
-            pfm_cmd_charge_export,
-            pfm_cmd_transaction_add,
-            pfm_cmd_transaction_transfer,
-            pfm_cmd_transaction_list,
-            pfm_cmd_transaction_find,
-            pfm_cmd_transaction_update,
-            pfm_cmd_transaction_delete,
-            pfm_cmd_transaction_import,
-            pfm_cmd_transaction_export,
-            pfm_cmd_budget_add,
-            pfm_cmd_budget_list,
-            pfm_cmd_budget_update,
-            pfm_cmd_budget_delete,
-            pfm_cmd_budget_import,
-            pfm_cmd_budget_export,
-            pfm_cmd_debug_carried_over,
-            pfm_cmd_debug_budget_track,
-            pfm_cmd_debug_set_today,
-            pfm_cmd_debug_clear_today,
-            pfm_cmd_util_clear_recurring_transactions,
-            pfm_cmd_util_clear_categories,
-            pfm_cmd_logging_level_set,
-            pfm_cmd_logging_level_clear
-        }
-        pfm_cmd_t;
-
     private:
         string command;
-        pfm_cmd_t commandCode;
         vector<string> parameters;
 
         vector<string> commandHistory;
         DBAccount selectedAccount;
-
-        typedef enum {
-            expect_criteria_type,
-            expect_string_value,
-            expect_numeric_value,
-            expect_date_value
-        }
-        find_state_t;
 
         Logger & log = Logger::getInstance();
 
@@ -191,9 +126,6 @@ class Command {
         int getLogLevelParameter(string & level);
         void setLoggingLevel(string & level);
         void clearLoggingLevel(string & level);
-
-        bool isCommandValid();
-        pfm_cmd_t getCommandCode();
 
     public:
         static void help();
