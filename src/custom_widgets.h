@@ -94,6 +94,39 @@ class PayeeSpinField : public CLISpinTextField {
         }
 };
 
+class AccountSpinField : public CLISpinTextField {
+    private:
+        DBAccount account;
+
+    public:
+        AccountSpinField() : CLISpinTextField() {}
+        AccountSpinField(string & label) : CLISpinTextField(label) {}
+        AccountSpinField(const char * label) : CLISpinTextField(label) {}
+
+        void show() override {
+            DBResult<DBAccount> result;
+            result.retrieveAll();
+
+            for (int i = 0;i < result.getNumRows();i++) {
+                DBAccount account = result.getResultAt(i);
+                addItem(account.code);
+            }
+
+            populate();
+
+            string code = readLine();
+            _setValue(code);
+
+            account.retrieveByCode(code);
+
+            clear();
+        }
+
+        DBAccount getAccount() {
+            return account;
+        }
+};
+
 class DateField : public CLITextField {
     private:
         const int maxAttemps = 5;

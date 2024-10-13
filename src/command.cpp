@@ -438,6 +438,33 @@ void Command::addTransaction(string & categoryCode, string & description, Money 
     transaction.save();
 }
 
+void Command::addTransferTransaction() {
+    checkAccountSelected();
+
+    TransferToAccountView view;
+    view.setSourceAccountCode(selectedAccount.code);
+    view.show();
+
+    DBTransaction sourceTransaction = view.getSourceTransaction();
+    sourceTransaction.accountId = selectedAccount.id;
+
+    DBTransaction targetTransaction = view.getTargetTransaction();
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    try {
+        db.begin();
+
+        sourceTransaction.save();
+        targetTransaction.save();
+
+        db.commit();
+    }
+    catch (pfm_error & e) {
+        db.rollback();
+    }
+}
+
 void Command::listTransactions(uint32_t rowLimit, bool isOnlyNonRecurring) {
     checkAccountSelected();
 
@@ -842,6 +869,9 @@ Command::pfm_cmd_t Command::getCommandCode() {
     else if (isCommand("add-transaction") || isCommand("at") || isCommand("add")) {
         return pfm_cmd_transaction_add;
     }
+    else if (isCommand("transfer-transaction") || isCommand("tr") || isCommand("transfer")) {
+        return pfm_cmd_transaction_transfer;
+    }
     else if (isCommand("list-transactions") || isCommand("lt") || isCommand("list")) {
         return pfm_cmd_transaction_list;
     }
@@ -1071,6 +1101,9 @@ bool Command::process(const string & command) {
         else {
             addTransaction();
         }
+    }
+    else if (this->commandCode == pfm_cmd_transaction_transfer) {
+        addTransferTransaction();
     }
     else if (this->commandCode == pfm_cmd_transaction_list) {
         bool includeRecurringTransactions;

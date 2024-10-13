@@ -49,6 +49,7 @@ class Command {
             pfm_cmd_charge_import,
             pfm_cmd_charge_export,
             pfm_cmd_transaction_add,
+            pfm_cmd_transaction_transfer,
             pfm_cmd_transaction_list,
             pfm_cmd_transaction_find,
             pfm_cmd_transaction_update,
@@ -165,6 +166,7 @@ class Command {
 
         void addTransaction();
         void addTransaction(string & categoryCode, string & description, Money & amount);
+        void addTransferTransaction();
         void listTransactions(uint32_t rowLimit, bool isOnlyNonRecurring);
         void findTransactions();
         void findTransactions(const string & criteria);
