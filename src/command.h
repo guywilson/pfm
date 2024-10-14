@@ -100,7 +100,7 @@ class Command {
         void clearRecurringTransactions();
 
         void addTransaction();
-        void addTransaction(string & categoryCode, string & description, Money & amount);
+        void addTransaction(StrDate & date, string & categoryCode, string & description, Money & amount);
         void addTransferTransaction();
         void listTransactions(uint32_t rowLimit, bool isOnlyNonRecurring);
         void findTransactions();

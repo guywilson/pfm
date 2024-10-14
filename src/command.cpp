@@ -415,7 +415,7 @@ void Command::addTransaction() {
     transaction.save();
 }
 
-void Command::addTransaction(string & categoryCode, string & description, Money & amount) {
+void Command::addTransaction(StrDate & date, string & categoryCode, string & description, Money & amount) {
     checkAccountSelected();
 
     DBTransaction transaction;
@@ -430,7 +430,7 @@ void Command::addTransaction(string & categoryCode, string & description, Money 
     }
 
     transaction.accountId = selectedAccount.id;
-    transaction.date = StrDate::today();
+    transaction.date = date;
     transaction.description = description;
     transaction.amount = amount;
     transaction.isCredit = false;
@@ -924,16 +924,15 @@ bool Command::process(const string & command) {
         exportRecurringCharges(filename);
     }
     else if (isCommand("add-transaction") || isCommand("at") || isCommand("add")) {
-        string transactionParameters = getParameter(0);
-
-        if (transactionParameters.length() > 0) {
-            string categoryCode = getParameter(0);
-            string description = getParameter(1);
-            string amountStr = getParameter(2);
+        if (hasParameters()) {
+            StrDate date = getParameter(0);
+            string categoryCode = getParameter(1);
+            string description = getParameter(2);
+            string amountStr = getParameter(3);
 
             Money amount(amountStr);
 
-            addTransaction(categoryCode, description, amount);
+            addTransaction(date, categoryCode, description, amount);
         }
         else {
             addTransaction();
