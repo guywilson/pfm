@@ -4,6 +4,7 @@
 #include <string.h>
 #include <vector>
 #include <unordered_map>
+#include <list>
 #include <stdint.h>
 
 #include <sqlcipher/sqlite3.h>
