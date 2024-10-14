@@ -44,7 +44,10 @@ class CategorySpinField : public CLISpinTextField {
             if (category.id == 0) {
                 category.code = code;
                 category.description = readLine("Category description: ");
-                category.save();
+
+                if (category.code.length() > 0 && category.description.length() > 0) {
+                    category.save();
+                }
             }
 
             clear();
@@ -83,7 +86,10 @@ class PayeeSpinField : public CLISpinTextField {
             if (payee.id == 0) {
                 payee.code = code;
                 payee.name = readLine("Payee name: ");
-                payee.save();
+
+                if (payee.code.length() > 0 && payee.name.length() > 0) {
+                    payee.save();
+                }
             }
 
             clear();
