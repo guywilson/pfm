@@ -216,6 +216,18 @@ class DBResult : public Result {
             results.clear();
         }
 
+        void reverse() {
+            list<T> l;
+
+            for (int i = results.size() - 1;i >= 0;i--) {
+                l.push_back(results[i]);
+            }
+            for (int i = 0;i < results.size();i++) {
+                results[i] = l.front();
+                l.pop_front();
+            }
+        }
+        
         int retrieve(const char * sqlStatement);
         int retrieveAll();
 
