@@ -101,6 +101,24 @@ class DBRecurringCharge : public DBPayment {
             set(src);
         }
 
+        static const string getCSVHeader() {
+            return "accountCode,categoryCode,payeeCode,date,endDate,description,frequency,amount\n";
+        }
+
+        string getCSVRecord() {
+            string record = 
+                    "\"" + getAccountCode() + "\"," + 
+                    "\"" + category.code + "\"," +
+                    "\"" + payee.code + "\"," +
+                    "\"" + date.shortDate() + "\"," +
+                    "\"" + endDate.shortDate() + "\"," +
+                    "\"" + description + "\"," +
+                    "\"" + frequency + "\"," +
+                    "" + amount.getRawStringValue() + "\n";
+
+            return record;
+        }
+
         void clear() {
             DBPayment::clear();
 

@@ -21,6 +21,14 @@ using namespace std;
 #define __INCL_PAYMENT
 
 class DBPayment : public DBEntity {
+    protected:
+        string getAccountCode() {
+            DBAccount account;
+            account.retrieve(this->accountId);
+
+            return account.code;
+        }
+
     public:
         pfm_id_t accountId;
         pfm_id_t categoryId;
@@ -96,10 +104,7 @@ class DBPayment : public DBEntity {
         JRecord getRecord() {
             JRecord r;
 
-            DBAccount account;
-            account.retrieve(this->accountId);
-
-            r.add("accountCode", account.code);
+            r.add("accountCode", getAccountCode());
             r.add("categoryCode", this->category.code);
             r.add("payeeCode", this->payee.code);
             r.add("date", this->date.shortDate());

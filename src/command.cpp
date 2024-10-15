@@ -622,6 +622,24 @@ void Command::exportTransactions(string & jsonFileName) {
     jFile.write(records, "transactions");
 }
 
+void Command::exportTransactionsAsCSV(string & csvFileName) {
+    DBResult<DBTransaction> results;
+    results.retrieveAll();
+
+    ofstream out(csvFileName);
+
+    out << DBTransaction::getCSVHeader();
+
+    for (int i = 0;i < results.getNumRows();i++) {
+        DBTransaction transaction = results.getResultAt(i);
+
+        string record = transaction.getCSVRecord();
+        out << record;
+    }
+    
+    out.close();
+}
+
 void Command::addBudget() {
     AddBudgetView view;
     view.show();
@@ -989,6 +1007,10 @@ bool Command::process(const string & command) {
     else if (isCommand("export-transactions") || isCommand("xt")) {
         string filename = getParameter(0);
         exportTransactions(filename);
+    }
+    else if (isCommand("export-transactions-csv") || isCommand("xtc")) {
+        string filename = getParameter(0);
+        exportTransactionsAsCSV(filename);
     }
     else if (isCommand("add-budget") || isCommand("ab")) {
         addBudget();

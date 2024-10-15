@@ -188,6 +188,25 @@ class DBTransaction : public DBPayment {
             clear();
         }
 
+        static const string getCSVHeader() {
+            return "accountCode,categoryCode,payeeCode,date,description,reference,creditDebit,isReconciled,amount\n";
+        }
+
+        string getCSVRecord() {
+            string record = 
+                    "\"" + getAccountCode() + "\"," + 
+                    "\"" + category.code + "\"," +
+                    "\"" + payee.code + "\"," +
+                    "\"" + date.shortDate() + "\"," +
+                    "\"" + description + "\"," +
+                    "\"" + reference + "\"," +
+                    "\"" + getCreditDebitValue() + "\"," +
+                    "\"" + (isReconciled ? "Y" : "N") + "\"," +
+                    "" + amount.getRawStringValue() + "\n";
+
+            return record;
+        }
+
         void clear() {
             DBPayment::clear();
 

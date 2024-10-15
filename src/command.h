@@ -111,6 +111,7 @@ class Command {
         void deleteTransaction(DBTransaction & transaction);
         void importTransactions(string & jsonFileName);
         void exportTransactions(string & jsonFileName);
+        void exportTransactionsAsCSV(string & csvFileName);
 
         void addBudget();
         void listBudgets();
