@@ -99,8 +99,6 @@ bool StrDate::isMonth(string & part) {
 ** As above but with / rather than -
 */
 StrDate::YMD StrDate::splitDate(const string & date) {
-    log.logEntry("StrDate::splitDate()");
-
     if (date.length() != DATE_STRING_LENGTH) {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
@@ -116,13 +114,9 @@ StrDate::YMD StrDate::splitDate(const string & date) {
     strncpy(dateBuffer, date.c_str(), DATE_STRING_LENGTH);
     dateBuffer[DATE_STRING_LENGTH] = 0;
 
-    log.logDebug("splitDate() - got date buffer '%s'", dateBuffer);
-
     string part1 = strtok_r(dateBuffer, "-/", &pszDate);
     string part2 = strtok_r(NULL, "-/", &pszDate);
     string part3 = strtok_r(NULL, "-/", &pszDate);
-
-    log.logDebug("splitDate() - parts ['%s', '%s', '%s']", part1.c_str(), part2.c_str(), part3.c_str());
 
     StrDate::YMD dateComponents;
 
@@ -151,8 +145,6 @@ StrDate::YMD StrDate::splitDate(const string & date) {
     else if (isYear(part3)) {
         dateComponents.year = (unsigned int)atoi(part3.c_str());
     }
-
-    log.logExit("StrDate::splitDate()");
 
     return dateComponents;
 }
@@ -333,8 +325,6 @@ void StrDate::set(const char * date) {
         clear();
     }
     else if (strlen(date) > 0) {
-        log.logDebug("Setting date from string '%s'", date);
-
         validateDateString(date);
 
         StrDate::YMD dateComponents = splitDate(date);

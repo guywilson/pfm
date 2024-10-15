@@ -144,6 +144,8 @@ void DBAccount::createCarriedOverLogs() {
     StrDate dateToday;
     StrDate periodEndDate = dateToday.addMonths(-1).firstDayInMonth();
 
+    log.logDebug("Using periodEndDate: %s", periodEndDate.shortDate().c_str());
+
     PFM_DB & db = PFM_DB::getInstance();
 
     try {
@@ -152,7 +154,10 @@ void DBAccount::createCarriedOverLogs() {
         DBCarriedOver co;
         int hasCO = co.retrieveLatestByAccountId(this->id);
 
-        if (!hasCO) {
+        if (hasCO) {
+            log.logDebug("Latest DBCarriedOverLog date '%s'", co.date.shortDate().c_str());
+        }
+        else {
             DBTransactionView transaction;
             DBResult<DBTransactionView> result = transaction.retrieveByAccountID(this->id, sort_ascending, 1);
 
@@ -178,6 +183,8 @@ void DBAccount::createCarriedOverLogs() {
             StrDate firstDate = co.date.firstDayInMonth();
             StrDate secondDate = co.date.lastDayInMonth();
 
+            log.logDebug("Creating DBCarriedOverLog for dates '%s' to '%s'", firstDate.shortDate().c_str(), secondDate.shortDate().c_str());
+            
             DBCarriedOver newCo;
             newCo.balance = co.balance;
             newCo.createForPeriod(this->id, firstDate, secondDate);
