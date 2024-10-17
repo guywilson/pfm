@@ -51,4 +51,23 @@ class FindTransactionCriteriaBuilder {
         string getCriteria();
 };
 
+class AddTransactionCriteriaBuilder {
+    private:
+        vector<string> parameters;
+
+        void parse();
+        string getParameter(int index) const;
+
+    public:
+        StrDate date;
+        string categoryCode;
+        string payeeCode;
+        string description;
+        string reference;
+        bool isCredit = false;
+        Money amount = 0.0;
+
+        AddTransactionCriteriaBuilder(vector<string> & parms);
+};
+
 #endif

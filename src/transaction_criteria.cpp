@@ -258,3 +258,64 @@ string FindTransactionCriteriaBuilder::getCriteria() {
 
     return criteria;
 }
+
+string AddTransactionCriteriaBuilder::getParameter(int index) const {
+    if (parameters.size() == 0) {
+        throw pfm_error("Expected parameters but none were supplied");
+    }
+    else if (index >= parameters.size()) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Expecting at least %d parameters but only %d have been supplied", 
+                    index + 1, 
+                    parameters.size()));
+    }
+
+    return parameters[index];
+}
+
+void AddTransactionCriteriaBuilder::parse() {
+    int i = 0;
+
+    while (i < parameters.size()) {
+        string parameter = getParameter(i);
+
+        if (parameter.compare("d") == 0) {
+            this->date = getParameter(i + 1);
+            i += 2;
+        }
+        else if (parameter.compare("c") == 0) {
+            this->categoryCode = getParameter(i + 1);
+            i += 2;
+        }
+        else if (parameter.compare("p") == 0) {
+            this->payeeCode = getParameter(i + 1);
+            i += 2;
+        }
+        else if (parameter.compare("ds") == 0) {
+            this->description = getParameter(i + 1);
+            i += 2;
+        }
+        else if (parameter.compare("r") == 0) {
+            this->reference = getParameter(i + 1);
+            i += 2;
+        }
+        else if (parameter.compare("db") == 0) {
+            this->isCredit = false;
+            i++;
+        }
+        else if (parameter.compare("cr") == 0) {
+            this->isCredit = true;
+            i++;
+        }
+        else if (parameter.compare("a") == 0) {
+            this->amount = getParameter(i + 1);
+            i += 2;
+        }
+    }
+}
+
+AddTransactionCriteriaBuilder::AddTransactionCriteriaBuilder(vector<string> & parms) {
+    this->parameters = parms;
+    parse();
+}

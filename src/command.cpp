@@ -415,25 +415,35 @@ void Command::addTransaction() {
     transaction.save();
 }
 
-void Command::addTransaction(StrDate & date, string & categoryCode, string & description, Money & amount) {
+void Command::addTransaction(AddTransactionCriteriaBuilder & builder) {
     checkAccountSelected();
 
     DBTransaction transaction;
 
     try {
         DBCategory category;
-        category.retrieveByCode(categoryCode);
+        category.retrieveByCode(builder.categoryCode);
         transaction.categoryId = category.id;
     }
     catch (pfm_error & e) {
         transaction.categoryId = 0;
     }
 
+    try {
+        DBPayee payee;
+        payee.retrieveByCode(builder.payeeCode);
+        transaction.payeeId = payee.id;
+    }
+    catch (pfm_error & e) {
+        transaction.payeeId = 0;
+    }
+
     transaction.accountId = selectedAccount.id;
-    transaction.date = date;
-    transaction.description = description;
-    transaction.amount = amount;
-    transaction.isCredit = false;
+    transaction.date = builder.date;
+    transaction.description = builder.description;
+    transaction.reference = builder.reference;
+    transaction.amount = builder.amount;
+    transaction.isCredit = builder.isCredit;
 
     transaction.save();
 }
@@ -465,7 +475,7 @@ void Command::addTransferTransaction() {
     }
 }
 
-void Command::listTransactions(uint32_t rowLimit, bool isOnlyNonRecurring) {
+void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool isOnlyNonRecurring) {
     checkAccountSelected();
 
     DBTransactionView transactionInstance;
@@ -476,6 +486,10 @@ void Command::listTransactions(uint32_t rowLimit, bool isOnlyNonRecurring) {
     }
     else {
         result = transactionInstance.retrieveByAccountID(selectedAccount.id, sort_descending, rowLimit);
+    }
+
+    if (sortDirection == sort_ascending) {
+        result.reverse();
     }
 
     TransactionListView view;
@@ -794,7 +808,7 @@ void Command::clearLoggingLevel(string & level) {
 }
 
 void Command::parse(const string & command) {
-    const char * parameterDelimiters = ";|";
+    const char * parameterDelimiters = ";:|";
 
     this->command.clear();
     this->parameters.clear();
@@ -943,14 +957,9 @@ bool Command::process(const string & command) {
     }
     else if (isCommand("add-transaction") || isCommand("at") || isCommand("add")) {
         if (hasParameters()) {
-            StrDate date = getParameter(0);
-            string categoryCode = getParameter(1);
-            string description = getParameter(2);
-            string amountStr = getParameter(3);
+            AddTransactionCriteriaBuilder builder(this->parameters);
 
-            Money amount(amountStr);
-
-            addTransaction(date, categoryCode, description, amount);
+            addTransaction(builder);
         }
         else {
             addTransaction();
@@ -962,6 +971,7 @@ bool Command::process(const string & command) {
     else if (isCommand("list-transactions") || isCommand("lt") || isCommand("list")) {
         bool includeRecurringTransactions;
         uint32_t rowLimit = 0;
+        db_sort_t sortDirection = sort_descending;
 
         for (string & parameter : parameters) {
             if (isdigit(parameter[0])) {
@@ -974,10 +984,13 @@ bool Command::process(const string & command) {
                 else if (parameter.compare("nr") == 0) {
                     includeRecurringTransactions = true;
                 }
+                else if (parameter.compare("asc") == 0) {
+                    sortDirection = sort_ascending;
+                }
             }
         }
 
-        listTransactions(rowLimit, includeRecurringTransactions);
+        listTransactions(rowLimit, sortDirection, includeRecurringTransactions);
     }
     else if (isCommand("find-transactions") || isCommand("find")) {
         if (hasParameters()) {

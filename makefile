@@ -7,8 +7,8 @@
 ###############################################################################
 
 # Version number for pfm
-MAJOR_VERSION = 0
-MINOR_VERSION = 8
+MAJOR_VERSION = 1
+MINOR_VERSION = 0
 
 # Directories
 SOURCE = src
@@ -39,8 +39,8 @@ CPPFLAGS_BASE = -c -Wall -pedantic -std=c++20 -DSQLITE_HAS_CODEC $(GLOBAL_DEF)
 CPPFLAGS_REL=$(CPPFLAGS_BASE) -O2
 CPPFLAGS_DBG=$(CPPFLAGS_BASE) -g
 
-CPPFLAGS=$(CPPFLAGS_DBG)
-CFLAGS=$(CFLAGS_DBG)
+CPPFLAGS=$(CPPFLAGS_REL)
+CFLAGS=$(CFLAGS_REL)
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP)/$*.Td
 
 # Libraries

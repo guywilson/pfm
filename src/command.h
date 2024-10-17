@@ -10,6 +10,7 @@
 #include "db_budget.h"
 #include "db_carried_over.h"
 #include "db_budget_track.h"
+#include "transaction_criteria.h"
 
 using namespace std;
 
@@ -100,9 +101,9 @@ class Command {
         void clearRecurringTransactions();
 
         void addTransaction();
-        void addTransaction(StrDate & date, string & categoryCode, string & description, Money & amount);
+        void addTransaction(AddTransactionCriteriaBuilder & builder);
         void addTransferTransaction();
-        void listTransactions(uint32_t rowLimit, bool isOnlyNonRecurring);
+        void listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool isOnlyNonRecurring);
         void findTransactions();
         void findTransactions(const string & criteria);
         string buildFindTransactionCriteria();
