@@ -969,23 +969,25 @@ bool Command::process(const string & command) {
         addTransferTransaction();
     }
     else if (isCommand("list-transactions") || isCommand("lt") || isCommand("list")) {
-        bool includeRecurringTransactions;
+        bool includeRecurringTransactions = true;
         uint32_t rowLimit = 0;
         db_sort_t sortDirection = sort_descending;
 
-        for (string & parameter : parameters) {
-            if (isdigit(parameter[0])) {
-                rowLimit = strtoul(parameter.c_str(), NULL, 10);
-            }
-            else {
-                if (parameter.compare("all") == 0) {
-                    includeRecurringTransactions = false;
+        if (hasParameters()) {
+            for (string & parameter : parameters) {
+                if (isdigit(parameter[0])) {
+                    rowLimit = strtoul(parameter.c_str(), NULL, 10);
                 }
-                else if (parameter.compare("nr") == 0) {
-                    includeRecurringTransactions = true;
-                }
-                else if (parameter.compare("asc") == 0) {
-                    sortDirection = sort_ascending;
+                else {
+                    if (parameter.compare("all") == 0) {
+                        includeRecurringTransactions = false;
+                    }
+                    else if (parameter.compare("nr") == 0) {
+                        includeRecurringTransactions = true;
+                    }
+                    else if (parameter.compare("asc") == 0) {
+                        sortDirection = sort_ascending;
+                    }
                 }
             }
         }
