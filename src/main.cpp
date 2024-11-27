@@ -110,8 +110,7 @@ int main(int argc, char ** argv) {
 #endif
 
     Command command;
-    // command.process("use HSBC");
-    // exit(0);
+    command.process("list-accounts");
 
     while (loop) {
         string cmdString = readline("pfm > ");
