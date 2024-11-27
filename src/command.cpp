@@ -25,6 +25,7 @@
 #include "db_budget.h"
 #include "db_carried_over.h"
 #include "db_v_budget_track.h"
+#include "db_v_carried_over.h"
 #include "jfile.h"
 #include "transaction_criteria.h"
 #include "command.h"
@@ -743,7 +744,7 @@ void Command::exportBudgets(string & jsonFileName) {
 }
 
 void Command::listCarriedOverLogs() {
-    DBResult<DBCarriedOver> result;
+    DBResult<DBCarriedOverView> result;
     result.retrieveAll();
 
     CarriedOverListView view;

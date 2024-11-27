@@ -6,7 +6,7 @@
 #include "pfm_error.h"
 #include "cli_widget.h"
 #include "custom_widgets.h"
-#include "db_carried_over.h"
+#include "db_v_carried_over.h"
 #include "db_v_budget_track.h"
 
 using namespace std;
@@ -18,7 +18,7 @@ class CarriedOverListView : public CLIListView {
     public:
         CarriedOverListView() : CLIListView() {}
 
-        void addResults(DBResult<DBCarriedOver> & result) {
+        void addResults(DBResult<DBCarriedOverView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
             snprintf(szTitle, TITLE_BUFFER_LEN, "Carried Over Logs (%d)", result.getNumRows());
@@ -26,22 +26,26 @@ class CarriedOverListView : public CLIListView {
 
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
+            CLIListColumn column1 = CLIListColumn("Account", 7, CLIListColumn::leftAligned);
             headerRow.addColumn(column1);
 
-            CLIListColumn column2 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
+            CLIListColumn column2 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
-            CLIListColumn column3 = CLIListColumn("Balance", 16, CLIListColumn::leftAligned);
+            CLIListColumn column3 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
             headerRow.addColumn(column3);
+
+            CLIListColumn column4 = CLIListColumn("Balance", 16, CLIListColumn::rightAligned);
+            headerRow.addColumn(column4);
 
             addHeaderRow(headerRow);
 
             for (int i = 0;i < result.getNumRows();i++) {
-                DBCarriedOver co = result.getResultAt(i);
+                DBCarriedOverView co = result.getResultAt(i);
 
                 CLIListRow row(headerRow);
 
+                row.addCellValue(co.accountCode);
                 row.addCellValue(co.date.shortDate());
                 row.addCellValue(co.description);
                 row.addCellValue(co.balance);

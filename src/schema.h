@@ -355,6 +355,20 @@ static const char * pszCreateBudgetTrackTable =
 /*
 ** Create views, do this last...
 */
+const char * pszCreateCOView = 
+    "CREATE VIEW v_carried_over_log AS SELECT" \
+    "co.id," \
+    "co.account_id," \
+    "a.code AS account_code," \
+    "co.date," \
+    "co. description," \
+    "co.balance," \
+    "co.created," \
+    "co.updated" \
+    "FROM carried_over_log co" \
+    "LEFT JOIN account a ON a.id = co.account_id" \
+    "ORDER BY co.date DESC;";
+
 const char * pszCreateListRCView = 
     "CREATE VIEW v_recurring_charge_list AS SELECT " \
     "rc.id," \
