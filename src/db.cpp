@@ -285,6 +285,7 @@ void PFM_DB::createSchema() {
         createView(pszCreateCOView);
         createView(pszCreateListRCView);
         createView(pszCreateListTransationView);
+        createView(pszCreateBudgetTrackView);
 
         createCurrencies();
         createDefaultCategories();

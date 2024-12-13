@@ -411,4 +411,19 @@ static const char * pszCreateListTransationView =
     "LEFT JOIN category c ON c.id = tr.category_id " \
     "ORDER BY tr.date ASC;";
 
+static const char * pszCreateBudgetTrackView =
+    "CREATE VIEW v_budget_track AS SELECT " \
+    "bt.id," \
+    "bt.budget_id," \
+    "bt.date," \
+    "bt.balance," \
+    "bu.payee_code," \
+    "bu.category_code," \
+    "bu.description," \
+    "bt.created," \
+    "bt.updated " \
+    "FROM period_budget_track bt " \
+    "LEFT JOIN budget bu ON bu.id = bt.budget_id " \
+    "ORDER BY bt.date DESC";
+
 #endif
