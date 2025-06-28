@@ -9,3 +9,4 @@ pfm
 *.log
 *.sqbpro
 .pfm-journal
+.DS_Store

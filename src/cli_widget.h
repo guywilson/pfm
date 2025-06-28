@@ -466,8 +466,16 @@ class CLIListRow : public CLIWidget {
         }
 
         void printTopBorder() {
-            for (int i = 0;i < tableWidth;i++) {
-                cout << "-";
+            cout << "+";
+
+            for (int i = 0;i < getNumColumns();i++) {
+                CLIListColumn column = getColumnAt(i);
+
+                for (int j = 0;j < column.getColumnWidth() - 1;j++) {
+                    cout << '-';
+                }
+
+                cout << '+';
             }
 
             cout << endl;
