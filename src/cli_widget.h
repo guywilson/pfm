@@ -575,6 +575,8 @@ class CLIListRow : public CLIWidget {
         }
 
         void showHeaderRow() {
+            printTopBorder();
+
             cout << "| ";
 
             for (int i = 0;i < getNumColumns();i++) {
@@ -630,6 +632,10 @@ class CLIListView : public CLIView {
 
             for (int i = 0;i < (int)dataRows.size();i++) {
                 dataRows[i].show();
+            }
+
+            if (!dataRows.empty()) {
+                showBottomBorder();
             }
 
             cout << endl;
