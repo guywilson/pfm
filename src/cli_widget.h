@@ -450,7 +450,6 @@ class CLIListRow : public CLIWidget {
     private:
         vector<CLIListColumn> columnDefintions;
         vector<string> columnValues;
-        int tableWidth;
 
     public:
         CLIListRow() : CLIWidget() {}
@@ -576,21 +575,14 @@ class CLIListRow : public CLIWidget {
         }
 
         void showHeaderRow() {
-            tableWidth = 0;
-
             cout << "| ";
 
             for (int i = 0;i < getNumColumns();i++) {
                 CLIListColumn column = getColumnAt(i);
-
                 column.printColumnHeader();
-
-                tableWidth += column.getColumnWidth();
             }
 
             cout << endl;
-
-            tableWidth += 1;
 
             printTopBorder();
         }
