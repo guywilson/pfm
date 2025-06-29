@@ -146,8 +146,7 @@ class RecurringChargeListView : public CLIListView {
         }
 
         void show() override {
-            CLIListView::show();
-            showBottomBorder();
+            CLIListView::showNoExtraCR();
             cout << "                                                                    Total charges: | " << bold_on << right << setw(17) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
         }
 };

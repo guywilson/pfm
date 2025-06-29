@@ -625,7 +625,7 @@ class CLIListView : public CLIView {
             headerRow.printBottomBorder();
         }
 
-        void show() override {
+        void showNoExtraCR() {
             printTitle();
 
             headerRow.showHeaderRow();
@@ -637,7 +637,10 @@ class CLIListView : public CLIView {
             if (!dataRows.empty()) {
                 showBottomBorder();
             }
+        }
 
+        void show() override {
+            showNoExtraCR();
             cout << endl;
         }
 };

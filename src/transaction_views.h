@@ -221,8 +221,7 @@ class TransactionListView : public CLIListView {
         }
 
         void show() override {
-            CLIListView::show();
-            showBottomBorder();
+            CLIListView::showNoExtraCR();
             cout << "                                                                        Total amount: | " << bold_on << right << setw(17) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
         }
 };

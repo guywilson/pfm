@@ -129,6 +129,17 @@ money_t Money::getDecimalValueFromString(const char * amount) {
         char buffer[AMOUNT_BUFFER_LENGTH];
 
         copyAfterDecimalPoint(buffer, amount, AMOUNT_BUFFER_LENGTH);
+
+        /*
+        ** If the amount after the decimal point is only 1 char,
+        ** e.g. 96.2, this is actually 96.20, not 96.02. This can
+        ** happen if we are importing transactions for example from a
+        ** spreadsheet...
+        */
+        if (strlen(buffer) == 1) {
+            strncat(buffer, "0", AMOUNT_BUFFER_LENGTH);
+        }
+
         decimal = (money_t)strtol(buffer, NULL, 10);
     }
 
