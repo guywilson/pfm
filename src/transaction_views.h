@@ -562,7 +562,7 @@ class FindTransactionByDateView : public CLIFindView {
 
             if (afterDateField.getValue().length() > 0) {
                 StrDate earliestDate = afterDateField.getValue();
-                criteria += " date > '" + earliestDate.shortDate() + "'";
+                criteria += " date >= '" + earliestDate.shortDate() + "'";
             }
 
             if (beforeDateField.getValue().length() > 0) {
