@@ -69,11 +69,14 @@ void DBCarriedOver::createForPeriod(pfm_id_t accountId, StrDate & startDate, Str
     DBTransactionView tr;
     DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(accountId, startDate, endDate);
 
+    Money total = 0.00;
+
     for (int i = 0;i < transactionResult.getNumRows();i++) {
         DBTransaction transaction = transactionResult.getResultAt(i);
-        this->balance += transaction.getSignedAmount();
+        total += transaction.getSignedAmount();
     }
 
+    this->balance = total;
     this->accountId = accountId;
     this->date = endDate;
     this->description = "Carried over (" + this->date.shortDate() + ")";
