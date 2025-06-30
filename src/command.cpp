@@ -364,8 +364,23 @@ void Command::updateRecurringCharge(DBRecurringCharge & charge) {
 }
 
 void Command::deleteRecurringCharge(DBRecurringCharge & charge) {
-    charge.remove();
-    charge.clear();
+    PFM_DB & db = PFM_DB::getInstance();
+
+    DBTransaction tr;
+
+    try {
+        db.begin();
+
+        tr.deleteByRecurringChargeId(charge.id);
+
+        charge.remove();
+        charge.clear();
+
+        db.commit();
+    }
+    catch (pfm_error & e) {
+        db.rollback();
+    }
 }
 
 void Command::importRecurringCharges(string & jsonFileName) {
