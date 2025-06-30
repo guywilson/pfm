@@ -212,7 +212,7 @@ Money DBAccount::calculateCurrentBalance() {
     DBCarriedOver co;
     co.retrieveLatestByAccountId(this->id);
 
-    Money balance = co.balance;
+    Money balance = this->openingBalance + co.balance;
 
     try {
         StrDate dateToday;
@@ -244,7 +244,7 @@ Money DBAccount::calculateBalanceAfterBills() {
     DBCarriedOver co;
     co.retrieveLatestByAccountId(this->id);
 
-    Money balance = co.balance;
+    Money balance = this->openingBalance + co.balance;
     Money transactionBalance = 0.0;
     Money chargeBalance = 0.0;
 
