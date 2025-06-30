@@ -99,7 +99,7 @@ int main(int argc, char ** argv) {
     string logFileName = "./pfm.log";
 
     Logger & log = Logger::getInstance();
-    log.initLogger(logFileName, LOG_LEVEL_ALL);
+    log.initLogger(logFileName, LOG_LEVEL_FATAL | LOG_LEVEL_ERROR);
 
     PFM_DB & db = PFM_DB::getInstance();
     db.open(pszDatabase);
