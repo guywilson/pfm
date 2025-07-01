@@ -46,6 +46,23 @@ void test() {
 }
 #endif
 
+static void checkTerminalSize(void) {
+    Terminal & t = Terminal::getInstance();
+
+    if ((int)t.getWidth() < TERMINAL_MIN_WIDTH || (int)t.getHeight() < TERMINAL_MIN_HEIGHT) {
+        fprintf(
+            stderr, 
+            "Terminal size must be at least %d x %d to run this program. " \
+            "Current size is %d x %d\n\n", 
+            TERMINAL_MIN_WIDTH,
+            TERMINAL_MIN_HEIGHT,
+            (int)t.getWidth(), 
+            (int)t.getHeight());
+
+        exit(-1);
+    }
+}
+
 int main(int argc, char ** argv) {
     int             i;
     char *          pszDatabase = NULL;
@@ -81,20 +98,9 @@ int main(int argc, char ** argv) {
         pszDatabase = strdup(DEFAULT_DATABASE_NAME);
     }
 
-    Terminal & t = Terminal::getInstance();
-
-    if ((int)t.getWidth() < TERMINAL_MIN_WIDTH || (int)t.getHeight() < TERMINAL_MIN_HEIGHT) {
-        fprintf(
-            stderr, 
-            "Terminal size must be at least %d x %d to run this program. " \
-            "Current size is %d x %d\n\n", 
-            TERMINAL_MIN_WIDTH,
-            TERMINAL_MIN_HEIGHT,
-            (int)t.getWidth(), 
-            (int)t.getHeight());
-
-        exit(-1);
-    }
+#ifndef RUN_IN_DEBUGGER
+    checkTerminalSize();
+#endif
 
     string logFileName = "./pfm.log";
 
@@ -111,6 +117,11 @@ int main(int argc, char ** argv) {
 
     Command command;
     command.process("list-accounts");
+
+#ifdef RUN_IN_DEBUGGER
+    command.process("set-logging-level all");
+    command.process("use HSBC");
+#endif
 
     while (loop) {
         string cmdString = readline("pfm > ");

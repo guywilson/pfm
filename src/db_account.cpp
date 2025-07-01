@@ -88,6 +88,12 @@ void DBAccount::createRecurringTransactions() {
                     transactionDate = charge.getNextRecurringTransactionDate(transaction.date);
                 }
 
+                log.logDebug(
+                    "Got transaction date for charge %lld - '%s' as '%s'", 
+                    charge.id, 
+                    charge.description.c_str(), 
+                    transactionDate.shortDate().c_str());
+
                 while (transactionDate <= dateToday) {
                     if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
                         cout << "| " << transactionDate.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;

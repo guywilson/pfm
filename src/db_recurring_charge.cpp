@@ -173,6 +173,14 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
 
     StrDate nextPaymentDate = startDate;
 
+    /*
+    ** If the start date has been modified (as it fell on a weekend),
+    ** reset the nextPaymentDate here to what it should be...
+    */
+    if (startDate.day() != this->date.day()) {
+        nextPaymentDate.set(startDate.year(), startDate.month(), this->date.day());
+    }
+
     switch (frequencyUnit) {
         case 'y':
             nextPaymentDate = nextPaymentDate.addYears(frequencyValue);
