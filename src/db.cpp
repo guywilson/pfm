@@ -26,7 +26,7 @@
 using namespace std;
 
 
-// #define __DEBUG_PASSWD          "Cal14rnia"
+#define __DEBUG_PASSWD          ""
 
 static int __getch(void) {
 	int		ch;
