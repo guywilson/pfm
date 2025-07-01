@@ -65,11 +65,11 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
     return result;
 }
 
-void DBCarriedOver::createForPeriod(pfm_id_t accountId, StrDate & startDate, StrDate & endDate) {
+void DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate) {
     DBTransactionView tr;
     DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(accountId, startDate, endDate);
 
-    Money total = 0.00;
+    Money total = startingBalance;
 
     for (int i = 0;i < transactionResult.getNumRows();i++) {
         DBTransaction transaction = transactionResult.getResultAt(i);

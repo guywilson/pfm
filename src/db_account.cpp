@@ -171,8 +171,7 @@ void DBAccount::createCarriedOverLogs() {
             StrDate secondDate = firstTransaction.date.lastDayInMonth();
 
             DBCarriedOver newCo;
-            newCo.balance = openingBalance;
-            newCo.createForPeriod(this->id, firstDate, secondDate);
+            newCo.createForPeriod(this->id, openingBalance, firstDate, secondDate);
 
             co = newCo;
         }
@@ -186,8 +185,7 @@ void DBAccount::createCarriedOverLogs() {
             log.logDebug("Creating DBCarriedOverLog for dates '%s' to '%s'", firstDate.shortDate().c_str(), secondDate.shortDate().c_str());
             
             DBCarriedOver newCo;
-            newCo.balance = co.balance;
-            newCo.createForPeriod(this->id, firstDate, secondDate);
+            newCo.createForPeriod(this->id, co.balance, firstDate, secondDate);
 
             co = newCo;
         }
@@ -212,7 +210,7 @@ Money DBAccount::calculateCurrentBalance() {
     DBCarriedOver co;
     co.retrieveLatestByAccountId(this->id);
 
-    Money balance = this->openingBalance + co.balance;
+    Money balance = co.balance;
 
     try {
         StrDate dateToday;
@@ -244,7 +242,7 @@ Money DBAccount::calculateBalanceAfterBills() {
     DBCarriedOver co;
     co.retrieveLatestByAccountId(this->id);
 
-    Money balance = this->openingBalance + co.balance;
+    Money balance = co.balance;
     Money transactionBalance = 0.0;
     Money chargeBalance = 0.0;
 
