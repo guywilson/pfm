@@ -19,6 +19,8 @@ using namespace std;
 #define AMOUNT_FIELD_STRING_LEN                 16
 #define TITLE_BUFFER_LEN                       128
 
+#define CLI_CANCEL_KEY                          'x'
+
 #if defined(__APPLE__) || defined(__unix__)
 std::ostream& bold_on(std::ostream& os) {
     return os << "\e[1m";
@@ -190,6 +192,10 @@ class CLITextField : public CLIField {
             }
             else if (defaultValue.length() > 0) {
                 text = defaultValue;
+            }
+
+            if (text.length() == 1 && text[0] == CLI_CANCEL_KEY) {
+                throw pfm_field_cancel_error(_getLabel().c_str());
             }
 
             return text;

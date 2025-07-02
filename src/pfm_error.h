@@ -82,4 +82,14 @@ class pfm_validation_error : public pfm_error {
         pfm_validation_error(const char * msg, const char * file, int line) : pfm_error(msg, file, line) {}
 };
 
+class pfm_field_cancel_error : public pfm_error {
+    public:
+        const char * getTitle() {
+            return "Field entry cancelled: ";
+        }
+
+        pfm_field_cancel_error() : pfm_error() {}
+        pfm_field_cancel_error(const char * fieldLabel) : pfm_error(fieldLabel) {}
+};
+
 #endif
