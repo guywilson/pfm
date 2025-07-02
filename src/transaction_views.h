@@ -412,8 +412,8 @@ class FindTransactionByPayeeView : public CLIFindView {
 class FindTransactionByCategoryView : public CLIFindView {
     private:
         CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
-        DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
-        DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+        DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
+        DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
         CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
 
     public:
@@ -444,7 +444,7 @@ class FindTransactionByCategoryView : public CLIFindView {
 
             if (afterDateField.getValue().length() > 0) {
                 StrDate earliestDate = afterDateField.getValue();
-                criteria += " AND date > '" + earliestDate.shortDate() + "'";
+                criteria += " AND date >= '" + earliestDate.shortDate() + "'";
             }
 
             if (beforeDateField.getValue().length() > 0) {
@@ -476,8 +476,8 @@ class FindTransactionByCategoryView : public CLIFindView {
 class FindTransactionByDescriptionView : public CLIFindView {
     private:
         CLITextField descriptionField = CLITextField("Transaction description: ");
-        DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
-        DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+        DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
+        DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
         CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
 
     public:
@@ -506,7 +506,7 @@ class FindTransactionByDescriptionView : public CLIFindView {
 
             if (afterDateField.getValue().length() > 0) {
                 StrDate earliestDate = afterDateField.getValue();
-                criteria += " AND date > '" + earliestDate.shortDate() + "'";
+                criteria += " AND date >= '" + earliestDate.shortDate() + "'";
             }
 
             if (beforeDateField.getValue().length() > 0) {
