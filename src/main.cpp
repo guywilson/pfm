@@ -63,19 +63,12 @@ static void checkTerminalSize(void) {
     }
 }
 
-static int handle_escape(int count, int key) {
-    cout << "In handle_escape()" << endl;
-    rl_forced_update_display();
-    return 0;
-}
-
 int main(int argc, char ** argv) {
     int             i;
     char *          pszDatabase = NULL;
     bool            loop = true;
 
     rl_bind_key('\t', rl_complete);
-    rl_bind_key(27, handle_escape);
     using_history();
 
 	if (argc > 1) {
