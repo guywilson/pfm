@@ -348,8 +348,8 @@ class UpdateTransactionView : public CLIView {
 class FindTransactionByPayeeView : public CLIFindView {
     private:
         PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
-        DateField afterDateField = DateField("Date (yyyy-mm-dd): ");
-        DateField beforeDateField = DateField("Date (yyyy-mm-dd)[today]: ");
+        DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
+        DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
         CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
 
     public:
