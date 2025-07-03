@@ -79,7 +79,7 @@ class BudgetTrackView : public CLIListView {
             CLIListColumn column4 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
             headerRow.addColumn(column4);
 
-            CLIListColumn column5 = CLIListColumn("Balance", 16, CLIListColumn::leftAligned);
+            CLIListColumn column5 = CLIListColumn("Balance", 16, CLIListColumn::rightAligned);
             headerRow.addColumn(column5);
 
             addHeaderRow(headerRow);
@@ -93,7 +93,7 @@ class BudgetTrackView : public CLIListView {
                 row.addCellValue(btv.categoryCode);
                 row.addCellValue(btv.date.shortDate());
                 row.addCellValue(btv.description);
-                row.addCellValue(btv.balance.getFormattedStringValue());
+                row.addCellValue(btv.balance);
 
                 addRow(row);
             }
