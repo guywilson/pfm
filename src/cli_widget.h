@@ -229,8 +229,6 @@ class CLITextField : public CLIField {
                 throw pfm_field_cancel_error(_getLabel().c_str());
             }
 
-            delimitSingleQuotes(text);
-
             return text;
         }
 
@@ -274,6 +272,7 @@ class CLITextField : public CLIField {
 
         void show() override {
             string line = readLine();
+            delimitSingleQuotes(line);
             _setValue(line);
         }
 };
