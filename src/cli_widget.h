@@ -225,10 +225,6 @@ class CLITextField : public CLIField {
                 text = defaultValue;
             }
 
-            if (text.length() == 1 && text[0] == CLI_CANCEL_KEY) {
-                throw pfm_field_cancel_error(_getLabel().c_str());
-            }
-
             return text;
         }
 
