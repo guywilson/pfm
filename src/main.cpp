@@ -65,8 +65,6 @@ static void checkTerminalSize(void) {
 }
 
 int handle_cancel_key(int count, int key) {
-    // rl_forced_update_display();
-    // return 0;
     throw pfm_field_cancel_error();
 }
 
