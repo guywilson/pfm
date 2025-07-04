@@ -25,8 +25,9 @@
 
 using namespace std;
 
-
-#define __DEBUG_PASSWD          ""
+#ifndef DEBUG_PASSWORD
+#define DEBUG_PASSWORD          ""
+#endif
 
 static int __getch(void) {
 	int		ch;
@@ -107,7 +108,7 @@ bool PFM_DB::open(string dbName) {
 #ifndef RUN_IN_DEBUGGER
         string password = getPassword();
 #else
-        string password = __DEBUG_PASSWD;
+        string password = DEBUG_PASSWORD;
 #endif
         sqlite3_key(this->dbHandle, password.c_str(), password.length());
     }
