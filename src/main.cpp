@@ -21,12 +21,12 @@
 #include "terminal.h"
 #include "money.h"
 #include "strdate.h"
+#include "rlcustom.h"
 #include "version.h"
 
 using namespace std;
 
 #define DEFAULT_DATABASE_NAME                   ".pfm"
-#define CANCEL_READLINE_KEYSEQ                  "\\C-x"
 
 #ifdef PFM_TEST_SUITE_ENABLED
 extern void testAccount();
@@ -64,18 +64,12 @@ static void checkTerminalSize(void) {
     }
 }
 
-int handle_cancel_key(int count, int key) {
-    throw pfm_field_cancel_error();
-}
-
 int main(int argc, char ** argv) {
     int             i;
     char *          pszDatabase = NULL;
     bool            loop = true;
 
-    rl_bind_key('\t', rl_complete);
-    rl_bind_keyseq(CANCEL_READLINE_KEYSEQ, handle_cancel_key);
-    using_history();
+    rl_utils::setup();
 
 	if (argc > 1) {
 		for (i = 1;i < argc;i++) {

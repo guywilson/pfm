@@ -8,6 +8,7 @@
 
 #include "money.h"
 #include "pfm_error.h"
+#include "rlcustom.h"
 
 using namespace std;
 
@@ -243,6 +244,7 @@ class CLITextField : public CLIField {
         CLITextField(const char * label) : CLIField(label) {}
 
         void setLengthLimit(int numChars) {
+            rl_utils::setLineLength(numChars);
             maxLength = numChars;
         }
 
