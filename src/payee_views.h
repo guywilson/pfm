@@ -80,7 +80,7 @@ class PayeeListView : public CLIListView {
             CLIListColumn column1 = CLIListColumn("Code", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column1);
 
-            CLIListColumn column2 = CLIListColumn("Name", 25, CLIListColumn::leftAligned);
+            CLIListColumn column2 = CLIListColumn("Name", 55, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
             addHeaderRow(headerRow);
