@@ -124,6 +124,8 @@ int main(int argc, char ** argv) {
 #endif
 
     while (loop) {
+        rl_utils::setLineLength(DEFAULT_LINE_LENGTH);
+        
         string cmdString = readline("pfm > ");
 
         if (cmdString.length()) {
