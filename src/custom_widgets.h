@@ -11,7 +11,6 @@ using namespace std;
 #ifndef __INCL_CUSTOM_WIDGETS
 #define __INCL_CUSTOM_WIDGETS
 
-#define CODE_FIELD_MAX_LENGTH                    5
 #define DATE_FIELD_LENGTH                       10
 
 class CategorySpinField : public CLISpinTextField {
@@ -24,7 +23,7 @@ class CategorySpinField : public CLISpinTextField {
         CategorySpinField(const char * label) : CLISpinTextField(label) {}
 
         void show() override {
-            setLengthLimit(CODE_FIELD_MAX_LENGTH);
+            rl_utils::setLineLength(maxLength);
 
             DBResult<DBCategory> result;
             result.retrieveAll();
@@ -43,6 +42,8 @@ class CategorySpinField : public CLISpinTextField {
 
             if (category.id == 0) {
                 category.code = code;
+
+                rl_utils::setLineLength(FIELD_STRING_LEN);
                 category.description = readLine("Category description: ");
 
                 if (category.code.length() > 0 && category.description.length() > 0) {
@@ -85,6 +86,8 @@ class PayeeSpinField : public CLISpinTextField {
 
             if (payee.id == 0) {
                 payee.code = code;
+
+                rl_utils::setLineLength(FIELD_STRING_LEN);
                 payee.name = readLine("Payee name: ");
 
                 if (payee.code.length() > 0 && payee.name.length() > 0) {
@@ -165,15 +168,23 @@ class DateField : public CLITextField {
         }
 
     public:
-        DateField() : CLITextField() {}
-        DateField(string & label) : CLITextField(label) {}
-        DateField(const char * label) : CLITextField(label) {}
+        DateField() : CLITextField() {
+            setLengthLimit(DATE_FIELD_LENGTH);
+        }
+
+        DateField(string & label) : CLITextField(label) {
+            setLengthLimit(DATE_FIELD_LENGTH);
+        }
+
+        DateField(const char * label) : CLITextField(label) {
+            setLengthLimit(DATE_FIELD_LENGTH);
+        }
 
         void show() override {
-            setLengthLimit(DATE_FIELD_LENGTH);
-
             populateDateHistory();
 
+            rl_utils::setLineLength(maxLength);
+            
             bool isDateValid = false;
             int attempts = 0;
             string line;

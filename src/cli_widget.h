@@ -19,6 +19,7 @@ using namespace std;
 #define MAX_PROMPT_LENGTH                      128
 #define AMOUNT_FIELD_STRING_LEN                 16
 #define TITLE_BUFFER_LEN                       128
+#define CODE_FIELD_MAX_LENGTH                    5
 
 #define CLI_CANCEL_KEY                         'x'
 #define SINGLE_QUOTE_CHAR                       39
@@ -180,7 +181,6 @@ class CLIField : public CLIWidget {
 
 class CLITextField : public CLIField {
     private:
-        int maxLength = FIELD_STRING_LEN;
         string defaultValue;
 
         uint64_t findSingleQuotePos(string & s, int startingPos = 0) {
@@ -213,6 +213,8 @@ class CLITextField : public CLIField {
         }
 
     protected:
+        int maxLength = FIELD_STRING_LEN;
+
         string readLine(const char * prompt) {
             string text;
 
@@ -277,9 +279,17 @@ class CLITextField : public CLIField {
 
 class CLICurrencyField : public CLITextField {
     public:
-        CLICurrencyField() : CLITextField() {}
-        CLICurrencyField(string & label) : CLITextField(label) {}
-        CLICurrencyField(const char * label) : CLITextField(label) {}
+        CLICurrencyField() : CLITextField() {
+            setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+        }
+
+        CLICurrencyField(string & label) : CLITextField(label) {
+            setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+        }
+
+        CLICurrencyField(const char * label) : CLITextField(label) {
+            setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+        }
 
         void setDefaultValue(double value) {
             char szValue[AMOUNT_FIELD_STRING_LEN];
@@ -293,7 +303,7 @@ class CLICurrencyField : public CLITextField {
         }
 
         void show() override {
-            setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+            rl_utils::setLineLength(maxLength);
 
             string line = readLine();
             _setValue(line);
@@ -320,9 +330,17 @@ class CLISpinTextField : public CLITextField {
         }
 
     public:
-        CLISpinTextField() : CLITextField() {}
-        CLISpinTextField(string & label) : CLITextField(label) {}
-        CLISpinTextField(const char * label) : CLITextField(label) {}
+        CLISpinTextField() : CLITextField() {
+            setLengthLimit(CODE_FIELD_MAX_LENGTH);
+        }
+
+        CLISpinTextField(string & label) : CLITextField(label) {
+            setLengthLimit(CODE_FIELD_MAX_LENGTH);
+        }
+
+        CLISpinTextField(const char * label) : CLITextField(label) {
+            setLengthLimit(CODE_FIELD_MAX_LENGTH);
+        }
 
         void addItem(string & item) {
             items.push_back(item);
@@ -331,6 +349,7 @@ class CLISpinTextField : public CLITextField {
         void show() override {
             populate();
 
+            rl_utils::setLineLength(maxLength);
             string line = readLine();
             _setValue(line);
 
