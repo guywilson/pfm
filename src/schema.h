@@ -228,6 +228,15 @@ const char * currencies[][3] = {
     {"ZWL", "Zimbabwe Dollar", "$"}
 };
 
+const char * commands[][4] = {
+    {"add-account", "aa", "", "Add a new account"},
+    {"list-accounts", "la", "", "List accounts"},
+    {"update-account", "ua", "account code", "Update the account with the supplied code"},
+    {"delete-account", "da", "account code", "Delete the account with the supplied code"},
+    {"add-payee", "ap", "", "Add a new payee"},
+    {"list-payees", "lp", "", "List payees"}
+};
+
 const char * pszCreateConfigTable =
     "CREATE TABLE config (" \
     "id INTEGER PRIMARY KEY," \

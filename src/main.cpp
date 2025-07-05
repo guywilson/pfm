@@ -33,7 +33,11 @@ extern void testAccount();
 #endif
 
 static void printUsage(void) {
-
+    cout << "pfm [options]" << endl;
+    cout << "Options:" << endl;
+    cout << "\t-db <db name> if not specified, defaults to '.pfm' in the current dir" << endl;
+    cout << "\t-h displays the help" << endl;
+    cout << "\t-version, -v print the program version" << endl << endl;
 }
 
 #ifdef PFM_TEST_SUITE_ENABLED
@@ -125,7 +129,7 @@ int main(int argc, char ** argv) {
 
     while (loop) {
         rl_utils::setLineLength(DEFAULT_LINE_LENGTH);
-        
+
         string cmdString = readline("pfm > ");
 
         if (cmdString.length()) {
