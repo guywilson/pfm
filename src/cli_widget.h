@@ -244,7 +244,6 @@ class CLITextField : public CLIField {
         CLITextField(const char * label) : CLIField(label) {}
 
         void setLengthLimit(int numChars) {
-            rl_utils::setLineLength(numChars);
             maxLength = numChars;
         }
 
@@ -269,6 +268,7 @@ class CLITextField : public CLIField {
         }
 
         void show() override {
+            rl_utils::setLineLength(maxLength);
             string line = readLine();
             delimitSingleQuotes(line);
             _setValue(line);
