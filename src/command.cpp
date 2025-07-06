@@ -32,6 +32,89 @@
 
 using namespace std;
 
+static DBAccount * createSampleAccount() {
+    DBAccount * account = new DBAccount();
+
+    account->code = "BANK";
+    account->name = "Sample bank account";
+    account->openingBalance = 1234.56;
+    account->openingDate = "2025-04-01";
+
+    return account;
+}
+
+static DBPayee * createSamplePayee() {
+    DBPayee * payee = new DBPayee();
+
+    payee->code = "JOES";
+    payee->name = "Joe's coffee shop";
+
+    return payee;
+}
+
+static DBCategory * createSampleCategory() {
+    DBCategory * category = new DBCategory();
+
+    category->code = "COFFE";
+    category->description = "Takeaway coffee";
+
+    return category;
+}
+
+static DBRecurringCharge * createSampleCharge() {
+    DBRecurringCharge * charge = new DBRecurringCharge();
+
+    DBAccount * account = createSampleAccount();
+    DBCategory * category = createSampleCategory();
+    DBPayee * payee = createSamplePayee();
+
+    charge->account = *account;
+    charge->amount = 12.63;
+    charge->category = *category;
+    charge->date = "2025-07-05";
+    charge->description = "Sample charge";
+    charge->endDate = "";
+    charge->frequency = "1m";
+    charge->payee = *payee;
+
+    return charge;
+}
+
+static DBTransaction * createSampleTransaction() {
+    DBTransaction * transaction = new DBTransaction();
+
+    DBAccount * account = createSampleAccount();
+    DBCategory * category = createSampleCategory();
+    DBPayee * payee = createSamplePayee();
+
+    transaction->account = *account;
+    transaction->amount = 15.78;
+    transaction->category = *category;
+    transaction->date = "2025-5-12";
+    transaction->description = "Sample transaction";
+    transaction->payee = *payee;
+    transaction->reference = "";
+
+    return transaction;
+}
+
+static DBBudget * createSampleBudget() {
+    DBBudget * budget = new DBBudget();
+
+    DBPayee * payee = createSamplePayee();
+    DBCategory * category = createSampleCategory();
+
+    budget->categoryCode = category->code;
+    budget->description = "Sample budget";
+    budget->endDate = "";
+    budget->maximumBudget = 100.00;
+    budget->minimumBudget = 0.00;
+    budget->payeeCode = payee->code;
+    budget->startDate = "2025-06-01";
+
+    return budget;
+}
+
 void Command::help() {
     const char * helpText = 
         "PFM supports the following commands, each command also has a short version\n" \
@@ -821,89 +904,6 @@ void Command::setLoggingLevel(string & level) {
 
 void Command::clearLoggingLevel(string & level) {
     log.clearLogLevel(getLogLevelParameter(level));
-}
-
-DBAccount * createSampleAccount() {
-    DBAccount * account = new DBAccount();
-
-    account->code = "BANK";
-    account->name = "Sample bank account";
-    account->openingBalance = 1234.56;
-    account->openingDate = "2025-04-01";
-
-    return account;
-}
-
-DBPayee * createSamplePayee() {
-    DBPayee * payee = new DBPayee();
-
-    payee->code = "JOES";
-    payee->name = "Joe's coffee shop";
-
-    return payee;
-}
-
-DBCategory * createSampleCategory() {
-    DBCategory * category = new DBCategory();
-
-    category->code = "COFFE";
-    category->description = "Takeaway coffee";
-
-    return category;
-}
-
-DBRecurringCharge * createSampleCharge() {
-    DBRecurringCharge * charge = new DBRecurringCharge();
-
-    DBAccount * account = createSampleAccount();
-    DBCategory * category = createSampleCategory();
-    DBPayee * payee = createSamplePayee();
-
-    charge->account = *account;
-    charge->amount = 12.63;
-    charge->category = *category;
-    charge->date = "2025-07-05";
-    charge->description = "Sample charge";
-    charge->endDate = "";
-    charge->frequency = "1m";
-    charge->payee = *payee;
-
-    return charge;
-}
-
-DBTransaction * createSampleTransaction() {
-    DBTransaction * transaction = new DBTransaction();
-
-    DBAccount * account = createSampleAccount();
-    DBCategory * category = createSampleCategory();
-    DBPayee * payee = createSamplePayee();
-
-    transaction->account = *account;
-    transaction->amount = 15.78;
-    transaction->category = *category;
-    transaction->date = "2025-5-12";
-    transaction->description = "Sample transaction";
-    transaction->payee = *payee;
-    transaction->reference = "";
-
-    return transaction;
-}
-
-DBBudget * createSampleBudget() {
-    DBBudget * budget = new DBBudget();
-
-    DBPayee * payee = createSamplePayee();
-    DBCategory * category = createSampleCategory();
-
-    budget->categoryCode = category->code;
-    budget->description = "Sample budget";
-    budget->endDate = "";
-    budget->maximumBudget = 100.00;
-    budget->minimumBudget = 0.00;
-    budget->payeeCode = payee->code;
-    budget->startDate = "2025-06-01";
-
-    return budget;
 }
 
 void Command::saveJsonTemplate() {
