@@ -823,85 +823,85 @@ void Command::clearLoggingLevel(string & level) {
     log.clearLogLevel(getLogLevelParameter(level));
 }
 
-DBAccount createSampleAccount() {
-    DBAccount account;
+DBAccount * createSampleAccount() {
+    DBAccount * account = new DBAccount();
 
-    account.code = "BANK";
-    account.name = "Sample bank account";
-    account.openingBalance = 1234.56;
-    account.openingDate = "2025-04-01";
+    account->code = "BANK";
+    account->name = "Sample bank account";
+    account->openingBalance = 1234.56;
+    account->openingDate = "2025-04-01";
 
     return account;
 }
 
-DBPayee createSamplePayee() {
-    DBPayee payee;
+DBPayee * createSamplePayee() {
+    DBPayee * payee = new DBPayee();
 
-    payee.code = "JOES";
-    payee.name = "Joe's coffee shop";
+    payee->code = "JOES";
+    payee->name = "Joe's coffee shop";
 
     return payee;
 }
 
-DBCategory createSampleCategory() {
-    DBCategory category;
+DBCategory * createSampleCategory() {
+    DBCategory * category = new DBCategory();
 
-    category.code = "COFFE";
-    category.description = "Takeaway coffee";
+    category->code = "COFFE";
+    category->description = "Takeaway coffee";
 
     return category;
 }
 
-DBRecurringCharge createSampleCharge() {
-    DBRecurringCharge charge;
+DBRecurringCharge * createSampleCharge() {
+    DBRecurringCharge * charge = new DBRecurringCharge();
 
-    DBAccount account = createSampleAccount();
-    DBCategory category = createSampleCategory();
-    DBPayee payee = createSamplePayee();
+    DBAccount * account = createSampleAccount();
+    DBCategory * category = createSampleCategory();
+    DBPayee * payee = createSamplePayee();
 
-    charge.account = account;
-    charge.amount = 12.63;
-    charge.category = category;
-    charge.date = "2025-07-05";
-    charge.description = "Sample charge";
-    charge.endDate = "";
-    charge.frequency = "1m";
-    charge.payee = payee;
+    charge->account = *account;
+    charge->amount = 12.63;
+    charge->category = *category;
+    charge->date = "2025-07-05";
+    charge->description = "Sample charge";
+    charge->endDate = "";
+    charge->frequency = "1m";
+    charge->payee = *payee;
 
     return charge;
 }
 
-DBTransaction createSampleTransaction() {
-    DBTransaction transaction;
+DBTransaction * createSampleTransaction() {
+    DBTransaction * transaction = new DBTransaction();
 
-    DBAccount account = createSampleAccount();
-    DBCategory category = createSampleCategory();
-    DBPayee payee = createSamplePayee();
+    DBAccount * account = createSampleAccount();
+    DBCategory * category = createSampleCategory();
+    DBPayee * payee = createSamplePayee();
 
-    transaction.account = account;
-    transaction.amount = 15.78;
-    transaction.category = category;
-    transaction.date = "2025-5-12";
-    transaction.description = "Sample transaction";
-    transaction.payee = payee;
-    transaction.reference = "";
+    transaction->account = *account;
+    transaction->amount = 15.78;
+    transaction->category = *category;
+    transaction->date = "2025-5-12";
+    transaction->description = "Sample transaction";
+    transaction->payee = *payee;
+    transaction->reference = "";
 
     return transaction;
 }
 
-DBBudget createSampleBudget() {
-    DBBudget budget;
+DBBudget * createSampleBudget() {
+    DBBudget * budget = new DBBudget();
 
-    DBPayee payee = createSamplePayee();
-    DBCategory category = createSampleCategory();
+    DBPayee * payee = createSamplePayee();
+    DBCategory * category = createSampleCategory();
 
-    budget.categoryCode = category.code;
-    budget.description = "Sample budget";
-    budget.endDate = "";
-    budget.maximumBudget = 100.00;
-    budget.minimumBudget = 0.00;
-    budget.payeeCode = payee.code;
-    budget.startDate = "2025-06-01";
+    budget->categoryCode = category->code;
+    budget->description = "Sample budget";
+    budget->endDate = "";
+    budget->maximumBudget = 100.00;
+    budget->minimumBudget = 0.00;
+    budget->payeeCode = payee->code;
+    budget->startDate = "2025-06-01";
 
     return budget;
 }
@@ -922,8 +922,9 @@ void Command::saveJsonTemplate() {
 
     cout << "Option = " << option << endl;
 
-    DBEntity entity;
+    DBEntity * entity;
     string name;
+    string className;
 
     switch (option) {
         case 1:
@@ -966,14 +967,16 @@ void Command::saveJsonTemplate() {
     }
 
     string filename = name + "_template.json";
-    JFileWriter writer(filename, entity.getClassName());
+    JFileWriter writer(filename, entity->getClassName());
 
     vector<JRecord> records;
 
-    records.push_back(entity.getRecord());
-    records.push_back(entity.getRecord());
+    records.push_back(entity->getRecord());
+    records.push_back(entity->getRecord());
 
     writer.write(records, name);
+
+    delete entity;
 }
 
 void Command::parse(const string & command) {

@@ -102,19 +102,24 @@ JFileWriter::~JFileWriter() {
 }
 
 void JFileWriter::write(vector<JRecord> & records, const char * name) {
-    json array;
+    auto jsonEntities = json::array();
 
     for (JRecord record : records) {
-        json j = json{};
-        array.push_back(record.getObject());
+        json j = json::object();
+        object_t o = record.getObject();
+
+        for (const auto& [key, value] : o) {
+            j[key] = value;
+        }
+
+        jsonEntities.push_back(j);
     }
 
-    json j;
-    j["className"] = this->className;
-    j[name] = array;
+    json entity;
+    entity["className"] = this->className;
+    entity[name] = {jsonEntities};
 
-    cout << j.dump(4) << endl;
-    this->fstream << j.dump(4) << endl;
+    this->fstream << entity.dump(4) << endl;
 }
 
 void JFileWriter::write(vector<JRecord> & records, string & name) {
