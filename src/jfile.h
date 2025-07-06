@@ -54,9 +54,11 @@ class JFileWriter {
 
     public:
         JFileWriter(string & filename, const char * className);
+        JFileWriter(const string & filename, const char * className);
         ~JFileWriter();
 
         void write(vector<JRecord> & records, const char * name);
+        void write(vector<JRecord> & records, string & name);
 };
 
 #endif

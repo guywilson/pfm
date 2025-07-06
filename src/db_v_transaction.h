@@ -166,6 +166,10 @@ class DBTransactionView : public DBTransaction {
             return "v_transaction_view";
         }
 
+        const char * getClassName() override {
+            return "DBTransactionView";
+        }
+
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);

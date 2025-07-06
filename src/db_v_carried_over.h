@@ -69,6 +69,10 @@ class DBCarriedOverView : public DBEntity {
         const char * getTableName() override {
             return "v_carried_over_log";
         }
+
+        const char * getClassName() override {
+            return "DBCarriedOverView";
+        }
 };
 
 #endif

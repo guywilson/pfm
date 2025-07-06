@@ -79,6 +79,10 @@ class DBBudgetTrackView : public DBEntity {
         const char * getTableName() override {
             return "v_budget_track";
         }
+
+        const char * getClassName() override {
+            return "DBBudgetTrackView";
+        }
 };
 
 #endif

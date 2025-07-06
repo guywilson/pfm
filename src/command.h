@@ -66,6 +66,8 @@ class Command {
             }
         }
 
+        void saveJsonTemplate();
+        
         void addAccount();
         void listAccounts();
         void chooseAccount(string & accountCode);

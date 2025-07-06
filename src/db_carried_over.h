@@ -120,6 +120,10 @@ class DBCarriedOver : public DBEntity {
             return "carried_over_log";
         }
 
+        const char * getClassName() override {
+            return "DBCarriedOver";
+        }
+
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 

@@ -124,6 +124,10 @@ class DBBudgetTrack : public DBEntity {
             return "period_budget_track";
         }
 
+        const char * getClassName() override {
+            return "DBBudgetTrack";
+        }
+
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 

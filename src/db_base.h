@@ -70,8 +70,17 @@ class DBEntity {
         
         virtual ~DBEntity() {}
 
+        virtual JRecord getRecord() {
+            JRecord r;
+            return r;
+        }
+        
         virtual const char * getTableName() {
             return "";
+        }
+
+        virtual const char * getClassName() {
+            return "DBEntity";
         }
 
         virtual const char * getSelectByIDStatement(pfm_id_t key) {

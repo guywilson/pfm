@@ -52,7 +52,7 @@ class DBCategory : public DBEntity {
             this->description = record.get("description");
         }
 
-        JRecord getRecord() {
+        JRecord getRecord() override  {
             JRecord r;
 
             r.add("code", this->code);
@@ -81,6 +81,10 @@ class DBCategory : public DBEntity {
 
         const char * getTableName() override {
             return "category";
+        }
+
+        const char * getClassName() override {
+            return "DBCategory";
         }
 
         const char * getInsertStatement() override {

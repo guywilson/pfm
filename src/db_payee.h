@@ -52,7 +52,7 @@ class DBPayee : public DBEntity {
             this->name = record.get("name");
         }
 
-        JRecord getRecord() {
+        JRecord getRecord() override  {
             JRecord r;
 
             r.add("code", this->code);
@@ -81,6 +81,10 @@ class DBPayee : public DBEntity {
 
         const char * getTableName() override {
             return "payee";
+        }
+
+        const char * getClassName() override {
+            return "DBPayee";
         }
 
         const char * getInsertStatement() override {

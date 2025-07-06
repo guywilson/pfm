@@ -112,6 +112,10 @@ class DBRecurringChargeView : public DBRecurringCharge {
             return "v_recurring_charge_list";
         }
 
+        const char * getClassName() override {
+            return "DBRecurringChrageView";
+        }
+
         DBResult<DBRecurringChargeView> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBRecurringChargeView> retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & dateAfter, StrDate & dateBefore);
 };

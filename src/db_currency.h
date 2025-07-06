@@ -75,6 +75,10 @@ class DBCurrency : public DBEntity {
             return "currency";
         }
 
+        const char * getClassName() override {
+            return "DBCurrency";
+        }
+
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 

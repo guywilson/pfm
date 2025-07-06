@@ -86,7 +86,7 @@ class DBAccount : public DBEntity {
             this->openingBalance = record.get("openingBalance");
         }
 
-        JRecord getRecord() {
+        JRecord getRecord() override  {
             JRecord r;
 
             r.add("name", name);
@@ -127,6 +127,10 @@ class DBAccount : public DBEntity {
 
         const char * getTableName() override {
             return "account";
+        }
+
+        const char * getClassName() override {
+            return "DBAccount";
         }
 
         const char * getInsertStatement() override {

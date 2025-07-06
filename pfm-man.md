@@ -18,7 +18,9 @@ PFM supports multiple accounts, transactions, recurring charges, categories and 
 
 The database file is specified using the option -db <*filename*>, if this is not specified, pfm assumes the filename is .pfm residing in the current directory.
 
-PFM supports importing and exporting of accounts, transactions, recurring charges, categories and payees. Import supports JSON format only, whilst ppm can export in JSON or CSV.
+PFM supports importing and exporting of accounts, transactions, recurring charges, categories and payees. Import supports JSON format only, whilst pfm can export in JSON or CSV formats.
+
+JSON import files must be in the format:
 
 
 

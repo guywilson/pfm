@@ -75,6 +75,10 @@ class DBConfig : public DBEntity {
             return "config";
         }
 
+        const char * getClassName() override {
+            return "DBConfig";
+        }
+
         const char * getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 

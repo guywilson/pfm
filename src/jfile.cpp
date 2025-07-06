@@ -92,6 +92,11 @@ JFileWriter::JFileWriter(string & filename, const char * className) {
     this->fstream.open(filename);
 }
 
+JFileWriter::JFileWriter(const string & filename, const char * className) {
+    this->className = className;
+    this->fstream.open(filename);
+}
+
 JFileWriter::~JFileWriter() {
     this->fstream.close();
 }
@@ -100,6 +105,7 @@ void JFileWriter::write(vector<JRecord> & records, const char * name) {
     json array;
 
     for (JRecord record : records) {
+        json j = json{};
         array.push_back(record.getObject());
     }
 
@@ -107,5 +113,10 @@ void JFileWriter::write(vector<JRecord> & records, const char * name) {
     j["className"] = this->className;
     j[name] = array;
 
+    cout << j.dump(4) << endl;
     this->fstream << j.dump(4) << endl;
+}
+
+void JFileWriter::write(vector<JRecord> & records, string & name) {
+    write(records, name.c_str());
 }

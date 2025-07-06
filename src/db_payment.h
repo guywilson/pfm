@@ -38,6 +38,7 @@ class DBPayment : public DBEntity {
         string description;
         Money amount;
 
+        DBAccount account;
         DBCategory category;
         DBPayee payee;
 
@@ -56,6 +57,7 @@ class DBPayment : public DBEntity {
             this->categoryId = 0;
             this->payeeId = 0;
 
+            this->account.clear();
             this->category.clear();
             this->payee.clear();
 
@@ -76,20 +78,18 @@ class DBPayment : public DBEntity {
             this->description = src.description;
             this->amount = src.amount;
 
+            this->account.set(src.account);
             this->category.set(src.category);
             this->payee.set(src.payee);
         }
 
         void set(JRecord & record) {
-            DBAccount account;
             string accountCode = record.get("accountCode");
             account.retrieveByCode(accountCode);
 
-            DBCategory category;
             string categoryCode = record.get("categoryCode");
             category.retrieveByCode(categoryCode);
 
-            DBPayee payee;
             string payeeCode = record.get("payeeCode");
             payee.retrieveByCode(payeeCode);
 
@@ -101,10 +101,10 @@ class DBPayment : public DBEntity {
             this->description = record.get("description");
         }
 
-        JRecord getRecord() {
+        JRecord getRecord() override {
             JRecord r;
 
-            r.add("accountCode", getAccountCode());
+            r.add("accountCode", this->account.code);
             r.add("categoryCode", this->category.code);
             r.add("payeeCode", this->payee.code);
             r.add("date", this->date.shortDate());

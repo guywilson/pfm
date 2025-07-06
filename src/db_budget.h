@@ -126,7 +126,7 @@ class DBBudget : public DBEntity {
             this->maximumBudget = record.get("maximumBudget");
         }
 
-        JRecord getRecord() {
+        JRecord getRecord() override  {
             JRecord r;
 
             r.add("startDate", this->startDate.shortDate());
@@ -184,6 +184,10 @@ class DBBudget : public DBEntity {
 
         const char * getTableName() override {
             return "budget";
+        }
+
+        const char * getClassName() override {
+            return "DBBudget";
         }
 
         const char * getInsertStatement() override {

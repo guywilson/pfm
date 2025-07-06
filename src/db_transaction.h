@@ -233,7 +233,7 @@ class DBTransaction : public DBPayment {
             this->isReconciled = (record.get("isReconciled").compare("Y") == 0 ? true : false);
         }
 
-        JRecord getRecord() {
+        JRecord getRecord() override  {
             JRecord r = DBPayment::getRecord();
 
             r.add("reference", this->reference);
@@ -334,6 +334,10 @@ class DBTransaction : public DBPayment {
 
         const char * getTableName() override {
             return "account_transaction";
+        }
+
+        const char * getClassName() override {
+            return "DBTransaction";
         }
 
         const char * getInsertStatement() override {

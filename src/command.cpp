@@ -823,6 +823,159 @@ void Command::clearLoggingLevel(string & level) {
     log.clearLogLevel(getLogLevelParameter(level));
 }
 
+DBAccount createSampleAccount() {
+    DBAccount account;
+
+    account.code = "BANK";
+    account.name = "Sample bank account";
+    account.openingBalance = 1234.56;
+    account.openingDate = "2025-04-01";
+
+    return account;
+}
+
+DBPayee createSamplePayee() {
+    DBPayee payee;
+
+    payee.code = "JOES";
+    payee.name = "Joe's coffee shop";
+
+    return payee;
+}
+
+DBCategory createSampleCategory() {
+    DBCategory category;
+
+    category.code = "COFFE";
+    category.description = "Takeaway coffee";
+
+    return category;
+}
+
+DBRecurringCharge createSampleCharge() {
+    DBRecurringCharge charge;
+
+    DBAccount account = createSampleAccount();
+    DBCategory category = createSampleCategory();
+    DBPayee payee = createSamplePayee();
+
+    charge.account = account;
+    charge.amount = 12.63;
+    charge.category = category;
+    charge.date = "2025-07-05";
+    charge.description = "Sample charge";
+    charge.endDate = "";
+    charge.frequency = "1m";
+    charge.payee = payee;
+
+    return charge;
+}
+
+DBTransaction createSampleTransaction() {
+    DBTransaction transaction;
+
+    DBAccount account = createSampleAccount();
+    DBCategory category = createSampleCategory();
+    DBPayee payee = createSamplePayee();
+
+    transaction.account = account;
+    transaction.amount = 15.78;
+    transaction.category = category;
+    transaction.date = "2025-5-12";
+    transaction.description = "Sample transaction";
+    transaction.payee = payee;
+    transaction.reference = "";
+
+    return transaction;
+}
+
+DBBudget createSampleBudget() {
+    DBBudget budget;
+
+    DBPayee payee = createSamplePayee();
+    DBCategory category = createSampleCategory();
+
+    budget.categoryCode = category.code;
+    budget.description = "Sample budget";
+    budget.endDate = "";
+    budget.maximumBudget = 100.00;
+    budget.minimumBudget = 0.00;
+    budget.payeeCode = payee.code;
+    budget.startDate = "2025-06-01";
+
+    return budget;
+}
+
+void Command::saveJsonTemplate() {
+    cout << "For which entity do you want a JSON template:" << endl;
+    cout << "1) Account" << endl;
+    cout << "2) Payee" << endl;
+    cout << "3) Category" << endl;
+    cout << "4) Recurring Charge" << endl;
+    cout << "5) Transaction" << endl;
+    cout << "6) Budget" << endl;
+
+    CLITextField optionField = CLITextField("Enter option: ");
+    optionField.show();
+
+    int option = (int)optionField.getIntegerValue();
+
+    cout << "Option = " << option << endl;
+
+    DBEntity entity;
+    string name;
+
+    switch (option) {
+        case 1:
+            entity = createSampleAccount();
+            name = "accounts";
+            break;
+
+        case 2:
+            entity = createSamplePayee();
+            name = "payees";
+            break;
+
+        case 3:
+            entity = createSampleCategory();
+            name = "categories";
+            break;
+
+        case 4:
+            entity = createSampleCharge();
+            name = "charges";
+            break;
+
+        case 5:
+            entity = createSampleTransaction();
+            name = "transactions";
+            break;
+
+        case 6:
+            entity = createSampleBudget();
+            name = "budgets";
+            break;
+
+        default:
+            throw pfm_validation_error(
+                        pfm_error::buildMsg(
+                            "saveJsonTemplate() : Invalid entity type %d", 
+                            option), 
+                        __FILE__, 
+                        __LINE__);
+    }
+
+    string filename = name + "_template.json";
+    JFileWriter writer(filename, entity.getClassName());
+
+    vector<JRecord> records;
+
+    records.push_back(entity.getRecord());
+    records.push_back(entity.getRecord());
+
+    writer.write(records, name);
+}
+
 void Command::parse(const string & command) {
     const char * parameterDelimiters = ";:|";
 
@@ -862,6 +1015,9 @@ bool Command::process(const string & command) {
     }
     else if (isCommand("help")) {
         Command::help();
+    }
+    else if (isCommand("save-json-template") || isCommand("sjt")) {
+        saveJsonTemplate();
     }
     else if (isCommand("add-account") || isCommand("aa")) {
         addAccount();

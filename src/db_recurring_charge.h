@@ -142,7 +142,7 @@ class DBRecurringCharge : public DBPayment {
             this->endDate = record.get("endDate");
         }
 
-        JRecord getRecord() {
+        JRecord getRecord() override  {
             JRecord r = DBPayment::getRecord();
 
             r.add("endDate", this->endDate.shortDate());
@@ -201,6 +201,10 @@ class DBRecurringCharge : public DBPayment {
 
         const char * getTableName() override {
             return "recurring_charge";
+        }
+
+        const char * getClassName() override {
+            return "DBRecurringCharge";
         }
 
         const char * getInsertStatement() override {
