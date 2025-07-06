@@ -69,14 +69,12 @@ static void checkTerminalSize(void) {
 }
 
 int main(int argc, char ** argv) {
-    int             i;
-    char *          pszDatabase = NULL;
-    bool            loop = true;
+    char * pszDatabase = strdup(DEFAULT_DATABASE_NAME);
 
     rl_utils::setup();
 
 	if (argc > 1) {
-		for (i = 1;i < argc;i++) {
+		for (int i = 1;i < argc;i++) {
 			if (argv[i][0] == '-') {
 				if (strncmp(&argv[i][1], "db", 2) == 0) {
 					pszDatabase = strdup(&argv[++i][0]);
@@ -97,10 +95,6 @@ int main(int argc, char ** argv) {
 			}
 		}
 	}
-
-    if (pszDatabase == NULL) {
-        pszDatabase = strdup(DEFAULT_DATABASE_NAME);
-    }
 
 #ifndef RUN_IN_DEBUGGER
     checkTerminalSize();
@@ -126,6 +120,8 @@ int main(int argc, char ** argv) {
     command.process("set-logging-level all");
     command.process("use HSBC");
 #endif
+
+    bool loop = true;
 
     while (loop) {
         rl_utils::setLineLength(DEFAULT_LINE_LENGTH);
