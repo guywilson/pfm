@@ -90,7 +90,7 @@ static DBTransaction * createSampleTransaction() {
     transaction->account = *account;
     transaction->amount = 15.78;
     transaction->category = *category;
-    transaction->date = "2025-5-12";
+    transaction->date = "2025-05-12";
     transaction->description = "Sample transaction";
     transaction->payee = *payee;
     transaction->reference = "";
