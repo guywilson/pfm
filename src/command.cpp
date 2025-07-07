@@ -1144,7 +1144,7 @@ bool Command::process(const string & command) {
         addTransferTransaction();
     }
     else if (isCommand("list-transactions") || isCommand("lt") || isCommand("list")) {
-        bool includeRecurringTransactions = true;
+        bool includeRecurringTransactions = false;
         uint32_t rowLimit = 0;
         db_sort_t sortDirection = sort_descending;
 
