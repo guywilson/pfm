@@ -9,6 +9,7 @@
 #include "db_base.h"
 #include "db_transaction.h"
 #include "db_recurring_charge.h"
+#include "db_config.h"
 #include "db.h"
 #include "logger.h"
 #include "strdate.h"
@@ -70,8 +71,19 @@ bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
 bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
     Logger & log = Logger::getInstance();
 
-    StrDate periodStart = referenceDate.firstDayInMonth();
-    StrDate periodEnd = referenceDate.lastDayInMonth();
+    DBConfig cfg;
+    cfg.retrieveByKey("cycle.start");
+    int periodStartDay = atoi(cfg.value.c_str());
+
+    cfg.retrieveByKey("cycle.end");
+    int periodEndDay = atoi(cfg.value.c_str());
+
+    if (periodEndDay == 0) {
+        periodEndDay = referenceDate.lastDayInMonth().day();
+    }
+
+    StrDate periodStart(referenceDate.year(), referenceDate.month(), periodStartDay);
+    StrDate periodEnd(referenceDate.year(), referenceDate.month(), periodEndDay);
 
     char frequencyValue = this->getFrequencyValue();
     char frequencyUnit = this->getFrequencyUnit();

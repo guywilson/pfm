@@ -116,6 +116,7 @@ class DBConfig : public DBEntity {
         }
 
         void retrieveByKey(string & key);
+        void retrieveByKey(const char * key);
 };
 
 #endif
