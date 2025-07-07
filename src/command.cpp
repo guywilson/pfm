@@ -574,17 +574,17 @@ void Command::addTransferTransaction() {
     }
 }
 
-void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool isOnlyNonRecurring) {
+void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool includeRecurring) {
     checkAccountSelected();
 
     DBTransactionView transactionInstance;
     DBResult<DBTransactionView> result;
 
-    if (isOnlyNonRecurring) {
-        result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sort_descending, rowLimit);
+    if (includeRecurring) {
+        result = transactionInstance.retrieveByAccountID(selectedAccount.id, sort_descending, rowLimit);
     }
     else {
-        result = transactionInstance.retrieveByAccountID(selectedAccount.id, sort_descending, rowLimit);
+        result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sort_descending, rowLimit);
     }
 
     if (sortDirection == sort_ascending) {
@@ -1155,13 +1155,16 @@ bool Command::process(const string & command) {
                 }
                 else {
                     if (parameter.compare("all") == 0) {
-                        includeRecurringTransactions = false;
+                        includeRecurringTransactions = true;
                     }
                     else if (parameter.compare("nr") == 0) {
-                        includeRecurringTransactions = true;
+                        includeRecurringTransactions = false;
                     }
                     else if (parameter.compare("asc") == 0) {
                         sortDirection = sort_ascending;
+                    }
+                    else if (parameter.compare("desc") == 0) {
+                        sortDirection = sort_descending;
                     }
                 }
             }

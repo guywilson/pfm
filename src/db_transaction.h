@@ -77,7 +77,6 @@ class DBTransaction : public DBPayment {
                         "updated " \
                         "FROM account_transaction " \
                         "WHERE account_id = %lld " \
-                        "AND recurring_charge_id = 0 " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 

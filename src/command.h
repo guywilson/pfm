@@ -105,7 +105,7 @@ class Command {
         void addTransaction();
         void addTransaction(AddTransactionCriteriaBuilder & builder);
         void addTransferTransaction();
-        void listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool isOnlyNonRecurring);
+        void listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool includeRecurring);
         void findTransactions();
         void findTransactions(const string & criteria);
         string buildFindTransactionCriteria();
