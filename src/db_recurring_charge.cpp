@@ -119,11 +119,9 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
     frequencyValue = getFrequencyValue();
     frequencyUnit = getFrequencyUnit();
 
-    StrDate nextPaymentDate;
+    StrDate nextPaymentDate = chargeStartDate;
 
     if (chargeStartDate <= dateToday) {
-        nextPaymentDate = chargeStartDate;
-
         switch (frequencyUnit) {
             case 'y':
                 nextPaymentDate = nextPaymentDate.addYears(frequencyValue * (dateToday.year() - nextPaymentDate.year()));
