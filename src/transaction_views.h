@@ -358,6 +358,7 @@ class FindTransactionByPayeeView : public CLIFindView {
         FindTransactionByPayeeView(const char * title) : CLIFindView(title) {
             string today = StrDate::today();
             beforeDateField.setDefaultValue(today);
+            recurringIncludeType.setDefaultValue("no");
         }
 
         void show() override {
@@ -422,6 +423,7 @@ class FindTransactionByCategoryView : public CLIFindView {
         FindTransactionByCategoryView(const char * title) : CLIFindView(title) {
             string today = StrDate::today();
             beforeDateField.setDefaultValue(today);
+            recurringIncludeType.setDefaultValue("no");
         }
 
         void show() override {
@@ -486,6 +488,7 @@ class FindTransactionByDescriptionView : public CLIFindView {
         FindTransactionByDescriptionView(const char * title) : CLIFindView(title) {
             string today = StrDate::today();
             beforeDateField.setDefaultValue(today);
+            recurringIncludeType.setDefaultValue("no");
         }
 
         void show() override {
@@ -547,6 +550,7 @@ class FindTransactionByDateView : public CLIFindView {
         FindTransactionByDateView(const char * title) : CLIFindView(title) {
             string today = StrDate::today();
             beforeDateField.setDefaultValue(today);
+            recurringIncludeType.setDefaultValue("no");
         }
 
         void show() override {
@@ -603,7 +607,9 @@ class FindTransactionView : public CLIFindView {
     public:
         FindTransactionView() : FindTransactionView("Find transaction (by SQL criteria)") {}
 
-        FindTransactionView(const char * title) : CLIFindView(title) {}
+        FindTransactionView(const char * title) : CLIFindView(title) {
+            criteriaField.setLengthLimit(CRITERIA_FIELD_MAX_LEN);
+        }
 
         void show() override {
             CLIView::show();

@@ -74,7 +74,35 @@ List all accounts, the following fields are displayed:
 	current balance: The balance of the account as of now
 	balance after bills: The projected balance at the end of the current period
 
-**update-account, ua <account code>**
+**update-account, ua [account-code]**
 
-Update the account details as entered with the add-account command.
+Update the account details for the account specified with account-code.
 
+**delete-account, da [account-code]**
+
+Permanently deletes the account specified with account-code.
+
+**use [account-code]**
+
+Set the current account context to the account with account-code.
+
+**import-accounts, ia [json-file]**
+
+Import accounts from the JSON file specified with *json-file*.
+
+**export-accounts, xa [json-file]**
+
+Export the accounts as a JSON file with name specified with *json-file*.
+
+**add-category, ac**
+
+Adds a new category to the system with the following fields:
+
+	code: The unique category code
+	description: The category description
+
+**list-categories, lc**
+
+Lists all categories stored in the system.
+
+ 

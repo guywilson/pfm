@@ -20,6 +20,7 @@ using namespace std;
 #define AMOUNT_FIELD_STRING_LEN                 16
 #define TITLE_BUFFER_LEN                       128
 #define CODE_FIELD_MAX_LENGTH                    5
+#define CRITERIA_FIELD_MAX_LEN                 256
 
 #define CLI_CANCEL_KEY                         'x'
 #define SINGLE_QUOTE_CHAR                       39
