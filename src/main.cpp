@@ -18,6 +18,7 @@
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
 #include "command.h"
+#include "cfgmgr.h"
 #include "terminal.h"
 #include "money.h"
 #include "strdate.h"
@@ -112,6 +113,9 @@ int main(int argc, char ** argv) {
 #ifdef PFM_TEST_SUITE_ENABLED
     test();
 #endif
+
+    cfgmgr & cfg = cfgmgr::getInstance();
+    cfg.initialise();
 
     Command command;
     command.process("list-accounts");
