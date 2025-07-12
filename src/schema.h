@@ -48,7 +48,7 @@ const char * defaultCategories[][2] = {
 */
 const char * defaultConfig[][3] = {
     {"cycle.start", "1", "The day each monthly cycle starts on"},
-    {"cycle.end", "0", "The day each monthly cycle ends on, 0 means last day of the month"},
+    {"cycle.end", "last-working-day", "The day each monthly cycle ends on"},
     {"currency.default", "GBP", "The default currency for accounts"},
     {"limits.row", "50", "The row limit when retrieving records"}
 };

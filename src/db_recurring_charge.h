@@ -87,6 +87,10 @@ class DBRecurringCharge : public DBPayment {
 
         bool isDateWithinCurrentPeriod(StrDate & date);
 
+        int getPeriodStartDay();
+        int getPeriodEndDay();
+        int getPeriodEndDay(StrDate & referenceDate);
+
     public:
         StrDate nextPaymentDate;    // Not persistent
 

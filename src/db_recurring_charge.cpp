@@ -11,10 +11,82 @@
 #include "db_recurring_charge.h"
 #include "db_config.h"
 #include "db.h"
+#include "cfgmgr.h"
 #include "logger.h"
 #include "strdate.h"
 
 using namespace std;
+
+static bool isNumeric(string & cfgDate) {
+    bool isNumeric = true;
+    for (int i = 0;i < cfgDate.length();i++) {
+        if (!isdigit(cfgDate.at(i))) {
+            isNumeric = false;
+            break;
+        }
+    }
+
+    return isNumeric;
+}
+
+int DBRecurringCharge::getPeriodStartDay() {
+    cfgmgr & cfg = cfgmgr::getInstance();
+
+    int periodStart = cfg.getValueAsInteger("cycle.start");
+
+    return periodStart;
+}
+
+int DBRecurringCharge::getPeriodEndDay() {
+    StrDate today;
+    return getPeriodEndDay(today);
+}
+
+int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
+    cfgmgr & cfg = cfgmgr::getInstance();
+
+    string cycleEnd = cfg.getValue("cycle.end");
+
+    int periodEnd;
+
+    if (isNumeric(cycleEnd)) {
+        periodEnd = atoi(cycleEnd.c_str());
+
+        StrDate specificDate(referenceDate.year(), referenceDate.month(), periodEnd);
+
+        while (specificDate.isWeekend()) {
+            specificDate = specificDate.addDays(-1);
+        }
+
+        periodEnd = specificDate.day();
+    }
+    else if (cycleEnd.compare("last-working-day") == 0) {
+        StrDate lastWorkingDay = referenceDate;
+        lastWorkingDay = lastWorkingDay.lastDayInMonth();
+
+        while (lastWorkingDay.isWeekend()) {
+            lastWorkingDay = lastWorkingDay.addDays(-1);
+        }
+
+        periodEnd = lastWorkingDay.day();
+    }
+    else if (cycleEnd.compare("last-friday") == 0) {
+        StrDate lastFriday = referenceDate;
+        lastFriday = lastFriday.lastDayInMonth();
+
+        while (lastFriday.dayOfTheWeek() != StrDate::sd_friday) {
+            lastFriday = lastFriday.addDays(-1);
+        }
+
+        periodEnd = lastFriday.day();
+    }
+    else {
+        StrDate lastDay = referenceDate.lastDayInMonth();
+        periodEnd = lastDay.day();
+    }
+
+    return periodEnd;
+}
 
 DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t accountId) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
@@ -71,16 +143,8 @@ bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
 bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
     Logger & log = Logger::getInstance();
 
-    DBConfig cfg;
-    cfg.retrieveByKey("cycle.start");
-    int periodStartDay = atoi(cfg.value.c_str());
-
-    cfg.retrieveByKey("cycle.end");
-    int periodEndDay = atoi(cfg.value.c_str());
-
-    if (periodEndDay == 0) {
-        periodEndDay = referenceDate.lastDayInMonth().day();
-    }
+    int periodStartDay = getPeriodStartDay();
+    int periodEndDay = getPeriodEndDay(referenceDate);
 
     StrDate periodStart(referenceDate.year(), referenceDate.month(), periodStartDay);
     StrDate periodEnd(referenceDate.year(), referenceDate.month(), periodEndDay);
