@@ -248,6 +248,7 @@ class ChooseTransactionView : public CLIView {
 class UpdateTransactionView : public CLIView {
     private:
         pfm_id_t transactionId;
+        pfm_id_t recurringChargeId;
 
         CategorySpinField categoryField;
         PayeeSpinField payeeField;
@@ -280,6 +281,7 @@ class UpdateTransactionView : public CLIView {
             transaction.retrieve();
 
             transactionId = transaction.id;
+            recurringChargeId = transaction.recurringChargeId;
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category ['%s']: ", transaction.category.code.c_str());
             categoryField.setLabel(szPrompt);
@@ -327,6 +329,7 @@ class UpdateTransactionView : public CLIView {
             DBTransaction transaction;
 
             transaction.id = transactionId;
+            transaction.recurringChargeId = recurringChargeId;
 
             transaction.category = categoryField.getCategory();
             transaction.categoryId = transaction.category.id;
