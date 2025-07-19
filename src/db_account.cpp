@@ -220,7 +220,7 @@ Money DBAccount::calculateCurrentBalance() {
 
     /*
     ** If we have a carried over log, use that as our starting balance
-    ** as it included the account's opening balance. Otherwise, just use
+    ** as it includes the account's opening balance. Otherwise, just use
     ** the account's opening balance.
     */
     if (numCORecords) {
