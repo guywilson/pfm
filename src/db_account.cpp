@@ -214,9 +214,21 @@ Money DBAccount::calculateCurrentBalance() {
     log.logEntry("DBAccount::calculateCurrentBalance()");
 
     DBCarriedOver co;
-    co.retrieveLatestByAccountId(this->id);
+    int numCORecords = co.retrieveLatestByAccountId(this->id);
 
-    Money balance = co.balance;
+    Money balance = 0.00;
+
+    /*
+    ** If we have a carried over log, use that as our starting balance
+    ** as it included the account's opening balance. Otherwise, just use
+    ** the account's opening balance.
+    */
+    if (numCORecords) {
+        balance = co.balance;
+    }
+    else {
+        balance = openingBalance;
+    }
 
     try {
         StrDate dateToday;

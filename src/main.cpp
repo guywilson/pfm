@@ -117,8 +117,21 @@ int main(int argc, char ** argv) {
     cfgmgr & cfg = cfgmgr::getInstance();
     cfg.initialise();
 
+    DBResult<DBAccount> accounts;
+    accounts.retrieveAll();
+
+    int numAccounts = accounts.getNumRows();
+
     Command command;
-    command.process("list-accounts");
+    
+    if (numAccounts > 0) {
+        command.process("list-accounts");
+    }
+    else {
+        cout << endl << "*** Welcome to PFM ***" << endl << endl << "Create your first account..." << endl << endl;
+        command.process("add-account");
+    }
+
 
 #ifdef RUN_IN_DEBUGGER
     command.process("set-logging-level all");
