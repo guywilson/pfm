@@ -243,6 +243,8 @@ void DBTransaction::beforeUpdate() {
         for (int i = 0;i < coResult.getNumRows();i++) {
             DBCarriedOver carriedOver = coResult.getResultAt(i);
 
+            log.logDebug("Updating CO with date '%s'", carriedOver.date.shortDate().c_str());
+
             carriedOver.balance -= transaction.getSignedAmount();
             carriedOver.balance += this->getSignedAmount();
             carriedOver.save();
