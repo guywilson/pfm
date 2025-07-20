@@ -71,6 +71,7 @@ class Command {
         void addAccount();
         void listAccounts();
         void chooseAccount(string & accountCode);
+        void setPrimaryAccount(string & accountCode);
         void updateAccount();
         void showAccountBalances(DBAccount & account);
         void importAccounts(string & jsonFileName);

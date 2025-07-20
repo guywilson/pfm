@@ -280,6 +280,7 @@ void PFM_DB::createSchema() {
         createTable(pszCreateConfigTable);
         createTable(pszCreateCurrencyTable);
         createTable(pszCreateAccountTable);
+        createTable(pszCreatePrimaryAccountTable);
         createTable(pszCreateCategoryTable);
         createTable(pszCreatePayeeTable);
         createTable(pszCreateRCTable);

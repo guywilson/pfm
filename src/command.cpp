@@ -19,6 +19,7 @@
 #include "views.h"
 #include "version.h"
 #include "db_account.h"
+#include "db_primary_account.h"
 #include "db_category.h"
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
@@ -141,6 +142,22 @@ void Command::addAccount() {
     DBAccount account = view.getAccount();
     account.save();
 
+    DBResult<DBAccount> accounts;
+    int numAccounts = accounts.retrieveAll();
+
+    /*
+    ** If this is the first account, then remove any existing records 
+    ** and create the primary account record...
+    */
+    if (numAccounts == 1) {
+        DBPrimaryAccount primaryAccount;
+        primaryAccount.removeAll();
+
+        primaryAccount.code = account.code;
+
+        primaryAccount.save();
+    }
+
     cout << "Created account with ID " << account.id << endl;
 }
 
@@ -173,6 +190,22 @@ void Command::chooseAccount(string & accountCode) {
     selectedAccount = account;
 
     log.logExit("Command::chooseAccount()");
+}
+
+void Command::setPrimaryAccount(string & accountCode) {
+    log.logEntry("Command::setPrimaryAccount()");
+
+    log.logDebug("Set primary account to '%s'", accountCode.c_str());
+
+    DBPrimaryAccount::setPrimaryAccount(accountCode);
+
+    DBAccount account;
+    account.retrieveByCode(accountCode);
+    account.onUseAccountTrigger();
+    
+    selectedAccount = account;
+
+    log.logExit("Command::setPrimaryAccount()");
 }
 
 void Command::updateAccount() {
@@ -1031,6 +1064,10 @@ bool Command::process(const string & command) {
     else if (isCommand("use")) {
         string accountCode = getParameter(0);
         chooseAccount(accountCode);
+    }
+    else if (isCommand("set-primary-account") || isCommand("spa")) {
+        string accountCode = getParameter(0);
+        setPrimaryAccount(accountCode);
     }
     else if (isCommand("update-account") || isCommand("ua")) {
         updateAccount();

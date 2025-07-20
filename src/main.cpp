@@ -13,6 +13,7 @@
 #include "db.h"
 #include "logger.h"
 #include "db_account.h"
+#include "db_primary_account.h"
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_recurring_charge.h"
@@ -132,11 +133,12 @@ int main(int argc, char ** argv) {
         command.process("add-account");
     }
 
-
 #ifdef RUN_IN_DEBUGGER
     command.process("set-logging-level all");
-    command.process("use HSBC");
 #endif
+
+    string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
+    command.process("use " + primaryAccountCode);
 
     bool loop = true;
 

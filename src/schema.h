@@ -270,6 +270,14 @@ const char * pszCreateAccountTable =
     "UNIQUE(code) ON CONFLICT ROLLBACK," \
     "FOREIGN KEY(currency_id) REFERENCES currency(id));";
 
+const char * pszCreatePrimaryAccountTable = 
+    "CREATE TABLE primary_account (" \
+    "id INTEGER PRIMARY KEY," \
+    "account_code TEXT NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
+    "FOREIGN KEY(account_code) REFERENCES account(code));";
+
 const char * pszCreateCategoryTable = 
     "CREATE TABLE category (" \
     "id INTEGER PRIMARY KEY," \
