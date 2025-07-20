@@ -180,6 +180,8 @@ class DBAccount : public DBEntity {
         Money calculateCurrentBalance();
         Money calculateBalanceAfterBills();
         void retrieveByCode(string & code);
+
+        bool isPrimary();
 };
 
 #endif

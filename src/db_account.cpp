@@ -10,6 +10,7 @@
 #include "pfm_error.h"
 #include "db_base.h"
 #include "db_account.h"
+#include "db_primary_account.h"
 #include "db_recurring_charge.h"
 #include "db_v_recurring_charge.h"
 #include "db_transaction.h"
@@ -320,4 +321,10 @@ Money DBAccount::calculateBalanceAfterBills() {
     }
 
     return balance;
+}
+
+bool DBAccount::isPrimary() {
+    string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
+
+    return primaryAccountCode.compare(code) == 0 ? true : false;
 }

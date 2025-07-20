@@ -100,6 +100,9 @@ class AccountListView : public CLIListView {
             CLIListColumn column4 = CLIListColumn("After Bills", 16, CLIListColumn::rightAligned);
             headerRow.addColumn(column4);
 
+            CLIListColumn column5 = CLIListColumn("Primary", 7, CLIListColumn::leftAligned);
+            headerRow.addColumn(column5);
+
             addHeaderRow(headerRow);
 
             for (int i = 0;i < result.getNumRows();i++) {
@@ -114,6 +117,7 @@ class AccountListView : public CLIListView {
                 row.addCellValue(account.name);
                 row.addCellValue(currentBalance);
                 row.addCellValue(balanceAfterBills);
+                row.addCellValue(account.isPrimary() ? "   *" : "");
 
                 addRow(row);
             }
