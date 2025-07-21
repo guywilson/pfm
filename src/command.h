@@ -130,6 +130,7 @@ class Command {
         void listBudgetTracks();
 
         void changePassword();
+        void getDBKey();
         
         int getLogLevelParameter(string & level);
         void setLoggingLevel(string & level);

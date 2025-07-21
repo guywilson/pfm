@@ -80,7 +80,7 @@ static string getPassword(const string & prompt) {
     return password;
 }
 
-static string getKey(const string & prompt) {
+string PFM_DB::getKey(const string & prompt) {
     uint8_t keyBuffer[32];
     char k[65];
 
@@ -116,6 +116,39 @@ static inline int _retrieveCallback(void * p, int numColumns, char ** columns, c
     rows->push_back(row);
 
     return SQLITE_OK;
+}
+
+void PFM_DB::openReadWrite(const string & dbName) {
+    int error = sqlite3_open_v2(
+                    dbName.c_str(), 
+                    &this->dbHandle, 
+                    SQLITE_OPEN_READWRITE, 
+                    NULL);
+
+    if (error != SQLITE_OK) {
+        const char * errorMsg = sqlite3_errmsg(this->dbHandle);
+
+        log.logError(
+                "Cannot open database file %s: %d:%s", 
+                databaseName.c_str(),
+                error,
+                errorMsg);
+
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Cannot open database file %s: %d:%s", 
+                    dbName.c_str(),
+                    error,
+                    errorMsg));
+    }
+}
+
+void PFM_DB::createDB(const string & dbName) {
+    int error = sqlite3_open_v2(
+                    dbName.c_str(),
+                    &this->dbHandle,
+                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
+                    NULL);
 }
 
 void PFM_DB::open(const string & dbName) {

@@ -14,6 +14,7 @@
 
 #include "pfm_error.h"
 #include "db.h"
+#include "cfgmgr.h"
 #include "cache.h"
 #include "strdate.h"
 #include "views.h"
@@ -903,6 +904,18 @@ void Command::changePassword() {
     db.changePassword();
 }
 
+void Command::getDBKey() {
+    PFM_DB & db = PFM_DB::getInstance();
+    cfgmgr & cfg = cfgmgr::getInstance();
+
+    string accessKey = db.getKey("Access password: ");
+
+    if (accessKey.compare(cfg.getValue("access.key")) == 0) {
+        string dbKey = db.getKey("Password: ");
+        cout << "Key: " << dbKey << endl;
+    }
+}
+
 int Command::getLogLevelParameter(string & level) {
     int levelID = 0;
 
@@ -1311,6 +1324,9 @@ bool Command::process(const string & command) {
     else if (isCommand("clear-logging-level")) {
         string logLevel = getParameter(0);
         clearLoggingLevel(logLevel);
+    }
+    else if (isCommand("get-db-key")) {
+        getDBKey();
     }
     else {
         throw pfm_validation_error(

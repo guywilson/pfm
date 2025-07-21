@@ -111,6 +111,9 @@ class PFM_DB {
             isTransactionActive = false;
         }
 
+        void openReadWrite(const string & dbName);
+        void createDB(const string & dbName);
+
         void _executeSQLNoCallback(const char * sql);
         void _executeSQLCallback(const char * sql, vector<DBRow> * rows);
 
@@ -130,6 +133,8 @@ class PFM_DB {
         void open(const string & dbName);
         void open();
         void close();
+
+        string getKey(const string & prompt);
 
         void changePassword();
 
