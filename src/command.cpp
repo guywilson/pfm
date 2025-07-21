@@ -914,6 +914,9 @@ void Command::getDBKey() {
         string dbKey = db.getKey("Password: ");
         cout << "Key: " << dbKey << endl;
     }
+    else {
+        cout << "Invalid access password supplied" << endl << endl;
+    }
 }
 
 int Command::getLogLevelParameter(string & level) {
