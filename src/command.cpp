@@ -738,6 +738,11 @@ void Command::deleteTransaction(DBTransaction & transaction) {
     transaction.remove();
 }
 
+void Command::reconcileTransaction(DBTransaction & transaction) {
+    transaction.isReconciled = true;
+    transaction.save();
+}
+
 void Command::importTransactions(string & jsonFileName) {
     JFileReader jfile = JFileReader(jsonFileName, "DBTransaction");
 
@@ -1229,6 +1234,12 @@ bool Command::process(const string & command) {
 
         DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
         deleteTransaction(transaction);
+    }
+    else if (isCommand("reconcile-transaction") || isCommand("reconcile") || isCommand("rt")) {
+        string sequence = getParameter(0);
+
+        DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
+        reconcileTransaction(transaction);
     }
     else if (isCommand("import-transactions") || isCommand("it")) {
         string filename = getParameter(0);
