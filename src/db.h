@@ -127,7 +127,7 @@ class PFM_DB {
         ~PFM_DB();
 
         void open(string dbName);
-
+        void close();
 
         void createTable(const char * sql);
         void createView(const char * sql);

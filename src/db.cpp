@@ -141,9 +141,15 @@ void PFM_DB::open(string dbName) {
     log.logExit("PFM_DB::open()");
 }
 
+void PFM_DB::close() {
+    log.logEntry("PFM_DB::close()");
+    sqlite3_close_v2(this->dbHandle);
+    log.logExit("PFM_DB::close()");
+}
+
 PFM_DB::~PFM_DB() {
     log.logEntry("PFM_DB::~PFM_DB()");
-    sqlite3_close_v2(this->dbHandle);
+    close();
     log.logExit("PFM_DB::~PFM_DB()");
 }
 
