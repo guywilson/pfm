@@ -16,6 +16,7 @@
 
 #include <pthread.h>
 #include <sqlcipher/sqlite3.h>
+#include <gcrypt.h>
 
 #include "logger.h"
 #include "db.h"
@@ -79,6 +80,28 @@ static string getPassword(const string & prompt) {
     return password;
 }
 
+static string getKey(const string & prompt) {
+    uint8_t keyBuffer[32];
+    char k[65];
+
+    string password = getPassword(prompt);
+	uint32_t keySize = gcry_md_get_algo_dlen(GCRY_MD_SHA3_256);
+
+	gcry_md_hash_buffer(GCRY_MD_SHA3_256, keyBuffer, password.c_str(), password.length());
+
+    int j = 0;
+    for (int i = 0;i < keySize;i++) {
+        snprintf(&k[j], 64, "%02X", keyBuffer[i]);
+        j += 2;
+    }
+
+    k[j] = 0;
+
+    string key(k);
+
+	return key;
+}
+
 static inline int _retrieveCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
     vector<DBRow> * rows = (vector<DBRow> *)p;
     vector<DBColumn> columnVector;
@@ -106,7 +129,7 @@ void PFM_DB::open(const string & dbName) {
 
     if (error == SQLITE_OK) {
 #ifndef RUN_IN_DEBUGGER
-        string password = getPassword("Enter database password: ");
+        string password = getKey("Enter database password: ");
 #else
         string password = DEBUG_PASSWORD;
 #endif
@@ -138,7 +161,7 @@ void PFM_DB::open(const string & dbName) {
                             NULL);
 
             if (error == SQLITE_OK) {
-                string password = getPassword("Please enter a password for database encryption: ");
+                string password = getKey("Please enter a password for database encryption: ");
                 int keyError = sqlite3_key(this->dbHandle, password.c_str(), password.length());
 
                 if (keyError != SQLITE_OK) {
@@ -211,7 +234,7 @@ void PFM_DB::close() {
 void PFM_DB::changePassword() {
     log.logEntry("PFM_DB::changePassword()");
 
-    string newPassword = getPassword("Enter new database password: ");
+    string newPassword = getKey("Enter new database password: ");
 
     int error = sqlite3_rekey(dbHandle, newPassword.c_str(), newPassword.length());
 

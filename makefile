@@ -8,7 +8,7 @@
 
 # Version number for pfm
 MAJOR_VERSION = 1
-MINOR_VERSION = 3
+MINOR_VERSION = 4
 
 # Directories
 SOURCE = src
@@ -48,7 +48,7 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP)/$*.Td
 
 # Libraries
 STDLIBS =
-EXTLIBS = -lreadline -lhistory -lcurses -lsqlcipher
+EXTLIBS = -lreadline -lhistory -lcurses -lsqlcipher -lgcrypt
 
 COMPILE.cpp = $(CPP) $(CPPFLAGS) $(DEPFLAGS) -o $@
 COMPILE.c = $(C) $(CFLAGS) $(DEPFLAGS) -o $@
