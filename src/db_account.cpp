@@ -302,7 +302,7 @@ Money DBAccount::calculateBalanceAfterBills() {
         StrDate periodStartDate = dateToday.firstDayInMonth();
 
         DBTransactionView tr;
-        DBResult<DBTransactionView> transactionResult = tr.retrieveNonRecurringByAccountIDForPeriod(this->id, periodStartDate, dateToday);
+        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, periodStartDate, dateToday);
 
         for (int i = 0;i < transactionResult.getNumRows();i++) {
             DBTransaction transaction = transactionResult.getResultAt(i);

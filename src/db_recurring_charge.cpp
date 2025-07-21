@@ -140,6 +140,11 @@ bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
     return false;
 }
 
+bool DBRecurringCharge::isChargeDueThisPeriod() {
+    StrDate today;
+    return isChargeDueThisPeriod(today);
+}
+
 bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
     Logger & log = Logger::getInstance();
 
@@ -175,7 +180,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
                 break;
         }
 
-        if (nextPaymentDate <= periodEnd && nextPaymentDate >= periodStart) {
+        if (nextPaymentDate <= periodEnd && nextPaymentDate > referenceDate) {
             if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
                 cout << "| " << nextPaymentDate.shortDate() << " | " << frequency << " | " << setw(16) << right << amount.getFormattedStringValue() << " | " << description << endl;
             }
