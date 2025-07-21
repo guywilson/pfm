@@ -226,6 +226,12 @@ Money DBAccount::calculateCurrentBalance() {
     */
     if (numCORecords) {
         balance = co.balance;
+
+        log.logDebug(
+                "calculateCurrentBalance(): Including carried over '%s' | '%s' | '%s'", 
+                co.date.shortDate().c_str(), 
+                co.description.c_str(), 
+                co.balance.getFormattedStringValue().c_str());
     }
     else {
         balance = openingBalance;
@@ -240,6 +246,13 @@ Money DBAccount::calculateCurrentBalance() {
 
         for (int i = 0;i < transactionResult.getNumRows();i++) {
             DBTransaction transaction = transactionResult.getResultAt(i);
+
+            log.logDebug(
+                    "calculateCurrentBalance(): Including transaction '%s' | '%s' | '%s'", 
+                    transaction.date.shortDate().c_str(), 
+                    transaction.description.c_str(), 
+                    transaction.amount.getFormattedStringValue().c_str());
+
             balance += transaction.getSignedAmount();
         }
 
@@ -270,6 +283,12 @@ Money DBAccount::calculateBalanceAfterBills() {
     */
     if (numCORecords) {
         balance = co.balance;
+
+        log.logDebug(
+                "calculateBalanceAfterBills(): Including carried over '%s' | '%s' | '%s'", 
+                co.date.shortDate().c_str(), 
+                co.description.c_str(), 
+                co.balance.getFormattedStringValue().c_str());
     }
     else {
         balance = openingBalance;
@@ -287,6 +306,13 @@ Money DBAccount::calculateBalanceAfterBills() {
 
         for (int i = 0;i < transactionResult.getNumRows();i++) {
             DBTransaction transaction = transactionResult.getResultAt(i);
+
+            log.logDebug(
+                    "calculateBalanceAfterBills(): Including transaction '%s' | '%s' | '%s'", 
+                    transaction.date.shortDate().c_str(), 
+                    transaction.description.c_str(), 
+                    transaction.amount.getFormattedStringValue().c_str());
+
             balance += transaction.getSignedAmount();
             transactionBalance += transaction.getSignedAmount();
         }
@@ -302,6 +328,12 @@ Money DBAccount::calculateBalanceAfterBills() {
             DBRecurringCharge charge = chargeResult.getResultAt(i);
 
             if (charge.isChargeDueThisPeriod(dateToday)) {
+                log.logDebug(
+                        "calculateBalanceAfterBills(): Including charge '%s' | '%s' | '%s'", 
+                        charge.nextPaymentDate.shortDate().c_str(), 
+                        charge.description.c_str(), 
+                        charge.amount.getFormattedStringValue().c_str());
+
                 balance -= charge.amount;
                 chargeBalance -= charge.amount;
             }

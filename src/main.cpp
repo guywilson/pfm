@@ -26,6 +26,8 @@
 #include "rlcustom.h"
 #include "version.h"
 
+//#define RUN_IN_DEBUGGER
+
 using namespace std;
 
 #define DEFAULT_DATABASE_NAME                   ".pfm"
