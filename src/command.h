@@ -129,6 +129,8 @@ class Command {
         void listCarriedOverLogs();
         void listBudgetTracks();
 
+        void changePassword();
+        
         int getLogLevelParameter(string & level);
         void setLoggingLevel(string & level);
         void clearLoggingLevel(string & level);

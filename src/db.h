@@ -103,6 +103,7 @@ class PFM_DB {
     private:
         sqlite3 * dbHandle;
         bool isTransactionActive;
+        string databaseName;
         pthread_mutex_t mutex;
         Logger & log = Logger::getInstance();
 
@@ -126,8 +127,11 @@ class PFM_DB {
     public:
         ~PFM_DB();
 
-        void open(string dbName);
+        void open(const string & dbName);
+        void open();
         void close();
+
+        void changePassword();
 
         void createTable(const char * sql);
         void createView(const char * sql);

@@ -897,6 +897,12 @@ void Command::listBudgetTracks() {
     view.show();
 }
 
+void Command::changePassword() {
+    PFM_DB & db = PFM_DB::getInstance();
+
+    db.changePassword();
+}
+
 int Command::getLogLevelParameter(string & level) {
     int levelID = 0;
 
@@ -1284,6 +1290,9 @@ bool Command::process(const string & command) {
     }
     else if (isCommand("list-budget-track-records") || isCommand("lbt")) {
         listBudgetTracks();
+    }
+    else if (isCommand("change-password")) {
+        changePassword();
     }
     else if (isCommand("set-today")) {
         string today = getParameter(0);

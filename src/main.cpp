@@ -110,7 +110,18 @@ int main(int argc, char ** argv) {
     log.initLogger(logFileName, LOG_LEVEL_FATAL | LOG_LEVEL_ERROR);
 
     PFM_DB & db = PFM_DB::getInstance();
-    db.open(pszDatabase);
+
+    try {
+        db.open(pszDatabase);
+    }
+    catch (pfm_fatal & f) {
+        log.logFatal("Fatal error: %s", f.what());
+        log.closeLogger();
+        
+        free(pszDatabase);
+        return -1;
+    }
+
     free(pszDatabase);
 
 #ifdef PFM_TEST_SUITE_ENABLED

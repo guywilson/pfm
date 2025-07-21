@@ -56,8 +56,8 @@ static int __getch(void) {
     return ch;
 }
 
-static string getPassword() {
-    printf("Enter password: ");
+static string getPassword(const string & prompt) {
+    cout << prompt;
 
     string password;
 	int	ch = 0;
@@ -73,7 +73,7 @@ static string getPassword() {
         }
     }
 
-    putchar('\n');
+    cout << endl;
     fflush(stdout);
 
     return password;
@@ -95,7 +95,7 @@ static inline int _retrieveCallback(void * p, int numColumns, char ** columns, c
     return SQLITE_OK;
 }
 
-void PFM_DB::open(string dbName) {
+void PFM_DB::open(const string & dbName) {
     log.logEntry("PFM_DB::open()");
 
     int error = sqlite3_open_v2(
@@ -106,11 +106,28 @@ void PFM_DB::open(string dbName) {
 
     if (error == SQLITE_OK) {
 #ifndef RUN_IN_DEBUGGER
-        string password = getPassword();
+        string password = getPassword("Enter database password: ");
 #else
         string password = DEBUG_PASSWORD;
 #endif
-        sqlite3_key(this->dbHandle, password.c_str(), password.length());
+        int keyError = sqlite3_key(this->dbHandle, password.c_str(), password.length());
+
+        if (keyError != SQLITE_OK) {
+            const char * errorMsg = sqlite3_errmsg(this->dbHandle);
+
+            log.logFatal(
+                    "Cannot decrypt database file %s, aborting: %d:%s", 
+                    databaseName.c_str(),
+                    error,
+                    errorMsg);
+
+            throw pfm_fatal(
+                    pfm_fatal::buildMsg(
+                        "Cannot decrypt database file %s, aborting: %d:%s", 
+                        dbName.c_str(),
+                        keyError,
+                        errorMsg));
+        }
     }
     else {
         if ((error & 0x000000FF) ==  SQLITE_CANTOPEN) {
@@ -121,30 +138,106 @@ void PFM_DB::open(string dbName) {
                             NULL);
 
             if (error == SQLITE_OK) {
-                string password = getPassword();
-                sqlite3_key(this->dbHandle, password.c_str(), password.length());
+                string password = getPassword("Please enter a password for database encryption: ");
+                int keyError = sqlite3_key(this->dbHandle, password.c_str(), password.length());
+
+                if (keyError != SQLITE_OK) {
+                    throw pfm_fatal(
+                            pfm_fatal::buildMsg(
+                                "Cannot decrypt database file %s, aborting: %d:%s", 
+                                dbName.c_str(),
+                                keyError,
+                                sqlite3_errmsg(this->dbHandle)));
+                }
 
                 cout << "Data file '" << dbName << "' does not exist, creating..." << endl;
                 createSchema();
             }
             else {
+                const char * errorMsg = sqlite3_errmsg(this->dbHandle);
+
+                log.logFatal(
+                        "Cannot open database file %s, aborting: %d:%s", 
+                        databaseName.c_str(),
+                        error,
+                        errorMsg);
+
                 throw pfm_fatal(
                         pfm_fatal::buildMsg(
                             "Cannot open database file %s, aborting: %d:%s", 
                             dbName.c_str(),
                             error,
-                            sqlite3_errmsg(this->dbHandle)));
+                            errorMsg));
             }
         }
     }
 
+    databaseName = dbName;
+
     log.logExit("PFM_DB::open()");
+}
+
+void PFM_DB::open() {
+    open(this->databaseName);
 }
 
 void PFM_DB::close() {
     log.logEntry("PFM_DB::close()");
-    sqlite3_close_v2(this->dbHandle);
+    
+    int error = sqlite3_close_v2(this->dbHandle);
+
+    if (error != SQLITE_OK) {
+        const char * errorMsg = sqlite3_errmsg(this->dbHandle);
+
+        close();
+
+        log.logFatal(
+                "Cannot close database file %s, aborting: %d:%s", 
+                databaseName.c_str(),
+                error,
+                errorMsg);
+
+        throw pfm_fatal(
+                pfm_fatal::buildMsg(
+                    "Cannot close database file %s, aborting: %d:%s", 
+                    databaseName.c_str(),
+                    error,
+                    errorMsg));
+    }
+
     log.logExit("PFM_DB::close()");
+}
+
+void PFM_DB::changePassword() {
+    log.logEntry("PFM_DB::changePassword()");
+
+    string newPassword = getPassword("Enter new database password: ");
+
+    int error = sqlite3_rekey(dbHandle, newPassword.c_str(), newPassword.length());
+
+    if (error != SQLITE_OK) {
+        const char * errorMsg = sqlite3_errmsg(this->dbHandle);
+
+        close();
+
+        log.logFatal(
+                "Failed to change the password on database file %s, aborting: %d:%s", 
+                databaseName.c_str(),
+                error,
+                errorMsg);
+
+        throw pfm_fatal(
+                pfm_fatal::buildMsg(
+                    "Failed to change the password on database file %s, aborting: %d:%s", 
+                    databaseName.c_str(),
+                    error,
+                    errorMsg));
+    }
+
+    close();
+    open();
+
+    log.logExit("PFM_DB::changePassword()");
 }
 
 PFM_DB::~PFM_DB() {
