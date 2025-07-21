@@ -95,7 +95,7 @@ static inline int _retrieveCallback(void * p, int numColumns, char ** columns, c
     return SQLITE_OK;
 }
 
-bool PFM_DB::open(string dbName) {
+void PFM_DB::open(string dbName) {
     log.logEntry("PFM_DB::open()");
 
     int error = sqlite3_open_v2(
@@ -139,8 +139,6 @@ bool PFM_DB::open(string dbName) {
     }
 
     log.logExit("PFM_DB::open()");
-
-    return true;
 }
 
 PFM_DB::~PFM_DB() {
