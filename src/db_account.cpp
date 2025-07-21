@@ -100,7 +100,7 @@ void DBAccount::createRecurringTransactions() {
                         cout << "| " << transactionDate.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;
                     }
 
-                    transaction.createFromRecurringChargeAndDate(charge, transactionDate);
+                    DBTransaction::createFromRecurringChargeAndDate(charge, transactionDate);
                     transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
                 }
             }
@@ -260,6 +260,64 @@ Money DBAccount::calculateCurrentBalance() {
     }
     catch (pfm_error & e) {
         log.logError("DBAccount.calculateCurrentBalance() - caught exception: %s", e.what());
+
+        throw e;
+    }
+
+    return balance;
+}
+
+
+Money DBAccount::calculateReconciledBalance() {
+    Logger & log = Logger::getInstance();
+    log.logEntry("DBAccount::calculateReconciledBalance()");
+
+    DBCarriedOver co;
+    int numCORecords = co.retrieveLatestByAccountId(this->id);
+
+    Money balance = 0.00;
+
+    /*
+    ** If we have a carried over log, use that as our starting balance
+    ** as it includes the account's opening balance. Otherwise, just use
+    ** the account's opening balance.
+    */
+    if (numCORecords) {
+        balance = co.balance;
+
+        log.logDebug(
+                "calculateReconciledBalance(): Including carried over '%s' | '%s' | '%s'", 
+                co.date.shortDate().c_str(), 
+                co.description.c_str(), 
+                co.balance.getFormattedStringValue().c_str());
+    }
+    else {
+        balance = openingBalance;
+    }
+
+    try {
+        StrDate dateToday;
+        StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
+
+        DBTransactionView tr;
+        DBResult<DBTransactionView> transactionResult = tr.retrieveReconciledByAccountIDForPeriod(this->id, periodStartDate, dateToday);
+
+        for (int i = 0;i < transactionResult.getNumRows();i++) {
+            DBTransaction transaction = transactionResult.getResultAt(i);
+
+            log.logDebug(
+                    "calculateReconciledBalance(): Including transaction '%s' | '%s' | '%s'", 
+                    transaction.date.shortDate().c_str(), 
+                    transaction.description.c_str(), 
+                    transaction.amount.getFormattedStringValue().c_str());
+
+            balance += transaction.getSignedAmount();
+        }
+
+        log.logExit("DBAccount::calculateReconciledBalance()");
+    }
+    catch (pfm_error & e) {
+        log.logError("DBAccount.calculateReconciledBalance() - caught exception: %s", e.what());
 
         throw e;
     }

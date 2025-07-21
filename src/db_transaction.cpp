@@ -41,6 +41,12 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId) {
     return result;
 }
 
+DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountID(pfm_id_t accountId) {
+    DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectReconciledByAccountID, accountId);
+
+    return result;
+}
+
 DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransaction> result;
@@ -138,6 +144,23 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDForPeriod(pfm_id_t acc
     return result;
 }
 
+DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBTransaction> result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlSelectReconciledByAccountIDBetweenDates, 
+        accountId,
+        firstDate.shortDate().c_str(),
+        secondDate.shortDate().c_str());
+
+    result.retrieve(szStatement);
+
+    return result;
+}
+
 DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransaction> result;
@@ -153,6 +176,28 @@ DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(
     result.retrieve(szStatement);
 
     return result;
+}
+
+void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {
+    DBTransaction tr;
+    tr.set(src);
+
+    tr.date = transactionDate;
+    tr.isCredit = false;
+    tr.isReconciled = true;
+
+    tr.save();
+}
+
+void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringChargeView & src, StrDate & transactionDate) {
+    DBTransaction tr;
+    tr.set(src);
+
+    tr.date = transactionDate;
+    tr.isCredit = false;
+    tr.isReconciled = true;
+
+    tr.save();
 }
 
 int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate) {

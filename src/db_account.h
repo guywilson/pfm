@@ -179,6 +179,7 @@ class DBAccount : public DBEntity {
         void beforeUpdate() override;
         Money calculateCurrentBalance();
         Money calculateBalanceAfterBills();
+        Money calculateReconciledBalance();
         void retrieveByCode(string & code);
 
         bool isPrimary();

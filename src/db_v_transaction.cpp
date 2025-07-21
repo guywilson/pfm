@@ -61,6 +61,12 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t acco
     return result;
 }
 
+DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm_id_t accountId) {
+    DBResult<DBTransactionView> result = retrieveByStatementAndID(sqlSelectReconciledByAccountID, accountId);
+
+    return result;
+}
+
 DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransactionView> result;
@@ -127,6 +133,23 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIDBetweenDates, 
+        accountId,
+        firstDate.shortDate().c_str(),
+        secondDate.shortDate().c_str());
+
+    result.retrieve(szStatement);
+
+    return result;
+}
+
+DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBTransactionView> result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlSelectReconciledByAccountIDBetweenDates, 
         accountId,
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());

@@ -36,6 +36,25 @@ class DBTransactionView : public DBTransaction {
                         "FROM v_transaction_list " \
                         "WHERE account_id = %lld;";
 
+        const char * sqlSelectReconciledByAccountID = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_code," \
+                        "payee_code," \
+                        "recurring_charge_id," \
+                        "date," \
+                        "reference," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM v_transaction_list " \
+                        "WHERE account_id = %lld " \
+                        "AND is_reconciled = 'Y'";
+
         const char * sqlSelectByAccountIDSortedByDate = 
                         "SELECT " \
                         "id," \
@@ -92,6 +111,27 @@ class DBTransactionView : public DBTransaction {
                         "updated " \
                         "FROM v_transaction_list " \
                         "WHERE account_id = %lld " \
+                        "AND date >= '%s' " \
+                        "AND date <= '%s';";
+
+        const char * sqlSelectReconciledByAccountIDBetweenDates = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_code," \
+                        "payee_code," \
+                        "recurring_charge_id," \
+                        "date," \
+                        "reference," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM v_transaction_list " \
+                        "WHERE account_id = %lld " \
+                        "AND is_reconciled = 'Y' " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 
@@ -172,9 +212,11 @@ class DBTransactionView : public DBTransaction {
 
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
+        DBResult<DBTransactionView> retrieveReconciledByAccountID(pfm_id_t accountId);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
         DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransactionView> retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t accountId, const string & criteria);
 };
 

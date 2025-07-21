@@ -80,6 +80,46 @@ class DBTransaction : public DBPayment {
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 
+        const char * sqlSelectReconciledByAccountID = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "recurring_charge_id," \
+                        "date," \
+                        "reference," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM account_transaction " \
+                        "WHERE account_id = %lld " \
+                        "AND is_reconciled = 'Y';";
+
+        const char * sqlSelectReconciledByAccountIDBetweenDates = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "category_id," \
+                        "payee_id," \
+                        "recurring_charge_id," \
+                        "date," \
+                        "reference," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM account_transaction " \
+                        "WHERE account_id = %lld " \
+                        "AND is_reconciled = 'Y' " \
+                        "AND date >= '%s' " \
+                        "AND date <= '%s';";
+
         const char * sqlSelectNonRecurringByAccountIDBetweenDates = 
                         "SELECT " \
                         "id," \
@@ -224,6 +264,18 @@ class DBTransaction : public DBPayment {
             this->isReconciled = src.isReconciled;
         }
 
+        void set(const DBRecurringCharge & src) {
+            DBPayment::set(src);
+
+            this->recurringChargeId = src.id;
+        }
+
+        void set(const DBRecurringChargeView & src) {
+            DBPayment::set(src);
+
+            this->recurringChargeId = src.id;
+        }
+
         void set(JRecord & record) {
             DBPayment::set(record);
 
@@ -240,34 +292,6 @@ class DBTransaction : public DBPayment {
             r.add("isReconciled", this->getIsReconciledValue());
 
             return r;
-        }
-
-        void createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {
-            DBPayment::set(src);
-
-            // We want to create (insert) a record, so clear the ID...
-            this->id = 0;
-
-            this->date = transactionDate;
-            this->recurringChargeId = src.id;
-            this->isCredit = false;
-            this->isReconciled = false;
-
-            this->save();
-        }
-
-        void createFromRecurringChargeAndDate(const DBRecurringChargeView & src, StrDate & transactionDate) {
-            DBPayment::set(src);
-
-            // We want to create (insert) a record, so clear the ID...
-            this->id = 0;
-
-            this->date = transactionDate;
-            this->recurringChargeId = src.id;
-            this->isCredit = false;
-            this->isReconciled = false;
-
-            this->save();
         }
 
         void print() {
@@ -398,10 +422,15 @@ class DBTransaction : public DBPayment {
         void deleteByRecurringChargeId(pfm_id_t recurringChargeId);
         void deleteAllRecurringTransactionsForAccount(pfm_id_t accountId);
 
+        static void createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate);
+        static void createFromRecurringChargeAndDate(const DBRecurringChargeView & src, StrDate & transactionDate);
+
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
+        DBResult<DBTransaction> retrieveReconciledByAccountID(pfm_id_t accountId);
         DBResult<DBTransaction> retrieveByRecurringChargeID(pfm_id_t recurringChargeId);
         DBResult<DBTransaction> retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransaction> retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransaction> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransaction> findTransactionsForAccountID(pfm_id_t accountId, string & criteria);
 };

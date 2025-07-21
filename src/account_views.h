@@ -97,11 +97,14 @@ class AccountListView : public CLIListView {
             CLIListColumn column3 = CLIListColumn("Balance", 16, CLIListColumn::rightAligned);
             headerRow.addColumn(column3);
 
-            CLIListColumn column4 = CLIListColumn("After Bills", 16, CLIListColumn::rightAligned);
+            CLIListColumn column4 = CLIListColumn("Reconciled", 16, CLIListColumn::rightAligned);
             headerRow.addColumn(column4);
 
-            CLIListColumn column5 = CLIListColumn("Primary", 7, CLIListColumn::leftAligned);
+            CLIListColumn column5 = CLIListColumn("After Bills", 16, CLIListColumn::rightAligned);
             headerRow.addColumn(column5);
+
+            CLIListColumn column6 = CLIListColumn("Primary", 7, CLIListColumn::leftAligned);
+            headerRow.addColumn(column6);
 
             addHeaderRow(headerRow);
 
@@ -111,11 +114,13 @@ class AccountListView : public CLIListView {
                 CLIListRow row(headerRow);
 
                 Money currentBalance = account.calculateCurrentBalance();
+                Money reconciledBalance = account.calculateReconciledBalance();
                 Money balanceAfterBills = account.calculateBalanceAfterBills();
 
                 row.addCellValue(account.code);
                 row.addCellValue(account.name);
                 row.addCellValue(currentBalance);
+                row.addCellValue(reconciledBalance);
                 row.addCellValue(balanceAfterBills);
                 row.addCellValue(account.isPrimary() ? "   *" : "");
 
