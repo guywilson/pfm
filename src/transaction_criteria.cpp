@@ -104,6 +104,15 @@ void FindTransactionCriteriaBuilder::parse() {
         }
         else if (parameter.compare("sql") == 0) {
             sqlWhereClause = getParameter(i + 1);
+
+            for (int c = 0;c < sqlWhereClause.length();c++) {
+                if (sqlWhereClause[c] == '*') {
+                    sqlWhereClause[c] = '%';
+                }
+                else if (sqlWhereClause[c] == '?') {
+                    sqlWhereClause[c] = '_';
+                }
+            }
             i += 2;
         }
     }
