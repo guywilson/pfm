@@ -22,7 +22,9 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "category_id," \
                         "category_code," \
+                        "payee_id," \
                         "payee_code," \
                         "recurring_charge_id," \
                         "date," \
@@ -40,7 +42,9 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "category_id," \
                         "category_code," \
+                        "payee_id," \
                         "payee_code," \
                         "recurring_charge_id," \
                         "date," \
@@ -59,7 +63,9 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "category_id," \
                         "category_code," \
+                        "payee_id," \
                         "payee_code," \
                         "recurring_charge_id," \
                         "date," \
@@ -78,7 +84,9 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "category_id," \
                         "category_code," \
+                        "payee_id," \
                         "payee_code," \
                         "recurring_charge_id," \
                         "date," \
@@ -98,7 +106,9 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "category_id," \
                         "category_code," \
+                        "payee_id," \
                         "payee_code," \
                         "recurring_charge_id," \
                         "date," \
@@ -118,7 +128,9 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "category_id," \
                         "category_code," \
+                        "payee_id," \
                         "payee_code," \
                         "recurring_charge_id," \
                         "date," \
@@ -139,7 +151,9 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "category_id," \
                         "category_code," \
+                        "payee_id," \
                         "payee_code," \
                         "recurring_charge_id," \
                         "date," \

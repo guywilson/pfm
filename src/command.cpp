@@ -634,7 +634,7 @@ void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool 
     cacheMgr.clearTransactions();
 
     for (int i = 0;i < result.getNumRows();i++) {
-        DBTransaction transaction = result.getResultAt(i);
+        DBTransactionView transaction = result.getResultAt(i);
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }
 }
@@ -701,12 +701,12 @@ void Command::findTransactions(const string & criteria) {
     cacheMgr.clearTransactions();
     
     for (int i = 0;i < result.getNumRows();i++) {
-        DBTransaction transaction = result.getResultAt(i);
+        DBTransactionView transaction = result.getResultAt(i);
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }
 }
 
-DBTransaction Command::getTransaction(int sequence) {
+DBTransactionView Command::getTransaction(int sequence) {
     int selectedSequence;
 
     if (sequence == 0) {
@@ -721,7 +721,7 @@ DBTransaction Command::getTransaction(int sequence) {
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
-    DBTransaction transaction = cacheMgr.getTransaction(selectedSequence);
+    DBTransactionView transaction = cacheMgr.getTransaction(selectedSequence);
 
     return transaction;
 }
@@ -739,9 +739,13 @@ void Command::deleteTransaction(DBTransaction & transaction) {
     transaction.remove();
 }
 
-void Command::reconcileTransaction(DBTransaction & transaction) {
-    transaction.isReconciled = true;
-    transaction.save();
+void Command::reconcileTransaction(DBTransactionView & transaction) {
+    DBTransaction tr;
+    tr.set(transaction);
+
+    tr.isReconciled = true;
+
+    tr.save();
 }
 
 void Command::importTransactions(string & jsonFileName) {
@@ -1260,7 +1264,7 @@ bool Command::process(const string & command) {
     else if (isCommand("reconcile-transaction") || isCommand("reconcile") || isCommand("rt")) {
         string sequence = getParameter(0);
 
-        DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
+        DBTransactionView transaction = getTransaction(atoi(sequence.c_str()));
         reconcileTransaction(transaction);
     }
     else if (isCommand("import-transactions") || isCommand("it")) {

@@ -9,6 +9,7 @@
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_recurring_charge.h"
+#include "db_v_transaction.h"
 #include "db_transaction.h"
 #include "db_budget.h"
 
@@ -28,7 +29,7 @@ class CacheMgr {
         CacheMgr() {}
 
         unordered_map<int, DBRecurringCharge> recurringChargeBySequence;
-        unordered_map<int, DBTransaction> transactionBySequence;
+        unordered_map<int, DBTransactionView> transactionBySequence;
         unordered_map<int, DBBudget> budgetBySequence;
 
     public:
@@ -50,7 +51,7 @@ class CacheMgr {
             recurringChargeBySequence.insert({sequence, charge});
         }
 
-        void addTransaction(int sequence, DBTransaction & transaction) {
+        void addTransaction(int sequence, DBTransactionView & transaction) {
             transactionBySequence.insert({sequence, transaction});
         }
 
@@ -68,8 +69,8 @@ class CacheMgr {
             throw pfm_error("DBRecurringCharge not found in cache.");
         }
 
-        DBTransaction getTransaction(int sequence) {
-            unordered_map<int, DBTransaction>::const_iterator item = transactionBySequence.find(sequence);
+        DBTransactionView getTransaction(int sequence) {
+            unordered_map<int, DBTransactionView>::const_iterator item = transactionBySequence.find(sequence);
 
             if (item != transactionBySequence.end()) {
                 return item->second;

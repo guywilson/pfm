@@ -6,6 +6,7 @@
 #include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
+#include "db_v_transaction.h"
 #include "db_transaction.h"
 #include "db_budget.h"
 #include "db_carried_over.h"
@@ -110,10 +111,10 @@ class Command {
         void findTransactions();
         void findTransactions(const string & criteria);
         string buildFindTransactionCriteria();
-        DBTransaction getTransaction(int sequence);
+        DBTransactionView getTransaction(int sequence);
         void updateTransaction(DBTransaction & transaction);
         void deleteTransaction(DBTransaction & transaction);
-        void reconcileTransaction(DBTransaction & transaction);
+        void reconcileTransaction(DBTransactionView & transaction);
         void importTransactions(string & jsonFileName);
         void exportTransactions(string & jsonFileName);
         void exportTransactionsAsCSV(string & csvFileName);
@@ -131,7 +132,7 @@ class Command {
 
         void changePassword();
         void getDBKey();
-        
+
         int getLogLevelParameter(string & level);
         void setLoggingLevel(string & level);
         void clearLoggingLevel(string & level);
