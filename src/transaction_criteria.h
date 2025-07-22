@@ -40,6 +40,7 @@ class FindTransactionCriteriaBuilder {
         string reference;
         string debitOrCredit;
         string recurringOrNonRecurring;
+        string sqlWhereClause;
         Money lessThanThisAmount = 0.0;
 
         void parse();

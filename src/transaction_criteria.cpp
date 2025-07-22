@@ -102,6 +102,10 @@ void FindTransactionCriteriaBuilder::parse() {
             betweenTheseAmountList.push_back(amount);
             i += 2;
         }
+        else if (parameter.compare("sql") == 0) {
+            sqlWhereClause = getParameter(i + 1);
+            i += 2;
+        }
     }
 }
 
@@ -254,6 +258,10 @@ string FindTransactionCriteriaBuilder::getCriteria() {
         else if (recurringOrNonRecurring.compare("n") == 0) {
             criteria += "recurring_charge_id = 0";
         }
+    }
+
+    if (sqlWhereClause.length() > 0) {
+        criteria = sqlWhereClause;
     }
 
     return criteria;
