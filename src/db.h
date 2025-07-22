@@ -111,8 +111,11 @@ class PFM_DB {
             isTransactionActive = false;
         }
 
-        void openReadWrite(const string & dbName);
+        int openReadWrite(const string & dbName);
         void createDB(const string & dbName);
+        bool isNewFileRequired(int errorCode);
+
+        void applyDatabaseKey(const string & dbName);
 
         void _executeSQLNoCallback(const char * sql);
         void _executeSQLCallback(const char * sql, vector<DBRow> * rows);

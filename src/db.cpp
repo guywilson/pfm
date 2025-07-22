@@ -118,29 +118,39 @@ static inline int _retrieveCallback(void * p, int numColumns, char ** columns, c
     return SQLITE_OK;
 }
 
-void PFM_DB::openReadWrite(const string & dbName) {
+int PFM_DB::openReadWrite(const string & dbName) {
     int error = sqlite3_open_v2(
                     dbName.c_str(), 
                     &this->dbHandle, 
                     SQLITE_OPEN_READWRITE, 
                     NULL);
 
-    if (error != SQLITE_OK) {
+    if (!isNewFileRequired(error) && error != SQLITE_OK) {
         const char * errorMsg = sqlite3_errmsg(this->dbHandle);
 
-        log.logError(
-                "Cannot open database file %s: %d:%s", 
+        log.logFatal(
+                "Cannot open database file %s for read-write, aborting: %d:%s", 
                 databaseName.c_str(),
                 error,
                 errorMsg);
 
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Cannot open database file %s: %d:%s", 
+        throw pfm_fatal(
+                pfm_fatal::buildMsg(
+                    "Cannot open database file %s for read-write, aborting: %d:%s", 
                     dbName.c_str(),
                     error,
                     errorMsg));
     }
+
+    return error;
+}
+
+bool PFM_DB::isNewFileRequired(int errorCode) {
+    if ((errorCode & 0x000000FF) == SQLITE_CANTOPEN) {
+        return true;
+    }
+
+    return false;
 }
 
 void PFM_DB::createDB(const string & dbName) {
@@ -149,83 +159,71 @@ void PFM_DB::createDB(const string & dbName) {
                     &this->dbHandle,
                     SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
                     NULL);
+
+    if (error != SQLITE_OK) {
+        const char * errorMsg = sqlite3_errmsg(this->dbHandle);
+
+        log.logFatal(
+                "Cannot open new database file %s, aborting: %d:%s", 
+                dbName.c_str(),
+                error,
+                errorMsg);
+
+        throw pfm_fatal(
+                pfm_fatal::buildMsg(
+                    "Cannot open new database file %s, aborting: %d:%s", 
+                    dbName.c_str(),
+                    error,
+                    errorMsg));
+    }
+}
+
+void PFM_DB::applyDatabaseKey(const string & dbName) {
+#ifndef RUN_IN_DEBUGGER
+    string password = getKey("Enter database password: ");
+#else
+    string password = DEBUG_PASSWORD;
+#endif
+    int keyError = sqlite3_key(this->dbHandle, password.c_str(), password.length());
+
+    if (keyError != SQLITE_OK) {
+        const char * errorMsg = sqlite3_errmsg(this->dbHandle);
+
+        log.logFatal(
+                "Cannot decrypt database file %s, aborting: %d:%s", 
+                dbName.c_str(),
+                keyError,
+                errorMsg);
+
+        throw pfm_fatal(
+                pfm_fatal::buildMsg(
+                    "Cannot decrypt database file %s, aborting: %d:%s", 
+                    dbName.c_str(),
+                    keyError,
+                    errorMsg));
+    }
 }
 
 void PFM_DB::open(const string & dbName) {
     log.logEntry("PFM_DB::open()");
 
-    int error = sqlite3_open_v2(
-                    dbName.c_str(), 
-                    &this->dbHandle, 
-                    SQLITE_OPEN_READWRITE, 
-                    NULL);
+    try {
+        int error = openReadWrite(dbName);
 
-    if (error == SQLITE_OK) {
-#ifndef RUN_IN_DEBUGGER
-        string password = getKey("Enter database password: ");
-#else
-        string password = DEBUG_PASSWORD;
-#endif
-        int keyError = sqlite3_key(this->dbHandle, password.c_str(), password.length());
+        if (isNewFileRequired(error)) {
+            createDB(dbName);
 
-        if (keyError != SQLITE_OK) {
-            const char * errorMsg = sqlite3_errmsg(this->dbHandle);
+            applyDatabaseKey(dbName);
 
-            log.logFatal(
-                    "Cannot decrypt database file %s, aborting: %d:%s", 
-                    databaseName.c_str(),
-                    error,
-                    errorMsg);
-
-            throw pfm_fatal(
-                    pfm_fatal::buildMsg(
-                        "Cannot decrypt database file %s, aborting: %d:%s", 
-                        dbName.c_str(),
-                        keyError,
-                        errorMsg));
+            cout << "Data file '" << dbName << "' does not exist, creating..." << endl;
+            createSchema();
+        }
+        else {
+            applyDatabaseKey(dbName);
         }
     }
-    else {
-        if ((error & 0x000000FF) ==  SQLITE_CANTOPEN) {
-            error = sqlite3_open_v2(
-                            dbName.c_str(),
-                            &this->dbHandle,
-                            SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
-                            NULL);
-
-            if (error == SQLITE_OK) {
-                string password = getKey("Please enter a password for database encryption: ");
-                int keyError = sqlite3_key(this->dbHandle, password.c_str(), password.length());
-
-                if (keyError != SQLITE_OK) {
-                    throw pfm_fatal(
-                            pfm_fatal::buildMsg(
-                                "Cannot decrypt database file %s, aborting: %d:%s", 
-                                dbName.c_str(),
-                                keyError,
-                                sqlite3_errmsg(this->dbHandle)));
-                }
-
-                cout << "Data file '" << dbName << "' does not exist, creating..." << endl;
-                createSchema();
-            }
-            else {
-                const char * errorMsg = sqlite3_errmsg(this->dbHandle);
-
-                log.logFatal(
-                        "Cannot open database file %s, aborting: %d:%s", 
-                        databaseName.c_str(),
-                        error,
-                        errorMsg);
-
-                throw pfm_fatal(
-                        pfm_fatal::buildMsg(
-                            "Cannot open database file %s, aborting: %d:%s", 
-                            dbName.c_str(),
-                            error,
-                            errorMsg));
-            }
-        }
+    catch (pfm_fatal & f) {
+        throw f;
     }
 
     databaseName = dbName;
