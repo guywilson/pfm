@@ -29,7 +29,7 @@ class CacheMgr {
         CacheMgr() {}
 
         unordered_map<int, DBRecurringCharge> recurringChargeBySequence;
-        unordered_map<int, DBTransactionView> transactionBySequence;
+        unordered_map<int, DBTransaction> transactionBySequence;
         unordered_map<int, DBBudget> budgetBySequence;
 
     public:
@@ -51,7 +51,7 @@ class CacheMgr {
             recurringChargeBySequence.insert({sequence, charge});
         }
 
-        void addTransaction(int sequence, DBTransactionView & transaction) {
+        void addTransaction(int sequence, DBTransaction & transaction) {
             transactionBySequence.insert({sequence, transaction});
         }
 
@@ -69,8 +69,8 @@ class CacheMgr {
             throw pfm_error("DBRecurringCharge not found in cache.");
         }
 
-        DBTransactionView getTransaction(int sequence) {
-            unordered_map<int, DBTransactionView>::const_iterator item = transactionBySequence.find(sequence);
+        DBTransaction getTransaction(int sequence) {
+            unordered_map<int, DBTransaction>::const_iterator item = transactionBySequence.find(sequence);
 
             if (item != transactionBySequence.end()) {
                 return item->second;

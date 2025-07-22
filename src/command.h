@@ -111,10 +111,10 @@ class Command {
         void findTransactions();
         void findTransactions(const string & criteria);
         string buildFindTransactionCriteria();
-        DBTransactionView getTransaction(int sequence);
+        DBTransaction getTransaction(int sequence);
         void updateTransaction(DBTransaction & transaction);
         void deleteTransaction(DBTransaction & transaction);
-        void reconcileTransaction(DBTransactionView & transaction);
+        void reconcileTransaction(DBTransaction & transaction);
         void importTransactions(string & jsonFileName);
         void exportTransactions(string & jsonFileName);
         void exportTransactionsAsCSV(string & csvFileName);

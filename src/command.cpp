@@ -706,7 +706,7 @@ void Command::findTransactions(const string & criteria) {
     }
 }
 
-DBTransactionView Command::getTransaction(int sequence) {
+DBTransaction Command::getTransaction(int sequence) {
     int selectedSequence;
 
     if (sequence == 0) {
@@ -721,7 +721,7 @@ DBTransactionView Command::getTransaction(int sequence) {
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
-    DBTransactionView transaction = cacheMgr.getTransaction(selectedSequence);
+    DBTransaction transaction = cacheMgr.getTransaction(selectedSequence);
 
     return transaction;
 }
@@ -739,13 +739,12 @@ void Command::deleteTransaction(DBTransaction & transaction) {
     transaction.remove();
 }
 
-void Command::reconcileTransaction(DBTransactionView & transaction) {
-    DBTransaction tr;
-    tr.set(transaction);
+void Command::reconcileTransaction(DBTransaction & transaction) {
+    transaction.retrieve();
 
-    tr.isReconciled = true;
+    transaction.isReconciled = true;
 
-    tr.save();
+    transaction.save();
 }
 
 void Command::importTransactions(string & jsonFileName) {
@@ -1264,7 +1263,7 @@ bool Command::process(const string & command) {
     else if (isCommand("reconcile-transaction") || isCommand("reconcile") || isCommand("rt")) {
         string sequence = getParameter(0);
 
-        DBTransactionView transaction = getTransaction(atoi(sequence.c_str()));
+        DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
         reconcileTransaction(transaction);
     }
     else if (isCommand("import-transactions") || isCommand("it")) {
