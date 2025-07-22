@@ -80,11 +80,10 @@ static string getPassword(const string & prompt) {
     return password;
 }
 
-string PFM_DB::getKey(const string & prompt) {
+static string getKeyFromPassword(const string & password) {
     uint8_t keyBuffer[32];
     char k[65];
 
-    string password = getPassword(prompt);
 	uint32_t keySize = gcry_md_get_algo_dlen(GCRY_MD_SHA3_256);
 
 	gcry_md_hash_buffer(GCRY_MD_SHA3_256, keyBuffer, password.c_str(), password.length());
@@ -98,6 +97,13 @@ string PFM_DB::getKey(const string & prompt) {
     k[j] = 0;
 
     string key(k);
+
+	return key;
+}
+
+string PFM_DB::getKey(const string & prompt) {
+    string password = getPassword(prompt);
+    string key = getKeyFromPassword(password);
 
 	return key;
 }
@@ -180,24 +186,24 @@ void PFM_DB::createDB(const string & dbName) {
 
 void PFM_DB::applyDatabaseKey(const string & dbName) {
 #ifndef RUN_IN_DEBUGGER
-    string password = getKey("Enter database password: ");
+    string key = getKey("Enter database password: ");
 #else
-    string password = DEBUG_PASSWORD;
+    string key = getKeyFromPassword(DEBUG_PASSWORD);
 #endif
-    int keyError = sqlite3_key(this->dbHandle, password.c_str(), password.length());
+    int keyError = sqlite3_key(this->dbHandle, key.c_str(), key.length());
 
     if (keyError != SQLITE_OK) {
         const char * errorMsg = sqlite3_errmsg(this->dbHandle);
 
         log.logFatal(
-                "Cannot decrypt database file %s, aborting: %d:%s", 
+                "Cannot apply key to database file %s, aborting: %d:%s", 
                 dbName.c_str(),
                 keyError,
                 errorMsg);
 
         throw pfm_fatal(
                 pfm_fatal::buildMsg(
-                    "Cannot decrypt database file %s, aborting: %d:%s", 
+                    "Cannot apply key to database file %s, aborting: %d:%s", 
                     dbName.c_str(),
                     keyError,
                     errorMsg));
