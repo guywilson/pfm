@@ -157,17 +157,7 @@ class TransactionListView : public CLIListView {
     private:
         Money total;
 
-    public:
-        TransactionListView() : CLIListView() {
-            total = 0.0;
-        }
-
-        void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
-            char szTitle[TITLE_BUFFER_LEN];
-
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%d)", accountCode.c_str(), result.getNumRows());
-            setTitle(szTitle);
-
+        void showResultsTable(DBResult<DBTransactionView> & result) {
             CLIListRow headerRow;
 
             CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
@@ -221,6 +211,29 @@ class TransactionListView : public CLIListView {
                 total += transaction.getSignedAmount();
                 addRow(row);
             }
+        }
+
+    public:
+        TransactionListView() : CLIListView() {
+            total = 0.0;
+        }
+
+        void addResults(DBResult<DBTransactionView> & result) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions list (%d)", result.getNumRows());
+            setTitle(szTitle);
+
+            showResultsTable(result);
+        }
+
+        void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%d)", accountCode.c_str(), result.getNumRows());
+            setTitle(szTitle);
+
+            showResultsTable(result);
         }
 
         void show() override {

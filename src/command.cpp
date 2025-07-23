@@ -691,7 +691,7 @@ void Command::findTransactions(const string & criteria) {
     DBResult<DBTransactionView> result = tr.findTransactionsForCriteria(criteria);
 
     TransactionListView view;
-    view.addResults(result, selectedAccount.code);
+    view.addResults(result);
     view.show();
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
