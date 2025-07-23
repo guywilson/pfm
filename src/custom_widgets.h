@@ -124,9 +124,12 @@ class AccountSpinField : public CLISpinTextField {
             populate();
 
             string code = readLine();
-            _setValue(code);
 
-            account.retrieveByCode(code);
+            if (code.length() > 0) {
+                _setValue(code);
+
+                account.retrieveByCode(code);
+            }
 
             clear();
         }

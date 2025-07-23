@@ -410,6 +410,7 @@ static const char * pszCreateListTransationView =
     "CREATE VIEW v_transaction_list AS SELECT " \
     "tr.id," \
     "tr.account_id," \
+    "a.code AS account_code," \
     "tr.recurring_charge_id," \
     "tr.date," \
     "tr.reference," \
@@ -426,6 +427,7 @@ static const char * pszCreateListTransationView =
     "FROM account_transaction tr " \
     "LEFT JOIN payee p ON p.id = tr.payee_id " \
     "LEFT JOIN category c ON c.id = tr.category_id " \
+    "LEFT JOIN account a ON a.id = tr.account_id " \
     "ORDER BY tr.date ASC;";
 
 static const char * pszCreateBudgetTrackView =

@@ -14,8 +14,7 @@ using namespace std;
 #ifndef __TRANSACTION_VIEW
 #define __TRANSACTION_VIEW
 
-#define PAYEE_ID_BUFFER_LENGTH                      32
-#define CATEGORY_ID_BUFFER_LENGTH                   32
+#define CRITERIA_BUFFER_LENGTH                      64
 
 class AddTransactionView : public CLIView {
     private:
@@ -174,29 +173,32 @@ class TransactionListView : public CLIListView {
             CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
             headerRow.addColumn(column1);
 
-            CLIListColumn column2 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
+            CLIListColumn column2 = CLIListColumn("Acct.", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
-            CLIListColumn column3 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
+            CLIListColumn column3 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
             headerRow.addColumn(column3);
 
-            CLIListColumn column4 = CLIListColumn("Reference", 12, CLIListColumn::leftAligned);
+            CLIListColumn column4 = CLIListColumn("Description", 20, CLIListColumn::leftAligned);
             headerRow.addColumn(column4);
 
-            CLIListColumn column5 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
+            CLIListColumn column5 = CLIListColumn("Reference", 9, CLIListColumn::leftAligned);
             headerRow.addColumn(column5);
 
-            CLIListColumn column6 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
+            CLIListColumn column6 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column6);
 
-            CLIListColumn column7 = CLIListColumn("CR/DB", 5, CLIListColumn::leftAligned);
+            CLIListColumn column7 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column7);
 
-            CLIListColumn column8 = CLIListColumn("Amount", 16, CLIListColumn::rightAligned);
+            CLIListColumn column8 = CLIListColumn("CR/DB", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column8);
 
-            CLIListColumn column9 = CLIListColumn("Rec", 3, CLIListColumn::leftAligned);
+            CLIListColumn column9 = CLIListColumn("Amount", 16, CLIListColumn::rightAligned);
             headerRow.addColumn(column9);
+
+            CLIListColumn column10 = CLIListColumn("Rec", 3, CLIListColumn::leftAligned);
+            headerRow.addColumn(column10);
 
             addHeaderRow(headerRow);
 
@@ -206,6 +208,7 @@ class TransactionListView : public CLIListView {
                 CLIListRow row(headerRow);
 
                 row.addCellValue(transaction.sequence);
+                row.addCellValue(transaction.accountCode);
                 row.addCellValue(transaction.date.shortDate());
                 row.addCellValue(transaction.description);
                 row.addCellValue(transaction.reference);
@@ -353,6 +356,7 @@ class UpdateTransactionView : public CLIView {
 
 class FindTransactionByPayeeView : public CLIFindView {
     private:
+        AccountSpinField accountField = AccountSpinField("Account code: ");
         PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
         DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
@@ -370,6 +374,7 @@ class FindTransactionByPayeeView : public CLIFindView {
         void show() override {
             CLIFindView::show();
 
+            accountField.show();
             payeeField.show();
             afterDateField.show();
             beforeDateField.show();
@@ -377,13 +382,19 @@ class FindTransactionByPayeeView : public CLIFindView {
         }
 
         string getCriteria() override {
-            string criteria;
+            string criteria = "";
 
+            DBAccount account = accountField.getAccount();
             DBPayee payee = payeeField.getPayee();
 
-            char buffer[PAYEE_ID_BUFFER_LENGTH];
-            snprintf(buffer, PAYEE_ID_BUFFER_LENGTH, "payee_id = %lld", payee.id);
-            criteria = buffer;
+            if (accountField.getValue().length() > 0) {
+                criteria += "account_code = '" + account.code + "' AND ";
+            }
+
+            char buffer[CRITERIA_BUFFER_LENGTH];
+            snprintf(buffer, CRITERIA_BUFFER_LENGTH, "payee_id = %lld", payee.id);
+
+            criteria += buffer;
 
             if (afterDateField.getValue().length() > 0) {
                 StrDate earliestDate = afterDateField.getValue();
@@ -418,6 +429,7 @@ class FindTransactionByPayeeView : public CLIFindView {
 
 class FindTransactionByCategoryView : public CLIFindView {
     private:
+        AccountSpinField accountField = AccountSpinField("Account code: ");
         CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
         DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
@@ -435,6 +447,7 @@ class FindTransactionByCategoryView : public CLIFindView {
         void show() override {
             CLIFindView::show();
 
+            accountField.show();
             categoryField.show();
             afterDateField.show();
             beforeDateField.show();
@@ -442,13 +455,19 @@ class FindTransactionByCategoryView : public CLIFindView {
         }
 
         string getCriteria() override {
-            string criteria;
+            string criteria = "";
 
+            DBAccount account = accountField.getAccount();
             DBCategory category = categoryField.getCategory();
 
-            char buffer[CATEGORY_ID_BUFFER_LENGTH];
-            snprintf(buffer, CATEGORY_ID_BUFFER_LENGTH, "category_id = %lld", category.id);
-            criteria = buffer;
+            if (accountField.getValue().length() > 0) {
+                criteria += "account_code = '" + account.code + "' AND ";
+            }
+
+            char buffer[CRITERIA_BUFFER_LENGTH];
+            snprintf(buffer, CRITERIA_BUFFER_LENGTH, "category_id = %lld", category.id);
+
+            criteria += buffer;
 
             if (afterDateField.getValue().length() > 0) {
                 StrDate earliestDate = afterDateField.getValue();
@@ -483,6 +502,7 @@ class FindTransactionByCategoryView : public CLIFindView {
 
 class FindTransactionByDescriptionView : public CLIFindView {
     private:
+        AccountSpinField accountField = AccountSpinField("Account code: ");
         CLITextField descriptionField = CLITextField("Transaction description: ");
         DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
@@ -500,6 +520,7 @@ class FindTransactionByDescriptionView : public CLIFindView {
         void show() override {
             CLIView::show();
 
+            accountField.show();
             descriptionField.show();
             afterDateField.show();
             beforeDateField.show();
@@ -507,11 +528,16 @@ class FindTransactionByDescriptionView : public CLIFindView {
         }
 
         string getCriteria() override {
-            string criteria;
+            string criteria = "";
 
+            DBAccount account = accountField.getAccount();
             string description = descriptionField.getValue();
 
-            criteria = "description LIKE '%" + description + "%'";
+            if (accountField.getValue().length() > 0) {
+                criteria += "account_code = '" + account.code + "' AND ";
+            }
+
+            criteria += "description LIKE '%" + description + "%'";
 
             if (afterDateField.getValue().length() > 0) {
                 StrDate earliestDate = afterDateField.getValue();
@@ -546,6 +572,7 @@ class FindTransactionByDescriptionView : public CLIFindView {
 
 class FindTransactionByDateView : public CLIFindView {
     private:
+        AccountSpinField accountField = AccountSpinField("Account code: ");
         DateField afterDateField = DateField("Earliest date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
         CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
@@ -562,14 +589,21 @@ class FindTransactionByDateView : public CLIFindView {
         void show() override {
             CLIView::show();
 
+            accountField.show();
             afterDateField.show();
             beforeDateField.show();
             recurringIncludeType.show();
         }
 
         string getCriteria() override {
-            string criteria;
+            string criteria = "";
 
+            DBAccount account = accountField.getAccount();
+
+            if (accountField.getValue().length() > 0) {
+                criteria += "account_code = '" + account.code + "' AND ";
+            }
+ 
             if (afterDateField.getValue().length() > 0) {
                 StrDate earliestDate = afterDateField.getValue();
                 criteria += " date >= '" + earliestDate.shortDate() + "'";

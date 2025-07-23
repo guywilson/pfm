@@ -93,6 +93,28 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(p
     return result;
 }
 
+DBResult<DBTransactionView> DBTransactionView::findTransactionsForCriteria(const string & criteria) {
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    int sqlRowLimit = SQL_ROW_LIMIT;
+    DBResult<DBTransactionView> result;
+
+    strncpy(szStatement, sqlSelectByCriteria, SQL_STATEMENT_BUFFER_LEN);
+
+    if (criteria.length() > 0) {
+        strcat(szStatement, criteria.c_str());
+    }
+    
+    snprintf(
+        &szStatement[strlen(szStatement)], 
+        SQL_STATEMENT_BUFFER_LEN, 
+        " ORDER BY date DESC LIMIT %d;", 
+        sqlRowLimit);
+
+    result.retrieve(szStatement);
+
+    return result;
+}
+
 DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_id_t accountId, const string & criteria) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     int sqlRowLimit = SQL_ROW_LIMIT;

@@ -18,10 +18,32 @@ using namespace std;
 
 class DBTransactionView : public DBTransaction {
     private:
+        const char * sqlSelectByCriteria = 
+                        "SELECT " \
+                        "id," \
+                        "account_id," \
+                        "account_code," \
+                        "category_id," \
+                        "category_code," \
+                        "payee_id," \
+                        "payee_code," \
+                        "recurring_charge_id," \
+                        "date," \
+                        "reference," \
+                        "description," \
+                        "credit_debit," \
+                        "amount," \
+                        "is_reconciled," \
+                        "created," \
+                        "updated " \
+                        "FROM v_transaction_list " \
+                        "WHERE ";
+
         const char * sqlSelectByAccountID = 
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "account_code," \
                         "category_id," \
                         "category_code," \
                         "payee_id," \
@@ -42,6 +64,7 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "account_code," \
                         "category_id," \
                         "category_code," \
                         "payee_id," \
@@ -63,6 +86,7 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "account_code," \
                         "category_id," \
                         "category_code," \
                         "payee_id," \
@@ -84,6 +108,7 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "account_code," \
                         "category_id," \
                         "category_code," \
                         "payee_id," \
@@ -106,6 +131,7 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "account_code," \
                         "category_id," \
                         "category_code," \
                         "payee_id," \
@@ -128,6 +154,7 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "account_code," \
                         "category_id," \
                         "category_code," \
                         "payee_id," \
@@ -151,6 +178,7 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "account_code," \
                         "category_id," \
                         "category_code," \
                         "payee_id," \
@@ -173,6 +201,7 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
     public:
+        string accountCode;
         string payeeCode;
         string categoryCode;
 
@@ -183,6 +212,7 @@ class DBTransactionView : public DBTransaction {
         void clear() {
             DBTransaction::clear();
 
+            this->accountCode = "";
             this->payeeCode = "";
             this->categoryCode = "";
         }
@@ -190,6 +220,7 @@ class DBTransactionView : public DBTransaction {
         void set(const DBTransactionView & src) {
             DBTransaction::set(src);
 
+            this->accountCode = src.accountCode;
             this->payeeCode = src.payeeCode;
             this->categoryCode = src.categoryCode;
         }
@@ -197,6 +228,7 @@ class DBTransactionView : public DBTransaction {
         void print() {
             DBTransaction::print();
 
+            cout << "AccountCode: '" << accountCode << "'" << endl;
             cout << "PayeeCode: '" << payeeCode << "'" << endl;
             cout << "CategoryCode: '" << categoryCode << "'" << endl;
         }
@@ -209,6 +241,9 @@ class DBTransactionView : public DBTransaction {
             }
             else if (column.getName() == "category_code") {
                 categoryCode = column.getValue();
+            }
+            else if (column.getName() == "account_code") {
+                accountCode = column.getValue();
             }
         }
 
@@ -231,6 +266,7 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransactionView> findTransactionsForCriteria(const string & criteria);
         DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t accountId, const string & criteria);
 };
 

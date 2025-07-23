@@ -640,8 +640,6 @@ void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool 
 }
 
 void Command::findTransactions() {
-    checkAccountSelected();
-
     cout << "How do you want to search for transactions:" << endl;
     cout << "1) By category" << endl;
     cout << "2) By payee" << endl;
@@ -690,7 +688,7 @@ void Command::findTransactions() {
 
 void Command::findTransactions(const string & criteria) {
     DBTransactionView tr;
-    DBResult<DBTransactionView> result = tr.findTransactionsForAccountID(selectedAccount.id, criteria);
+    DBResult<DBTransactionView> result = tr.findTransactionsForCriteria(criteria);
 
     TransactionListView view;
     view.addResults(result, selectedAccount.code);
