@@ -615,14 +615,10 @@ void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool 
     DBResult<DBTransactionView> result;
 
     if (includeRecurring) {
-        result = transactionInstance.retrieveByAccountID(selectedAccount.id, sort_descending, rowLimit);
+        result = transactionInstance.retrieveByAccountID(selectedAccount.id, sortDirection, rowLimit);
     }
     else {
-        result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sort_descending, rowLimit);
-    }
-
-    if (sortDirection == sort_ascending) {
-        result.reverse();
+        result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sortDirection, rowLimit);
     }
 
     TransactionListView view;
