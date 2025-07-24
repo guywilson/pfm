@@ -621,7 +621,7 @@ void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool 
         result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sortDirection, rowLimit);
     }
 
-    TransactionListView view;
+    TransactionListView view(false);
     view.addResults(result, selectedAccount.code);
     view.show();
 
@@ -686,7 +686,7 @@ void Command::findTransactions(const string & criteria) {
     DBTransactionView tr;
     DBResult<DBTransactionView> result = tr.findTransactionsForCriteria(criteria);
 
-    TransactionListView view;
+    TransactionListView view(true);
     view.addResults(result);
     view.show();
 
