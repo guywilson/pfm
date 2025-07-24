@@ -153,6 +153,8 @@ int main(int argc, char ** argv) {
     string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
     command.process("use " + primaryAccountCode);
 
+    command.process("list 12:all:desc");
+    
     bool loop = true;
 
     while (loop) {
