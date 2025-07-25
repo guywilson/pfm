@@ -2,6 +2,7 @@
 /dep
 /.vscode
 pfm
+pfm.1
 *.db
 *.json
 .pfm

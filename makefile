@@ -14,15 +14,20 @@ MINOR_VERSION = 5
 SOURCE = src
 BUILD = build
 DEP = dep
+DOC = doc
+
+MANSOURCE = $(DOC)/pfm.1.md
 
 # What is our target
 TARGET = pfm
+MANTARGET = $(TARGET).1
 
 # Tools
 VBUILD = vbuild
 C = gcc
 CPP = g++
 LINKER = g++
+PANDOC = pandoc
 
 # postcompile step
 PRECOMPILE = @ mkdir -p $(BUILD) $(DEP)
@@ -46,6 +51,8 @@ CFLAGS=$(CFLAGS_REL)
 # CFLAGS=$(CFLAGS_DBG)
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP)/$*.Td
 
+PANDOCFLAGS = -s -t man
+
 # Libraries
 STDLIBS =
 EXTLIBS = -lreadline -lhistory -lcurses -lsqlcipher -lgcrypt
@@ -54,12 +61,14 @@ COMPILE.cpp = $(CPP) $(CPPFLAGS) $(DEPFLAGS) -o $@
 COMPILE.c = $(C) $(CFLAGS) $(DEPFLAGS) -o $@
 LINK.o = $(LINKER) $(STDLIBS) -o $@
 
+PANDOC.md = $(PANDOC) $(PANDOCFLAGS) -o $@
+
 CSRCFILES = $(wildcard $(SOURCE)/*.c)
 CPPSRCFILES = $(wildcard $(SOURCE)/*.cpp)
 OBJFILES = $(patsubst $(SOURCE)/%.c, $(BUILD)/%.o, $(CSRCFILES)) $(patsubst $(SOURCE)/%.cpp, $(BUILD)/%.o, $(CPPSRCFILES))
 DEPFILES = $(patsubst $(SOURCE)/%.c, $(DEP)/%.d, $(CSRCFILES)) $(patsubst $(SOURCE)/%.cpp, $(DEP)/%.d, $(CPPSRCFILES))
 
-all: $(TARGET)
+all: $(TARGET) $(MANTARGET)
 
 # Compile C/C++ source files
 #
@@ -78,6 +87,9 @@ $(BUILD)/%.o: $(SOURCE)/%.cpp $(DEP)/%.d
 	$(COMPILE.cpp) $<
 	$(POSTCOMPILE)
 
+$(MANTARGET): $(MANSOURCE)
+	$(PANDOC.md) $<
+
 .PRECIOUS = $(DEP)/%.d
 $(DEP)/%.d: ;
 
@@ -85,6 +97,7 @@ $(DEP)/%.d: ;
 
 install: $(TARGET)
 	cp $(TARGET) /usr/local/bin
+	cp $(TARGET).1 /usr/local/share/man/man1
 
 version:
 	$(VBUILD) -incfile $(TARGET).ver -template version.c.template -out $(SOURCE)/version.c -major $(MAJOR_VERSION) -minor $(MINOR_VERSION)
@@ -93,3 +106,4 @@ clean:
 	rm -r $(BUILD)
 	rm -r $(DEP)
 	rm $(TARGET)
+	rm $(TARGET).1
