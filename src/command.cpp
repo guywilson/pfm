@@ -118,18 +118,8 @@ static DBBudget * createSampleBudget() {
 }
 
 void Command::help() {
-    const char * helpText = 
-        "PFM supports the following commands, each command also has a short version\n" \
-        "which you can use for convenience:\n" \
-        "\tadd-account, aa\n" \
-        "\tlist-accounts, la\n" \
-        "\tupdate-account <account code>, ua <account code>\n" \
-        "\tdelete-account <account code>, da <account code>\n" \
-        "\timport-accounts <filename (JSON)>\n" \
-        "\t\n" \
-        "\n";
-
-    cout << helpText;
+    cout << "For help, please see the manual" << endl;
+    cout << "\tman pfm" << endl << endl;
 }
 
 void Command::version() {
