@@ -60,9 +60,10 @@ static int __getch(void) {
 static string getPassword(const string & prompt) {
     cout << prompt;
 
-    string password;
+    char password[256];
 	int	ch = 0;
-
+	int i = 0;
+	
     while (ch != '\n') {
         ch = __getch();
 
@@ -70,41 +71,49 @@ static string getPassword(const string & prompt) {
             putchar('*');
             fflush(stdout);
 
-            password += (char)ch;
+            password[i++] = (char)ch;
         }
     }
 
+	password[i] = 0;
+	
     cout << endl;
     fflush(stdout);
 
-    return password;
+    return string(password);
 }
 
 static string getKeyFromPassword(const string & password) {
-    uint8_t keyBuffer[32];
-    char k[65];
-
 	uint32_t keySize = gcry_md_get_algo_dlen(GCRY_MD_SHA3_256);
+
+	uint8_t * keyBuffer = (uint8_t *)malloc(keySize);
+	char * k = (char *)malloc((keySize * 2) + 1);
 
 	gcry_md_hash_buffer(GCRY_MD_SHA3_256, keyBuffer, password.c_str(), password.length());
 
+	char hexBuffer[3];
     int j = 0;
     for (int i = 0;i < keySize;i++) {
-        snprintf(&k[j], 64, "%02X", keyBuffer[i]);
-        j += 2;
+        snprintf(hexBuffer, 3, "%02X", keyBuffer[i]);
+
+        k[j++] = hexBuffer[0];
+        k[j++] = hexBuffer[1];
     }
 
     k[j] = 0;
 
     string key(k);
 
+	free(keyBuffer);
+	free(k);
+	
 	return key;
 }
 
 string PFM_DB::getKey(const string & prompt) {
     string password = getPassword(prompt);
     string key = getKeyFromPassword(password);
-
+	
 	return key;
 }
 
