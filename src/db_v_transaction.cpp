@@ -98,7 +98,7 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForCriteria(const
     int sqlRowLimit = SQL_ROW_LIMIT;
     DBResult<DBTransactionView> result;
 
-    strncpy(szStatement, sqlSelectByCriteria, SQL_STATEMENT_BUFFER_LEN);
+    strncpy(szStatement, sqlSelectByCriteria, SQL_STATEMENT_BUFFER_LEN - 1);
 
     if (criteria.length() > 0) {
         strcat(szStatement, criteria.c_str());
