@@ -309,12 +309,6 @@ void PFM_DB::changePassword() {
     log.logExit("PFM_DB::changePassword()");
 }
 
-PFM_DB::~PFM_DB() {
-    log.logEntry("PFM_DB::~PFM_DB()");
-    close();
-    log.logExit("PFM_DB::~PFM_DB()");
-}
-
 bool PFM_DB::getIsTransactionActive() {
     log.logEntry("PFM_DB::getIsTransactionActive()");
 

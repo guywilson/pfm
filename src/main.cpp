@@ -180,5 +180,8 @@ int main(int argc, char ** argv) {
         }
     }
 
+    db.close();
+    log.closeLogger();
+
     return 0; 
 }

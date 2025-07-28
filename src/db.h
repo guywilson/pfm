@@ -131,7 +131,7 @@ class PFM_DB {
         void createCurrencies();
 
     public:
-        ~PFM_DB();
+        ~PFM_DB() {}
 
         void open(const string & dbName);
         void open();
