@@ -43,7 +43,7 @@ class Logger {
         int logMessage(int logLevel, const char * fmt, va_list args);
 
     public:
-        ~Logger();
+        ~Logger() {}
 
         static int getLogLevelFromString(string & logLevel);
 

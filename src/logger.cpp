@@ -45,10 +45,6 @@ char * Logger::trim(const char * src) {
     return trimmedString;
 }
 
-Logger::~Logger() {
-    closeLogger();
-}
-
 void Logger::initLogger(string & filename, int logLevel) {
     this->loggingLevel = logLevel;
 
