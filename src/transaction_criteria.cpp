@@ -12,7 +12,7 @@ string FindTransactionCriteriaBuilder::getParameter(int index) const {
     if (parameters.size() == 0) {
         throw pfm_error("Expected parameters but none were supplied");
     }
-    else if (index >= parameters.size()) {
+    else if (index >= (int)parameters.size()) {
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Expecting at least %d parameters but only %d have been supplied", 
@@ -26,7 +26,7 @@ string FindTransactionCriteriaBuilder::getParameter(int index) const {
 void FindTransactionCriteriaBuilder::parse() {
     int i = 0;
 
-    while (i < parameters.size()) {
+    while (i < (int)parameters.size()) {
         string parameter = getParameter(i);
 
         if (parameter.compare("D") == 0) {
@@ -52,7 +52,7 @@ void FindTransactionCriteriaBuilder::parse() {
         else if (parameter.compare("ds") == 0) {
             string ds = getParameter(i + 1);
 
-            for (int c = 0;c < ds.length();c++) {
+            for (int c = 0;c < (int)ds.length();c++) {
                 if (ds[c] == '*') {
                     description[c] = '%';
                 }
@@ -68,7 +68,7 @@ void FindTransactionCriteriaBuilder::parse() {
         else if (parameter.compare("r") == 0) {
             string r = getParameter(i + 1);
 
-            for (int c = 0;c < r.length();c++) {
+            for (int c = 0;c < (int)r.length();c++) {
                 if (r[c] == '*') {
                     reference[c] = '%';
                 }
@@ -105,7 +105,7 @@ void FindTransactionCriteriaBuilder::parse() {
         else if (parameter.compare("sql") == 0) {
             sqlWhereClause = getParameter(i + 1);
 
-            for (int c = 0;c < sqlWhereClause.length();c++) {
+            for (int c = 0;c < (int)sqlWhereClause.length();c++) {
                 if (sqlWhereClause[c] == '*') {
                     sqlWhereClause[c] = '%';
                 }
@@ -280,7 +280,7 @@ string AddTransactionCriteriaBuilder::getParameter(int index) const {
     if (parameters.size() == 0) {
         throw pfm_error("Expected parameters but none were supplied");
     }
-    else if (index >= parameters.size()) {
+    else if (index >= (int)parameters.size()) {
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Expecting at least %d parameters but only %d have been supplied", 
@@ -294,7 +294,7 @@ string AddTransactionCriteriaBuilder::getParameter(int index) const {
 void AddTransactionCriteriaBuilder::parse() {
     int i = 0;
 
-    while (i < parameters.size()) {
+    while (i < (int)parameters.size()) {
         string parameter = getParameter(i);
 
         if (parameter.compare("d") == 0) {

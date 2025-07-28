@@ -93,7 +93,7 @@ static string getKeyFromPassword(const string & password) {
 
 	char hexBuffer[3];
     int j = 0;
-    for (int i = 0;i < keySize;i++) {
+    for (int i = 0;i < (int)keySize;i++) {
         snprintf(hexBuffer, 3, "%02X", keyBuffer[i]);
 
         k[j++] = hexBuffer[0];

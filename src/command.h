@@ -46,7 +46,7 @@ class Command {
             if (parameters.size() == 0) {
                 throw pfm_error("Expected parameters but none were supplied");
             }
-            else if (index >= parameters.size()) {
+            else if (index >= (int)parameters.size()) {
                 throw pfm_error(
                         pfm_error::buildMsg(
                             "Expecting at least %d parameters but only %d have been supplied", 

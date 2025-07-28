@@ -19,7 +19,7 @@ using namespace std;
 
 static bool isNumeric(string & cfgDate) {
     bool isNumeric = true;
-    for (int i = 0;i < cfgDate.length();i++) {
+    for (int i = 0;i < (int)cfgDate.length();i++) {
         if (!isdigit(cfgDate.at(i))) {
             isNumeric = false;
             break;

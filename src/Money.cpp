@@ -137,7 +137,7 @@ money_t Money::getDecimalValueFromString(const char * amount) {
         ** spreadsheet...
         */
         if (strlen(buffer) == 1) {
-            strncat(buffer, "0", AMOUNT_BUFFER_LENGTH);
+            strncat(buffer, "0", AMOUNT_BUFFER_LENGTH - 1);
         }
 
         decimal = (money_t)strtol(buffer, NULL, 10);
