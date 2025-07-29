@@ -44,6 +44,16 @@ std::ostream& bold_off(std::ostream& os) {
 }
 #endif
 
+static bool containsMultiByteChar(const string & str) {
+    for (unsigned char c : str) {
+        if (c & 0x80) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 class CLIWidget {
     public:
         CLIWidget() {}
@@ -586,7 +596,16 @@ class CLIListRow : public CLIWidget {
             ** Changes specified in P2675 should fix this:
             ** https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p2675r1.pdf
             */
-            string value = "#" + val.getFormattedStringValue();
+            string moneyString = val.getFormattedStringValue();
+            
+            string value;
+            if (containsMultiByteChar(moneyString)) {
+                value = "#" + moneyString;
+            }
+            else {
+                value = moneyString;
+            }
+
             columnValues.push_back(value);
         }
 
