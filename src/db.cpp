@@ -22,6 +22,8 @@
 ** OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ** 
+** *** For SQLCipher used in this software ***
+**
 ** Copyright (c) 2025, ZETETIC LLC
 ** All rights reserved.
 ** 
