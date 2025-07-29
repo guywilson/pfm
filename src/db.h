@@ -17,6 +17,8 @@ using namespace std;
 
 #define SQLITE_ERROR_BUFFER_LEN                     512
 #define SQL_STATEMENT_BUFFER_LEN                    512
+#define SQL_ORDER_BY_BUFFER_LEN                      48
+
 #define SQL_ROW_LIMIT                                80
 
 typedef enum {

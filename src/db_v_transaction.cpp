@@ -104,11 +104,15 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForCriteria(const
         strcat(szStatement, criteria.c_str());
     }
     
+    char szOrderBy[SQL_ORDER_BY_BUFFER_LEN];
+
     snprintf(
-        &szStatement[strlen(szStatement)], 
-        SQL_STATEMENT_BUFFER_LEN, 
+        szOrderBy, 
+        SQL_ORDER_BY_BUFFER_LEN - 1, 
         " ORDER BY date DESC LIMIT %d;", 
         sqlRowLimit);
+
+    strcat(szStatement, szOrderBy);
 
     result.retrieve(szStatement);
 
@@ -135,12 +139,16 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_
         strcat(szStatement, " AND ");
         strcat(szStatement, criteria.c_str());
     }
-    
+        
+    char szOrderBy[SQL_ORDER_BY_BUFFER_LEN];
+
     snprintf(
-        &szStatement[strlen(szStatement)], 
-        SQL_STATEMENT_BUFFER_LEN, 
+        szOrderBy, 
+        SQL_ORDER_BY_BUFFER_LEN - 1, 
         " ORDER BY date DESC LIMIT %d;", 
         sqlRowLimit);
+
+    strcat(szStatement, szOrderBy);
 
     result.retrieve(szStatement);
 
