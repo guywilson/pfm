@@ -49,6 +49,7 @@
 #include "money.h"
 #include "strdate.h"
 #include "rlcustom.h"
+#include "license.h"
 #include "version.h"
 
 //#define RUN_IN_DEBUGGER
@@ -66,7 +67,12 @@ static void printUsage(void) {
     cout << "Options:" << endl;
     cout << "\t-db <db name> if not specified, defaults to '.pfm' in the current dir" << endl;
     cout << "\t-h displays the help" << endl;
-    cout << "\t-version, -v print the program version" << endl << endl;
+    cout << "\t--license, -l print the license" << endl;
+    cout << "\t--version, -v print the program version" << endl << endl;
+}
+
+static void printLicense(void) {
+    cout << licenseText << endl << endl;
 }
 
 #ifdef PFM_TEST_SUITE_ENABLED
@@ -114,6 +120,10 @@ int main(int argc, char ** argv) {
 				}
                 else if (argv[i][1] == 'v' || strncmp(&argv[i][1], "-version", 8) == 0) {
                     Command::version();
+                    return 0;
+                }
+                else if (argv[i][1] == 'l' || strncmp(&argv[i][1], "-license", 8) == 0) {
+                    printLicense();
                     return 0;
                 }
 				else {
