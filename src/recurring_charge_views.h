@@ -121,7 +121,7 @@ class RecurringChargeListView : public CLIListView {
             CLIListColumn column7 = CLIListColumn("Frq", 4, CLIListColumn::leftAligned);
             headerRow.addColumn(column7);
 
-            CLIListColumn column8 = CLIListColumn("Amount", 16, CLIListColumn::rightAligned);
+            CLIListColumn column8 = CLIListColumn("Amount", 11, CLIListColumn::rightAligned);
             headerRow.addColumn(column8);
 
             addHeaderRow(headerRow);
@@ -147,7 +147,7 @@ class RecurringChargeListView : public CLIListView {
 
         void show() override {
             CLIListView::showNoExtraCR();
-            cout << "                                                                    Total charges: | " << bold_on << right << setw(17) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
+            cout << "                                                                    Total charges: | " << bold_on << right << setw(12) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
         }
 };
 

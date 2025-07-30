@@ -9,7 +9,7 @@ using namespace std;
 #ifndef __INCL_TERMINAL
 #define __INCL_TERMINAL
 
-#define TERMINAL_MIN_WIDTH                   80
+#define TERMINAL_MIN_WIDTH                   100
 #define TERMINAL_MIN_HEIGHT                  24
 
 class Terminal {
