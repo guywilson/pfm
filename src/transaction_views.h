@@ -170,10 +170,10 @@ class TransactionListView : public CLIListView {
             CLIListColumn column3 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
             headerRow.addColumn(column3);
 
-            CLIListColumn column4 = CLIListColumn("Description", 20, CLIListColumn::leftAligned);
+            CLIListColumn column4 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
             headerRow.addColumn(column4);
 
-            CLIListColumn column5 = CLIListColumn("Ref.", 6, CLIListColumn::leftAligned);
+            CLIListColumn column5 = CLIListColumn("Reference", 9, CLIListColumn::leftAligned);
             headerRow.addColumn(column5);
 
             CLIListColumn column6 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
@@ -246,7 +246,7 @@ class TransactionListView : public CLIListView {
             CLIListView::showNoExtraCR();
 
             if (showTotal) {
-                cout << "                                                                  Total amount: | " << bold_on << right << setw(12) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
+                cout << "                                                                          Total amount: | " << bold_on << right << setw(12) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
             }
             else {
                 cout << endl;
