@@ -700,6 +700,10 @@ class CLIListView : public CLIView {
             headerRow.printBottomBorder();
         }
 
+        void showTotal(int alignedColumn, string & total) {
+            
+        }
+
         void showNoExtraCR() {
             printTitle();
 
