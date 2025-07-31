@@ -10,9 +10,7 @@ using namespace std;
 #define __INCL_TERMINAL
 
 #define TERMINAL_MIN_WIDTH                   110
-#define TERMINAL_MIN_HEIGHT                  30
-
-const char * t = "+-----+-------+------------+----------------------+-----------+-------+-------+----+-------------+---+";
+#define TERMINAL_MIN_HEIGHT                   24
 
 class Terminal {
     public:
