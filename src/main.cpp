@@ -159,6 +159,10 @@ int main(int argc, char ** argv) {
     Logger & log = Logger::getInstance();
     log.init(logFileName, LOG_LEVEL_FATAL | LOG_LEVEL_ERROR);
 
+#ifdef RUN_IN_DEBUGGER
+    log.setLogLevel(LOG_LEVEL_ALL);
+#endif
+
     checkTerminalSize();
 
     PFM_DB & db = PFM_DB::getInstance();
@@ -197,10 +201,6 @@ int main(int argc, char ** argv) {
         cout << endl << "*** Welcome to PFM ***" << endl << endl << "Create your first account..." << endl << endl;
         command.process("add-account");
     }
-
-#ifdef RUN_IN_DEBUGGER
-    command.process("set-logging-level all");
-#endif
 
     string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
     command.process("use " + primaryAccountCode);
