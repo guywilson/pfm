@@ -700,7 +700,7 @@ class CLIListView : public CLIView {
             headerRow.printBottomBorder();
         }
 
-        void showTotal(int alignedColumn, string & total) {
+        void showTotal(int alignedColumn, const string & total) {
             int numPaddingSpaces = 0;
 
             for (int i = 0;i < alignedColumn;i++) {

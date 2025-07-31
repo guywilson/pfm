@@ -246,8 +246,7 @@ class TransactionListView : public CLIListView {
             CLIListView::showNoExtraCR();
 
             if (isTotalEnabled) {
-                string totalStr = total.getFormattedStringValue();
-                showTotal(8, totalStr);
+                showTotal(8, total.getFormattedStringValue());
             }
             else {
                 cout << endl;

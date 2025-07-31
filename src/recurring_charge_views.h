@@ -148,8 +148,7 @@ class RecurringChargeListView : public CLIListView {
         void show() override {
             CLIListView::showNoExtraCR();
 
-            string totalStr = total.getFormattedStringValue();
-            showTotal(7, totalStr);
+            showTotal(7, total.getFormattedStringValue());
         }
 };
 
