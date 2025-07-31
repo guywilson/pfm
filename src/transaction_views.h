@@ -156,7 +156,7 @@ class TransferToAccountView : public CLIView {
 class TransactionListView : public CLIListView {
     private:
         Money total;
-        bool showTotal;
+        bool isTotalEnabled;
 
         void showResultsTable(DBResult<DBTransactionView> & result) {
             CLIListRow headerRow;
@@ -216,12 +216,12 @@ class TransactionListView : public CLIListView {
 
     public:
         TransactionListView() : CLIListView() {
-            TransactionListView(true);
+            isTotalEnabled = false;
         }
 
-        TransactionListView(bool showTotal) : CLIListView() {
+        void addTotal() {
             total = 0.0;
-            this->showTotal = showTotal;
+            isTotalEnabled = true;
         }
 
         void addResults(DBResult<DBTransactionView> & result) {
@@ -245,8 +245,9 @@ class TransactionListView : public CLIListView {
         void show() override {
             CLIListView::showNoExtraCR();
 
-            if (showTotal) {
-                cout << "                                                                          Total amount: | " << bold_on << right << setw(12) << total.getFormattedStringValue() << bold_off << " |" << endl << endl;
+            if (isTotalEnabled) {
+                string totalStr = total.getFormattedStringValue();
+                showTotal(8, totalStr);
             }
             else {
                 cout << endl;

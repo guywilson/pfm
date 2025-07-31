@@ -701,7 +701,26 @@ class CLIListView : public CLIView {
         }
 
         void showTotal(int alignedColumn, string & total) {
-            
+            int numPaddingSpaces = 0;
+
+            for (int i = 0;i < alignedColumn;i++) {
+                CLIListColumn column = headerRow.getColumnAt(i);
+
+                for (int j = 0;j < column.getColumnWidth() - 1;j++) {
+                    numPaddingSpaces++;
+                }
+                numPaddingSpaces++;
+            }
+
+            string label = "Total amount: ";
+
+            numPaddingSpaces -= (int)label.length();
+
+            for (int i = 0;i < numPaddingSpaces;i++) {
+                cout << ' ';
+            }
+
+            cout << label << "| " << bold_on << right << setw(12) << total << bold_off << " |" << endl << endl;
         }
 
         void showNoExtraCR() {
