@@ -88,18 +88,37 @@ void test() {
 
 static void checkTerminalSize(void) {
     Terminal & t = Terminal::getInstance();
+    Logger & log = Logger::getInstance();
 
-    if ((int)t.getWidth() < TERMINAL_MIN_WIDTH || (int)t.getHeight() < TERMINAL_MIN_HEIGHT) {
+    uint16_t width = t.getWidth();
+    uint16_t height = t.getHeight();
+
+    log.logDebug(
+            "Terminal size (w x h) reported as %u x %u", 
+            (unsigned int)width, 
+            (unsigned int)height);
+
+    if ((int)width < TERMINAL_MIN_WIDTH || (int)height < TERMINAL_MIN_HEIGHT) {
+        log.logError(
+            "Terminal size must be at least %d x %d to run this program. " \
+            "Current size is %d x %d\n\n", 
+            TERMINAL_MIN_WIDTH,
+            TERMINAL_MIN_HEIGHT,
+            (int)width, 
+            (int)height);
+            
+#ifndef RUN_IN_DEBUGGER
         fprintf(
             stderr, 
             "Terminal size must be at least %d x %d to run this program. " \
             "Current size is %d x %d\n\n", 
             TERMINAL_MIN_WIDTH,
             TERMINAL_MIN_HEIGHT,
-            (int)t.getWidth(), 
-            (int)t.getHeight());
+            (int)width, 
+            (int)height);
 
         exit(-1);
+#endif
     }
 }
 
@@ -135,14 +154,12 @@ int main(int argc, char ** argv) {
 		}
 	}
 
-#ifndef RUN_IN_DEBUGGER
-    checkTerminalSize();
-#endif
-
     string logFileName = "./pfm.log";
 
     Logger & log = Logger::getInstance();
     log.initLogger(logFileName, LOG_LEVEL_FATAL | LOG_LEVEL_ERROR);
+
+    checkTerminalSize();
 
     PFM_DB & db = PFM_DB::getInstance();
 
