@@ -45,7 +45,7 @@ char * Logger::trim(const char * src) {
     return trimmedString;
 }
 
-void Logger::initLogger(string & filename, int logLevel) {
+void Logger::init(string & filename, int logLevel) {
     this->loggingLevel = logLevel;
 
     if (filename.length() > 0) {
@@ -61,12 +61,12 @@ void Logger::initLogger(string & filename, int logLevel) {
     }
 }
 
-void Logger::initLogger(int logLevel) {
+void Logger::init(int logLevel) {
     this->loggingLevel = logLevel;
     this->lfp = stdout;
 }
 
-void Logger::closeLogger() {
+void Logger::close() {
     if (lfp != stdout) {
         fclose(lfp);
     }
@@ -177,7 +177,7 @@ void Logger::newline() {
     fprintf(this->lfp, "\n");
 }
 
-int Logger::logInfo(const char * fmt, ...) {
+int Logger::info(const char * fmt, ...) {
     va_list     args;
     int         bytesWritten;
 
@@ -190,7 +190,7 @@ int Logger::logInfo(const char * fmt, ...) {
     return bytesWritten;
 }
 
-int Logger::logStatus(const char * fmt, ...) {
+int Logger::status(const char * fmt, ...) {
     va_list     args;
     int         bytesWritten;
 
@@ -203,7 +203,7 @@ int Logger::logStatus(const char * fmt, ...) {
     return bytesWritten;
 }
 
-int Logger::logDebug(const char * fmt, ...) {
+int Logger::debug(const char * fmt, ...) {
     va_list     args;
     int         bytesWritten;
 
@@ -216,7 +216,7 @@ int Logger::logDebug(const char * fmt, ...) {
     return bytesWritten;
 }
 
-int Logger::logEntry(const char * fmt, ...) {
+int Logger::entry(const char * fmt, ...) {
     va_list     args;
     int         bytesWritten;
 
@@ -229,7 +229,7 @@ int Logger::logEntry(const char * fmt, ...) {
     return bytesWritten;
 }
 
-int Logger::logExit(const char * fmt, ...) {
+int Logger::exit(const char * fmt, ...) {
     va_list     args;
     int         bytesWritten;
 
@@ -242,7 +242,7 @@ int Logger::logExit(const char * fmt, ...) {
     return bytesWritten;
 }
 
-int Logger::logError(const char * fmt, ...) {
+int Logger::error(const char * fmt, ...) {
     va_list     args;
     int         bytesWritten;
 
@@ -255,7 +255,7 @@ int Logger::logError(const char * fmt, ...) {
     return bytesWritten;
 }
 
-int Logger::logFatal(const char * fmt, ...) {
+int Logger::fatal(const char * fmt, ...) {
     va_list     args;
     int         bytesWritten;
 

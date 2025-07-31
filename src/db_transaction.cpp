@@ -240,7 +240,7 @@ int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, St
 
 void DBTransaction::afterInsert() {
     Logger & log = Logger::getInstance();
-    log.logEntry("DBTransaction::afterInsert()");
+    log.entry("DBTransaction::afterInsert()");
 
     DBCarriedOver co;
     DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
@@ -266,12 +266,12 @@ void DBTransaction::afterInsert() {
         t.balance += amount;
     }
 
-    log.logExit("DBTransaction::afterInsert()");
+    log.exit("DBTransaction::afterInsert()");
 }
 
 void DBTransaction::beforeUpdate() {
     Logger & log = Logger::getInstance();
-    log.logEntry("DBTransaction::beforeUpdate()");
+    log.entry("DBTransaction::beforeUpdate()");
 
     DBTransaction transaction;
     transaction.retrieve(id);
@@ -288,7 +288,7 @@ void DBTransaction::beforeUpdate() {
         for (int i = 0;i < coResult.getNumRows();i++) {
             DBCarriedOver carriedOver = coResult.getResultAt(i);
 
-            log.logDebug("Updating CO with date '%s'", carriedOver.date.shortDate().c_str());
+            log.debug("Updating CO with date '%s'", carriedOver.date.shortDate().c_str());
 
             carriedOver.balance -= transaction.getSignedAmount();
             carriedOver.balance += this->getSignedAmount();
@@ -315,12 +315,12 @@ void DBTransaction::beforeUpdate() {
         }
     }
 
-    log.logExit("DBTransaction::beforeUpdate()");
+    log.exit("DBTransaction::beforeUpdate()");
 }
 
 void DBTransaction::afterRemove() {
     Logger & log = Logger::getInstance();
-    log.logEntry("DBTransaction::afterRemove()");
+    log.entry("DBTransaction::afterRemove()");
 
     DBCarriedOver co;
     DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
@@ -349,7 +349,7 @@ void DBTransaction::afterRemove() {
         }
     }
 
-    log.logExit("DBTransaction::afterRemove()");
+    log.exit("DBTransaction::afterRemove()");
 }
 
 void DBTransaction::deleteByRecurringChargeId(pfm_id_t recurringChargeId) {

@@ -195,7 +195,7 @@ int PFM_DB::openReadWrite(const string & dbName) {
     if (!isNewFileRequired(error) && error != SQLITE_OK) {
         const char * errorMsg = sqlite3_errmsg(this->dbHandle);
 
-        log.logFatal(
+        log.fatal(
                 "Cannot open database file %s for read-write, aborting: %d:%s", 
                 databaseName.c_str(),
                 error,
@@ -230,7 +230,7 @@ void PFM_DB::createDB(const string & dbName) {
     if (error != SQLITE_OK) {
         const char * errorMsg = sqlite3_errmsg(this->dbHandle);
 
-        log.logFatal(
+        log.fatal(
                 "Cannot open new database file %s, aborting: %d:%s", 
                 dbName.c_str(),
                 error,
@@ -256,7 +256,7 @@ void PFM_DB::applyDatabaseKey(const string & dbName) {
     if (keyError != SQLITE_OK) {
         const char * errorMsg = sqlite3_errmsg(this->dbHandle);
 
-        log.logFatal(
+        log.fatal(
                 "Cannot apply key to database file %s, aborting: %d:%s", 
                 dbName.c_str(),
                 keyError,
@@ -272,7 +272,7 @@ void PFM_DB::applyDatabaseKey(const string & dbName) {
 }
 
 void PFM_DB::open(const string & dbName) {
-    log.logEntry("PFM_DB::open()");
+    log.entry("PFM_DB::open()");
 
     try {
         int error = openReadWrite(dbName);
@@ -295,7 +295,7 @@ void PFM_DB::open(const string & dbName) {
 
     databaseName = dbName;
 
-    log.logExit("PFM_DB::open()");
+    log.exit("PFM_DB::open()");
 }
 
 void PFM_DB::open() {
@@ -303,7 +303,7 @@ void PFM_DB::open() {
 }
 
 void PFM_DB::close() {
-    log.logEntry("PFM_DB::close()");
+    log.entry("PFM_DB::close()");
     
     int error = sqlite3_close_v2(this->dbHandle);
 
@@ -312,7 +312,7 @@ void PFM_DB::close() {
 
         close();
 
-        log.logFatal(
+        log.fatal(
                 "Cannot close database file %s, aborting: %d:%s", 
                 databaseName.c_str(),
                 error,
@@ -326,11 +326,11 @@ void PFM_DB::close() {
                     errorMsg));
     }
 
-    log.logExit("PFM_DB::close()");
+    log.exit("PFM_DB::close()");
 }
 
 void PFM_DB::changePassword() {
-    log.logEntry("PFM_DB::changePassword()");
+    log.entry("PFM_DB::changePassword()");
 
     string newPassword = getKey("Enter new database password: ");
 
@@ -341,7 +341,7 @@ void PFM_DB::changePassword() {
 
         close();
 
-        log.logFatal(
+        log.fatal(
                 "Failed to change the password on database file %s, aborting: %d:%s", 
                 databaseName.c_str(),
                 error,
@@ -358,51 +358,51 @@ void PFM_DB::changePassword() {
     close();
     open();
 
-    log.logExit("PFM_DB::changePassword()");
+    log.exit("PFM_DB::changePassword()");
 }
 
 bool PFM_DB::getIsTransactionActive() {
-    log.logEntry("PFM_DB::getIsTransactionActive()");
+    log.entry("PFM_DB::getIsTransactionActive()");
 
     pthread_mutex_lock(&mutex);
     bool active = isTransactionActive;
     pthread_mutex_unlock(&mutex);
 
-    log.logExit("PFM_DB::getIsTransactionActive()");
+    log.exit("PFM_DB::getIsTransactionActive()");
 
     return active;
 }
 
 void PFM_DB::setIsTransactionActive() {
-    log.logEntry("PFM_DB::setIsTransactionActive()");
+    log.entry("PFM_DB::setIsTransactionActive()");
 
     pthread_mutex_lock(&mutex);
     isTransactionActive = true;
     pthread_mutex_unlock(&mutex);
 
-    log.logExit("PFM_DB::setIsTransactionActive()");
+    log.exit("PFM_DB::setIsTransactionActive()");
 }
 
 void PFM_DB::clearIsTransactionActive() {
-    log.logEntry("PFM_DB::clearIsTransactionActive()");
+    log.entry("PFM_DB::clearIsTransactionActive()");
 
     pthread_mutex_lock(&mutex);
     isTransactionActive = false;
     pthread_mutex_unlock(&mutex);
 
-    log.logExit("PFM_DB::clearIsTransactionActive()");
+    log.exit("PFM_DB::clearIsTransactionActive()");
 }
 
 void PFM_DB::_executeSQLNoCallback(const char * sql) {
-    log.logEntry("PFM_DB::_executeSQLNoCallback()");
+    log.entry("PFM_DB::_executeSQLNoCallback()");
 
-    log.logDebug("Executing SQL '%s'", sql);
+    log.debug("Executing SQL '%s'", sql);
     
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, sql, NULL, NULL, &pszErrorMsg);
 
     if (error) {
-        log.logError("Failed to execute statement '%s' with error '%s'", sql, pszErrorMsg);
+        log.error("Failed to execute statement '%s' with error '%s'", sql, pszErrorMsg);
 
         throw pfm_error(
             pfm_error::buildMsg(
@@ -413,19 +413,19 @@ void PFM_DB::_executeSQLNoCallback(const char * sql) {
             __LINE__);
     }
 
-    log.logExit("PFM_DB::_executeSQLNoCallback()");
+    log.exit("PFM_DB::_executeSQLNoCallback()");
 }
 
 void PFM_DB::_executeSQLCallback(const char * sql, vector<DBRow> * rows) {
-    log.logEntry("PFM_DB::_executeSQLCallback()");
+    log.entry("PFM_DB::_executeSQLCallback()");
 
-    log.logDebug("Executing SQL '%s'", sql);
+    log.debug("Executing SQL '%s'", sql);
 
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, sql, _retrieveCallback, rows, &pszErrorMsg);
 
     if (error) {
-        log.logError("Failed to execute statement '%s' with error '%s'", sql, pszErrorMsg);
+        log.error("Failed to execute statement '%s' with error '%s'", sql, pszErrorMsg);
 
         throw pfm_error(
             pfm_error::buildMsg(
@@ -436,19 +436,19 @@ void PFM_DB::_executeSQLCallback(const char * sql, vector<DBRow> * rows) {
             __LINE__);
     }
 
-    log.logExit("PFM_DB::_executeSQLCallback()");
+    log.exit("PFM_DB::_executeSQLCallback()");
 }
 
 void PFM_DB::createTable(const char * sql) {
-    log.logEntry("PFM_DB::createTable()");
+    log.entry("PFM_DB::createTable()");
     
-    log.logDebug("Creating table with sql %s", sql);
+    log.debug("Creating table with sql %s", sql);
 
     try {
         _executeSQLNoCallback(sql);
     }
     catch (pfm_error & e) {
-        log.logError("Failed to create table with error '%s'", e.what());
+        log.error("Failed to create table with error '%s'", e.what());
 
         throw pfm_error(
             pfm_error::buildMsg(
@@ -459,19 +459,19 @@ void PFM_DB::createTable(const char * sql) {
             __LINE__);
     }
 
-    log.logExit("PFM_DB::createTable()");
+    log.exit("PFM_DB::createTable()");
 }
 
 void PFM_DB::createView(const char * sql) {
-    log.logEntry("PFM_DB::createView()");
+    log.entry("PFM_DB::createView()");
     
-    log.logDebug("Creating view with sql %s", sql);
+    log.debug("Creating view with sql %s", sql);
 
     try {
         _executeSQLNoCallback(sql);
     }
     catch (pfm_error & e) {
-        log.logError("Failed to create view with error '%s'", e.what());
+        log.error("Failed to create view with error '%s'", e.what());
 
         throw pfm_error(
             pfm_error::buildMsg(
@@ -482,11 +482,11 @@ void PFM_DB::createView(const char * sql) {
             __LINE__);
     }
 
-    log.logExit("PFM_DB::createView()");
+    log.exit("PFM_DB::createView()");
 }
 
 void PFM_DB::createSchema() {
-    log.logEntry("PFM_DB::createSchema()");
+    log.entry("PFM_DB::createSchema()");
 
     try {
         createTable(pszCreateConfigTable);
@@ -511,15 +511,15 @@ void PFM_DB::createSchema() {
         createDefaultConfig();
     }
     catch (pfm_error & e) {
-        log.logError("Failed to create schema: %s", e.what());
+        log.error("Failed to create schema: %s", e.what());
         throw e;
     }
 
-    log.logExit("PFM_DB::createSchema()");
+    log.exit("PFM_DB::createSchema()");
 }
 
 void PFM_DB::createDefaultCategories() {
-    log.logEntry("PFM_DB::createDefaultCategories()");
+    log.entry("PFM_DB::createDefaultCategories()");
 
     const char * insertStatement = 
         "INSERT INTO category (code, description, created, updated) VALUES ('%s', '%s', '%s', '%s')";
@@ -549,15 +549,15 @@ void PFM_DB::createDefaultCategories() {
     catch (pfm_error & e) {
         rollback();
 
-        log.logError("Failed to insert default categories");
+        log.error("Failed to insert default categories");
         throw pfm_error("Failed to insert default categories", __FILE__, __LINE__);
     }
 
-    log.logExit("PFM_DB::createDefaultCategories()");
+    log.exit("PFM_DB::createDefaultCategories()");
 }
 
 void PFM_DB::createDefaultConfig() {
-    log.logEntry("PFM_DB::createDefaultConfig()");
+    log.entry("PFM_DB::createDefaultConfig()");
 
     const char * insertStatement = 
         "INSERT INTO config (key, value, description, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s')";
@@ -588,15 +588,15 @@ void PFM_DB::createDefaultConfig() {
     catch (pfm_error & e) {
         rollback();
 
-        log.logError("Failed to insert default config");
+        log.error("Failed to insert default config");
         throw pfm_error("Failed to insert default config", __FILE__, __LINE__);
     }
 
-    log.logExit("PFM_DB::createDefaultConfig()");
+    log.exit("PFM_DB::createDefaultConfig()");
 }
 
 void PFM_DB::createCurrencies() {
-    log.logEntry("PFM_DB::createCurrencies()");
+    log.entry("PFM_DB::createCurrencies()");
 
     const char * insertStatement = 
         "INSERT INTO currency (code, name, symbol, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s')";
@@ -627,66 +627,66 @@ void PFM_DB::createCurrencies() {
     catch (pfm_error & e) {
         rollback();
 
-        log.logError("Failed to insert currencies");
+        log.error("Failed to insert currencies");
         throw pfm_error("Failed to insert currencies", __FILE__, __LINE__);
     }
 
-    log.logExit("PFM_DB::createCurrencies()");
+    log.exit("PFM_DB::createCurrencies()");
 }
 
 int PFM_DB::executeSelect(const char * statement, vector<DBRow> * rows) {
-    log.logEntry("PFM_DB::executeSelect()");
+    log.entry("PFM_DB::executeSelect()");
 
     _executeSQLCallback(statement, rows);
 
-    log.logDebug("Execute SELECT returned %d rows", rows->size());
+    log.debug("Execute SELECT returned %d rows", rows->size());
 
-    log.logExit("PFM_DB::executeSelect()");
+    log.exit("PFM_DB::executeSelect()");
 
     return rows->size();
 }
 
 pfm_id_t PFM_DB::executeInsert(const char * statement) {
-    log.logEntry("PFM_DB::executeInsert()");
+    log.entry("PFM_DB::executeInsert()");
 
     _executeSQLNoCallback(statement);
 
-    log.logExit("PFM_DB::executeInsert()");
+    log.exit("PFM_DB::executeInsert()");
 
     return sqlite3_last_insert_rowid(dbHandle);
 }
 
 void PFM_DB::executeUpdate(const char * statement) {
-    log.logEntry("PFM_DB::executeUpdate()");
+    log.entry("PFM_DB::executeUpdate()");
 
     _executeSQLNoCallback(statement);
 
-    log.logExit("PFM_DB::executeUpdate()");
+    log.exit("PFM_DB::executeUpdate()");
 }
 
 void PFM_DB::executeDelete(const char * statement) {
-    log.logEntry("PFM_DB::executeDelete()");
+    log.entry("PFM_DB::executeDelete()");
 
     _executeSQLNoCallback(statement);
 
-    log.logExit("PFM_DB::executeDelete()");
+    log.exit("PFM_DB::executeDelete()");
 }
 
 void PFM_DB::begin() {
-    log.logEntry("PFM_DB::begin()");
+    log.entry("PFM_DB::begin()");
 
     if (getIsTransactionActive()) {
-        log.logInfo("Begin transaction - transaction already active, skipping");
+        log.info("Begin transaction - transaction already active, skipping");
         return;
     }
 
-    log.logDebug("BEGIN TRANSACTION");
+    log.debug("BEGIN TRANSACTION");
 
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, "BEGIN DEFERRED TRANSACTION;", NULL, NULL, &pszErrorMsg);
 
     if (error) {
-        log.logError("Failed to begin transaction with error '%s'", pszErrorMsg);
+        log.error("Failed to begin transaction with error '%s'", pszErrorMsg);
 
         throw pfm_error(
             pfm_error::buildMsg(
@@ -698,24 +698,24 @@ void PFM_DB::begin() {
 
     setIsTransactionActive();
 
-    log.logExit("PFM_DB::begin()");
+    log.exit("PFM_DB::begin()");
 }
 
 void PFM_DB::commit() {
-    log.logEntry("PFM_DB::commit()");
+    log.entry("PFM_DB::commit()");
 
     if (!getIsTransactionActive()) {
-        log.logInfo("Commit transaction - no transaction active, skipping");
+        log.info("Commit transaction - no transaction active, skipping");
         return;
     }
     
-    log.logDebug("COMMIT TRANSACTION");
+    log.debug("COMMIT TRANSACTION");
 
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, "COMMIT TRANSACTION;", NULL, NULL, &pszErrorMsg);
 
     if (error) {
-        log.logError("Failed to commit transaction with error '%s'", pszErrorMsg);
+        log.error("Failed to commit transaction with error '%s'", pszErrorMsg);
 
         throw pfm_error(
             pfm_error::buildMsg(
@@ -727,24 +727,24 @@ void PFM_DB::commit() {
 
     clearIsTransactionActive();
 
-    log.logExit("PFM_DB::commit()");
+    log.exit("PFM_DB::commit()");
 }
 
 void PFM_DB::rollback() {
-    log.logEntry("PFM_DB::rollback()");
+    log.entry("PFM_DB::rollback()");
 
     if (!getIsTransactionActive()) {
-        log.logInfo("Rollback transaction - no transaction active, skipping");
+        log.info("Rollback transaction - no transaction active, skipping");
         return;
     }
 
-    log.logDebug("ROLLBACK TRANSACTION");
+    log.debug("ROLLBACK TRANSACTION");
 
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, "ROLLBACK TRANSACTION;", NULL, NULL, &pszErrorMsg);
 
     if (error) {
-        log.logError("Failed to rollback transaction with error '%s'", pszErrorMsg);
+        log.error("Failed to rollback transaction with error '%s'", pszErrorMsg);
 
         throw pfm_error(
             pfm_error::buildMsg(
@@ -756,5 +756,5 @@ void PFM_DB::rollback() {
 
     clearIsTransactionActive();
 
-    log.logExit("PFM_DB::rollback()");
+    log.exit("PFM_DB::rollback()");
 }

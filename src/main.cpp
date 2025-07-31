@@ -93,20 +93,20 @@ static void checkTerminalSize(void) {
     uint16_t width = t.getWidth();
     uint16_t height = t.getHeight();
 
-    log.logDebug(
+    log.debug(
             "Terminal size (w x h) reported as %u x %u", 
             (unsigned int)width, 
             (unsigned int)height);
 
     if ((int)width < TERMINAL_MIN_WIDTH || (int)height < TERMINAL_MIN_HEIGHT) {
-        log.logError(
+        log.error(
             "Terminal size must be at least %d x %d to run this program. " \
             "Current size is %d x %d\n\n", 
             TERMINAL_MIN_WIDTH,
             TERMINAL_MIN_HEIGHT,
             (int)width, 
             (int)height);
-            
+
 #ifndef RUN_IN_DEBUGGER
         fprintf(
             stderr, 
@@ -157,7 +157,7 @@ int main(int argc, char ** argv) {
     string logFileName = "./pfm.log";
 
     Logger & log = Logger::getInstance();
-    log.initLogger(logFileName, LOG_LEVEL_FATAL | LOG_LEVEL_ERROR);
+    log.init(logFileName, LOG_LEVEL_FATAL | LOG_LEVEL_ERROR);
 
     checkTerminalSize();
 
@@ -167,8 +167,8 @@ int main(int argc, char ** argv) {
         db.open(pszDatabase);
     }
     catch (pfm_fatal & f) {
-        log.logFatal("Fatal error: %s", f.what());
-        log.closeLogger();
+        log.fatal("Fatal error: %s", f.what());
+        log.close();
         
         free(pszDatabase);
         return -1;
@@ -233,7 +233,7 @@ int main(int argc, char ** argv) {
     }
 
     db.close();
-    log.closeLogger();
+    log.close();
 
     return 0; 
 }

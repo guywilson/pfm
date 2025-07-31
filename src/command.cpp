@@ -163,9 +163,9 @@ void Command::listAccounts() {
 }
 
 void Command::chooseAccount(string & accountCode) {
-    log.logEntry("Command::chooseAccount()");
+    log.entry("Command::chooseAccount()");
 
-    log.logDebug("Choose account with code '%s'", accountCode.c_str());
+    log.debug("Choose account with code '%s'", accountCode.c_str());
 
     if (accountCode.length() == 0) {
         ChooseAccountView view;
@@ -180,13 +180,13 @@ void Command::chooseAccount(string & accountCode) {
     
     selectedAccount = account;
 
-    log.logExit("Command::chooseAccount()");
+    log.exit("Command::chooseAccount()");
 }
 
 void Command::setPrimaryAccount(string & accountCode) {
-    log.logEntry("Command::setPrimaryAccount()");
+    log.entry("Command::setPrimaryAccount()");
 
-    log.logDebug("Set primary account to '%s'", accountCode.c_str());
+    log.debug("Set primary account to '%s'", accountCode.c_str());
 
     DBPrimaryAccount::setPrimaryAccount(accountCode);
 
@@ -196,7 +196,7 @@ void Command::setPrimaryAccount(string & accountCode) {
     
     selectedAccount = account;
 
-    log.logExit("Command::setPrimaryAccount()");
+    log.exit("Command::setPrimaryAccount()");
 }
 
 void Command::updateAccount() {

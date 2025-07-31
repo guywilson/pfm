@@ -45,7 +45,7 @@ void DBAccount::retrieveByCode(string & code) {
 
 void DBAccount::createRecurringTransactions() {
     Logger & log = Logger::getInstance();
-    log.logEntry("DBAccount::createRecurringTransactions()");
+    log.entry("DBAccount::createRecurringTransactions()");
 
     StrDate dateToday;
     StrDate transactionDate;
@@ -70,7 +70,7 @@ void DBAccount::createRecurringTransactions() {
                 int numRows = transaction.findLatestByRecurringChargeID(charge.id);
 
                 if (numRows == 0) {
-                    log.logDebug("Found no exisiting transactions for charge %lld", charge.id);
+                    log.debug("Found no exisiting transactions for charge %lld", charge.id);
 
                     if (charge.date < openingDate) {
                         transactionDate = charge.date;
@@ -84,12 +84,12 @@ void DBAccount::createRecurringTransactions() {
                     }
                 }
                 else {
-                    log.logDebug("Found latest transactions for charge %lld with date '%s'", charge.id, transaction.date.shortDate().c_str());
+                    log.debug("Found latest transactions for charge %lld with date '%s'", charge.id, transaction.date.shortDate().c_str());
                     
                     transactionDate = charge.getNextRecurringTransactionDate(transaction.date);
                 }
 
-                log.logDebug(
+                log.debug(
                     "Got transaction date for charge %lld - '%s' as '%s'", 
                     charge.id, 
                     charge.description.c_str(), 
@@ -108,12 +108,12 @@ void DBAccount::createRecurringTransactions() {
 
         db.commit();
 
-        log.logExit("DBAccount::createRecurringTransactions()");
+        log.exit("DBAccount::createRecurringTransactions()");
     }
     catch (pfm_error & e) {
         db.rollback();
 
-        log.logError("DBAccount.createRecurringTransactions() - caught exception: %s", e.what());
+        log.error("DBAccount.createRecurringTransactions() - caught exception: %s", e.what());
 
         throw e;
     }
@@ -146,12 +146,12 @@ void DBAccount::beforeUpdate() {
 
 void DBAccount::createCarriedOverLogs() {
     Logger & log = Logger::getInstance();
-    log.logEntry("DBAccount::createCarriedOverLogs()");
+    log.entry("DBAccount::createCarriedOverLogs()");
 
     StrDate dateToday;
     StrDate periodEndDate = dateToday.addMonths(-1).firstDayInMonth();
 
-    log.logDebug("Using periodEndDate: %s", periodEndDate.shortDate().c_str());
+    log.debug("Using periodEndDate: %s", periodEndDate.shortDate().c_str());
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -162,7 +162,7 @@ void DBAccount::createCarriedOverLogs() {
         int hasCO = co.retrieveLatestByAccountId(this->id);
 
         if (hasCO) {
-            log.logDebug("Latest DBCarriedOverLog date '%s'", co.date.shortDate().c_str());
+            log.debug("Latest DBCarriedOverLog date '%s'", co.date.shortDate().c_str());
         }
         else {
             DBTransactionView transaction;
@@ -189,7 +189,7 @@ void DBAccount::createCarriedOverLogs() {
             StrDate firstDate = co.date.firstDayInMonth();
             StrDate secondDate = co.date.lastDayInMonth();
 
-            log.logDebug("Creating DBCarriedOverLog for dates '%s' to '%s'", firstDate.shortDate().c_str(), secondDate.shortDate().c_str());
+            log.debug("Creating DBCarriedOverLog for dates '%s' to '%s'", firstDate.shortDate().c_str(), secondDate.shortDate().c_str());
             
             DBCarriedOver newCo;
             newCo.createForPeriod(this->id, co.balance, firstDate, secondDate);
@@ -199,12 +199,12 @@ void DBAccount::createCarriedOverLogs() {
 
         db.commit();
         
-        log.logExit("DBAccount::createCarriedOverLogs()");
+        log.exit("DBAccount::createCarriedOverLogs()");
     }
     catch (pfm_error & e) {
         db.rollback();
 
-        log.logError("DBAccount.createCarriedOverLogs() - caught exception: %s", e.what());
+        log.error("DBAccount.createCarriedOverLogs() - caught exception: %s", e.what());
 
         throw e;
     }
@@ -212,7 +212,7 @@ void DBAccount::createCarriedOverLogs() {
 
 Money DBAccount::calculateCurrentBalance() {
     Logger & log = Logger::getInstance();
-    log.logEntry("DBAccount::calculateCurrentBalance()");
+    log.entry("DBAccount::calculateCurrentBalance()");
 
     DBCarriedOver co;
     int numCORecords = co.retrieveLatestByAccountId(this->id);
@@ -227,7 +227,7 @@ Money DBAccount::calculateCurrentBalance() {
     if (numCORecords) {
         balance = co.balance;
 
-        log.logDebug(
+        log.debug(
                 "calculateCurrentBalance(): Including carried over '%s' | '%s' | '%s'", 
                 co.date.shortDate().c_str(), 
                 co.description.c_str(), 
@@ -247,7 +247,7 @@ Money DBAccount::calculateCurrentBalance() {
         for (int i = 0;i < transactionResult.getNumRows();i++) {
             DBTransaction transaction = transactionResult.getResultAt(i);
 
-            log.logDebug(
+            log.debug(
                     "calculateCurrentBalance(): Including transaction '%s' | '%s' | '%s'", 
                     transaction.date.shortDate().c_str(), 
                     transaction.description.c_str(), 
@@ -256,10 +256,10 @@ Money DBAccount::calculateCurrentBalance() {
             balance += transaction.getSignedAmount();
         }
 
-        log.logExit("DBAccount::calculateCurrentBalance()");
+        log.exit("DBAccount::calculateCurrentBalance()");
     }
     catch (pfm_error & e) {
-        log.logError("DBAccount.calculateCurrentBalance() - caught exception: %s", e.what());
+        log.error("DBAccount.calculateCurrentBalance() - caught exception: %s", e.what());
 
         throw e;
     }
@@ -270,7 +270,7 @@ Money DBAccount::calculateCurrentBalance() {
 
 Money DBAccount::calculateReconciledBalance() {
     Logger & log = Logger::getInstance();
-    log.logEntry("DBAccount::calculateReconciledBalance()");
+    log.entry("DBAccount::calculateReconciledBalance()");
 
     DBCarriedOver co;
     int numCORecords = co.retrieveLatestByAccountId(this->id);
@@ -285,7 +285,7 @@ Money DBAccount::calculateReconciledBalance() {
     if (numCORecords) {
         balance = co.balance;
 
-        log.logDebug(
+        log.debug(
                 "calculateReconciledBalance(): Including carried over '%s' | '%s' | '%s'", 
                 co.date.shortDate().c_str(), 
                 co.description.c_str(), 
@@ -305,7 +305,7 @@ Money DBAccount::calculateReconciledBalance() {
         for (int i = 0;i < transactionResult.getNumRows();i++) {
             DBTransaction transaction = transactionResult.getResultAt(i);
 
-            log.logDebug(
+            log.debug(
                     "calculateReconciledBalance(): Including transaction '%s' | '%s' | '%s'", 
                     transaction.date.shortDate().c_str(), 
                     transaction.description.c_str(), 
@@ -314,10 +314,10 @@ Money DBAccount::calculateReconciledBalance() {
             balance += transaction.getSignedAmount();
         }
 
-        log.logExit("DBAccount::calculateReconciledBalance()");
+        log.exit("DBAccount::calculateReconciledBalance()");
     }
     catch (pfm_error & e) {
-        log.logError("DBAccount.calculateReconciledBalance() - caught exception: %s", e.what());
+        log.error("DBAccount.calculateReconciledBalance() - caught exception: %s", e.what());
 
         throw e;
     }
@@ -327,7 +327,7 @@ Money DBAccount::calculateReconciledBalance() {
 
 Money DBAccount::calculateBalanceAfterBills() {
     Logger & log = Logger::getInstance();
-    log.logEntry("DBAccount::calculateBalanceAfterBills()");
+    log.entry("DBAccount::calculateBalanceAfterBills()");
 
     DBCarriedOver co;
     int numCORecords = co.retrieveLatestByAccountId(this->id);
@@ -342,7 +342,7 @@ Money DBAccount::calculateBalanceAfterBills() {
     if (numCORecords) {
         balance = co.balance;
 
-        log.logDebug(
+        log.debug(
                 "calculateBalanceAfterBills(): Including carried over '%s' | '%s' | '%s'", 
                 co.date.shortDate().c_str(), 
                 co.description.c_str(), 
@@ -365,7 +365,7 @@ Money DBAccount::calculateBalanceAfterBills() {
         for (int i = 0;i < transactionResult.getNumRows();i++) {
             DBTransaction transaction = transactionResult.getResultAt(i);
 
-            log.logDebug(
+            log.debug(
                     "calculateBalanceAfterBills(): Including transaction '%s' | '%s' | '%s'", 
                     transaction.date.shortDate().c_str(), 
                     transaction.description.c_str(), 
@@ -386,7 +386,7 @@ Money DBAccount::calculateBalanceAfterBills() {
             DBRecurringCharge charge = chargeResult.getResultAt(i);
 
             if (charge.isChargeDueThisPeriod(dateToday)) {
-                log.logDebug(
+                log.debug(
                         "calculateBalanceAfterBills(): Including charge '%s' | '%s' | '%s'", 
                         charge.nextPaymentDate.shortDate().c_str(), 
                         charge.description.c_str(), 
@@ -402,10 +402,10 @@ Money DBAccount::calculateBalanceAfterBills() {
             cout << "Total charge balance = " << chargeBalance.getFormattedStringValue() << endl;
         }
 
-        log.logExit("DBAccount::calculateBalanceAfterBills()");
+        log.exit("DBAccount::calculateBalanceAfterBills()");
     }
     catch (pfm_error & e) {
-        log.logError("DBAccount.calculateBalanceAfterBills() - caught exception: %s", e.what());
+        log.error("DBAccount.calculateBalanceAfterBills() - caught exception: %s", e.what());
 
         throw e;
     }

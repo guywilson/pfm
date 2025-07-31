@@ -126,7 +126,7 @@ void testAccount() {
         charge1.save();
     }
     catch (pfm_error & e) {
-        log.logError("testAccount(): Failed to create charge1: '%s'", e.what());
+        log.error("testAccount(): Failed to create charge1: '%s'", e.what());
         throw e;
     }
 
@@ -141,7 +141,7 @@ void testAccount() {
         charge2.save();
     }
     catch (pfm_error & e) {
-        log.logError("testAccount(): Failed to create charge2: '%s'", e.what());
+        log.error("testAccount(): Failed to create charge2: '%s'", e.what());
         throw e;
     }
 
@@ -156,7 +156,7 @@ void testAccount() {
         charge3.save();
     }
     catch (pfm_error & e) {
-        log.logError("testAccount(): Failed to create charge3: '%s'", e.what());
+        log.error("testAccount(): Failed to create charge3: '%s'", e.what());
         throw e;
     }
 

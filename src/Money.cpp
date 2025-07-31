@@ -95,7 +95,7 @@ money_t Money::_getValue() const {
 money_t Money::getWholeValueFromString(const char * amount) {
     int decimalPointPos = findDecimalPointPos(amount);
 
-    log.logInfo("Money::getWholeValue(%s), decimal index %d", amount, decimalPointPos);
+    log.info("Money::getWholeValue(%s), decimal index %d", amount, decimalPointPos);
     
     money_t whole;
 
@@ -106,11 +106,11 @@ money_t Money::getWholeValueFromString(const char * amount) {
         char buffer[AMOUNT_BUFFER_LENGTH];
 
         copyToDecimalPoint(buffer, amount, AMOUNT_BUFFER_LENGTH);
-        log.logInfo("Got whole number buffer '%s'", buffer);
+        log.info("Got whole number buffer '%s'", buffer);
         whole = (money_t)strtol(buffer, NULL, 10);
     }
 
-    log.logInfo("Money::getWholeValue() = %u", whole);
+    log.info("Money::getWholeValue() = %u", whole);
 
     return whole;
 }
@@ -118,7 +118,7 @@ money_t Money::getWholeValueFromString(const char * amount) {
 money_t Money::getDecimalValueFromString(const char * amount) {
     int decimalPointPos = findDecimalPointPos(amount);
 
-    log.logDebug("Money::getDecimalValue(%s), decimal index %d", amount, decimalPointPos);
+    log.debug("Money::getDecimalValue(%s), decimal index %d", amount, decimalPointPos);
     
     money_t decimal;
 
@@ -143,7 +143,7 @@ money_t Money::getDecimalValueFromString(const char * amount) {
         decimal = (money_t)strtol(buffer, NULL, 10);
     }
 
-    log.logDebug("Money::getDecimalValue() = %u", decimal);
+    log.debug("Money::getDecimalValue() = %u", decimal);
 
     return decimal;
 }

@@ -47,10 +47,10 @@ class Logger {
 
         static int getLogLevelFromString(string & logLevel);
 
-        void initLogger(string & filename, int logLevel);
-        void initLogger(int logLevel);
+        void init(string & filename, int logLevel);
+        void init(int logLevel);
         
-        void closeLogger();
+        void close();
 
         void setLogLevel(int logLevel);
         void addLogLevel(int logLevel);
@@ -58,13 +58,13 @@ class Logger {
         bool isLogLevel(int logLevel);
 
         void newline();
-        int logInfo(const char * fmt, ...);
-        int logStatus(const char * fmt, ...);
-        int logDebug(const char * fmt, ...);
-        int logEntry(const char * fmt, ...);
-        int logExit(const char * fmt, ...);
-        int logError(const char * fmt, ...);
-        int logFatal(const char * fmt, ...);
+        int info(const char * fmt, ...);
+        int status(const char * fmt, ...);
+        int debug(const char * fmt, ...);
+        int entry(const char * fmt, ...);
+        int exit(const char * fmt, ...);
+        int error(const char * fmt, ...);
+        int fatal(const char * fmt, ...);
 };
 
 #endif

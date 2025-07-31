@@ -17,15 +17,15 @@ using namespace std;
 pfm_id_t DBEntity::insert() {
     Logger & log = Logger::getInstance();
     
-    log.logEntry("DBEntity::insert()");
+    log.entry("DBEntity::insert()");
 
     const char * statement = getInsertStatement();
 
-    log.logDebug("Executing INSERT statement '%s'", statement);
+    log.debug("Executing INSERT statement '%s'", statement);
 
     PFM_DB & db = PFM_DB::getInstance();
 
-    log.logExit("DBEntity::insert()");
+    log.exit("DBEntity::insert()");
 
     return db.executeInsert(statement);
 }
@@ -33,17 +33,17 @@ pfm_id_t DBEntity::insert() {
 void DBEntity::update() {
     Logger & log = Logger::getInstance();
     
-    log.logEntry("DBEntity::update()");
+    log.entry("DBEntity::update()");
 
     const char * statement = getUpdateStatement();
 
-    log.logDebug("Executing UPDATE statement '%s'", statement);
+    log.debug("Executing UPDATE statement '%s'", statement);
 
     PFM_DB & db = PFM_DB::getInstance();
 
     db.executeUpdate(statement);
 
-    log.logExit("DBEntity::update()");
+    log.exit("DBEntity::update()");
 }
 
 void DBEntity::retrieve() {
@@ -53,7 +53,7 @@ void DBEntity::retrieve() {
 void DBEntity::retrieve(pfm_id_t id) {
     Logger & log = Logger::getInstance();
     
-    log.logEntry("DBEntity::retrieve()");
+    log.entry("DBEntity::retrieve()");
 
     const char * statement = getSelectByIDStatement(id);
 
@@ -61,7 +61,7 @@ void DBEntity::retrieve(pfm_id_t id) {
 
     vector<DBRow> rows;
 
-    log.logDebug("Executing SELECT BY id statement '%s'", statement);
+    log.debug("Executing SELECT BY id statement '%s'", statement);
     int rowsRetrievedCount = db.executeSelect(statement, &rows);
 
     if (rowsRetrievedCount != 1) {
@@ -85,13 +85,13 @@ void DBEntity::retrieve(pfm_id_t id) {
     */
     onRowComplete(1);
 
-    log.logExit("DBEntity::retrieve()");
+    log.exit("DBEntity::retrieve()");
 }
 
 void DBEntity::remove() {
     Logger & log = Logger::getInstance();
     
-    log.logEntry("DBEntity::remove()");
+    log.entry("DBEntity::remove()");
 
     const char * statement = getDeleteByIDStatement(id);
 
@@ -102,7 +102,7 @@ void DBEntity::remove() {
 
         beforeRemove();
 
-        log.logDebug("Executing DELETE statement '%s'", statement);
+        log.debug("Executing DELETE statement '%s'", statement);
         db.executeDelete(statement);
 
         afterRemove();
@@ -111,43 +111,43 @@ void DBEntity::remove() {
     }
     catch (pfm_error & e) {
         db.rollback();
-        log.logError("Failed to remove entity with id: %lld", id);
+        log.error("Failed to remove entity with id: %lld", id);
 
         throw e;
     }
 
-    log.logExit("DBEntity::remove()");
+    log.exit("DBEntity::remove()");
 }
 
 void DBEntity::remove(const char * statement) {
     Logger & log = Logger::getInstance();
     
-    log.logEntry("DBEntity::remove()");
+    log.entry("DBEntity::remove()");
 
     PFM_DB & db = PFM_DB::getInstance();
 
     try {
         db.begin();
 
-        log.logDebug("Executing DELETE statement '%s'", statement);
+        log.debug("Executing DELETE statement '%s'", statement);
         db.executeDelete(statement);
 
         db.commit();
     }
     catch (pfm_error & e) {
         db.rollback();
-        log.logError("Failed to remove entities with sql statement '%s'", statement);
+        log.error("Failed to remove entities with sql statement '%s'", statement);
 
         throw e;
     }
 
-    log.logExit("DBEntity::remove()");
+    log.exit("DBEntity::remove()");
 }
 
 void DBEntity::removeAll() {
     Logger & log = Logger::getInstance();
     
-    log.logEntry("DBEntity::remove()");
+    log.entry("DBEntity::remove()");
 
     const char * statement = getDeleteAllStatement();
 
@@ -156,25 +156,25 @@ void DBEntity::removeAll() {
     try {
         db.begin();
 
-        log.logDebug("Executing DELETE statement '%s'", statement);
+        log.debug("Executing DELETE statement '%s'", statement);
         db.executeDelete(statement);
 
         db.commit();
     }
     catch (pfm_error & e) {
         db.rollback();
-        log.logError("Failed to remove entity with id: %lld", id);
+        log.error("Failed to remove entity with id: %lld", id);
 
         throw e;
     }
 
-    log.logExit("DBEntity::remove()");
+    log.exit("DBEntity::remove()");
 }
 
 void DBEntity::save() {
     Logger & log = Logger::getInstance();
     
-    log.logEntry("DBEntity::save()");
+    log.entry("DBEntity::save()");
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -196,10 +196,10 @@ void DBEntity::save() {
     }
     catch (pfm_error & e) {
         db.rollback();
-        log.logError("Failed to save entity with id: %lld", id);
+        log.error("Failed to save entity with id: %lld", id);
 
         throw e;
     }
 
-    log.logExit("DBEntity::save()");
+    log.exit("DBEntity::save()");
 }
