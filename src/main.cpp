@@ -124,7 +124,7 @@ static void checkTerminalSize(void) {
 }
 
 int main(int argc, char ** argv) {
-    char * pszDatabase = strdup(DEFAULT_DATABASE_NAME);
+    char * pszDatabase = NULL;
     int defaultLogLevel = LOG_LEVEL_ERROR | LOG_LEVEL_FATAL;
 
 #ifdef RUN_IN_DEBUGGER
@@ -161,6 +161,10 @@ int main(int argc, char ** argv) {
             printUsage();
             return 0;
         }
+    }
+
+    if (pszDatabase == NULL) {
+        pszDatabase = strdup(DEFAULT_DATABASE_NAME);
     }
 
     string logFileName = "./pfm.log";
