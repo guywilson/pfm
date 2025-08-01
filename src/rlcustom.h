@@ -4,7 +4,7 @@
 #ifndef __INCL_RLCUSTOM
 #define __INCL_RLCUSTOM
 
-#define DEFAULT_LINE_LENGTH                     128
+#define DEFAULT_LINE_LENGTH                     180
 #define CANCEL_READLINE_KEYSEQ                  "\\C-x"
 
 class rl_utils {

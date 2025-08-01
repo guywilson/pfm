@@ -33,6 +33,7 @@ class FindTransactionCriteriaBuilder {
 
         vector<StrDate> betweenTheseDatesList;
         vector<StrDate> onTheseDatesList;
+        vector<string> withTheseAccountsList;
         vector<string> withTheseCategoriesList;
         vector<string> withThesePayeesList;
         vector<Money> betweenTheseAmountList;

@@ -1197,7 +1197,7 @@ bool Command::process(const string & command) {
     }
     else if (isCommand("list-transactions") || isCommand("lt") || isCommand("list")) {
         bool includeRecurringTransactions = false;
-        uint32_t rowLimit = 0;
+        uint32_t rowLimit = 25;
         db_sort_t sortDirection = sort_descending;
 
         if (hasParameters()) {

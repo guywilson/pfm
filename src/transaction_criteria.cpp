@@ -65,6 +65,11 @@ void FindTransactionCriteriaBuilder::parse() {
             }
             i += 2;
         }
+        else if (parameter.compare("acc") == 0) {
+            string accountCode = getParameter(i + 1);
+            withTheseAccountsList.push_back(accountCode);
+            i += 2;
+        }
         else if (parameter.compare("r") == 0) {
             string r = getParameter(i + 1);
 
@@ -171,6 +176,25 @@ string FindTransactionCriteriaBuilder::getCriteria() {
 
             criteria += "'" + date.shortDate() + "'";
             hadFirstDate = true;
+        }
+
+        criteria += ")";
+    }
+
+    if (withTheseAccountsList.size() > 0) {
+        if (criteria.length() > 0) {
+            criteria += " AND ";
+        }
+
+        bool hadFirstAccount = false;
+        criteria += "account_code in (";
+        for (string & account : withTheseAccountsList) {
+            if (hadFirstAccount) {
+                criteria += ", ";
+            }
+
+            criteria += "'" + account + "'";
+            hadFirstAccount = true;
         }
 
         criteria += ")";

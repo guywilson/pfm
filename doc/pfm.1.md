@@ -113,6 +113,7 @@ Parameters are listed below, any parameters that accept wildcards recognise * as
 - d:[date] - transactions on the specified date
 - D:[date]|D:[date] - transactions between these dates
 - ds:[description] - transactions with this description
+- acc:[account code] - transactions with this account code
 - c:[category code] - transactions with this category code
 - p:[payee code] - transactions with this payee code
 - ds:[description] - transactions like this description, wildcards are accepted
