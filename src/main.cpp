@@ -45,6 +45,7 @@
 #include "db_transaction.h"
 #include "command.h"
 #include "cfgmgr.h"
+#include "cmdarg.h"
 #include "terminal.h"
 #include "money.h"
 #include "strdate.h"
@@ -124,44 +125,48 @@ static void checkTerminalSize(void) {
 
 int main(int argc, char ** argv) {
     char * pszDatabase = strdup(DEFAULT_DATABASE_NAME);
+    int defaultLogLevel = LOG_LEVEL_ERROR | LOG_LEVEL_FATAL;
+
+#ifdef RUN_IN_DEBUGGER
+    defaultLogLevel = LOG_LEVEL_ALL;
+#endif
 
     rl_utils::setup();
 
-	if (argc > 1) {
-		for (int i = 1;i < argc;i++) {
-			if (argv[i][0] == '-') {
-				if (strncmp(&argv[i][1], "db", 2) == 0) {
-					pszDatabase = strdup(&argv[++i][0]);
-				}
-				else if (argv[i][1] == 'h' || argv[i][1] == '?') {
-					printUsage();
-					return 0;
-				}
-                else if (argv[i][1] == 'v' || strncmp(&argv[i][1], "-version", 8) == 0) {
-                    Command::version();
-                    return 0;
-                }
-                else if (argv[i][1] == 'l' || strncmp(&argv[i][1], "-license", 8) == 0) {
-                    printLicense();
-                    return 0;
-                }
-				else {
-					printf("Unknown argument '%s'", &argv[i][0]);
-					printUsage();
-					return 0;
-				}
-			}
-		}
-	}
+    CmdArg cmdarg(argc, argv);
+
+    while (cmdarg.hasMoreArgs()) {
+        string arg = cmdarg.nextArg();
+
+        if (arg.compare("-db") == 0) {
+            pszDatabase = strdup(cmdarg.nextArg().c_str());
+        }
+        else if (arg.compare("-h") == 0 || arg.compare("-?") == 0) {
+            printUsage();
+            return 0;
+        }
+        else if (arg.compare("-v") == 0 || arg.compare("--version") == 0) {
+            Command::version();
+            return 0;
+        }
+        else if (arg.compare("-l") == 0 || arg.compare("--license") == 0) {
+            printLicense();
+            return 0;
+        }
+        else if (arg.compare("--full-logging") == 0) {
+            defaultLogLevel = LOG_LEVEL_ALL;
+        }
+        else {
+            cout << "Unknown argument '" << arg << "'" << endl;
+            printUsage();
+            return 0;
+        }
+    }
 
     string logFileName = "./pfm.log";
 
     Logger & log = Logger::getInstance();
-    log.init(logFileName, LOG_LEVEL_FATAL | LOG_LEVEL_ERROR);
-
-#ifdef RUN_IN_DEBUGGER
-    log.setLogLevel(LOG_LEVEL_ALL);
-#endif
+    log.init(logFileName, defaultLogLevel);
 
     checkTerminalSize();
 
