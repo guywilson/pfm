@@ -182,7 +182,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
 
         if (nextPaymentDate <= periodEnd && nextPaymentDate > referenceDate) {
             if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
-                cout << "| " << nextPaymentDate.shortDate() << " | " << frequency << " | " << setw(16) << right << amount.getFormattedStringValue() << " | " << description << endl;
+                cout << "| " << nextPaymentDate.shortDate() << " | " << frequency << " | " << setw(16) << right << amount.localeFormattedStringValue() << " | " << description << endl;
             }
             return true;
         }

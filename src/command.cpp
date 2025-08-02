@@ -198,8 +198,8 @@ void Command::showAccountBalances(DBAccount & account) {
     Money currentBalance = account.calculateCurrentBalance();
     Money balanceAfterBills = account.calculateBalanceAfterBills();
 
-    cout << "Current balance:     " << right << setw(13) << currentBalance.getFormattedStringValue() << endl;
-    cout << "Balance after bills: " << right << setw(13) << balanceAfterBills.getFormattedStringValue() << endl;
+    cout << "Current balance:     " << right << setw(13) << currentBalance.localeFormattedStringValue() << endl;
+    cout << "Balance after bills: " << right << setw(13) << balanceAfterBills.localeFormattedStringValue() << endl;
 }
 
 void Command::importAccounts(string & jsonFileName) {

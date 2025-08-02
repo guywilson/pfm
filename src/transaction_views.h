@@ -246,7 +246,7 @@ class TransactionListView : public CLIListView {
             CLIListView::showNoExtraCR();
 
             if (isTotalEnabled) {
-                showTotal(8, total.getFormattedStringValue());
+                showTotal(8, total.localeFormattedStringValue());
             }
             else {
                 cout << endl;
@@ -339,9 +339,9 @@ class UpdateTransactionView : public CLIView {
             creditDebitField.setDefaultValue(creditDebit);
             creditDebitField.setLengthLimit(2);
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%s]: ", transaction.amount.getRawStringValue().c_str());
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%s]: ", transaction.amount.rawStringValue().c_str());
             amountField.setLabel(szPrompt);
-            amountField.setDefaultValue(transaction.amount.getRawStringValue());
+            amountField.setDefaultValue(transaction.amount.rawStringValue());
         }
 
         void show() override {

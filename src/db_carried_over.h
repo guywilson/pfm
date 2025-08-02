@@ -114,7 +114,7 @@ class DBCarriedOver : public DBEntity {
             cout << "Description: '" << description << "'" << endl;
 
             cout << fixed << setprecision(2);
-            cout << "Balance: " << balance.getFormattedStringValue() << endl;
+            cout << "Balance: " << balance.localeFormattedStringValue() << endl;
         }
 
         const char * getTableName() override {
@@ -137,7 +137,7 @@ class DBCarriedOver : public DBEntity {
                 accountId,
                 date.shortDate().c_str(),
                 description.c_str(),
-                balance.getRawStringValue().c_str(),
+                balance.rawStringValue().c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -156,7 +156,7 @@ class DBCarriedOver : public DBEntity {
                 accountId,
                 date.shortDate().c_str(),
                 description.c_str(),
-                balance.getRawStringValue().c_str(),
+                balance.rawStringValue().c_str(),
                 now.c_str(),
                 id);
 
@@ -176,7 +176,7 @@ class DBCarriedOver : public DBEntity {
                 description = column.getValue();
             }
             else if (column.getName() == "balance") {
-                balance = column.getDoubleValue();
+                balance = column.doubleValue();
             }
         }
 

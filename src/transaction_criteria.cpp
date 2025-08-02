@@ -151,14 +151,14 @@ string FindTransactionCriteriaBuilder::getCriteria() {
             criteria += " AND ";
         }
 
-        criteria += "amount > " + betweenTheseAmountList[0].getRawStringValue();
+        criteria += "amount > " + betweenTheseAmountList[0].rawStringValue();
     }
     else if (betweenTheseAmountList.size() >= 2) {
         if (criteria.length() > 0) {
             criteria += " AND ";
         }
 
-        criteria += "amount >= " + betweenTheseAmountList[0].getRawStringValue() + " AND amount <= " + betweenTheseAmountList[1].getRawStringValue();
+        criteria += "amount >= " + betweenTheseAmountList[0].rawStringValue() + " AND amount <= " + betweenTheseAmountList[1].rawStringValue();
     }
 
     if (onTheseDatesList.size() > 0) {
@@ -277,7 +277,7 @@ string FindTransactionCriteriaBuilder::getCriteria() {
             criteria += " AND ";
         }
 
-        criteria += "amount < " + lessThanThisAmount.getRawStringValue();
+        criteria += "amount < " + lessThanThisAmount.rawStringValue();
     }
 
     if (recurringOrNonRecurring.length() > 0) {

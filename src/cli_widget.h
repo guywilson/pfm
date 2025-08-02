@@ -596,7 +596,7 @@ class CLIListRow : public CLIWidget {
             ** Changes specified in P2675 should fix this:
             ** https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p2675r1.pdf
             */
-            string moneyString = val.getFormattedStringValue();
+            string moneyString = val.localeFormattedStringValue();
             
             string value;
             if (containsMultiByteChar(moneyString)) {

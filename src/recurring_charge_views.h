@@ -148,7 +148,7 @@ class RecurringChargeListView : public CLIListView {
         void show() override {
             CLIListView::showNoExtraCR();
 
-            showTotal(7, total.getFormattedStringValue());
+            showTotal(7, total.localeFormattedStringValue());
         }
 };
 
@@ -197,9 +197,9 @@ class UpdateRecurringChargeView : public CLIView {
             frequencyField.setLabel(szPrompt);
             frequencyField.setDefaultValue(charge.frequency);
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%s]: ", charge.amount.getRawStringValue().c_str());
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%s]: ", charge.amount.rawStringValue().c_str());
             amountField.setLabel(szPrompt);
-            amountField.setDefaultValue(charge.amount.getRawStringValue());
+            amountField.setDefaultValue(charge.amount.rawStringValue());
         }
 
         void show() override {

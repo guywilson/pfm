@@ -249,7 +249,7 @@ class DBTransaction : public DBPayment {
                     "\"" + reference + "\"," +
                     "\"" + getCreditDebitValue() + "\"," +
                     "\"" + (isReconciled ? "Y" : "N") + "\"," +
-                    "" + amount.getRawStringValue() + "\n";
+                    "" + amount.rawStringValue() + "\n";
 
             return record;
         }
@@ -388,7 +388,7 @@ class DBTransaction : public DBPayment {
                 reference.c_str(),
                 description.c_str(),
                 getCreditDebitValue().c_str(),
-                amount.getRawStringValue().c_str(),
+                amount.rawStringValue().c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
                 now.c_str());
@@ -412,7 +412,7 @@ class DBTransaction : public DBPayment {
                 reference.c_str(),
                 description.c_str(),
                 getCreditDebitValue().c_str(),
-                amount.getRawStringValue().c_str(),
+                amount.rawStringValue().c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
                 id);

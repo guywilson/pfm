@@ -224,8 +224,8 @@ void testAccount() {
                 throw pfm_error(
                         pfm_error::buildMsg(
                             "Carried Over Test 1: Expected balance %.2f, got %.2f", 
-                            expected.getDoubleValue(), 
-                            coAfter.balance.getDoubleValue()),
+                            expected.doubleValue(), 
+                            coAfter.balance.doubleValue()),
                         __FILE__,
                         __LINE__);
             }
@@ -251,8 +251,8 @@ void testAccount() {
                 throw pfm_error(
                         pfm_error::buildMsg(
                             "Carried Over Test 2: Expected balance %.2f, got %.2f", 
-                            expected.getDoubleValue(), 
-                            coAfter.balance.getDoubleValue()),
+                            expected.doubleValue(), 
+                            coAfter.balance.doubleValue()),
                         __FILE__,
                         __LINE__);
             }
@@ -278,8 +278,8 @@ void testAccount() {
                 throw pfm_error(
                         pfm_error::buildMsg(
                             "Carried Over Test 3: Expected balance %.2f, got %.2f", 
-                            expected.getDoubleValue(), 
-                            coAfter.balance.getDoubleValue()),
+                            expected.doubleValue(), 
+                            coAfter.balance.doubleValue()),
                         __FILE__,
                         __LINE__);
             }
@@ -304,8 +304,8 @@ void testAccount() {
                 throw pfm_error(
                         pfm_error::buildMsg(
                             "Carried Over Test 4: Expected balance %.2f, got %.2f", 
-                            expected.getDoubleValue(), 
-                            coAfter.balance.getDoubleValue()),
+                            expected.doubleValue(), 
+                            coAfter.balance.doubleValue()),
                         __FILE__,
                         __LINE__);
             }

@@ -163,9 +163,9 @@ class UpdateAccountView : public CLIView {
             openingDateField.setDefaultValue(account.openingDate.shortDate());
             openingDateField.setLengthLimit(DATE_FIELD_LENGTH);
 
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%s]: ", account.openingBalance.getRawStringValue().c_str());
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%s]: ", account.openingBalance.rawStringValue().c_str());
             openingBalanceField.setLabel(szPrompt);
-            openingBalanceField.setDefaultValue(account.openingBalance.getRawStringValue());
+            openingBalanceField.setDefaultValue(account.openingBalance.rawStringValue());
         }
 
         void show() override {

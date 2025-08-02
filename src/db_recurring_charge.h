@@ -118,7 +118,7 @@ class DBRecurringCharge : public DBPayment {
                     "\"" + endDate.shortDate() + "\"," +
                     "\"" + description + "\"," +
                     "\"" + frequency + "\"," +
-                    "" + amount.getRawStringValue() + "\n";
+                    "" + amount.rawStringValue() + "\n";
 
             return record;
         }
@@ -227,7 +227,7 @@ class DBRecurringCharge : public DBPayment {
                 date.shortDate().c_str(),
                 endDate.shortDate().c_str(),
                 description.c_str(),
-                amount.getRawStringValue().c_str(),
+                amount.rawStringValue().c_str(),
                 frequency.c_str(),
                 now.c_str(),
                 now.c_str());
@@ -249,7 +249,7 @@ class DBRecurringCharge : public DBPayment {
                 date.shortDate().c_str(),
                 endDate.shortDate().c_str(),
                 description.c_str(),
-                amount.getRawStringValue().c_str(),
+                amount.rawStringValue().c_str(),
                 frequency.c_str(),
                 now.c_str(),
                 id);

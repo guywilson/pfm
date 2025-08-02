@@ -92,7 +92,7 @@ class DBAccount : public DBEntity {
             r.add("name", name);
             r.add("code", code);
             r.add("openingDate", openingDate.shortDate());
-            r.add("openingBalance", openingBalance.getRawStringValue());
+            r.add("openingBalance", openingBalance.rawStringValue());
 
             return r;
         }
@@ -110,7 +110,7 @@ class DBAccount : public DBEntity {
                 openingDate = column.getValue();
             }
             else if (column.getName() == "opening_balance") {
-                openingBalance = column.getDoubleValue();
+                openingBalance = column.doubleValue();
             }
         }
 
@@ -122,7 +122,7 @@ class DBAccount : public DBEntity {
             cout << "Opening date: '" <<  openingDate.shortDate() << "'" << endl;
 
             cout << fixed << setprecision(2);
-            cout << "Opening balance: " << openingBalance.getFormattedStringValue() << endl;
+            cout << "Opening balance: " << openingBalance.localeFormattedStringValue() << endl;
         }
 
         const char * getTableName() override {
@@ -145,7 +145,7 @@ class DBAccount : public DBEntity {
                 name.c_str(),
                 code.c_str(),
                 openingDate.shortDate().c_str(),
-                openingBalance.getRawStringValue().c_str(),
+                openingBalance.rawStringValue().c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -164,7 +164,7 @@ class DBAccount : public DBEntity {
                 name.c_str(),
                 code.c_str(),
                 openingDate.shortDate().c_str(),
-                openingBalance.getRawStringValue().c_str(),
+                openingBalance.rawStringValue().c_str(),
                 now.c_str(),
                 id);
 

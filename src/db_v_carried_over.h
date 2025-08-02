@@ -62,7 +62,7 @@ class DBCarriedOverView : public DBEntity {
                 description = column.getValue();
             }
             else if (column.getName() == "balance") {
-                balance = column.getDoubleValue();
+                balance = column.doubleValue();
             }
         }
 

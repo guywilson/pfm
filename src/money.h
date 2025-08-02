@@ -51,9 +51,10 @@ class Money {
 
         Money(const Money & src);
 
-        double getDoubleValue();
-        string getRawStringValue() const;
-        string getFormattedStringValue() const;
+        double doubleValue();
+        string rawStringValue() const;
+        string rawStringValue(string & currencySymbol) const;
+        string localeFormattedStringValue() const;
 
         Money & operator=(const Money & rhs);
         Money & operator=(const string & rhs);
@@ -196,7 +197,7 @@ class MoneyTest {
             const char * amount = "137.47";
             Money m(amount);
 
-            double value = m.getDoubleValue();
+            double value = m.doubleValue();
 
             if (value != (double)137.47) {
                 throw pfm_error("testGetDoubleValue1(): Test failed");
@@ -210,7 +211,7 @@ class MoneyTest {
             const char * amount = "137.00";
             Money m(amount);
 
-            double value = m.getDoubleValue();
+            double value = m.doubleValue();
 
             if (value != (double)137.0) {
                 throw pfm_error("testGetDoubleValue2(): Test failed");
@@ -224,7 +225,7 @@ class MoneyTest {
             const char * amount = "137.47";
             Money m(amount);
 
-            if (m.getRawStringValue() != amount) {
+            if (m.rawStringValue() != amount) {
                 throw pfm_error("testGetRawStringValue1(): Test failed");
             }
             else {
@@ -236,7 +237,7 @@ class MoneyTest {
             const char * amount = "137.00";
             Money m(amount);
 
-            if (m.getRawStringValue() != amount) {
+            if (m.rawStringValue() != amount) {
                 throw pfm_error("testGetRawStringValue2(): Test failed");
             }
             else {
@@ -248,7 +249,7 @@ class MoneyTest {
             const char * amount = "-25.25";
             Money m(amount);
 
-            if (m.getRawStringValue() != amount) {
+            if (m.rawStringValue() != amount) {
                 throw pfm_error("testGetRawStringValue3(): Test failed");
             }
             else {
@@ -260,7 +261,7 @@ class MoneyTest {
             const char * amount = "-137.47";
             Money m(amount);
 
-            if (m.getRawStringValue() != amount) {
+            if (m.rawStringValue() != amount) {
                 throw pfm_error("testGetRawStringValue4(): Test failed");
             }
             else {

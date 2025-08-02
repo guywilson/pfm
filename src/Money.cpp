@@ -169,12 +169,12 @@ void Money::_setValue(money_t amount) {
     this->representedValue = amount;
 }
 
-double Money::getDoubleValue() {
+double Money::doubleValue() {
     double value = (double)this->representedValue / (double)100.0;
     return value;
 }
 
-string Money::getRawStringValue() const {
+string Money::rawStringValue() const {
     char buffer[AMOUNT_BUFFER_LENGTH];
     money_t whole = this->representedValue / 100;
     money_t decimal = this->representedValue - (whole * 100);
@@ -189,7 +189,11 @@ string Money::getRawStringValue() const {
     return value;
 }
 
-string Money::getFormattedStringValue() const {    
+string Money::rawStringValue(string & currencySymbol) const {
+    return currencySymbol + rawStringValue();
+}
+
+string Money::localeFormattedStringValue() const {    
     char buffer[AMOUNT_BUFFER_LENGTH];
     snprintf(buffer, AMOUNT_BUFFER_LENGTH, "%d", this->representedValue);
 

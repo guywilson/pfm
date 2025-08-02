@@ -109,7 +109,7 @@ class DBPayment : public DBEntity {
             r.add("payeeCode", this->payee.code);
             r.add("date", this->date.shortDate());
             r.add("description", this->description);
-            r.add("amount", this->amount.getRawStringValue());
+            r.add("amount", this->amount.rawStringValue());
 
             return r;
         }
@@ -125,7 +125,7 @@ class DBPayment : public DBEntity {
             cout << "Description: '" << description << "'" << endl;
 
             cout << fixed << setprecision(2);
-            cout << "Amount: " << amount.getFormattedStringValue() << endl;
+            cout << "Amount: " << amount.localeFormattedStringValue() << endl;
 
             cout << "DBCategory (encapsulated object):" << endl;
             category.print();
@@ -153,7 +153,7 @@ class DBPayment : public DBEntity {
                 description = column.getValue();
             }
             else if (column.getName() == "amount") {
-                amount = column.getDoubleValue();
+                amount = column.doubleValue();
             }
         }
 };

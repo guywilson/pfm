@@ -54,7 +54,7 @@ class DBColumn {
             return value;
         }
 
-        double getDoubleValue() {
+        double doubleValue() {
             return strtod(getValue().c_str(), NULL);
         }
 

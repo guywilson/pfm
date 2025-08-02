@@ -97,7 +97,7 @@ void DBAccount::createRecurringTransactions() {
 
                 while (transactionDate <= dateToday) {
                     if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
-                        cout << "| " << transactionDate.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.getFormattedStringValue() << " | " << charge.description << endl;
+                        cout << "| " << transactionDate.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.localeFormattedStringValue() << " | " << charge.description << endl;
                     }
 
                     DBTransaction::createFromRecurringChargeAndDate(charge, transactionDate);
@@ -231,7 +231,7 @@ Money DBAccount::calculateCurrentBalance() {
                 "calculateCurrentBalance(): Including carried over '%s' | '%s' | '%s'", 
                 co.date.shortDate().c_str(), 
                 co.description.c_str(), 
-                co.balance.getFormattedStringValue().c_str());
+                co.balance.localeFormattedStringValue().c_str());
     }
     else {
         balance = openingBalance;
@@ -251,7 +251,7 @@ Money DBAccount::calculateCurrentBalance() {
                     "calculateCurrentBalance(): Including transaction '%s' | '%s' | '%s'", 
                     transaction.date.shortDate().c_str(), 
                     transaction.description.c_str(), 
-                    transaction.amount.getFormattedStringValue().c_str());
+                    transaction.amount.localeFormattedStringValue().c_str());
 
             balance += transaction.getSignedAmount();
         }
@@ -303,7 +303,7 @@ Money DBAccount::calculateReconciledBalance() {
                 "calculateReconciledBalance(): Including carried over '%s' | '%s' | '%s'", 
                 referenceCO.date.shortDate().c_str(), 
                 referenceCO.description.c_str(), 
-                referenceCO.balance.getFormattedStringValue().c_str());
+                referenceCO.balance.localeFormattedStringValue().c_str());
     }
     else {
         periodStartDate = openingDate;
@@ -321,7 +321,7 @@ Money DBAccount::calculateReconciledBalance() {
                     "calculateReconciledBalance(): Including transaction '%s' | '%s' | '%s'", 
                     transaction.date.shortDate().c_str(), 
                     transaction.description.c_str(), 
-                    transaction.amount.getFormattedStringValue().c_str());
+                    transaction.amount.localeFormattedStringValue().c_str());
 
             balance += transaction.getSignedAmount();
         }
@@ -358,7 +358,7 @@ Money DBAccount::calculateBalanceAfterBills() {
                 "calculateBalanceAfterBills(): Including carried over '%s' | '%s' | '%s'", 
                 co.date.shortDate().c_str(), 
                 co.description.c_str(), 
-                co.balance.getFormattedStringValue().c_str());
+                co.balance.localeFormattedStringValue().c_str());
     }
     else {
         balance = openingBalance;
@@ -381,7 +381,7 @@ Money DBAccount::calculateBalanceAfterBills() {
                     "calculateBalanceAfterBills(): Including transaction '%s' | '%s' | '%s'", 
                     transaction.date.shortDate().c_str(), 
                     transaction.description.c_str(), 
-                    transaction.amount.getFormattedStringValue().c_str());
+                    transaction.amount.localeFormattedStringValue().c_str());
 
             balance += transaction.getSignedAmount();
             transactionBalance += transaction.getSignedAmount();
@@ -402,7 +402,7 @@ Money DBAccount::calculateBalanceAfterBills() {
                         "calculateBalanceAfterBills(): Including charge '%s' | '%s' | '%s'", 
                         charge.nextPaymentDate.shortDate().c_str(), 
                         charge.description.c_str(), 
-                        charge.amount.getFormattedStringValue().c_str());
+                        charge.amount.localeFormattedStringValue().c_str());
 
                 balance -= charge.amount;
                 chargeBalance -= charge.amount;
@@ -410,8 +410,8 @@ Money DBAccount::calculateBalanceAfterBills() {
         }
 
         if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
-            cout << "Total transaction balance = " << transactionBalance.getFormattedStringValue() << endl;
-            cout << "Total charge balance = " << chargeBalance.getFormattedStringValue() << endl;
+            cout << "Total transaction balance = " << transactionBalance.localeFormattedStringValue() << endl;
+            cout << "Total charge balance = " << chargeBalance.localeFormattedStringValue() << endl;
         }
 
         log.exit("DBAccount::calculateBalanceAfterBills()");
