@@ -178,6 +178,48 @@ DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(
     return result;
 }
 
+void DBTransaction::reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDate & referenceDate) {
+    Logger & log = Logger::getInstance();
+
+    log.entry("reconcileAllForAccountIDBeforeDate()");
+
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+    StrDate now;
+
+    log.debug(
+        "Reconciling all transactions before '%s' for account ID %lld", 
+        now.shortDate().c_str(), 
+        accountId);
+        
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlReconcileByAccountIDBeforeDate, 
+        now.shortDate().c_str(),
+        accountId,
+        referenceDate.shortDate().c_str());
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    db.begin();
+
+    try {
+        db.executeUpdate(szStatement);
+    }
+    catch (pfm_error & e) {
+        db.rollback();
+
+        log.error("reconcileAllForAccountIDBeforeDate() - Failed to execute update '%s'", e.what());
+
+        throw e;
+    }
+
+    db.commit();
+
+    log.exit("reconcileAllForAccountIDBeforeDate");
+}
+
 void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {
     DBTransaction tr;
     tr.set(src);

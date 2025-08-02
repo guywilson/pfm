@@ -209,6 +209,14 @@ class DBTransaction : public DBPayment {
                         "updated = '%s' " \
                         "WHERE id = %lld;";
 
+        const char * sqlReconcileByAccountIDBeforeDate = 
+                        "UPDATE account_transaction " \
+                        "SET is_reconciled = 'Y'," \
+                        "updated = '%s' " \
+                        "WHERE account_id = %lld " \
+                        "AND date <= '%s'" \
+                        "AND is_reconciled = 'N';";
+
         const char * sqlDeleteByRecurringCharge = 
                         "DELETE FROM account_transaction WHERE recurring_charge_id = %lld;";
 
@@ -421,6 +429,8 @@ class DBTransaction : public DBPayment {
 
         void deleteByRecurringChargeId(pfm_id_t recurringChargeId);
         void deleteAllRecurringTransactionsForAccount(pfm_id_t accountId);
+
+        void reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDate & referenceDate);
 
         static void createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate);
         static void createFromRecurringChargeAndDate(const DBRecurringChargeView & src, StrDate & transactionDate);

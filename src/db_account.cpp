@@ -277,29 +277,40 @@ Money DBAccount::calculateReconciledBalance() {
 
     Money balance = 0.00;
 
+    StrDate dateToday;
+    StrDate periodStartDate;
+    DBCarriedOver referenceCO;
+
     /*
-    ** If we have a carried over log, use that as our starting balance
+    ** If we have more than one carried over log, use the second to latest
     ** as it includes the account's opening balance. Otherwise, just use
     ** the account's opening balance.
+    **
+    ** Assume that all transactions prior to the chosen carried over log
+    ** date should be reconciled by now, so go ahead and force that.
     */
-    if (cos.size() > 0) {
-        DBCarriedOver latestCarriedOver = cos[0];
-        balance = latestCarriedOver.balance;
+    if (cos.size() > 1) {
+        referenceCO = cos[1];
+        balance = referenceCO.balance;
+
+        periodStartDate = referenceCO.date;
+        periodStartDate.addDays(1);
+
+        DBTransaction transaction;
+        transaction.reconcileAllForAccountIDBeforeDate(this->id, referenceCO.date);
 
         log.debug(
                 "calculateReconciledBalance(): Including carried over '%s' | '%s' | '%s'", 
-                latestCarriedOver.date.shortDate().c_str(), 
-                latestCarriedOver.description.c_str(), 
-                latestCarriedOver.balance.getFormattedStringValue().c_str());
+                referenceCO.date.shortDate().c_str(), 
+                referenceCO.description.c_str(), 
+                referenceCO.balance.getFormattedStringValue().c_str());
     }
     else {
+        periodStartDate = openingDate;
         balance = openingBalance;
     }
 
     try {
-        StrDate dateToday;
-        StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
-
         DBTransactionView tr;
         DBResult<DBTransactionView> transactionResult = tr.retrieveReconciledByAccountIDForPeriod(this->id, periodStartDate, dateToday);
 
