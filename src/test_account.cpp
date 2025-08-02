@@ -15,7 +15,6 @@
 #include "db_recurring_charge.h"
 #include "db_carried_over.h"
 #include "db_transaction.h"
-#include "db_budget.h"
 
 using namespace std;
 

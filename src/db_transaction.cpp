@@ -13,8 +13,6 @@
 #include "db_transaction.h"
 #include "db_account.h"
 #include "db_carried_over.h"
-#include "db_budget.h"
-#include "db_budget_track.h"
 #include "db.h"
 #include "strdate.h"
 
@@ -294,20 +292,6 @@ void DBTransaction::afterInsert() {
         carriedOver.save();
     }
 
-    DBBudget budget;
-    DBResult<DBBudget> budgetResult = budget.retrieveByCategoryOrPayeeCode(category.code, payee.code);
-
-    for (int i = 0;i < budgetResult.size();i++) {
-        DBBudget b = budgetResult.at(i);
-
-        b.createOutstandingTrackingRecords();
-
-        DBBudgetTrack t;
-        t.retrieveLatestByBudgetId(b.id);
-
-        t.balance += amount;
-    }
-
     log.exit("DBTransaction::afterInsert()");
 }
 
@@ -336,25 +320,6 @@ void DBTransaction::beforeUpdate() {
             carriedOver.balance += this->getSignedAmount();
             carriedOver.save();
         }
-
-        DBBudget bu;
-        DBResult<DBBudget> buResult = bu.retrieveByCategoryOrPayeeCode(this->category.code, this->payee.code);
-
-        for (int i = 0;i < buResult.size();i++) {
-            DBBudget b = buResult.at(i);
-
-            DBBudgetTrack trk;
-            DBResult<DBBudgetTrack> trkResult = trk.retrieveByBudgetIdAfterDate(b.id, this->date);
-
-            for (int j = 0;j < trkResult.size();j++) {
-                DBBudgetTrack t = trkResult.at(j);
-
-                t.balance -= transaction.getSignedAmount();
-                t.balance += this->getSignedAmount();
-
-                t.save();
-            }
-        }
     }
 
     log.exit("DBTransaction::beforeUpdate()");
@@ -372,23 +337,6 @@ void DBTransaction::afterRemove() {
 
         carriedOver.balance -= getSignedAmount();
         carriedOver.save();
-    }
-
-    DBBudget bu;
-    DBResult<DBBudget> buResult = bu.retrieveByCategoryOrPayeeCode(this->category.code, this->payee.code);
-
-    for (int i = 0;i < buResult.size();i++) {
-        DBBudget b = buResult.at(i);
-
-        DBBudgetTrack trk;
-        DBResult<DBBudgetTrack> trkResult = trk.retrieveByBudgetIdAfterDate(b.id, this->date);
-
-        for (int j = 0;j < trkResult.size();j++) {
-            DBBudgetTrack t = trkResult.at(j);
-
-            t.balance -= this->getSignedAmount();
-            t.save();
-        }
     }
 
     log.exit("DBTransaction::afterRemove()");

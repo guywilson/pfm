@@ -498,13 +498,10 @@ void PFM_DB::createSchema() {
         createTable(pszCreateRCTable);
         createTable(pszCreateTransationTable);
         createTable(pszCreateCarriedOverTable);
-        createTable(pszCreateBudgetTable);
-        createTable(pszCreateBudgetTrackTable);
 
         createView(pszCreateCOView);
         createView(pszCreateListRCView);
         createView(pszCreateListTransationView);
-        createView(pszCreateBudgetTrackView);
 
         createCurrencies();
         createDefaultCategories();

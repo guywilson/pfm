@@ -24,9 +24,7 @@
 #include "db_category.h"
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
-#include "db_budget.h"
 #include "db_carried_over.h"
-#include "db_v_budget_track.h"
 #include "db_v_carried_over.h"
 #include "jfile.h"
 #include "transaction_criteria.h"
@@ -98,23 +96,6 @@ static DBTransaction * createSampleTransaction() {
     transaction->reference = "";
 
     return transaction;
-}
-
-static DBBudget * createSampleBudget() {
-    DBBudget * budget = new DBBudget();
-
-    DBPayee * payee = createSamplePayee();
-    DBCategory * category = createSampleCategory();
-
-    budget->categoryCode = category->code;
-    budget->description = "Sample budget";
-    budget->endDate = "";
-    budget->maximumBudget = 100.00;
-    budget->minimumBudget = 0.00;
-    budget->payeeCode = payee->code;
-    budget->startDate = "2025-06-01";
-
-    return budget;
 }
 
 void Command::help() {
@@ -780,108 +761,11 @@ void Command::exportTransactionsAsCSV(string & csvFileName) {
     out.close();
 }
 
-void Command::addBudget() {
-    AddBudgetView view;
-    view.show();
-
-    DBBudget budget = view.getBudget();
-    budget.save();
-}
-
-void Command::listBudgets() {
-    DBResult<DBBudget> result;
-    result.retrieveAll();
-
-    BudgetListView view;
-    view.addResults(result);
-    view.show();
-
-    CacheMgr & cacheMgr = CacheMgr::getInstance();
-
-    for (int i = 0;i < result.size();i++) {
-        DBBudget budget = result.at(i);
-        cacheMgr.addBudget(budget.sequence, budget);
-    }
-}
-
-DBBudget Command::getBudget(int sequence) {
-    int selectedSequence;
-
-    if (sequence == 0) {
-        ChooseBudgetView view;
-        view.show();
-
-        selectedSequence = view.getSequence();
-    }
-    else {
-        selectedSequence = sequence;
-    }
-
-    CacheMgr & cacheMgr = CacheMgr::getInstance();
-
-    DBBudget budget = cacheMgr.getBudget(selectedSequence);
-
-    return budget;
-}
-
-void Command::updateBudget(DBBudget & budget) {
-    UpdateBudgetView view;
-    view.setBudget(budget);
-    view.show();
-
-    DBBudget updatedBudget = view.getBudget();
-    updatedBudget.save();
-}
-
-void Command::deleteBudget(DBBudget & budget) {
-    budget.remove();
-    budget.clear();
-}
-
-void Command::importBudgets(string & jsonFileName) {
-    JFileReader jfile = JFileReader(jsonFileName, "DBBudget");
-
-    vector<JRecord> records = jfile.read("budgets");
-
-    for (JRecord & record : records) {
-        DBBudget budget;
-
-        budget.set(record);
-        budget.save();
-    }
-}
-
-void Command::exportBudgets(string & jsonFileName) {
-    DBResult<DBBudget> results;
-    results.retrieveAll();
-
-    vector<JRecord> records;
-
-    for (int i = 0;i < results.size();i++) {
-        DBBudget budget = results.at(i);
-
-        JRecord r = budget.getRecord();
-        records.push_back(r);
-    }
-    
-    JFileWriter jFile = JFileWriter(jsonFileName, "DBBudget");
-    jFile.write(records, "budgets");
-}
-
 void Command::listCarriedOverLogs() {
     DBResult<DBCarriedOverView> result;
     result.retrieveAll();
 
     CarriedOverListView view;
-    view.addResults(result);
-    view.show();
-}
-
-void Command::listBudgetTracks() {
-    DBResult<DBBudgetTrackView> result;
-    result.retrieveAll();
-
-    BudgetTrackView view;
     view.addResults(result);
     view.show();
 }
@@ -961,7 +845,6 @@ void Command::saveJsonTemplate() {
     cout << "3) Category" << endl;
     cout << "4) Recurring Charge" << endl;
     cout << "5) Transaction" << endl;
-    cout << "6) Budget" << endl;
 
     CLITextField optionField = CLITextField("Enter option: ");
     optionField.show();
@@ -998,11 +881,6 @@ void Command::saveJsonTemplate() {
         case 5:
             entity = createSampleTransaction();
             name = "transactions";
-            break;
-
-        case 6:
-            entity = createSampleBudget();
-            name = "budgets";
             break;
 
         default:
@@ -1263,37 +1141,8 @@ bool Command::process(const string & command) {
         string filename = getParameter(0);
         exportTransactionsAsCSV(filename);
     }
-    else if (isCommand("add-budget") || isCommand("ab")) {
-        addBudget();
-    }
-    else if (isCommand("list-budgets") || isCommand("lb")) {
-        listBudgets();
-    }
-    else if (isCommand("update-budget") || isCommand("ub")) {
-        string sequence = getParameter(0);
-
-        DBBudget budget = getBudget(atoi(sequence.c_str()));
-        updateBudget(budget);
-    }
-    else if (isCommand("delete-budget") || isCommand("db")) {
-        string sequence = getParameter(0);
-
-        DBBudget budget = getBudget(atoi(sequence.c_str()));
-        deleteBudget(budget);
-    }
-    else if (isCommand("import-budgets") || isCommand("ib")) {
-        string filename = getParameter(0);
-        importBudgets(filename);
-    }
-    else if (isCommand("export-budgets") || isCommand("xb")) {
-        string filename = getParameter(0);
-        exportBudgets(filename);
-    }
     else if (isCommand("list-carried-over-logs") || isCommand("lco")) {
         listCarriedOverLogs();
-    }
-    else if (isCommand("list-budget-track-records") || isCommand("lbt")) {
-        listBudgetTracks();
     }
     else if (isCommand("change-password")) {
         changePassword();

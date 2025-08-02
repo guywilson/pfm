@@ -344,31 +344,6 @@ static const char * pszCreateCarriedOverTable =
     "updated TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id));";
 
-static const char * pszCreateBudgetTable = 
-    "CREATE TABLE budget (" \
-    "id INTEGER PRIMARY KEY," \
-    "start_date TEXT NOT NULL," \
-    "end_date TEXT," \
-    "category_code TEXT," \
-    "payee_code TEXT," \
-    "description TEXT NOT NULL," \
-    "min_budget NUMERIC," \
-    "max_budget NUMERIC," \
-    "created TEXT NOT NULL," \
-    "updated TEXT NOT NULL," \
-    "FOREIGN KEY(payee_code) REFERENCES payee(code)," \
-    "FOREIGN KEY(category_code) REFERENCES category(code));";
-
-static const char * pszCreateBudgetTrackTable = 
-    "CREATE TABLE period_budget_track (" \
-    "id INTEGER PRIMARY KEY," \
-    "budget_id INTEGER NOT NULL," \
-    "date TEXT NOT NULL," \
-    "balance NUMERIC NOT NULL," \
-    "created TEXT NOT NULL," \
-    "updated TEXT NOT NULL," \
-    "FOREIGN KEY(budget_id) REFERENCES budget(id));";
-
 /*
 ** Create views, do this last...
 */
@@ -429,20 +404,5 @@ static const char * pszCreateListTransationView =
     "LEFT JOIN category c ON c.id = tr.category_id " \
     "LEFT JOIN account a ON a.id = tr.account_id " \
     "ORDER BY tr.date ASC;";
-
-static const char * pszCreateBudgetTrackView =
-    "CREATE VIEW v_budget_track AS SELECT " \
-    "bt.id," \
-    "bt.budget_id," \
-    "bt.date," \
-    "bt.balance," \
-    "bu.payee_code," \
-    "bu.category_code," \
-    "bu.description," \
-    "bt.created," \
-    "bt.updated " \
-    "FROM period_budget_track bt " \
-    "LEFT JOIN budget bu ON bu.id = bt.budget_id " \
-    "ORDER BY bt.date DESC";
 
 #endif

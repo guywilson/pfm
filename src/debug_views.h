@@ -7,7 +7,6 @@
 #include "cli_widget.h"
 #include "custom_widgets.h"
 #include "db_v_carried_over.h"
-#include "db_v_budget_track.h"
 
 using namespace std;
 
@@ -49,51 +48,6 @@ class CarriedOverListView : public CLIListView {
                 row.addCellValue(co.date.shortDate());
                 row.addCellValue(co.description);
                 row.addCellValue(co.balance);
-
-                addRow(row);
-            }
-        }
-};
-
-class BudgetTrackView : public CLIListView {
-    public:
-        BudgetTrackView() : CLIListView() {}
-
-        void addResults(DBResult<DBBudgetTrackView> & result) {
-            char szTitle[TITLE_BUFFER_LEN];
-
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Budget Track Records (%d)", result.size());
-            setTitle(szTitle);
-
-            CLIListRow headerRow;
-
-            CLIListColumn column1 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Cat.", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
-            headerRow.addColumn(column3);
-
-            CLIListColumn column4 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
-            headerRow.addColumn(column4);
-
-            CLIListColumn column5 = CLIListColumn("Balance", 16, CLIListColumn::rightAligned);
-            headerRow.addColumn(column5);
-
-            addHeaderRow(headerRow);
-
-            for (int i = 0;i < result.size();i++) {
-                DBBudgetTrackView btv = result.at(i);
-
-                CLIListRow row(headerRow);
-
-                row.addCellValue(btv.payeeCode);
-                row.addCellValue(btv.categoryCode);
-                row.addCellValue(btv.date.shortDate());
-                row.addCellValue(btv.description);
-                row.addCellValue(btv.balance);
 
                 addRow(row);
             }

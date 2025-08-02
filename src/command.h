@@ -8,9 +8,7 @@
 #include "db_payee.h"
 #include "db_v_transaction.h"
 #include "db_transaction.h"
-#include "db_budget.h"
 #include "db_carried_over.h"
-#include "db_budget_track.h"
 #include "transaction_criteria.h"
 
 using namespace std;
@@ -119,16 +117,7 @@ class Command {
         void exportTransactions(string & jsonFileName);
         void exportTransactionsAsCSV(string & csvFileName);
 
-        void addBudget();
-        void listBudgets();
-        DBBudget getBudget(int sequence);
-        void updateBudget(DBBudget & budget);
-        void deleteBudget(DBBudget & budget);
-        void importBudgets(string & jsonFileName);
-        void exportBudgets(string & jsonFileName);
-
         void listCarriedOverLogs();
-        void listBudgetTracks();
 
         void changePassword();
         void getDBKey();
