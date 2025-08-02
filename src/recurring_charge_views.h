@@ -95,7 +95,7 @@ class RecurringChargeListView : public CLIListView {
         void addResults(DBResult<DBRecurringChargeView> & result, string & accountCode) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Recurring charges for account: %s (%d)", accountCode.c_str(), result.getNumRows());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Recurring charges for account: %s (%d)", accountCode.c_str(), result.size());
             setTitle(szTitle);
 
             CLIListRow headerRow;
@@ -126,8 +126,8 @@ class RecurringChargeListView : public CLIListView {
 
             addHeaderRow(headerRow);
 
-            for (int i = 0;i < result.getNumRows();i++) {
-                DBRecurringChargeView charge = result.getResultAt(i);
+            for (int i = 0;i < result.size();i++) {
+                DBRecurringChargeView charge = result.at(i);
 
                 CLIListRow row(headerRow);
 

@@ -304,8 +304,8 @@ void DBRecurringCharge::beforeUpdate() {
         DBTransaction tr;
         DBResult<DBTransaction> trResult = tr.retrieveByRecurringChargeID(id);
 
-        for (int i = 0;i < trResult.getNumRows();i++) {
-            DBTransaction transaction = trResult.getResultAt(i);
+        for (int i = 0;i < trResult.size();i++) {
+            DBTransaction transaction = trResult.at(i);
 
             transaction.description = this->description;
             transaction.categoryId = this->categoryId;

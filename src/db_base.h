@@ -193,7 +193,7 @@ class Result {
             sequenceCounter = 1;
         }
 
-        int getNumRows() {
+        int size() {
             return numRows;
         }
 
@@ -241,17 +241,25 @@ class DBResult : public Result {
         int retrieve(const char * sqlStatement);
         int retrieveAll();
 
-        T getResultAt(int i) {
-            if (getNumRows() > i) {
+        T & at(int i) {
+            if (size() > i) {
                 return results[i];
             }
             else {
                 throw pfm_error(
                         pfm_error::buildMsg(
-                            "getResultAt(): Index out of range: numRows: %d, requested row: %d", getNumRows(), i), 
+                            "at(): Index out of range: numRows: %d, requested row: %d", size(), i), 
                         __FILE__, 
                         __LINE__);
             }
+        }
+
+        T & operator[](int i) {
+            return at(i);
+        }
+
+        const T & operator[](int i) const {
+            return at(i);
         }
 
         void addRow(T & entity) {

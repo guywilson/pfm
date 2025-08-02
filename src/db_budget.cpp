@@ -46,8 +46,8 @@ DBResult<DBBudget> DBBudget::retrieveByCategoryOrPayeeCode(string & categoryCode
     DBResult<DBBudget> result = retrieveByCategoryCode(categoryCode);
     DBResult<DBBudget> resultByPayee = retrieveByPayeeCode(payeeCode);
 
-    for (int i = 0;i < resultByPayee.getNumRows();i++) {
-        DBBudget budgetByPayee = resultByPayee.getResultAt(i);
+    for (int i = 0;i < resultByPayee.size();i++) {
+        DBBudget budgetByPayee = resultByPayee.at(i);
         result.addRow(budgetByPayee);
     }
 

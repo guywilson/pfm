@@ -26,7 +26,7 @@ void DBPayee::retrieveByCode(string & code) {
     int rowsRetrievedCount = result.retrieve(szStatement);
 
     if (rowsRetrievedCount == 1) {
-        set(result.getResultAt(0));
+        set(result.at(0));
     }
     else {
         clear();

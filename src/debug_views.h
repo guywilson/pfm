@@ -21,7 +21,7 @@ class CarriedOverListView : public CLIListView {
         void addResults(DBResult<DBCarriedOverView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Carried Over Logs (%d)", result.getNumRows());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Carried Over Logs (%d)", result.size());
             setTitle(szTitle);
 
             CLIListRow headerRow;
@@ -40,8 +40,8 @@ class CarriedOverListView : public CLIListView {
 
             addHeaderRow(headerRow);
 
-            for (int i = 0;i < result.getNumRows();i++) {
-                DBCarriedOverView co = result.getResultAt(i);
+            for (int i = 0;i < result.size();i++) {
+                DBCarriedOverView co = result.at(i);
 
                 CLIListRow row(headerRow);
 
@@ -62,7 +62,7 @@ class BudgetTrackView : public CLIListView {
         void addResults(DBResult<DBBudgetTrackView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Budget Track Records (%d)", result.getNumRows());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Budget Track Records (%d)", result.size());
             setTitle(szTitle);
 
             CLIListRow headerRow;
@@ -84,8 +84,8 @@ class BudgetTrackView : public CLIListView {
 
             addHeaderRow(headerRow);
 
-            for (int i = 0;i < result.getNumRows();i++) {
-                DBBudgetTrackView btv = result.getResultAt(i);
+            for (int i = 0;i < result.size();i++) {
+                DBBudgetTrackView btv = result.at(i);
 
                 CLIListRow row(headerRow);
 

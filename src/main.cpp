@@ -199,7 +199,7 @@ int main(int argc, char ** argv) {
     DBResult<DBAccount> accounts;
     accounts.retrieveAll();
 
-    int numAccounts = accounts.getNumRows();
+    int numAccounts = accounts.size();
 
     Command command;
     

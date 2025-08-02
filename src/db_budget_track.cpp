@@ -53,7 +53,7 @@ int DBBudgetTrack::retrieveLatestByBudgetId(pfm_id_t budgetId) {
     int rowsRetrievedCount = result.retrieve(szStatement);
 
     if (rowsRetrievedCount == 1) {
-        set(result.getResultAt(0));
+        set(result.at(0));
     }
 
     return rowsRetrievedCount;

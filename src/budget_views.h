@@ -92,7 +92,7 @@ class BudgetListView : public CLIListView {
         void addResults(DBResult<DBBudget> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Budgets (%d)", result.getNumRows());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Budgets (%d)", result.size());
             setTitle(szTitle);
 
             CLIListRow headerRow;
@@ -123,8 +123,8 @@ class BudgetListView : public CLIListView {
 
             addHeaderRow(headerRow);
 
-            for (int i = 0;i < result.getNumRows();i++) {
-                DBBudget budget = result.getResultAt(i);
+            for (int i = 0;i < result.size();i++) {
+                DBBudget budget = result.at(i);
 
                 CLIListRow row(headerRow);
 

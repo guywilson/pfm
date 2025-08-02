@@ -171,20 +171,20 @@ void testAccount() {
     DBTransaction tr;
     DBResult<DBTransaction> trResult1 = tr.retrieveByRecurringChargeID(charge1.id);
 
-    if (trResult1.getNumRows() != 8) {
-        throw pfm_error(pfm_error::buildMsg("Expected 8 transactions, got %d", trResult1.getNumRows()));
+    if (trResult1.size() != 8) {
+        throw pfm_error(pfm_error::buildMsg("Expected 8 transactions, got %d", trResult1.size()));
     }
 
     DBResult<DBTransaction> trResult2 = tr.retrieveByRecurringChargeID(charge2.id);
 
-    if (trResult2.getNumRows() != 7) {
-        throw pfm_error(pfm_error::buildMsg("Expected 7 transactions, got %d", trResult2.getNumRows()));
+    if (trResult2.size() != 7) {
+        throw pfm_error(pfm_error::buildMsg("Expected 7 transactions, got %d", trResult2.size()));
     }
 
     DBResult<DBTransaction> trResult3 = tr.retrieveByRecurringChargeID(charge3.id);
 
-    if (trResult3.getNumRows() != 5) {
-        throw pfm_error(pfm_error::buildMsg("Expected 5 transactions, got %d", trResult3.getNumRows()));
+    if (trResult3.size() != 5) {
+        throw pfm_error(pfm_error::buildMsg("Expected 5 transactions, got %d", trResult3.size()));
     }
 
     /*
@@ -193,8 +193,8 @@ void testAccount() {
     DBCarriedOver co;
     DBResult<DBCarriedOver> coResultBeforeInsert = co.retrieveByAccountId(accountId);
 
-    if (coResultBeforeInsert.getNumRows() != 7) {
-        throw pfm_error(pfm_error::buildMsg("Expected 7 carried over logs, got %d", coResultBeforeInsert.getNumRows()));
+    if (coResultBeforeInsert.size() != 7) {
+        throw pfm_error(pfm_error::buildMsg("Expected 7 carried over logs, got %d", coResultBeforeInsert.size()));
     }
 
     /*
@@ -214,9 +214,9 @@ void testAccount() {
 
     DBResult<DBCarriedOver> coResultAfterInsert = co.retrieveByAccountId(accountId);
 
-    for (int i = 0;i < coResultAfterInsert.getNumRows();i++) {
-        DBCarriedOver coBefore = coResultBeforeInsert.getResultAt(i);
-        DBCarriedOver coAfter = coResultAfterInsert.getResultAt(i);
+    for (int i = 0;i < coResultAfterInsert.size();i++) {
+        DBCarriedOver coBefore = coResultBeforeInsert.at(i);
+        DBCarriedOver coAfter = coResultAfterInsert.at(i);
 
         if (coAfter.id >= 3) {
             Money expected = (coBefore.balance - trTest.amount);
@@ -241,9 +241,9 @@ void testAccount() {
 
     DBResult<DBCarriedOver> coResultAfterUpdate = co.retrieveByAccountId(accountId);
 
-    for (int i = 0;i < coResultAfterUpdate.getNumRows();i++) {
-        DBCarriedOver coBefore = coResultBeforeInsert.getResultAt(i);
-        DBCarriedOver coAfter = coResultAfterUpdate.getResultAt(i);
+    for (int i = 0;i < coResultAfterUpdate.size();i++) {
+        DBCarriedOver coBefore = coResultBeforeInsert.at(i);
+        DBCarriedOver coAfter = coResultAfterUpdate.at(i);
 
         if (coAfter.id >= 3) {
             Money expected = (coBefore.balance - trTest.amount);
@@ -268,9 +268,9 @@ void testAccount() {
 
     DBResult<DBCarriedOver> coResultAfterUpdate2 = co.retrieveByAccountId(accountId);
 
-    for (int i = 0;i < coResultAfterUpdate2.getNumRows();i++) {
-        DBCarriedOver coBefore = coResultBeforeInsert.getResultAt(i);
-        DBCarriedOver coAfter = coResultAfterUpdate2.getResultAt(i);
+    for (int i = 0;i < coResultAfterUpdate2.size();i++) {
+        DBCarriedOver coBefore = coResultBeforeInsert.at(i);
+        DBCarriedOver coAfter = coResultAfterUpdate2.at(i);
 
         if (coAfter.id >= 3) {
             Money expected = (coBefore.balance + trTest.amount);
@@ -294,9 +294,9 @@ void testAccount() {
 
     DBResult<DBCarriedOver> coResultAfterDelete = co.retrieveByAccountId(accountId);
 
-    for (int i = 0;i < coResultAfterDelete.getNumRows();i++) {
-        DBCarriedOver coBefore = coResultBeforeInsert.getResultAt(i);
-        DBCarriedOver coAfter = coResultAfterDelete.getResultAt(i);
+    for (int i = 0;i < coResultAfterDelete.size();i++) {
+        DBCarriedOver coBefore = coResultBeforeInsert.at(i);
+        DBCarriedOver coAfter = coResultAfterDelete.at(i);
 
         if (coAfter.id >= 3) {
             Money expected = coBefore.balance;

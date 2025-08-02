@@ -28,7 +28,7 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
     int rowsRetrievedCount = result.retrieve(szStatement);
 
     if (rowsRetrievedCount == 1) {
-        set(result.getResultAt(0));
+        set(result.at(0));
     }
 
     return rowsRetrievedCount;
@@ -66,20 +66,33 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
 }
 
 void DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate) {
-    DBTransactionView tr;
-    DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(accountId, startDate, endDate);
+    PFM_DB & db = PFM_DB::getInstance();
 
-    Money total = startingBalance;
+    db.begin();
 
-    for (int i = 0;i < transactionResult.getNumRows();i++) {
-        DBTransaction transaction = transactionResult.getResultAt(i);
-        total += transaction.getSignedAmount();
+    try {
+        DBTransactionView tr;
+        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(accountId, startDate, endDate);
+
+        Money total = startingBalance;
+
+        for (int i = 0;i < transactionResult.size();i++) {
+            DBTransaction transaction = transactionResult.at(i);
+            total += transaction.getSignedAmount();
+        }
+
+        DBCarriedOver co;
+        co.balance = total;
+        co.accountId = accountId;
+        co.date = endDate;
+        co.description = "Carried over (" + endDate.shortDate() + ")";
+
+        co.save();
+    }
+    catch (pfm_error & e) {
+        db.rollback();
+        throw e;
     }
 
-    this->balance = total;
-    this->accountId = accountId;
-    this->date = endDate;
-    this->description = "Carried over (" + this->date.shortDate() + ")";
-
-    save();
+    db.commit();
 }

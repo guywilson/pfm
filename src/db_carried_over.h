@@ -27,7 +27,8 @@ class DBCarriedOver : public DBEntity {
                         "created," \
                         "updated " \
                         "FROM carried_over_log " \
-                        "WHERE account_id = %lld;";
+                        "WHERE account_id = %lld " \
+                        "ORDER BY date DESC;";
 
         const char * sqlSelectByAccountIdAfterDate = 
                         "SELECT id, " \
@@ -182,6 +183,7 @@ class DBCarriedOver : public DBEntity {
         int retrieveLatestByAccountId(pfm_id_t accountId);
         DBResult<DBCarriedOver> retrieveByAccountId(pfm_id_t accountId);
         DBResult<DBCarriedOver> retrieveByAccountIdAfterDate(pfm_id_t accountId, StrDate & after);
+
         void createForPeriod(pfm_id_t accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate);
 };
 

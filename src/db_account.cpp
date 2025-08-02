@@ -40,7 +40,7 @@ void DBAccount::retrieveByCode(string & code) {
                 __LINE__);
     }
 
-    set(result.getResultAt(0));
+    set(result.at(0));
 }
 
 void DBAccount::createRecurringTransactions() {
@@ -62,8 +62,8 @@ void DBAccount::createRecurringTransactions() {
             cout << "Creating recurring transactions for account '" << this->code << "': " << endl;
         }
 
-        for (int i = 0;i < chargeResult.getNumRows();i++) {
-            DBRecurringChargeView charge = chargeResult.getResultAt(i);
+        for (int i = 0;i < chargeResult.size();i++) {
+            DBRecurringChargeView charge = chargeResult.at(i);
 
             if (charge.isActive()) {
                 DBTransaction transaction;
@@ -127,16 +127,16 @@ void DBAccount::beforeUpdate() {
         DBCarriedOver co;
         DBResult<DBCarriedOver> coResult = co.retrieveByAccountId(id);
 
-        for (int i = 0;i < coResult.getNumRows();i++) {
-            DBCarriedOver carriedOver = coResult.getResultAt(i);
+        for (int i = 0;i < coResult.size();i++) {
+            DBCarriedOver carriedOver = coResult.at(i);
             carriedOver.remove();
         }
 
         DBRecurringChargeView ch;
         DBResult<DBRecurringChargeView> chResult = ch.retrieveByAccountID(id);
 
-        for (int i = 0;i < chResult.getNumRows();i++) {
-            DBRecurringCharge charge = chResult.getResultAt(i);
+        for (int i = 0;i < chResult.size();i++) {
+            DBRecurringCharge charge = chResult.at(i);
 
             DBTransaction tr;
             tr.deleteByRecurringChargeId(charge.id);
@@ -161,18 +161,18 @@ void DBAccount::createCarriedOverLogs() {
         DBCarriedOver co;
         int hasCO = co.retrieveLatestByAccountId(this->id);
 
-        if (hasCO) {
+        if (hasCO > 0) {
             log.debug("Latest DBCarriedOverLog date '%s'", co.date.shortDate().c_str());
         }
         else {
             DBTransactionView transaction;
             DBResult<DBTransactionView> result = transaction.retrieveByAccountID(this->id, sort_ascending, 1);
 
-            if (result.getNumRows() == 0) {
+            if (result.size() == 0) {
                 return;
             }
             
-            DBTransaction firstTransaction = result.getResultAt(0);
+            DBTransaction firstTransaction = result.at(0);
 
             StrDate firstDate = firstTransaction.date.firstDayInMonth();
             StrDate secondDate = firstTransaction.date.lastDayInMonth();
@@ -244,8 +244,8 @@ Money DBAccount::calculateCurrentBalance() {
         DBTransactionView tr;
         DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, periodStartDate, dateToday);
 
-        for (int i = 0;i < transactionResult.getNumRows();i++) {
-            DBTransaction transaction = transactionResult.getResultAt(i);
+        for (int i = 0;i < transactionResult.size();i++) {
+            DBTransaction transaction = transactionResult.at(i);
 
             log.debug(
                     "calculateCurrentBalance(): Including transaction '%s' | '%s' | '%s'", 
@@ -273,7 +273,7 @@ Money DBAccount::calculateReconciledBalance() {
     log.entry("DBAccount::calculateReconciledBalance()");
 
     DBCarriedOver co;
-    int numCORecords = co.retrieveLatestByAccountId(this->id);
+    DBResult<DBCarriedOver> cos = co.retrieveByAccountId(this->id);
 
     Money balance = 0.00;
 
@@ -282,14 +282,15 @@ Money DBAccount::calculateReconciledBalance() {
     ** as it includes the account's opening balance. Otherwise, just use
     ** the account's opening balance.
     */
-    if (numCORecords) {
-        balance = co.balance;
+    if (cos.size() > 0) {
+        DBCarriedOver latestCarriedOver = cos[0];
+        balance = latestCarriedOver.balance;
 
         log.debug(
                 "calculateReconciledBalance(): Including carried over '%s' | '%s' | '%s'", 
-                co.date.shortDate().c_str(), 
-                co.description.c_str(), 
-                co.balance.getFormattedStringValue().c_str());
+                latestCarriedOver.date.shortDate().c_str(), 
+                latestCarriedOver.description.c_str(), 
+                latestCarriedOver.balance.getFormattedStringValue().c_str());
     }
     else {
         balance = openingBalance;
@@ -302,8 +303,8 @@ Money DBAccount::calculateReconciledBalance() {
         DBTransactionView tr;
         DBResult<DBTransactionView> transactionResult = tr.retrieveReconciledByAccountIDForPeriod(this->id, periodStartDate, dateToday);
 
-        for (int i = 0;i < transactionResult.getNumRows();i++) {
-            DBTransaction transaction = transactionResult.getResultAt(i);
+        for (int i = 0;i < transactionResult.size();i++) {
+            DBTransaction transaction = transactionResult.at(i);
 
             log.debug(
                     "calculateReconciledBalance(): Including transaction '%s' | '%s' | '%s'", 
@@ -362,8 +363,8 @@ Money DBAccount::calculateBalanceAfterBills() {
         DBTransactionView tr;
         DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, periodStartDate, dateToday);
 
-        for (int i = 0;i < transactionResult.getNumRows();i++) {
-            DBTransaction transaction = transactionResult.getResultAt(i);
+        for (int i = 0;i < transactionResult.size();i++) {
+            DBTransaction transaction = transactionResult.at(i);
 
             log.debug(
                     "calculateBalanceAfterBills(): Including transaction '%s' | '%s' | '%s'", 
@@ -382,8 +383,8 @@ Money DBAccount::calculateBalanceAfterBills() {
             cout << "Identified charges due this period:" << endl;
         }
 
-        for (int i = 0;i < chargeResult.getNumRows();i++) {
-            DBRecurringCharge charge = chargeResult.getResultAt(i);
+        for (int i = 0;i < chargeResult.size();i++) {
+            DBRecurringCharge charge = chargeResult.at(i);
 
             if (charge.isChargeDueThisPeriod(dateToday)) {
                 log.debug(

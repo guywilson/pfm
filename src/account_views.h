@@ -83,7 +83,7 @@ class AccountListView : public CLIListView {
         void addResults(DBResult<DBAccount> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Accounts (%d)", result.getNumRows());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Accounts (%d)", result.size());
             setTitle(szTitle);
 
             CLIListRow headerRow;
@@ -108,8 +108,8 @@ class AccountListView : public CLIListView {
 
             addHeaderRow(headerRow);
 
-            for (int i = 0;i < result.getNumRows();i++) {
-                DBAccount account = result.getResultAt(i);
+            for (int i = 0;i < result.size();i++) {
+                DBAccount account = result.at(i);
 
                 CLIListRow row(headerRow);
 

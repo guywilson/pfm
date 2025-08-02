@@ -21,7 +21,7 @@ string DBPrimaryAccount::getPrimaryAccountCode() {
     int numPrimaryAccounts = primaryAccounts.retrieveAll();
 
     if (numPrimaryAccounts == 1) {
-        DBPrimaryAccount account = primaryAccounts.getResultAt(0);
+        DBPrimaryAccount account = primaryAccounts.at(0);
 
         return account.code;
     }
@@ -41,7 +41,7 @@ void DBPrimaryAccount::setPrimaryAccount(string & accountCode) {
     int numPrimaryAccounts = primaryAccounts.retrieveAll();
 
     if (numPrimaryAccounts == 1) {
-        DBPrimaryAccount account = primaryAccounts.getResultAt(0);
+        DBPrimaryAccount account = primaryAccounts.at(0);
 
         account.code = accountCode;
         account.save();

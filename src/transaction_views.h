@@ -193,8 +193,8 @@ class TransactionListView : public CLIListView {
 
             addHeaderRow(headerRow);
 
-            for (int i = 0;i < result.getNumRows();i++) {
-                DBTransactionView transaction = result.getResultAt(i);
+            for (int i = 0;i < result.size();i++) {
+                DBTransactionView transaction = result.at(i);
 
                 CLIListRow row(headerRow);
 
@@ -227,7 +227,7 @@ class TransactionListView : public CLIListView {
         void addResults(DBResult<DBTransactionView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions list (%d)", result.getNumRows());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions list (%d)", result.size());
             setTitle(szTitle);
 
             showResultsTable(result);
@@ -236,7 +236,7 @@ class TransactionListView : public CLIListView {
         void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%d)", accountCode.c_str(), result.getNumRows());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%d)", accountCode.c_str(), result.size());
             setTitle(szTitle);
 
             showResultsTable(result);

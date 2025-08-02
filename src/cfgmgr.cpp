@@ -34,8 +34,8 @@ void cfgmgr::initialise() {
     DBResult<DBConfig> results;
     results.retrieveAll();
 
-    for (int i = 0;i < results.getNumRows();i++) {
-        DBConfig item = results.getResultAt(i);
+    for (int i = 0;i < results.size();i++) {
+        DBConfig item = results.at(i);
 
         string key = item.key;
         string value = item.value;

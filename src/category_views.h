@@ -72,7 +72,7 @@ class CategoryListView : public CLIListView {
         void addResults(DBResult<DBCategory> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Categories (%d)", result.getNumRows());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Categories (%d)", result.size());
             setTitle(szTitle);
 
             CLIListRow headerRow;
@@ -85,8 +85,8 @@ class CategoryListView : public CLIListView {
 
             addHeaderRow(headerRow);
 
-            for (int i = 0;i < result.getNumRows();i++) {
-                DBCategory category = result.getResultAt(i);
+            for (int i = 0;i < result.size();i++) {
+                DBCategory category = result.at(i);
 
                 CLIListRow row(headerRow);
 

@@ -28,8 +28,8 @@ class CategorySpinField : public CLISpinTextField {
             DBResult<DBCategory> result;
             result.retrieveAll();
 
-            for (int i = 0;i < result.getNumRows();i++) {
-                DBCategory category = result.getResultAt(i);
+            for (int i = 0;i < result.size();i++) {
+                DBCategory category = result.at(i);
                 addItem(category.code);
             }
 
@@ -72,8 +72,8 @@ class PayeeSpinField : public CLISpinTextField {
             DBResult<DBPayee> result;
             result.retrieveAll();
 
-            for (int i = 0;i < result.getNumRows();i++) {
-                DBPayee payee = result.getResultAt(i);
+            for (int i = 0;i < result.size();i++) {
+                DBPayee payee = result.at(i);
                 addItem(payee.code);
             }
 
@@ -116,8 +116,8 @@ class AccountSpinField : public CLISpinTextField {
             DBResult<DBAccount> result;
             result.retrieveAll();
 
-            for (int i = 0;i < result.getNumRows();i++) {
-                DBAccount account = result.getResultAt(i);
+            for (int i = 0;i < result.size();i++) {
+                DBAccount account = result.at(i);
                 addItem(account.code);
             }
 

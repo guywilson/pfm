@@ -32,5 +32,5 @@ void DBCurrency::retrieveByCode(string & code) {
                 __LINE__);
     }
 
-    set(result.getResultAt(0));
+    set(result.at(0));
 }

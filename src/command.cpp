@@ -240,8 +240,8 @@ void Command::exportAccounts(string & jsonFileName) {
 
     vector<JRecord> records;
 
-    for (int i = 0;i < results.getNumRows();i++) {
-        DBAccount account = results.getResultAt(i);
+    for (int i = 0;i < results.size();i++) {
+        DBAccount account = results.at(i);
 
         JRecord r = account.getRecord();
         records.push_back(r);
@@ -316,8 +316,8 @@ void Command::exportCategories(string & jsonFileName) {
 
     vector<JRecord> records;
 
-    for (int i = 0;i < results.getNumRows();i++) {
-        DBCategory category = results.getResultAt(i);
+    for (int i = 0;i < results.size();i++) {
+        DBCategory category = results.at(i);
 
         JRecord r = category.getRecord();
         records.push_back(r);
@@ -397,8 +397,8 @@ void Command::exportPayees(string & jsonFileName) {
 
     vector<JRecord> records;
 
-    for (int i = 0;i < results.getNumRows();i++) {
-        DBPayee payee = results.getResultAt(i);
+    for (int i = 0;i < results.size();i++) {
+        DBPayee payee = results.at(i);
 
         JRecord r = payee.getRecord();
         records.push_back(r);
@@ -432,8 +432,8 @@ void Command::listRecurringCharges() {
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
-    for (int i = 0;i < result.getNumRows();i++) {
-        DBRecurringCharge charge = result.getResultAt(i);
+    for (int i = 0;i < result.size();i++) {
+        DBRecurringCharge charge = result.at(i);
         cacheMgr.addRecurringCharge(charge.sequence, charge);
     }
 }
@@ -509,8 +509,8 @@ void Command::exportRecurringCharges(string & jsonFileName) {
 
     vector<JRecord> records;
 
-    for (int i = 0;i < results.getNumRows();i++) {
-        DBRecurringCharge charge = results.getResultAt(i);
+    for (int i = 0;i < results.size();i++) {
+        DBRecurringCharge charge = results.at(i);
 
         JRecord r = charge.getRecord();
         records.push_back(r);
@@ -619,8 +619,8 @@ void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool 
 
     cacheMgr.clearTransactions();
 
-    for (int i = 0;i < result.getNumRows();i++) {
-        DBTransactionView transaction = result.getResultAt(i);
+    for (int i = 0;i < result.size();i++) {
+        DBTransactionView transaction = result.at(i);
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }
 }
@@ -685,8 +685,8 @@ void Command::findTransactions(const string & criteria) {
 
     cacheMgr.clearTransactions();
     
-    for (int i = 0;i < result.getNumRows();i++) {
-        DBTransactionView transaction = result.getResultAt(i);
+    for (int i = 0;i < result.size();i++) {
+        DBTransactionView transaction = result.at(i);
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }
 }
@@ -751,8 +751,8 @@ void Command::exportTransactions(string & jsonFileName) {
 
     vector<JRecord> records;
 
-    for (int i = 0;i < results.getNumRows();i++) {
-        DBTransaction transaction = results.getResultAt(i);
+    for (int i = 0;i < results.size();i++) {
+        DBTransaction transaction = results.at(i);
 
         JRecord r = transaction.getRecord();
         records.push_back(r);
@@ -770,8 +770,8 @@ void Command::exportTransactionsAsCSV(string & csvFileName) {
 
     out << DBTransaction::getCSVHeader();
 
-    for (int i = 0;i < results.getNumRows();i++) {
-        DBTransaction transaction = results.getResultAt(i);
+    for (int i = 0;i < results.size();i++) {
+        DBTransaction transaction = results.at(i);
 
         string record = transaction.getCSVRecord();
         out << record;
@@ -798,8 +798,8 @@ void Command::listBudgets() {
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
-    for (int i = 0;i < result.getNumRows();i++) {
-        DBBudget budget = result.getResultAt(i);
+    for (int i = 0;i < result.size();i++) {
+        DBBudget budget = result.at(i);
         cacheMgr.addBudget(budget.sequence, budget);
     }
 }
@@ -857,8 +857,8 @@ void Command::exportBudgets(string & jsonFileName) {
 
     vector<JRecord> records;
 
-    for (int i = 0;i < results.getNumRows();i++) {
-        DBBudget budget = results.getResultAt(i);
+    for (int i = 0;i < results.size();i++) {
+        DBBudget budget = results.at(i);
 
         JRecord r = budget.getRecord();
         records.push_back(r);

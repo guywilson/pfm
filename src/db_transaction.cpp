@@ -80,19 +80,19 @@ DBResult<DBTransaction> DBTransaction::retrieveByRecurringChargeID(pfm_id_t recu
 int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
     DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectLatestByChargeID, chargeId);
 
-    if (result.getNumRows() == 1) {
-        set(result.getResultAt(0));
+    if (result.size() == 1) {
+        set(result.at(0));
     }
-    else if (result.getNumRows() > 1) {
+    else if (result.size() > 1) {
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Expected no more than 1 row, got %d", 
-                    result.getNumRows()), 
+                    result.size()), 
                 __FILE__, 
                 __LINE__);
     }
 
-    return result.getNumRows();
+    return result.size();
 }
 
 DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(pfm_id_t accountId, string & criteria) {
@@ -245,8 +245,8 @@ void DBTransaction::afterInsert() {
     DBCarriedOver co;
     DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
 
-    for (int i = 0;i < coResult.getNumRows();i++) {
-        DBCarriedOver carriedOver = coResult.getResultAt(i);
+    for (int i = 0;i < coResult.size();i++) {
+        DBCarriedOver carriedOver = coResult.at(i);
 
         carriedOver.balance += getSignedAmount();
         carriedOver.save();
@@ -255,8 +255,8 @@ void DBTransaction::afterInsert() {
     DBBudget budget;
     DBResult<DBBudget> budgetResult = budget.retrieveByCategoryOrPayeeCode(category.code, payee.code);
 
-    for (int i = 0;i < budgetResult.getNumRows();i++) {
-        DBBudget b = budgetResult.getResultAt(i);
+    for (int i = 0;i < budgetResult.size();i++) {
+        DBBudget b = budgetResult.at(i);
 
         b.createOutstandingTrackingRecords();
 
@@ -285,8 +285,8 @@ void DBTransaction::beforeUpdate() {
         DBCarriedOver co;
         DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
 
-        for (int i = 0;i < coResult.getNumRows();i++) {
-            DBCarriedOver carriedOver = coResult.getResultAt(i);
+        for (int i = 0;i < coResult.size();i++) {
+            DBCarriedOver carriedOver = coResult.at(i);
 
             log.debug("Updating CO with date '%s'", carriedOver.date.shortDate().c_str());
 
@@ -298,14 +298,14 @@ void DBTransaction::beforeUpdate() {
         DBBudget bu;
         DBResult<DBBudget> buResult = bu.retrieveByCategoryOrPayeeCode(this->category.code, this->payee.code);
 
-        for (int i = 0;i < buResult.getNumRows();i++) {
-            DBBudget b = buResult.getResultAt(i);
+        for (int i = 0;i < buResult.size();i++) {
+            DBBudget b = buResult.at(i);
 
             DBBudgetTrack trk;
             DBResult<DBBudgetTrack> trkResult = trk.retrieveByBudgetIdAfterDate(b.id, this->date);
 
-            for (int j = 0;j < trkResult.getNumRows();j++) {
-                DBBudgetTrack t = trkResult.getResultAt(j);
+            for (int j = 0;j < trkResult.size();j++) {
+                DBBudgetTrack t = trkResult.at(j);
 
                 t.balance -= transaction.getSignedAmount();
                 t.balance += this->getSignedAmount();
@@ -325,8 +325,8 @@ void DBTransaction::afterRemove() {
     DBCarriedOver co;
     DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
 
-    for (int i = 0;i < coResult.getNumRows();i++) {
-        DBCarriedOver carriedOver = coResult.getResultAt(i);
+    for (int i = 0;i < coResult.size();i++) {
+        DBCarriedOver carriedOver = coResult.at(i);
 
         carriedOver.balance -= getSignedAmount();
         carriedOver.save();
@@ -335,14 +335,14 @@ void DBTransaction::afterRemove() {
     DBBudget bu;
     DBResult<DBBudget> buResult = bu.retrieveByCategoryOrPayeeCode(this->category.code, this->payee.code);
 
-    for (int i = 0;i < buResult.getNumRows();i++) {
-        DBBudget b = buResult.getResultAt(i);
+    for (int i = 0;i < buResult.size();i++) {
+        DBBudget b = buResult.at(i);
 
         DBBudgetTrack trk;
         DBResult<DBBudgetTrack> trkResult = trk.retrieveByBudgetIdAfterDate(b.id, this->date);
 
-        for (int j = 0;j < trkResult.getNumRows();j++) {
-            DBBudgetTrack t = trkResult.getResultAt(j);
+        for (int j = 0;j < trkResult.size();j++) {
+            DBBudgetTrack t = trkResult.at(j);
 
             t.balance -= this->getSignedAmount();
             t.save();
