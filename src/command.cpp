@@ -899,7 +899,7 @@ void Command::getDBKey() {
     string accessKey = db.getKey("Access password: ");
 
     if (accessKey.compare(cfg.getValue("access.key")) == 0) {
-        string dbKey = db.getKey("Password: ");
+        string dbKey = db.getKey("Database password: ");
         cout << "Key: " << dbKey << endl;
     }
     else {
