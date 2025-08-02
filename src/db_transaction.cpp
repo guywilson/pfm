@@ -185,18 +185,18 @@ void DBTransaction::reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDa
 
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
-    StrDate now;
+    string now = StrDate::getTimestamp();
 
     log.debug(
         "Reconciling all transactions before '%s' for account ID %lld", 
-        now.shortDate().c_str(), 
+        referenceDate.shortDate().c_str(), 
         accountId);
-        
+
     snprintf(
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlReconcileByAccountIDBeforeDate, 
-        now.shortDate().c_str(),
+        now.c_str(),
         accountId,
         referenceDate.shortDate().c_str());
 

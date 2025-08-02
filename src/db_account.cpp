@@ -294,7 +294,7 @@ Money DBAccount::calculateReconciledBalance() {
         balance = referenceCO.balance;
 
         periodStartDate = referenceCO.date;
-        periodStartDate.addDays(1);
+        periodStartDate = periodStartDate.addDays(1);
 
         DBTransaction transaction;
         transaction.reconcileAllForAccountIDBeforeDate(this->id, referenceCO.date);
