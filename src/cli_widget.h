@@ -7,6 +7,7 @@
 #include <readline/history.h>
 
 #include "money.h"
+#include "cfgmgr.h"
 #include "pfm_error.h"
 #include "rlcustom.h"
 

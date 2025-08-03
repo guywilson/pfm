@@ -9,6 +9,7 @@
 #include "db_recurring_charge.h"
 #include "db_v_recurring_charge.h"
 #include "money.h"
+#include "cfgmgr.h"
 
 using namespace std;
 

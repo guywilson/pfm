@@ -8,6 +8,7 @@
 #include <stdint.h>
 
 #include "logger.h"
+#include "cfgmgr.h"
 #include "money.h"
 
 using namespace std;
@@ -193,7 +194,11 @@ string Money::rawStringValue(string & currencySymbol) const {
     return currencySymbol + rawStringValue();
 }
 
-string Money::localeFormattedStringValue() const {    
+string Money::localeFormattedStringValue() const {
+    return localeFormattedStringValue(cfg.getValue(CONFIG_LOCALE_KEY));
+}
+
+string Money::localeFormattedStringValue(const string & localeString) const {    
     char buffer[AMOUNT_BUFFER_LENGTH];
     snprintf(buffer, AMOUNT_BUFFER_LENGTH, "%d", this->representedValue);
 
@@ -201,7 +206,7 @@ string Money::localeFormattedStringValue() const {
 
     stringstream s;
 
-    s.imbue(locale(""));
+    s.imbue(locale(localeString));
     s << showbase << put_money(raw);
 
     return s.str();

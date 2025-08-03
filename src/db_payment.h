@@ -14,6 +14,7 @@
 #include "strdate.h"
 #include "jfile.h"
 #include "money.h"
+#include "cfgmgr.h"
 
 using namespace std;
 

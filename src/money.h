@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "logger.h"
+#include "cfgmgr.h"
 #include "pfm_error.h"
 
 using namespace std;
@@ -12,6 +13,8 @@ using namespace std;
 
 #define DECIMAL_POINT_NOT_FOUND_VALUE               -1
 #define AMOUNT_BUFFER_LENGTH                        64
+
+#define CONFIG_LOCALE_KEY                           "money.locale"
 
 typedef int32_t money_t;
 
@@ -25,6 +28,7 @@ class Money {
         money_t representedValue;
 
         Logger & log = Logger::getInstance();
+        cfgmgr & cfg = cfgmgr::getInstance();
         
         int findDecimalPointPos(const char * amount);
         void copyToDecimalPoint(char * targetBuffer, const char * amount, int targetBufferLen);
@@ -55,6 +59,7 @@ class Money {
         string rawStringValue() const;
         string rawStringValue(string & currencySymbol) const;
         string localeFormattedStringValue() const;
+        string localeFormattedStringValue(const string & localeString) const;
 
         Money & operator=(const Money & rhs);
         Money & operator=(const string & rhs);

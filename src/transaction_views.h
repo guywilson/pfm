@@ -8,6 +8,7 @@
 #include "custom_widgets.h"
 #include "db_transaction.h"
 #include "db_v_transaction.h"
+#include "cfgmgr.h"
 
 using namespace std;
 

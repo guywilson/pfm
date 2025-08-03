@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "logger.h"
+#include "cfgmgr.h"
 #include "db_account.h"
 #include "db_category.h"
 #include "db_payee.h"
@@ -25,6 +26,7 @@ class Command {
         DBAccount selectedAccount;
 
         Logger & log = Logger::getInstance();
+        cfgmgr & cfg = cfgmgr::getInstance();
 
         void parse(const string & command);
         

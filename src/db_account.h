@@ -10,6 +10,7 @@
 #include "db.h"
 #include "strdate.h"
 #include "money.h"
+#include "cfgmgr.h"
 
 using namespace std;
 
