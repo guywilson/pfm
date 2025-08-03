@@ -13,11 +13,7 @@
 
 using namespace std;
 
-void DBConfig::retrieveByKey(string & key) {
-    retrieveByKey(key.c_str());
-}
-
-void DBConfig::retrieveByKey(const char * key) {
+void DBConfig::retrieveByKey(const string & key) {
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBConfig> result;
 
@@ -25,7 +21,7 @@ void DBConfig::retrieveByKey(const char * key) {
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByKey, 
-        key);
+        key.c_str());
 
     int rowsRetrievedCount = result.retrieve(szStatement);
 

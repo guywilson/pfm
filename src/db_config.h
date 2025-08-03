@@ -115,8 +115,7 @@ class DBConfig : public DBEntity {
             return szStatement;
         }
 
-        void retrieveByKey(string & key);
-        void retrieveByKey(const char * key);
+        void retrieveByKey(const string & key);
 };
 
 #endif
