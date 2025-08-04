@@ -34,3 +34,11 @@ void DBConfig::retrieveByKey(const string & key) {
 
     set(result.at(0));
 }
+
+DBResult<DBConfig> DBConfig::retrieveAllVisible() {
+    DBResult<DBConfig> result;
+
+    result.retrieve(sqlSelectVisible);
+
+    return result;
+}

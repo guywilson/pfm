@@ -16,10 +16,13 @@ using namespace std;
 class DBConfig : public DBEntity {
     private:
         const char * sqlSelectByKey = 
-                        "SELECT id, key, value, description, is_read_only, created, updated FROM config where key = '%s';";
+                        "SELECT id, key, value, description, is_read_only, created, updated FROM config where key = '%s' AND is_visible = 'Y';";
+
+        const char * sqlSelectVisible = 
+                        "SELECT id, key, value, description, is_read_only, is_visible, created, updated FROM config where is_visible = 'Y';";
 
         const char * sqlInsert = 
-                        "INSERT INTO config (key, value, description, is_read_only, created, updated) VALUES ('%s', '%s', '%s', 'N', '%s', '%s');";
+                        "INSERT INTO config (key, value, description, is_read_only, is_visible, created, updated) VALUES ('%s', '%s', '%s', 'N', 'Y', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE config SET key = '%s', value = '%s', description = '%s', updated = '%s' WHERE id = %lld;";
@@ -29,6 +32,7 @@ class DBConfig : public DBEntity {
         string                  value;
         string                  description;
         bool                    isReadOnly;
+        bool                    isVisible;
 
         DBConfig() : DBEntity() {
             clear();
@@ -41,6 +45,7 @@ class DBConfig : public DBEntity {
             this->value = "";
             this->description = "";
             this->isReadOnly = false;
+            this->isVisible = true;
         }
 
         void set(const DBConfig & src) {
@@ -50,6 +55,7 @@ class DBConfig : public DBEntity {
             this->value.assign(src.value);
             this->description.assign(src.description);
             this->isReadOnly = src.isReadOnly;
+            this->isVisible = src.isVisible;
         }
 
         void print() {
@@ -74,6 +80,9 @@ class DBConfig : public DBEntity {
             }
             else if (column.getName() == "is_read_only") {
                 isReadOnly = column.getBoolValue();
+            }
+            else if (column.getName() == "is_visible") {
+                isVisible = column.getBoolValue();
             }
         }
 
@@ -122,6 +131,7 @@ class DBConfig : public DBEntity {
         }
 
         void retrieveByKey(const string & key);
+        DBResult<DBConfig> retrieveAllVisible();
 };
 
 #endif

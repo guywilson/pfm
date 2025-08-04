@@ -81,16 +81,16 @@ class ConfigListView : public CLIListView {
 
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Key", 20, CLIListColumn::leftAligned);
+            CLIListColumn column1 = CLIListColumn("Key", 17, CLIListColumn::leftAligned);
             headerRow.addColumn(column1);
 
             CLIListColumn column2 = CLIListColumn("Value", 25, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
-            CLIListColumn column3 = CLIListColumn("Description", 40, CLIListColumn::leftAligned);
+            CLIListColumn column3 = CLIListColumn("Description", 55, CLIListColumn::leftAligned);
             headerRow.addColumn(column3);
 
-            CLIListColumn column4 = CLIListColumn("RO", 2, CLIListColumn::leftAligned);
+            CLIListColumn column4 = CLIListColumn("R/W", 3, CLIListColumn::leftAligned);
             headerRow.addColumn(column4);
 
             addHeaderRow(headerRow);

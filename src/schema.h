@@ -46,10 +46,12 @@ const char * defaultCategories[][2] = {
 /*
 ** Each row specifies: key, value, description, is_read_only
 */
-const char * defaultConfig[][4] = {
-    {"cycle.start", "1", "The day each monthly cycle starts on", "Y"},
-    {"cycle.end", "last-working-day", "The day each monthly cycle ends on", "N"},
-    {"limits.row", "50", "The row limit when retrieving records", "N"}
+const char * defaultConfig[][5] = {
+    {"cycle.start", "1", "The day each monthly cycle starts on", "Y", "Y"},
+    {"cycle.end", "last-working-day", "The day each monthly cycle ends on", "N", "Y"},
+    {"limits.row", "50", "The row limit when retrieving records", "N", "Y"},
+    {"money.locale", "", "Locale used for money fields", "N", "Y"},
+    {"access.key", "B3FCBAE4F9EEB0D8C41BF5EB1CD1B990B8D8F266B8DD02F94A63DA8BD609F539", "The access key", "Y", "N"}
 };
 
 /*
@@ -243,6 +245,7 @@ const char * pszCreateConfigTable =
     "value TEXT NOT NULL," \
     "description TEXT NULL," \
     "is_read_only TEXT NOT NULL DEFAULT 'N'," \
+    "is_visible TEXT NOT NULL DEFAULT 'Y'," \
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
     "UNIQUE(key) ON CONFLICT ROLLBACK);";

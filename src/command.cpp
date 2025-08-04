@@ -233,17 +233,26 @@ void Command::exportAccounts(string & jsonFileName) {
 }
 
 void Command::addConfig() {
-    AddConfigView view;
-    view.show();
+    PFM_DB & db = PFM_DB::getInstance();
 
-    DBConfig config = view.getConfig();
+    string accessKey = db.getKey("Access password: ");
 
-    config.save();
+    if (accessKey.compare(cfg.getValue("access.key")) == 0) {
+        AddConfigView view;
+        view.show();
+
+        DBConfig config = view.getConfig();
+
+        config.save();
+    }
+    else {
+        cout << "Invalid access password supplied" << endl << endl;
+    }
 }
 
 void Command::listConfigItems() {
-    DBResult<DBConfig> result;
-    result.retrieveAll();
+    DBConfig config;
+    DBResult<DBConfig> result = config.retrieveAllVisible();
 
     ConfigListView view;
     view.addResults(result);
@@ -281,15 +290,24 @@ void Command::updateConfig(DBConfig & config) {
 }
 
 void Command::deleteConfig(DBConfig & config) {
-    if (config.isReadOnly) {
-        throw pfm_validation_error(
-            pfm_error::buildMsg(
-                "Selected config item '%s' is read-only and cannot be modified", 
-                config.key.c_str()));
+    PFM_DB & db = PFM_DB::getInstance();
+
+    string accessKey = db.getKey("Access password: ");
+
+    if (accessKey.compare(cfg.getValue("access.key")) == 0) {
+        if (config.isReadOnly) {
+            throw pfm_validation_error(
+                pfm_error::buildMsg(
+                    "Selected config item '%s' is read-only and cannot be modified", 
+                    config.key.c_str()));
+        }
+        
+        config.remove();
+        config.clear();
     }
-    
-    config.remove();
-    config.clear();
+    else {
+        cout << "Invalid access password supplied" << endl << endl;
+    }
 }
 
 void Command::addCategory() {
@@ -838,7 +856,6 @@ void Command::changePassword() {
 
 void Command::getDBKey() {
     PFM_DB & db = PFM_DB::getInstance();
-    cfgmgr & cfg = cfgmgr::getInstance();
 
     string accessKey = db.getKey("Access password: ");
 
