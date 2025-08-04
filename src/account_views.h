@@ -94,13 +94,13 @@ class AccountListView : public CLIListView {
             CLIListColumn column2 = CLIListColumn("Name", 25, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
-            CLIListColumn column3 = CLIListColumn("Balance", 11, CLIListColumn::rightAligned);
+            CLIListColumn column3 = CLIListColumn("Balance", 14, CLIListColumn::rightAligned);
             headerRow.addColumn(column3);
 
-            CLIListColumn column4 = CLIListColumn("Reconciled", 11, CLIListColumn::rightAligned);
+            CLIListColumn column4 = CLIListColumn("Reconciled", 14, CLIListColumn::rightAligned);
             headerRow.addColumn(column4);
 
-            CLIListColumn column5 = CLIListColumn("After Bills", 11, CLIListColumn::rightAligned);
+            CLIListColumn column5 = CLIListColumn("After Bills", 14, CLIListColumn::rightAligned);
             headerRow.addColumn(column5);
 
             CLIListColumn column6 = CLIListColumn("Primary", 7, CLIListColumn::leftAligned);

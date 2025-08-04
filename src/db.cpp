@@ -557,7 +557,7 @@ void PFM_DB::createDefaultConfig() {
     log.entry("PFM_DB::createDefaultConfig()");
 
     const char * insertStatement = 
-        "INSERT INTO config (key, value, description, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s')";
+        "INSERT INTO config (key, value, description, is_read_only, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')";
 
     char statement[SQL_STATEMENT_BUFFER_LEN];
 
@@ -574,6 +574,7 @@ void PFM_DB::createDefaultConfig() {
                 defaultConfig[i][0], 
                 defaultConfig[i][1], 
                 defaultConfig[i][2], 
+                defaultConfig[i][3], 
                 now.c_str(), 
                 now.c_str());
 

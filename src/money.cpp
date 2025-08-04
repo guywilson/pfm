@@ -3,6 +3,8 @@
 #include <sstream>
 #include <locale>
 #include <iomanip>
+#include <exception>
+
 #include <string.h>
 #include <math.h>
 #include <stdint.h>
@@ -206,8 +208,19 @@ string Money::localeFormattedStringValue(const string & localeString) const {
 
     stringstream s;
 
-    s.imbue(locale(localeString));
-    s << showbase << put_money(raw);
+    try {
+        s.imbue(locale(localeString));
+        s << showbase << put_money(raw);
+    }
+    catch (exception & e) {
+        log.error(
+            "Money::localeFormattedStringValue(): Failed to apply locale '%s', reverting to default system locale", 
+            localeString.c_str());
+
+        s.clear();
+        s.imbue(locale(""));
+        s << showbase << put_money(raw);
+    }
 
     return s.str();
 }

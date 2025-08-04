@@ -232,6 +232,66 @@ void Command::exportAccounts(string & jsonFileName) {
     jFile.write(records, "accounts");
 }
 
+void Command::addConfig() {
+    AddConfigView view;
+    view.show();
+
+    DBConfig config = view.getConfig();
+
+    config.save();
+}
+
+void Command::listConfigItems() {
+    DBResult<DBConfig> result;
+    result.retrieveAll();
+
+    ConfigListView view;
+    view.addResults(result);
+    view.show();
+}
+
+DBConfig Command::getConfig(string & key) {
+    if (key.length() == 0) {
+        ChooseConfigView view;
+        view.show();
+
+        key = view.getKey();
+    }
+
+    DBConfig config;
+    config.retrieveByKey(key);
+
+    return config;
+}
+
+void Command::updateConfig(DBConfig & config) {
+    if (config.isReadOnly) {
+        throw pfm_validation_error(
+            pfm_error::buildMsg(
+                "Selected config item '%s' is read-only and cannot be modified", 
+                config.key.c_str()));
+    }
+
+    UpdateConfigView view;
+    view.setConfig(config);
+    view.show();
+
+    DBConfig updatedConfig = view.getConfig();
+    updatedConfig.save();
+}
+
+void Command::deleteConfig(DBConfig & config) {
+    if (config.isReadOnly) {
+        throw pfm_validation_error(
+            pfm_error::buildMsg(
+                "Selected config item '%s' is read-only and cannot be modified", 
+                config.key.c_str()));
+    }
+    
+    config.remove();
+    config.clear();
+}
+
 void Command::addCategory() {
     AddCategoryView view;
     view.show();
@@ -978,6 +1038,24 @@ bool Command::process(const string & command) {
     else if (isCommand("export-accounts") || isCommand("xa")) {
         string filename = getParameter(0);
         exportAccounts(filename);
+    }
+    else if (isCommand("add-config-item") || isCommand("acfg")) {
+        addConfig();
+    }
+    else if (isCommand("list-config-items") || isCommand("lcfg")) {
+        listConfigItems();
+    }
+    else if (isCommand("update-config-item") || isCommand("ucfg")) {
+        string configKey = getParameter(0);
+        DBConfig config = getConfig(configKey);
+
+        updateConfig(config);
+    }
+    else if (isCommand("delete-config-item") || isCommand("dcfg")) {
+        string configKey = getParameter(0);
+        DBConfig config = getConfig(configKey);
+
+        deleteConfig(config);
     }
     else if (isCommand("add-category") || isCommand("ac")) {
         addCategory();

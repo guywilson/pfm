@@ -4,3 +4,4 @@
 #include "recurring_charge_views.h"
 #include "transaction_views.h"
 #include "debug_views.h"
+#include "config_views.h"

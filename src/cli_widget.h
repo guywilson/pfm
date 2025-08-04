@@ -45,14 +45,15 @@ std::ostream& bold_off(std::ostream& os) {
 }
 #endif
 
-static bool containsMultiByteChar(const string & str) {
+static int countMultiByteChars(const string & str) {
+    int i = 0;
     for (unsigned char c : str) {
         if (c & 0x80) {
-            return true;
+            i++;
         }
     }
 
-    return false;
+    return i;
 }
 
 class CLIWidget {
@@ -471,13 +472,24 @@ class CLIListColumn : public CLIField {
             cout << " | ";
         }
 
-        void printCell(string value) {
+        void printCell(string & value) {
             int width = getWidth();
             string v = value;
 
-            if (value[0] == '#') {
-                width++;
-                v = v.substr(1);
+            /*
+            ** Handle 2-byte characters, e.g. currency symbols,
+            ** width is adjusted here for such strings.
+            ** Changes specified in P2675 should fix this:
+            ** https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p2675r1.pdf
+            */
+            int numMultiByteChars = countMultiByteChars(value);
+
+            if (numMultiByteChars > 0) {
+                if (numMultiByteChars >= 2) {
+                    numMultiByteChars--;
+                }
+
+                width += numMultiByteChars;
             }
 
             if (width < (int)v.length()) {
@@ -591,22 +603,7 @@ class CLIListRow : public CLIWidget {
         }
 
         void addCellValue(Money & val) {
-            /*
-            ** Handle 2-byte characters, e.g. currency symbols,
-            ** width is adjusted in printCell() for Money cells.
-            ** Changes specified in P2675 should fix this:
-            ** https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p2675r1.pdf
-            */
-            string moneyString = val.localeFormattedStringValue();
-            
-            string value;
-            if (containsMultiByteChar(moneyString)) {
-                value = "#" + moneyString;
-            }
-            else {
-                value = moneyString;
-            }
-
+            string value = val.localeFormattedStringValue();
             columnValues.push_back(value);
         }
 

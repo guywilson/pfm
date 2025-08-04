@@ -186,7 +186,7 @@ class TransactionListView : public CLIListView {
             CLIListColumn column8 = CLIListColumn("CD", 2, CLIListColumn::leftAligned);
             headerRow.addColumn(column8);
 
-            CLIListColumn column9 = CLIListColumn("Amount", 11, CLIListColumn::rightAligned);
+            CLIListColumn column9 = CLIListColumn("Amount", 14, CLIListColumn::rightAligned);
             headerRow.addColumn(column9);
 
             CLIListColumn column10 = CLIListColumn("R", 1, CLIListColumn::leftAligned);

@@ -5,6 +5,7 @@
 #include "logger.h"
 #include "cfgmgr.h"
 #include "db_account.h"
+#include "db_config.h"
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_v_transaction.h"
@@ -77,6 +78,12 @@ class Command {
         void showAccountBalances(DBAccount & account);
         void importAccounts(string & jsonFileName);
         void exportAccounts(string & jsonFileName);
+
+        void addConfig();
+        void listConfigItems();
+        DBConfig getConfig(string & key);
+        void updateConfig(DBConfig & config);
+        void deleteConfig(DBConfig & config);
 
         void addCategory();
         void listCategories();

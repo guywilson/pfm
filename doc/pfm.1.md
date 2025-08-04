@@ -41,6 +41,11 @@ The full list of ‘standard’ CRUD commands are as follows, commands outside o
 **update-account, ua**
 **delete-account, da**
 
+**add-config-item, acfg**
+**list-config-items, lcfg**
+**update-config-item, ucfg**
+**delete-config-item, dcfg**
+
 **add-category, ac**
 **list-categories, lc**
 **update-category, uc**

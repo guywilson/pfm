@@ -16,10 +16,10 @@ using namespace std;
 class DBConfig : public DBEntity {
     private:
         const char * sqlSelectByKey = 
-                        "SELECT id, key, value, description, created, updated FROM config where key = '%s';";
+                        "SELECT id, key, value, description, is_read_only, created, updated FROM config where key = '%s';";
 
         const char * sqlInsert = 
-                        "INSERT INTO config (key, value, description, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s');";
+                        "INSERT INTO config (key, value, description, is_read_only, created, updated) VALUES ('%s', '%s', '%s', 'N', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE config SET key = '%s', value = '%s', description = '%s', updated = '%s' WHERE id = %lld;";
@@ -28,6 +28,7 @@ class DBConfig : public DBEntity {
         string                  key;
         string                  value;
         string                  description;
+        bool                    isReadOnly;
 
         DBConfig() : DBEntity() {
             clear();
@@ -39,6 +40,7 @@ class DBConfig : public DBEntity {
             this->key = "";
             this->value = "";
             this->description = "";
+            this->isReadOnly = false;
         }
 
         void set(const DBConfig & src) {
@@ -47,6 +49,7 @@ class DBConfig : public DBEntity {
             this->key.assign(src.key);
             this->value.assign(src.value);
             this->description.assign(src.description);
+            this->isReadOnly = src.isReadOnly;
         }
 
         void print() {
@@ -68,6 +71,9 @@ class DBConfig : public DBEntity {
             }
             else if (column.getName() == "description") {
                 description = column.getValue();
+            }
+            else if (column.getName() == "is_read_only") {
+                isReadOnly = column.getBoolValue();
             }
         }
 
