@@ -157,7 +157,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
     char frequencyValue = this->getFrequencyValue();
     char frequencyUnit = this->getFrequencyUnit();
 
-    if (this->date <= periodEnd) {
+    if (this->date <= periodEnd && this->isActive()) {
         StrDate nextPaymentDate = this->date;
 
         switch (frequencyUnit) {
@@ -192,7 +192,6 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
 }
 
 StrDate DBRecurringCharge::calculateNextPaymentDate() {
-    StrDate     chargeStartDate(date);
     StrDate     dateToday;
     char        frequencyUnit;
     int         frequencyValue;
@@ -200,9 +199,11 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
     frequencyValue = getFrequencyValue();
     frequencyUnit = getFrequencyUnit();
 
-    StrDate nextPaymentDate = chargeStartDate;
+    StrDate nextPaymentDate;
 
-    if (chargeStartDate <= dateToday) {
+    if (this->date <= dateToday && this->isActive()) {
+        nextPaymentDate = this->date;
+
         switch (frequencyUnit) {
             case 'y':
                 nextPaymentDate = nextPaymentDate.addYears(frequencyValue * (dateToday.year() - nextPaymentDate.year()));
@@ -242,6 +243,9 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
                 break;
         }
     }
+    else if (!isActive()) {
+        nextPaymentDate.clear();
+    }
 
     return nextPaymentDate;
 }
@@ -252,37 +256,52 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
 
     StrDate nextPaymentDate = startDate;
 
-    /*
-    ** If the start date has been modified (as it fell on a weekend),
-    ** reset the nextPaymentDate here to what it should be...
-    */
-    if (startDate.day() != this->date.day()) {
-        nextPaymentDate.set(startDate.year(), startDate.month(), this->date.day());
+    if (isActive()) {
+        nextPaymentDate = startDate;
+    }
+    else {
+        nextPaymentDate.clear();
+        return nextPaymentDate;
     }
 
-    switch (frequencyUnit) {
-        case 'y':
-            nextPaymentDate = nextPaymentDate.addYears(frequencyValue);
-            break;
+    if (isActive()) {
+        nextPaymentDate = startDate;
 
-        case 'm':
-            nextPaymentDate = nextPaymentDate.addMonths(frequencyValue);
-            break;
+        /*
+        ** If the start date has been modified (as it fell on a weekend),
+        ** reset the nextPaymentDate here to what it should be...
+        */
+        if (startDate.day() != this->date.day()) {
+            nextPaymentDate.set(startDate.year(), startDate.month(), this->date.day());
+        }
 
-        case 'w':
-            nextPaymentDate = nextPaymentDate.addWeeks(frequencyValue);
-            break;
+        switch (frequencyUnit) {
+            case 'y':
+                nextPaymentDate = nextPaymentDate.addYears(frequencyValue);
+                break;
 
-        case 'd':
-            nextPaymentDate = nextPaymentDate.addDays(frequencyValue);
-            break;
+            case 'm':
+                nextPaymentDate = nextPaymentDate.addMonths(frequencyValue);
+                break;
+
+            case 'w':
+                nextPaymentDate = nextPaymentDate.addWeeks(frequencyValue);
+                break;
+
+            case 'd':
+                nextPaymentDate = nextPaymentDate.addDays(frequencyValue);
+                break;
+        }
+
+        if (nextPaymentDate.isSaturday()) {
+            nextPaymentDate = nextPaymentDate.addDays(2);
+        }
+        else if (nextPaymentDate.isSunday()) {
+            nextPaymentDate = nextPaymentDate.addDays(1);
+        }
     }
-
-    if (nextPaymentDate.isSaturday()) {
-        nextPaymentDate = nextPaymentDate.addDays(2);
-    }
-    else if (nextPaymentDate.isSunday()) {
-        nextPaymentDate = nextPaymentDate.addDays(1);
+    else {
+        nextPaymentDate.clear();
     }
     
     return nextPaymentDate;

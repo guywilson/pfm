@@ -23,6 +23,9 @@ using namespace std;
 #define CODE_FIELD_MAX_LENGTH                    5
 #define CRITERIA_FIELD_MAX_LEN                 256
 
+#define LIST_VIEW_AMOUNT_WIDTH                  14
+#define LIST_VIEW_TOTAL_AMOUNT_WIDTH            LIST_VIEW_AMOUNT_WIDTH + 1
+
 #define CLI_CANCEL_KEY                         'x'
 #define SINGLE_QUOTE_CHAR                       39
 
@@ -718,7 +721,7 @@ class CLIListView : public CLIView {
                 cout << ' ';
             }
 
-            cout << label << "| " << bold_on << right << setw(12) << total << bold_off << " |" << endl << endl;
+            cout << label << "| " << bold_on << right << setw(LIST_VIEW_TOTAL_AMOUNT_WIDTH) << total << bold_off << " |" << endl << endl;
         }
 
         void showNoExtraCR() {

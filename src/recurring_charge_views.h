@@ -122,7 +122,7 @@ class RecurringChargeListView : public CLIListView {
             CLIListColumn column7 = CLIListColumn("Frq", 4, CLIListColumn::leftAligned);
             headerRow.addColumn(column7);
 
-            CLIListColumn column8 = CLIListColumn("Amount", 14, CLIListColumn::rightAligned);
+            CLIListColumn column8 = CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
             headerRow.addColumn(column8);
 
             addHeaderRow(headerRow);
