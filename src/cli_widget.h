@@ -24,7 +24,6 @@ using namespace std;
 #define CRITERIA_FIELD_MAX_LEN                 256
 
 #define LIST_VIEW_AMOUNT_WIDTH                  14
-#define LIST_VIEW_TOTAL_AMOUNT_WIDTH            LIST_VIEW_AMOUNT_WIDTH + 1
 
 #define CLI_CANCEL_KEY                         'x'
 #define SINGLE_QUOTE_CHAR                       39
@@ -57,6 +56,27 @@ static int countMultiByteChars(const string & str) {
     }
 
     return i;
+}
+
+static int calculateFieldWidth(const string & amount, int baseWidth) {
+    /*
+    ** Handle 2-byte characters, e.g. currency symbols,
+    ** width is adjusted here for such strings.
+    ** Changes specified in P2675 should fix this:
+    ** https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p2675r1.pdf
+    */
+    int width = baseWidth;
+    int numMultiByteChars = countMultiByteChars(amount);
+
+    if (numMultiByteChars > 0) {
+        if (numMultiByteChars >= 2) {
+            numMultiByteChars--;
+        }
+
+        width += numMultiByteChars;
+    }
+
+    return width;
 }
 
 class CLIWidget {
@@ -479,21 +499,7 @@ class CLIListColumn : public CLIField {
             int width = getWidth();
             string v = value;
 
-            /*
-            ** Handle 2-byte characters, e.g. currency symbols,
-            ** width is adjusted here for such strings.
-            ** Changes specified in P2675 should fix this:
-            ** https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p2675r1.pdf
-            */
-            int numMultiByteChars = countMultiByteChars(value);
-
-            if (numMultiByteChars > 0) {
-                if (numMultiByteChars >= 2) {
-                    numMultiByteChars--;
-                }
-
-                width += numMultiByteChars;
-            }
+            width = calculateFieldWidth(value, width);
 
             if (width < (int)v.length()) {
                 v = v.substr(0, width - 3);
@@ -721,7 +727,9 @@ class CLIListView : public CLIView {
                 cout << ' ';
             }
 
-            cout << label << "| " << bold_on << right << setw(LIST_VIEW_TOTAL_AMOUNT_WIDTH) << total << bold_off << " |" << endl << endl;
+            int fieldWidth = calculateFieldWidth(total, LIST_VIEW_AMOUNT_WIDTH);
+
+            cout << label << "| " << bold_on << right << setw(fieldWidth) << total << bold_off << " |" << endl << endl;
         }
 
         void showNoExtraCR() {
