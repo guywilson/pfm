@@ -284,7 +284,17 @@ string PFM_DB::readKeyFile(const string & keyFileName) {
 
 	char * k = (char *)malloc(keyFileSize + 1);
 
-    fread(k, 1, keyFileSize, fptr);
+    int bytesRead = fread(k, 1, keyFileSize, fptr);
+
+    if (bytesRead < keyFileSize) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Read %d bytes from file '%s' but expected %d bytes", 
+                    bytesRead, 
+                    keyFileName.c_str(), 
+                    keyFileSize));
+    }
+
     fclose(fptr);
 
     string key(k);
@@ -305,8 +315,17 @@ void PFM_DB::saveKeyFile(const string & key) {
         throw pfm_error(pfm_error::buildMsg("Could not open key file '%s' for writing", keyFileName));
     }
 
-    write(fd, key.c_str(), key.length());
+    int bytesWritten = write(fd, key.c_str(), key.length());
     ::close(fd);
+
+    if (bytesWritten < key.length()) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Wrote %d bytes to file '%s' but expected to write %d bytes", 
+                    bytesWritten, 
+                    keyFileName, 
+                    key.length()));
+    }
 }    
 
 
