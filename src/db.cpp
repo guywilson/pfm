@@ -286,7 +286,7 @@ string PFM_DB::readKeyFile(const string & keyFileName) {
 
     int bytesRead = fread(k, 1, keyFileSize, fptr);
 
-    if (bytesRead < keyFileSize) {
+    if (bytesRead < (int)keyFileSize) {
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Read %d bytes from file '%s' but expected %d bytes", 
@@ -318,7 +318,7 @@ void PFM_DB::saveKeyFile(const string & key) {
     int bytesWritten = write(fd, key.c_str(), key.length());
     ::close(fd);
 
-    if (bytesWritten < key.length()) {
+    if (bytesWritten < (int)key.length()) {
         throw pfm_error(
                 pfm_error::buildMsg(
                     "Wrote %d bytes to file '%s' but expected to write %d bytes", 
