@@ -117,7 +117,8 @@ class PFM_DB {
         void createDB(const string & dbName);
         bool isNewFileRequired(int errorCode);
 
-        void applyDatabaseKey(const string & dbName);
+        void applyDatabaseKey(const string & dbName, const string & key);
+        string readKeyFile(const string & keyFileName);
 
         void _executeSQLNoCallback(const char * sql);
         void _executeSQLCallback(const char * sql, vector<DBRow> * rows);
@@ -140,6 +141,8 @@ class PFM_DB {
         void close();
 
         string getKey(const string & prompt);
+
+        void saveKeyFile(const string & key);
 
         void changePassword();
 

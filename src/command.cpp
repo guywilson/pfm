@@ -868,6 +868,20 @@ void Command::getDBKey() {
     }
 }
 
+void Command::saveDBKey() {
+    PFM_DB & db = PFM_DB::getInstance();
+
+    string accessKey = db.getKey("Access password: ");
+
+    if (accessKey.compare(cfg.getValue("access.key")) == 0) {
+        string dbKey = db.getKey("Database password: ");
+        db.saveKeyFile(dbKey);
+    }
+    else {
+        cout << "Invalid access password supplied" << endl << endl;
+    }
+}
+
 int Command::getLogLevelParameter(string & level) {
     int levelID = 0;
 
@@ -1262,6 +1276,9 @@ bool Command::process(const string & command) {
     }
     else if (isCommand("get-db-key")) {
         getDBKey();
+    }
+    else if (isCommand("save-db-key")) {
+        saveDBKey();
     }
     else {
         throw pfm_validation_error(

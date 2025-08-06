@@ -54,6 +54,9 @@
 #include <string>
 #include <vector>
 
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -71,6 +74,7 @@
 #include <gcrypt.h>
 
 #include "logger.h"
+#include "cfgmgr.h"
 #include "db.h"
 #include "strdate.h"
 #include "pfm_error.h"
@@ -81,6 +85,8 @@ using namespace std;
 #ifndef DEBUG_PASSWORD
 #define DEBUG_PASSWORD          ""
 #endif
+
+#define KEY_FILE_NAME           "./.pfm_key"
 
 static int __getch(void) {
 	int		ch;
@@ -245,12 +251,7 @@ void PFM_DB::createDB(const string & dbName) {
     }
 }
 
-void PFM_DB::applyDatabaseKey(const string & dbName) {
-#ifndef RUN_IN_DEBUGGER
-    string key = getKey("Enter database password: ");
-#else
-    string key = getKeyFromPassword(DEBUG_PASSWORD);
-#endif
+void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
     int keyError = sqlite3_key(this->dbHandle, key.c_str(), key.length());
 
     if (keyError != SQLITE_OK) {
@@ -271,6 +272,44 @@ void PFM_DB::applyDatabaseKey(const string & dbName) {
     }
 }
 
+string PFM_DB::readKeyFile(const string & keyFileName) {
+    FILE * fptr = fopen(keyFileName.c_str(), "rt");
+
+    if (fptr == NULL) {
+        log.error("Could not open key file '%s'", keyFileName.c_str());
+        throw pfm_error(pfm_error::buildMsg("Failed to open key file '%s'", keyFileName.c_str()));
+    }
+
+	uint32_t keyFileSize = gcry_md_get_algo_dlen(GCRY_MD_SHA3_256) * 2;
+
+	char * k = (char *)malloc(keyFileSize + 1);
+
+    fread(k, 1, keyFileSize, fptr);
+    fclose(fptr);
+
+    string key(k);
+
+    free(k);
+
+    return key;
+}
+
+void PFM_DB::saveKeyFile(const string & key) {
+    const char * keyFileName = KEY_FILE_NAME;
+
+    // Permissions: 0600 => rw------- (owner can read/write)
+    mode_t mode = S_IRUSR | S_IWUSR;
+
+    int fd = ::open(keyFileName, O_CREAT | O_WRONLY | O_TRUNC, mode);
+    if (fd == -1) {
+        throw pfm_error(pfm_error::buildMsg("Could not open key file '%s' for writing", keyFileName));
+    }
+
+    write(fd, key.c_str(), key.length());
+    ::close(fd);
+}    
+
+
 void PFM_DB::open(const string & dbName) {
     log.entry("PFM_DB::open()");
 
@@ -280,13 +319,27 @@ void PFM_DB::open(const string & dbName) {
         if (isNewFileRequired(error)) {
             createDB(dbName);
 
-            applyDatabaseKey(dbName);
+#ifndef RUN_IN_DEBUGGER
+            string key = getKey("Enter a password to encrypt the database: ");
+#else
+            string key = getKeyFromPassword(DEBUG_PASSWORD);
+#endif
+            applyDatabaseKey(dbName, key);
 
             cout << "Data file '" << dbName << "' does not exist, creating..." << endl;
             createSchema();
         }
         else {
-            applyDatabaseKey(dbName);
+            string key;
+            
+            try {
+                key = readKeyFile(KEY_FILE_NAME);
+            }
+            catch (pfm_error & e) {
+                key = getKey("Enter database password: ");
+            }
+
+            applyDatabaseKey(dbName, key);
         }
     }
     catch (pfm_fatal & f) {
