@@ -117,6 +117,8 @@ class PFM_DB {
         void createDB(const string & dbName);
         bool isNewFileRequired(int errorCode);
 
+        void encryptKey(const string & key, uint8_t * buffer, int bufferLength);
+        string decryptKey(uint8_t * buffer, int bufferLength);
         void applyDatabaseKey(const string & dbName, const string & key);
         string readKeyFile(const string & keyFileName);
 

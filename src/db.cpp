@@ -87,6 +87,7 @@ using namespace std;
 #endif
 
 #define KEY_FILE_NAME           "./.pfm_key"
+#define KEY_KEY                 "A3FD703B6EDA53752F9019EC9491ED63A1E58ECE0B9EA8B582E00C1AA47A85A6"
 
 static int __getch(void) {
 	int		ch;
@@ -251,6 +252,32 @@ void PFM_DB::createDB(const string & dbName) {
     }
 }
 
+void PFM_DB::encryptKey(const string & key, uint8_t * buffer, int bufferLength) {
+    string encryptionKey = KEY_KEY;
+
+    if (bufferLength < key.length()) {
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "PFM_DB::encryptKey() - supplied buffer is not long enough, it needs to be at least '%d' bytes long", 
+                (int)key.length()));
+    }
+
+    for (int i = 0;i < key.length();i++) {
+        buffer[i] = ((uint8_t)key[i] ^ (uint8_t)encryptionKey[i]);
+    }
+}
+
+string PFM_DB::decryptKey(uint8_t * buffer, int bufferLength) {
+    string encryptionKey = KEY_KEY;
+
+    string key;
+    for (int i = 0;i < encryptionKey.length();i++) {
+        key += (char)(buffer[i] ^ (uint8_t)encryptionKey[i]);
+    }
+
+    return key;
+}
+
 void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
     int keyError = sqlite3_key(this->dbHandle, key.c_str(), key.length());
 
@@ -273,7 +300,7 @@ void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
 }
 
 string PFM_DB::readKeyFile(const string & keyFileName) {
-    FILE * fptr = fopen(keyFileName.c_str(), "rt");
+    FILE * fptr = fopen(keyFileName.c_str(), "rb");
 
     if (fptr == NULL) {
         log.error("Could not open key file '%s'", keyFileName.c_str());
@@ -282,9 +309,13 @@ string PFM_DB::readKeyFile(const string & keyFileName) {
 
 	uint32_t keyFileSize = gcry_md_get_algo_dlen(GCRY_MD_SHA3_256) * 2;
 
-	char * k = (char *)malloc(keyFileSize + 1);
+    uint8_t * buffer = (uint8_t *)malloc(keyFileSize);
 
-    int bytesRead = fread(k, 1, keyFileSize, fptr);
+    int bytesRead = fread(buffer, 1, keyFileSize, fptr);
+    fclose(fptr);
+
+    string key = decryptKey(buffer, keyFileSize);
+    free(buffer);
 
     if (bytesRead < (int)keyFileSize) {
         throw pfm_error(
@@ -295,11 +326,6 @@ string PFM_DB::readKeyFile(const string & keyFileName) {
                     keyFileSize));
     }
 
-    fclose(fptr);
-
-    string key(k);
-
-    free(k);
 
     return key;
 }
@@ -315,7 +341,10 @@ void PFM_DB::saveKeyFile(const string & key) {
         throw pfm_error(pfm_error::buildMsg("Could not open key file '%s' for writing", keyFileName));
     }
 
-    int bytesWritten = write(fd, key.c_str(), key.length());
+    uint8_t * buffer = (uint8_t *)malloc(key.length());
+    encryptKey(key, buffer, key.length());
+
+    int bytesWritten = write(fd, buffer, key.length());
     ::close(fd);
 
     if (bytesWritten < (int)key.length()) {
