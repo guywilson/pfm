@@ -255,14 +255,14 @@ void PFM_DB::createDB(const string & dbName) {
 void PFM_DB::encryptKey(const string & key, uint8_t * buffer, int bufferLength) {
     string encryptionKey = KEY_KEY;
 
-    if (bufferLength < key.length()) {
+    if (bufferLength < (int)key.length()) {
         throw pfm_error(
             pfm_error::buildMsg(
                 "PFM_DB::encryptKey() - supplied buffer is not long enough, it needs to be at least '%d' bytes long", 
                 (int)key.length()));
     }
 
-    for (int i = 0;i < key.length();i++) {
+    for (int i = 0;i < (int)key.length();i++) {
         buffer[i] = ((uint8_t)key[i] ^ (uint8_t)encryptionKey[i]);
     }
 }
@@ -271,7 +271,7 @@ string PFM_DB::decryptKey(uint8_t * buffer, int bufferLength) {
     string encryptionKey = KEY_KEY;
 
     string key;
-    for (int i = 0;i < encryptionKey.length();i++) {
+    for (int i = 0;i < (int)encryptionKey.length();i++) {
         key += (char)(buffer[i] ^ (uint8_t)encryptionKey[i]);
     }
 
