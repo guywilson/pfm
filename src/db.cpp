@@ -57,6 +57,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -454,6 +455,15 @@ void PFM_DB::changePassword() {
                     databaseName.c_str(),
                     error,
                     errorMsg));
+    }
+
+    int unlinkRtn = unlink(KEY_FILE_NAME);
+
+    if (unlinkRtn < 0) {
+        log.error("PFM_DB::changePassword() - Failed to delete key file '%s'", strerror(errno));
+    }
+    else {
+        log.debug("PFM_DB::changePassword() - Successfully deleted key file");
     }
 
     close();
