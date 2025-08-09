@@ -8,7 +8,7 @@
 */
 #define NUM_DEFAULT_CATEGORIES                       27
 #define NUM_CURRENCIES                              168
-#define NUM_CONFIG_ITEMS                              3
+#define NUM_CONFIG_ITEMS                              4
 
 /*
 ** Each row specifies: code, description
@@ -50,8 +50,7 @@ const char * defaultConfig[][5] = {
     {"cycle.start", "1", "The day each monthly cycle starts on", "Y", "Y"},
     {"cycle.end", "last-working-day", "The day each monthly cycle ends on", "N", "Y"},
     {"limits.row", "50", "The row limit when retrieving records", "N", "Y"},
-    {"money.locale", "", "Locale used for money fields", "N", "Y"},
-    {"access.key", "B3FCBAE4F9EEB0D8C41BF5EB1CD1B990B8D8F266B8DD02F94A63DA8BD609F539", "The access key", "Y", "N"}
+    {"money.locale", "", "Locale used for money fields", "N", "Y"}
 };
 
 /*

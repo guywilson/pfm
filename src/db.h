@@ -122,6 +122,7 @@ class PFM_DB {
         void applyDatabaseKey(const string & dbName, const string & key);
         string readKeyFile(const string & keyFileName);
 
+        void createAccessKeyRecord(const string & key);
         void _executeSQLNoCallback(const char * sql);
         void _executeSQLCallback(const char * sql, vector<DBRow> * rows);
 

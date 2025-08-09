@@ -358,6 +358,40 @@ void PFM_DB::saveKeyFile(const string & key) {
     }
 }    
 
+void PFM_DB::createAccessKeyRecord(const string & key) {
+    log.entry("PFM_DB::createAccessKeyRecord()");
+
+    const char * insertStatement = 
+        "INSERT INTO config (key, value, description, is_read_only, is_visible, created, updated) VALUES ('access.key', '%s', 'The admin access key', 'Y', 'N', '%s', '%s')";
+
+    char statement[SQL_STATEMENT_BUFFER_LEN];
+
+    string now = StrDate::getTimestamp();
+
+    try {
+        begin();
+
+        snprintf(
+            statement, 
+            SQL_STATEMENT_BUFFER_LEN, 
+            insertStatement, 
+            key.c_str(), 
+            now.c_str(), 
+            now.c_str());
+
+        executeInsert(statement);
+
+        commit();
+    }
+    catch (pfm_error & e) {
+        rollback();
+
+        log.error("Failed to create access key record");
+        throw pfm_error("Failed to create access key record", __FILE__, __LINE__);
+    }
+
+    log.exit("PFM_DB::createAccessKeyRecord()");
+}
 
 void PFM_DB::open(const string & dbName) {
     log.entry("PFM_DB::open()");
@@ -368,15 +402,26 @@ void PFM_DB::open(const string & dbName) {
         if (isNewFileRequired(error)) {
             createDB(dbName);
 
-#ifndef RUN_IN_DEBUGGER
-            string key = getKey("Enter a password to encrypt the database: ");
-#else
-            string key = getKeyFromPassword(DEBUG_PASSWORD);
-#endif
+            cout << "Please enter a password that will be used to encrypt the database file" << endl;
+            cout << "with strong encryption (AES-256)." << endl;
+
+            string key = getKey("Enter a password: ");
+
+            cout << endl;
+
             applyDatabaseKey(dbName, key);
 
             cout << "Data file '" << dbName << "' does not exist, creating..." << endl;
             createSchema();
+
+            cout << "Please enter an admin access password, this is used to control access" << endl;
+            cout << "to admin functions." << endl;
+
+            string accessKey = getKey("Enter admin password: ");
+
+            cout << endl;
+
+            createAccessKeyRecord(accessKey);
         }
         else {
             string key;
@@ -385,7 +430,11 @@ void PFM_DB::open(const string & dbName) {
                 key = readKeyFile(KEY_FILE_NAME);
             }
             catch (pfm_error & e) {
-                key = getKey("Enter database password: ");
+#ifndef RUN_IN_DEBUGGER
+                string key = getKey("Enter database password: ");
+#else
+                string key = getKeyFromPassword(DEBUG_PASSWORD);
+#endif
             }
 
             applyDatabaseKey(dbName, key);
@@ -668,7 +717,7 @@ void PFM_DB::createDefaultConfig() {
     log.entry("PFM_DB::createDefaultConfig()");
 
     const char * insertStatement = 
-        "INSERT INTO config (key, value, description, is_read_only, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')";
+        "INSERT INTO config (key, value, description, is_read_only, is_visible, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')";
 
     char statement[SQL_STATEMENT_BUFFER_LEN];
 
@@ -686,6 +735,7 @@ void PFM_DB::createDefaultConfig() {
                 defaultConfig[i][1], 
                 defaultConfig[i][2], 
                 defaultConfig[i][3], 
+                defaultConfig[i][4],
                 now.c_str(), 
                 now.c_str());
 
