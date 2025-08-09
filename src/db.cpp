@@ -399,13 +399,13 @@ void PFM_DB::open(const string & dbName) {
     try {
         int error = openReadWrite(dbName);
 
+        string key;
+
         if (isNewFileRequired(error)) {
             createDB(dbName);
 
-            cout << "Please enter a password that will be used to encrypt the database file" << endl;
-            cout << "with strong encryption (AES-256)." << endl;
-
-            string key = getKey("Enter a password: ");
+            cout << "Please enter a password that will be used to encrypt the database file." << endl;
+            key = getKey("Enter a password: ");
 
             cout << endl;
 
@@ -416,7 +416,6 @@ void PFM_DB::open(const string & dbName) {
 
             cout << "Please enter an admin access password, this is used to control access" << endl;
             cout << "to admin functions." << endl;
-
             string accessKey = getKey("Enter admin password: ");
 
             cout << endl;
@@ -424,16 +423,14 @@ void PFM_DB::open(const string & dbName) {
             createAccessKeyRecord(accessKey);
         }
         else {
-            string key;
-            
             try {
                 key = readKeyFile(KEY_FILE_NAME);
             }
             catch (pfm_error & e) {
 #ifndef RUN_IN_DEBUGGER
-                string key = getKey("Enter database password: ");
+                key = getKey("Enter database password: ");
 #else
-                string key = getKeyFromPassword(DEBUG_PASSWORD);
+                key = getKeyFromPassword(DEBUG_PASSWORD);
 #endif
             }
 
