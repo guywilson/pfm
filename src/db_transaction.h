@@ -275,12 +275,14 @@ class DBTransaction : public DBPayment {
         void set(const DBRecurringCharge & src) {
             DBPayment::set(src);
 
+            this->id = 0;
             this->recurringChargeId = src.id;
         }
 
         void set(const DBRecurringChargeView & src) {
             DBPayment::set(src);
 
+            this->id = 0;
             this->recurringChargeId = src.id;
         }
 
@@ -433,7 +435,6 @@ class DBTransaction : public DBPayment {
         void reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDate & referenceDate);
 
         static void createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate);
-        static void createFromRecurringChargeAndDate(const DBRecurringChargeView & src, StrDate & transactionDate);
 
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);

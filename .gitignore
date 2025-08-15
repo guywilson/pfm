@@ -11,3 +11,4 @@ pfm.1
 *.sqbpro
 .pfm-journal
 .DS_Store
+.pfm_key

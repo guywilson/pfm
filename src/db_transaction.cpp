@@ -229,17 +229,6 @@ void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringCharge & s
     tr.save();
 }
 
-void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringChargeView & src, StrDate & transactionDate) {
-    DBTransaction tr;
-    tr.set(src);
-
-    tr.date = transactionDate;
-    tr.isCredit = false;
-    tr.isReconciled = true;
-
-    tr.save();
-}
-
 int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate) {
     StrDate dateToday;
 
