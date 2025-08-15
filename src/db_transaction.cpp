@@ -220,7 +220,7 @@ void DBTransaction::reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDa
 
 void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {
     DBTransaction tr;
-    tr.set(src);
+    tr.setFromRecurringCharge(src);
 
     tr.date = transactionDate;
     tr.isCredit = false;

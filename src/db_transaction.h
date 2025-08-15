@@ -272,20 +272,6 @@ class DBTransaction : public DBPayment {
             this->isReconciled = src.isReconciled;
         }
 
-        void set(const DBRecurringCharge & src) {
-            DBPayment::set(src);
-
-            this->id = 0;
-            this->recurringChargeId = src.id;
-        }
-
-        void set(const DBRecurringChargeView & src) {
-            DBPayment::set(src);
-
-            this->id = 0;
-            this->recurringChargeId = src.id;
-        }
-
         void set(JRecord & record) {
             DBPayment::set(record);
 
@@ -302,6 +288,13 @@ class DBTransaction : public DBPayment {
             r.add("isReconciled", this->getIsReconciledValue());
 
             return r;
+        }
+
+        void setFromRecurringCharge(const DBRecurringCharge & src) {
+            DBPayment::set(src);
+
+            this->id = 0;
+            this->recurringChargeId = src.id;
         }
 
         void print() {
