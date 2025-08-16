@@ -407,4 +407,30 @@ static const char * pszCreateListTransationView =
     "LEFT JOIN account a ON a.id = tr.account_id " \
     "ORDER BY tr.date ASC;";
 
+static const char * pszCreateRecurringTransactionsView =
+    "CREATE VIEW v_recurring_transactions AS " \
+    "SELECT tr.id," \
+    "tr.account_id," \
+    "a.code AS account_code," \
+    "tr.recurring_charge_id," \
+    "tr.date," \
+    "tr.reference," \
+    "tr.description," \
+    "tr.payee_id," \
+    "p.code AS payee_code," \
+    "tr.category_id," \
+    "c.code AS category_code," \
+    "rc.frequency AS frequency_code," \
+    "tr.amount," \
+    "tr.is_reconciled," \
+    "tr.created," \
+    "tr.updated " \
+    "FROM account_transaction tr " \
+    "LEFT JOIN payee p ON p.id = tr.payee_id " \
+    "LEFT JOIN category c ON c.id = tr.category_id " \
+    "LEFT JOIN account a ON a.id = tr.account_id " \
+    "LEFT JOIN recurring_charge rc ON rc.id = tr.recurring_charge_id " \
+    "WHERE tr.recurring_charge_id <> 0 " \
+    "ORDER BY tr.description, tr.date DESC";
+
 #endif
