@@ -14,6 +14,9 @@
 using namespace std;
 
 void DBCurrency::retrieveByCode(string & code) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBCurrency::retrieveByCode()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBCurrency> result;
 
@@ -33,4 +36,6 @@ void DBCurrency::retrieveByCode(string & code) {
     }
 
     set(result.at(0));
+
+    log.exit("DBCurrency::retrieveByCode()");
 }

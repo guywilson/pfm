@@ -30,12 +30,20 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByStatementAndID(const ch
 }
 
 DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::retrieveByAccountID()");
+
     DBResult<DBTransactionView> result = retrieveByStatementAndID(sqlSelectByAccountID, accountId);
+
+    log.exit("DBTransactionView::retrieveByAccountID()");
 
     return result;
 }
 
 DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::retrieveByAccountID()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransactionView> result;
 
@@ -58,16 +66,26 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t acco
 
     result.retrieve(szStatement);
 
+    log.exit("DBTransactionView::retrieveByAccountID()");
+
     return result;
 }
 
 DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm_id_t accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::retrieveReconciledByAccountID()");
+
     DBResult<DBTransactionView> result = retrieveByStatementAndID(sqlSelectReconciledByAccountID, accountId);
+
+    log.exit("DBTransactionView::retrieveReconciledByAccountID()");
 
     return result;
 }
 
 DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::retrieveNonRecurringByAccountID()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransactionView> result;
 
@@ -89,6 +107,8 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(p
     }
 
     result.retrieve(szStatement);
+
+    log.exit("DBTransactionView::retrieveNonRecurringByAccountID()");
 
     return result;
 }
@@ -120,6 +140,9 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForCriteria(const
 }
 
 DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_id_t accountId, const string & criteria) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::findTransactionsForAccountID()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     int sqlRowLimit = SQL_ROW_LIMIT;
     DBResult<DBTransactionView> result;
@@ -152,10 +175,15 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_
 
     result.retrieve(szStatement);
 
+    log.exit("DBTransactionView::findTransactionsForAccountID()");
+
     return result;
 }
 
 DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::retrieveByAccountIDForPeriod()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransactionView> result;
 
@@ -169,10 +197,15 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_
 
     result.retrieve(szStatement);
 
+    log.exit("DBTransactionView::retrieveByAccountIDForPeriod()");
+
     return result;
 }
 
 DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::retrieveReconciledByAccountIDForPeriod()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransactionView> result;
 
@@ -186,10 +219,15 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForP
 
     result.retrieve(szStatement);
 
+    log.exit("DBTransactionView::retrieveReconciledByAccountIDForPeriod()");
+
     return result;
 }
 
 DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::retrieveNonRecurringByAccountIDForPeriod()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransactionView> result;
 
@@ -202,6 +240,8 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDFo
         secondDate.shortDate().c_str());
 
     result.retrieve(szStatement);
+
+    log.exit("DBTransactionView::retrieveNonRecurringByAccountIDForPeriod()");
 
     return result;
 }

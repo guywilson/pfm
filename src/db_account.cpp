@@ -22,6 +22,9 @@
 using namespace std;
 
 void DBAccount::retrieveByCode(string & code) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBAccount::retrieveByCode()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBAccount> result;
 
@@ -41,6 +44,8 @@ void DBAccount::retrieveByCode(string & code) {
     }
 
     set(result.at(0));
+
+    log.exit("DBAccount::retrieveByCode()");
 }
 
 void DBAccount::createRecurringTransactions() {
@@ -120,6 +125,9 @@ void DBAccount::createRecurringTransactions() {
 }
 
 void DBAccount::beforeUpdate() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBAccount::beforeUpdate()");
+
     DBAccount account;
     account.retrieveByCode(code);
 
@@ -142,6 +150,8 @@ void DBAccount::beforeUpdate() {
             tr.deleteByRecurringChargeId(charge.id);
         }
     }
+
+    log.exit("DBAccount::beforeUpdate()");
 }
 
 void DBAccount::createCarriedOverLogs() {
@@ -426,7 +436,16 @@ Money DBAccount::calculateBalanceAfterBills() {
 }
 
 bool DBAccount::isPrimary() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBAccount::isPrimary()");
+
     string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
 
-    return primaryAccountCode.compare(code) == 0 ? true : false;
+    bool isPrimaryAccount = primaryAccountCode.compare(code) == 0 ? true : false;
+
+    log.info("This account with code %s is %sthe primary account", this->code.c_str(), isPrimaryAccount ? "" : "not ");
+
+    log.exit("DBAccount::isPrimary()");
+
+    return isPrimaryAccount;
 }

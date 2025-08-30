@@ -14,6 +14,9 @@
 using namespace std;
 
 DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_id_t accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringChargeView::retrieveByAccountID()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBRecurringChargeView> result;
 
@@ -25,10 +28,15 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_i
 
     result.retrieve(szStatement);
 
+    log.exit("DBRecurringChargeView::retrieveByAccountID()");
+
     return result;
 }
 
 DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & dateAfter, StrDate & dateBefore) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringChargeView::retrieveByAccountIDBetweenDates()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBRecurringChargeView> result;
 
@@ -41,6 +49,8 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetwee
         dateBefore.shortDate().c_str());
 
     result.retrieve(szStatement);
+
+    log.exit("DBRecurringChargeView::retrieveByAccountIDBetweenDates()");
 
     return result;
 }

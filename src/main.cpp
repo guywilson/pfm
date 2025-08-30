@@ -156,6 +156,9 @@ int main(int argc, char ** argv) {
         else if (arg.compare("--full-logging") == 0) {
             defaultLogLevel = LOG_LEVEL_ALL;
         }
+        else if (arg.compare("--debug-logging") == 0) {
+            defaultLogLevel = LOG_LEVEL_DEBUG | LOG_LEVEL_INFO;
+        }
         else {
             cout << "Unknown argument '" << arg << "'" << endl;
             printUsage();

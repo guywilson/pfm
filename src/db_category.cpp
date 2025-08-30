@@ -14,6 +14,9 @@
 using namespace std;
 
 void DBCategory::retrieveByCode(string & code) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBCategory::retrieveByCode()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBCategory> result;
 
@@ -31,4 +34,6 @@ void DBCategory::retrieveByCode(string & code) {
     else {
         clear();
     }
+
+    log.exit("DBCategory::retrieveByCode()");
 }

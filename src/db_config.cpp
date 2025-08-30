@@ -14,6 +14,9 @@
 using namespace std;
 
 void DBConfig::retrieveByKey(const string & key) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBConfig::retrieveByKey()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBConfig> result;
 
@@ -33,12 +36,19 @@ void DBConfig::retrieveByKey(const string & key) {
     }
 
     set(result.at(0));
+
+    log.exit("DBConfig::retrieveByKey()");
 }
 
 DBResult<DBConfig> DBConfig::retrieveAllVisible() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBConfig>::retrieveAllVisible()");
+
     DBResult<DBConfig> result;
 
     result.retrieve(sqlSelectVisible);
+
+    log.exit("DBConfig>::retrieveAllVisible()");
 
     return result;
 }

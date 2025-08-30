@@ -34,18 +34,31 @@ DBResult<DBTransaction> DBTransaction::retrieveByStatementAndID(const char * sql
 }
 
 DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::retrieveByAccountID()");
+
     DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectByAccountID, accountId);
+
+    log.exit("DBTransaction::retrieveByAccountID()");
 
     return result;
 }
 
 DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountID(pfm_id_t accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::retrieveReconciledByAccountID()");
+
     DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectReconciledByAccountID, accountId);
+
+    log.exit("DBTransaction::retrieveReconciledByAccountID()");
 
     return result;
 }
 
 DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::retrieveByAccountID()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransaction> result;
 
@@ -68,14 +81,26 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, d
 
     result.retrieve(szStatement);
 
+    log.exit("DBTransaction::retrieveByAccountID()");
+
     return result;
 }
 
 DBResult<DBTransaction> DBTransaction::retrieveByRecurringChargeID(pfm_id_t recurringChargeId) {
-    return retrieveByStatementAndID(sqlSelectByRecurringChargeID, recurringChargeId);
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::retrieveByRecurringChargeID()");
+
+    DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectByRecurringChargeID, recurringChargeId);
+
+    log.exit("DBTransaction::retrieveByRecurringChargeID()");
+
+    return result;
 }
 
 int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::findLatestByRecurringChargeID()");
+
     DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectLatestByChargeID, chargeId);
 
     if (result.size() == 1) {
@@ -90,10 +115,15 @@ int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
                 __LINE__);
     }
 
+    log.exit("DBTransaction::findLatestByRecurringChargeID()");
+
     return result.size();
 }
 
 DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(pfm_id_t accountId, string & criteria) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::findTransactionsForAccountID()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     int sqlRowLimit = SQL_ROW_LIMIT;
     DBResult<DBTransaction> result;
@@ -122,10 +152,15 @@ DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(pfm_id_t acc
 
     result.retrieve(szStatement);
 
+    log.exit("DBTransaction::findTransactionsForAccountID()");
+
     return result;
 }
 
 DBResult<DBTransaction> DBTransaction::retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::retrieveByAccountIDForPeriod()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransaction> result;
 
@@ -139,10 +174,15 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDForPeriod(pfm_id_t acc
 
     result.retrieve(szStatement);
 
+    log.exit("DBTransaction::retrieveByAccountIDForPeriod()");
+
     return result;
 }
 
 DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::retrieveReconciledByAccountIDForPeriod()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransaction> result;
 
@@ -156,10 +196,15 @@ DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountIDForPeriod(pf
 
     result.retrieve(szStatement);
 
+    log.exit("DBTransaction::retrieveReconciledByAccountIDForPeriod()");
+
     return result;
 }
 
 DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::retrieveNonRecurringByAccountIDForPeriod()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBTransaction> result;
 
@@ -172,6 +217,8 @@ DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(
         secondDate.shortDate().c_str());
 
     result.retrieve(szStatement);
+
+    log.exit("DBTransaction::retrieveNonRecurringByAccountIDForPeriod()");
 
     return result;
 }
@@ -219,6 +266,11 @@ void DBTransaction::reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDa
 }
 
 void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::createFromRecurringChargeAndDate()");
+
+    log.debug("Creating recurring transaction '%s' for date '%s'", src.description.c_str(), transactionDate.shortDate().c_str());
+
     DBTransaction tr;
     tr.setFromRecurringCharge(src);
 
@@ -227,9 +279,14 @@ void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringCharge & s
     tr.isReconciled = true;
 
     tr.save();
+
+    log.exit("DBTransaction::createFromRecurringChargeAndDate()");
 }
 
 int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::createNextTransactionForCharge()");
+
     StrDate dateToday;
 
     if (latestDate <= dateToday) {
@@ -263,6 +320,8 @@ int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, St
             return CHARGE_OK;
         }
     }
+
+    log.exit("DBTransaction::createNextTransactionForCharge()");
 
     return CHARGE_NOT_DUE;
 }
@@ -332,6 +391,9 @@ void DBTransaction::afterRemove() {
 }
 
 void DBTransaction::deleteByRecurringChargeId(pfm_id_t recurringChargeId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::deleteByRecurringChargeId()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
     snprintf(
@@ -341,9 +403,14 @@ void DBTransaction::deleteByRecurringChargeId(pfm_id_t recurringChargeId) {
         recurringChargeId);
 
     remove(szStatement);
+
+    log.exit("DBTransaction::deleteByRecurringChargeId()");
 }
 
 void DBTransaction::deleteAllRecurringTransactionsForAccount(pfm_id_t accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::deleteAllRecurringTransactionsForAccount()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
     snprintf(
@@ -353,4 +420,6 @@ void DBTransaction::deleteAllRecurringTransactionsForAccount(pfm_id_t accountId)
         accountId);
 
     remove(szStatement);
+
+    log.exit("DBTransaction::deleteAllRecurringTransactionsForAccount()");
 }

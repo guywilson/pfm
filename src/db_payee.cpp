@@ -14,6 +14,9 @@
 using namespace std;
 
 void DBPayee::retrieveByCode(string & code) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBPayee::retrieveByCode()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBPayee> result;
 
@@ -31,4 +34,6 @@ void DBPayee::retrieveByCode(string & code) {
     else {
         clear();
     }
+
+    log.exit("DBPayee::retrieveByCode()");
 }

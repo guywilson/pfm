@@ -16,6 +16,9 @@
 using namespace std;
 
 int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBCarriedOver::retrieveLatestByAccountId()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBCarriedOver> result;
 
@@ -31,10 +34,15 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
         set(result.at(0));
     }
 
+    log.exit("DBCarriedOver::retrieveLatestByAccountId()");
+
     return rowsRetrievedCount;
 }
 
 DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBCarriedOver::retrieveByAccountId()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBCarriedOver> result;
 
@@ -46,10 +54,15 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
 
     result.retrieve(szStatement);
 
+    log.exit("DBCarriedOver::retrieveByAccountId()");
+
     return result;
 }
 
 DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t accountId, StrDate & after) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBCarriedOver::retrieveByAccountIdAfterDate()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBCarriedOver> result;
 
@@ -62,10 +75,15 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
 
     result.retrieve(szStatement);
 
+    log.exit("DBCarriedOver::retrieveByAccountIdAfterDate()");
+
     return result;
 }
 
 void DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBCarriedOver::createForPeriod()");
+
     PFM_DB & db = PFM_DB::getInstance();
 
     db.begin();
@@ -81,6 +99,12 @@ void DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance,
             total += transaction.getSignedAmount();
         }
 
+        log.debug(
+            "Creating carried over log with date '%s' from %d transactions for total %s", 
+            endDate.shortDate().c_str(), 
+            transactionResult.size(), 
+            total.localeFormattedStringValue().c_str());
+
         DBCarriedOver co;
         co.balance = total;
         co.accountId = accountId;
@@ -95,4 +119,6 @@ void DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance,
     }
 
     db.commit();
+
+    log.exit("DBCarriedOver::createForPeriod()");
 }

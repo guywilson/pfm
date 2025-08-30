@@ -16,6 +16,9 @@
 using namespace std;
 
 string DBPrimaryAccount::getPrimaryAccountCode() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBPrimaryAccount::getPrimaryAccountCode()");
+
     DBResult<DBPrimaryAccount> primaryAccounts;
 
     int numPrimaryAccounts = primaryAccounts.retrieveAll();
@@ -33,9 +36,14 @@ string DBPrimaryAccount::getPrimaryAccountCode() {
                 __FILE__,
                 __LINE__);
     }
+
+    log.exit("DBPrimaryAccount::getPrimaryAccountCode()");
 }
 
 void DBPrimaryAccount::setPrimaryAccount(string & accountCode) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBPrimaryAccount::setPrimaryAccount()");
+
     DBResult<DBPrimaryAccount> primaryAccounts;
 
     int numPrimaryAccounts = primaryAccounts.retrieveAll();
@@ -54,4 +62,6 @@ void DBPrimaryAccount::setPrimaryAccount(string & accountCode) {
                 __FILE__,
                 __LINE__);
     }
+
+    log.exit("DBPrimaryAccount::setPrimaryAccount()");
 }

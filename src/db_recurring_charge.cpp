@@ -30,9 +30,14 @@ static bool isNumeric(string & cfgDate) {
 }
 
 int DBRecurringCharge::getPeriodStartDay() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::getPeriodStartDay()");
+
     cfgmgr & cfg = cfgmgr::getInstance();
 
     int periodStart = cfg.getValueAsInteger("cycle.start");
+
+    log.exit("DBRecurringCharge::getPeriodStartDay()");
 
     return periodStart;
 }
@@ -43,6 +48,9 @@ int DBRecurringCharge::getPeriodEndDay() {
 }
 
 int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::getPeriodEndDay()");
+
     cfgmgr & cfg = cfgmgr::getInstance();
 
     string cycleEnd = cfg.getValue("cycle.end");
@@ -85,10 +93,17 @@ int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
         periodEnd = lastDay.day();
     }
 
+    log.debug("Got period end day as %d for date '%s'", referenceDate.shortDate().c_str());
+
+    log.exit("DBRecurringCharge::getPeriodEndDay()");
+
     return periodEnd;
 }
 
 DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::retrieveByAccountID()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBRecurringCharge> result;
 
@@ -100,10 +115,15 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t acco
 
     result.retrieve(szStatement);
 
+    log.exit("DBRecurringCharge::retrieveByAccountID()");
+
     return result;
 }
 
 DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & dateAfter, StrDate & dateBefore) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::retrieveByAccountIDBetweenDates()");
+
     char szStatement[SQL_STATEMENT_BUFFER_LEN];
     DBResult<DBRecurringCharge> result;
 
@@ -117,6 +137,8 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(p
 
     result.retrieve(szStatement);
 
+    log.exit("DBRecurringCharge::retrieveByAccountIDBetweenDates()");
+
     return result;
 }
 
@@ -129,13 +151,19 @@ char DBRecurringCharge::getFrequencyUnit() {
 }
 
 bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::isDateWithinCurrentPeriod()");
+
     StrDate dateToday;
     int periodStartDay = 1;
     int periodEndDay = dateToday.daysInMonth();
 
     if (date.month() == dateToday.month() && date.day() >= periodStartDay && date.day() <= periodEndDay) {
+        log.debug("The date '%s' is within the current period", date.shortDate().c_str());
         return true;
     }
+
+    log.exit("DBRecurringCharge::isDateWithinCurrentPeriod()");
 
     return false;
 }
@@ -147,6 +175,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod() {
 
 bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
     Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::isChargeDueThisPeriod()");
 
     int periodStartDay = getPeriodStartDay();
     int periodEndDay = getPeriodEndDay(referenceDate);
@@ -184,14 +213,22 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
             if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
                 cout << "| " << nextPaymentDate.shortDate() << " | " << frequency << " | " << setw(16) << right << amount.localeFormattedStringValue() << " | " << description << endl;
             }
+
+            log.debug("Charge '%s' is due this period", this->description.c_str());
+
             return true;
         }
     }
+
+    log.exit("DBRecurringCharge::isChargeDueThisPeriod()");
 
     return false;
 }
 
 StrDate DBRecurringCharge::calculateNextPaymentDate() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::calculateNextPaymentDate()");
+
     StrDate     dateToday;
     char        frequencyUnit;
     int         frequencyValue;
@@ -229,7 +266,7 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
 
             case 'd':
                 while (nextPaymentDate.year() < dateToday.year() || nextPaymentDate.month() < dateToday.month()) {
-                    nextPaymentDate =   nextPaymentDate.addDays(frequencyValue);
+                    nextPaymentDate = nextPaymentDate.addDays(frequencyValue);
                 }
                 break;
 
@@ -247,10 +284,16 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
         nextPaymentDate.clear();
     }
 
+    log.debug("Calculated nextPaymentDate of charge '%s' as '%s'", this->description.c_str(), nextPaymentDate.shortDate().c_str());
+    log.exit("DBRecurringCharge::calculateNextPaymentDate()");
+
     return nextPaymentDate;
 }
 
 StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::getNextRecurringTransactionDate()");
+
     char frequencyValue = getFrequencyValue();
     char frequencyUnit = getFrequencyUnit();
 
@@ -303,15 +346,26 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
     else {
         nextPaymentDate.clear();
     }
-    
+
+    log.debug("Got next transaction date for charge '%s' as '%s'", this->description.c_str(), nextPaymentDate.shortDate().c_str());
+    log.exit("DBRecurringCharge::getNextRecurringTransactionDate()");
+
     return nextPaymentDate;
 }
 
 void DBRecurringCharge::setNextPaymentDate() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::setNextPaymentDate()");
+
     this->nextPaymentDate = calculateNextPaymentDate();
+
+    log.exit("DBRecurringCharge::setNextPaymentDate()");
 }
 
 void DBRecurringCharge::beforeUpdate() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::beforeUpdate()");
+
     DBRecurringCharge currentCharge;
     currentCharge.id = this->id;
     currentCharge.retrieve();
@@ -320,6 +374,8 @@ void DBRecurringCharge::beforeUpdate() {
         this->categoryId != currentCharge.categoryId ||
         this->payeeId != currentCharge.payeeId)
     {
+        log.debug("Updating transactions for charge '%s'", this->description.c_str());
+        
         DBTransaction tr;
         DBResult<DBTransaction> trResult = tr.retrieveByRecurringChargeID(id);
 
@@ -333,4 +389,6 @@ void DBRecurringCharge::beforeUpdate() {
             transaction.save();
         }
     }
+
+    log.exit("DBRecurringCharge::beforeUpdate()");
 }
