@@ -280,6 +280,8 @@ class UpdateTransactionView : public CLIView {
         pfm_id_t transactionId;
         pfm_id_t recurringChargeId;
 
+        bool isReconciled;
+
         CategorySpinField categoryField;
         PayeeSpinField payeeField;
         DateField dateField;
@@ -287,7 +289,6 @@ class UpdateTransactionView : public CLIView {
         CLITextField referenceField;
         CLITextField creditDebitField;
         CLICurrencyField amountField;
-        CLITextField isReconciledField;
 
         bool decodeCreditDebit(const char * credit_debit) {
             if (strncmp(credit_debit, "CR", 2) == 0) {
@@ -313,6 +314,7 @@ class UpdateTransactionView : public CLIView {
             transactionId = transaction.id;
             recurringChargeId = transaction.recurringChargeId;
             accountId = transaction.accountId;
+            isReconciled = transaction.isReconciled;
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Category ['%s']: ", transaction.category.code.c_str());
             categoryField.setLabel(szPrompt);
@@ -362,6 +364,7 @@ class UpdateTransactionView : public CLIView {
             transaction.id = transactionId;
             transaction.recurringChargeId = recurringChargeId;
             transaction.accountId = accountId;
+            transaction.isReconciled = isReconciled;
 
             transaction.category = categoryField.getCategory();
             transaction.categoryId = transaction.category.id;
