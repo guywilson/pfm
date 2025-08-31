@@ -52,6 +52,8 @@ class DBAccount : public DBEntity {
         void createRecurringTransactions();
         void createCarriedOverLogs();
 
+        void doBalancePrerequisites();
+
     public:
         string                  name;
         string                  code;
@@ -171,12 +173,7 @@ class DBAccount : public DBEntity {
 
             return szStatement;
         }
-
-        void onUseAccountTrigger() {
-            createRecurringTransactions();
-            createCarriedOverLogs();
-        }
-
+        
         void beforeUpdate() override;
         Money calculateCurrentBalance();
         Money calculateBalanceAfterBills();

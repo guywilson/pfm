@@ -157,7 +157,6 @@ void Command::chooseAccount(string & accountCode) {
 
     DBAccount account;
     account.retrieveByCode(accountCode);
-    account.onUseAccountTrigger();
     
     selectedAccount = account;
 
@@ -173,7 +172,6 @@ void Command::setPrimaryAccount(string & accountCode) {
 
     DBAccount account;
     account.retrieveByCode(accountCode);
-    account.onUseAccountTrigger();
     
     selectedAccount = account;
 
