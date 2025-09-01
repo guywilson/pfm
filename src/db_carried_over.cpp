@@ -80,13 +80,15 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
     return result;
 }
 
-void DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate) {
+DBCarriedOver DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBCarriedOver::createForPeriod()");
 
     PFM_DB & db = PFM_DB::getInstance();
     
     db.begin();
+
+    DBCarriedOver co;
 
     try {
         DBTransactionView tr;
@@ -105,15 +107,12 @@ void DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance,
             transactionResult.size(), 
             total.localeFormattedStringValue().c_str());
 
-        DBCarriedOver co;
         co.balance = total;
         co.accountId = accountId;
         co.date = endDate;
         co.description = "Carried over (" + endDate.shortDate() + ")";
 
         co.save();
-
-        this->set(co);
     }
     catch (pfm_error & e) {
         db.rollback();
@@ -123,4 +122,6 @@ void DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance,
     db.commit();
 
     log.exit("DBCarriedOver::createForPeriod()");
+
+    return co;
 }

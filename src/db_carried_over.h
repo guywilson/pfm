@@ -185,7 +185,7 @@ class DBCarriedOver : public DBEntity {
         DBResult<DBCarriedOver> retrieveByAccountId(pfm_id_t accountId);
         DBResult<DBCarriedOver> retrieveByAccountIdAfterDate(pfm_id_t accountId, StrDate & after);
 
-        void createForPeriod(pfm_id_t accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate);
+        static DBCarriedOver createForPeriod(pfm_id_t accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate);
 };
 
 #endif

@@ -203,10 +203,7 @@ void DBAccount::createCarriedOverLogs() {
             StrDate firstDate = firstTransaction.date.firstDayInMonth();
             StrDate secondDate = firstTransaction.date.lastDayInMonth();
 
-            DBCarriedOver newCo;
-            newCo.createForPeriod(this->id, openingBalance, firstDate, secondDate);
-
-            co = newCo;
+            co = DBCarriedOver::createForPeriod(this->id, openingBalance, firstDate, secondDate);
         }
 
         while (co.date < periodEndDate) {
@@ -217,10 +214,7 @@ void DBAccount::createCarriedOverLogs() {
 
             log.debug("Creating DBCarriedOverLog for dates '%s' to '%s'", firstDate.shortDate().c_str(), secondDate.shortDate().c_str());
             
-            DBCarriedOver newCo;
-            newCo.createForPeriod(this->id, co.balance, firstDate, secondDate);
-
-            co = newCo;
+            co = DBCarriedOver::createForPeriod(this->id, co.balance, firstDate, secondDate);
         }
 
         db.commit();
