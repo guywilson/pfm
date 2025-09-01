@@ -45,6 +45,8 @@ void DBAccount::retrieveByCode(string & code) {
 
     set(result.at(0));
 
+    doBalancePrerequisites();
+
     log.exit("DBAccount::retrieveByCode()");
 }
 
@@ -155,12 +157,17 @@ void DBAccount::beforeUpdate() {
 }
 
 void DBAccount::doBalancePrerequisites() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBAccount::doBalancePrerequisites()");
+
     /*
     ** Make sure we're up to date, this will ensure that the
     ** balances are calculated correctly...
     */
     createRecurringTransactions();
     createCarriedOverLogs();
+
+    log.exit("DBAccount::doBalancePrerequisites()");
 }
 
 void DBAccount::createCarriedOverLogs() {

@@ -98,9 +98,9 @@ class DBAccount : public DBEntity {
             return r;
         }
 
-        void onRowComplete(int sequence) override {
-            doBalancePrerequisites();
-        }
+        // void onRowComplete(int sequence) override {
+        //     doBalancePrerequisites();
+        // }
 
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);

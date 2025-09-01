@@ -132,33 +132,20 @@ class DBEntity {
         void retrieve(pfm_id_t id);
 
         void clear() {
-            Logger & log = Logger::getInstance();
-            log.entry("%s:clear()", getClassName());
-
             this->id = 0;
             this->sequence = 0;
             this->createdDate = "";
             this->updatedDate = "";
-
-            log.exit("%s:clear()", getClassName());
         }
 
         void set(const DBEntity & src) {
-            Logger & log = Logger::getInstance();
-            log.entry("%s:set()", getClassName());
-
             this->id = src.id;
             this->createdDate = src.createdDate;
             this->updatedDate = src.updatedDate;
             this->sequence = src.sequence;
-
-            log.exit("%s:set()", getClassName());
         }
 
         virtual void assignColumn(DBColumn & column) {
-            Logger & log = Logger::getInstance();
-            log.entry("%s:assignColumn()", getClassName());
-
             if (column.getName() == "id") {
                 id = column.getIDValue();
             }
@@ -168,8 +155,6 @@ class DBEntity {
             else if (column.getName() == "updated") {
                 updatedDate = column.getValue();
             }
-
-            log.exit("%s:assignColumn()", getClassName());
         }
 
         virtual void onRowComplete(int sequence) {
@@ -185,14 +170,9 @@ class DBEntity {
         }
 
         static bool isYesNoBooleanValid(string & ynValue) {
-            Logger & log = Logger::getInstance();
-            log.entry("DBEntity::isYesNoBooleanValid()");
-
             if (ynValue == "Y" || ynValue == "N") {
                 return true;
             }
-            
-            log.exit("DBEntity::isYesNoBooleanValid()");
 
             return false;
         }
@@ -241,13 +221,8 @@ class DBResult : public Result {
         }
 
         void clear() override {
-            Logger & log = Logger::getInstance();
-            log.entry("DBResult::clear()");
-
             Result::clear();
             results.clear();
-
-            log.exit("DBResult::clear()");
         }
 
         void reverse() {
@@ -296,9 +271,6 @@ class DBResult : public Result {
         }
 
         void processRow(DBRow & row) {
-            Logger & log = Logger::getInstance();
-            log.entry("DBResult::processRow()");
-
             T entity;
 
             for (size_t i = 0;i < row.getNumColumns();i++) {
@@ -312,8 +284,6 @@ class DBResult : public Result {
 
             addRow(entity);
             incrementNumRows();
-
-            log.exit("DBResult::processRow()");
         }
 };
 

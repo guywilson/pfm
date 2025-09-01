@@ -85,7 +85,7 @@ void DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance,
     log.entry("DBCarriedOver::createForPeriod()");
 
     PFM_DB & db = PFM_DB::getInstance();
-
+    
     db.begin();
 
     try {
@@ -112,6 +112,8 @@ void DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance,
         co.description = "Carried over (" + endDate.shortDate() + ")";
 
         co.save();
+
+        this->set(co);
     }
     catch (pfm_error & e) {
         db.rollback();

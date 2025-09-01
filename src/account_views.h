@@ -112,7 +112,7 @@ class AccountListView : public CLIListView {
                 DBAccount account = result[i];
 
                 account.doBalancePrerequisites();
-                
+
                 CLIListRow row(headerRow);
 
                 Money currentBalance = account.calculateCurrentBalance();
