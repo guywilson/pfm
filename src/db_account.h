@@ -143,11 +143,13 @@ class DBAccount : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string dName = delimitSingleQuotes(name);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                name.c_str(),
+                dName.c_str(),
                 code.c_str(),
                 openingDate.shortDate().c_str(),
                 openingBalance.rawStringValue().c_str(),
@@ -162,11 +164,13 @@ class DBAccount : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string dName = delimitSingleQuotes(name);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
-                name.c_str(),
+                dName.c_str(),
                 code.c_str(),
                 openingDate.shortDate().c_str(),
                 openingBalance.rawStringValue().c_str(),

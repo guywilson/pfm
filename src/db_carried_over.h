@@ -131,13 +131,15 @@ class DBCarriedOver : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string dDescription = delimitSingleQuotes(description);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
                 accountId,
                 date.shortDate().c_str(),
-                description.c_str(),
+                dDescription.c_str(),
                 balance.rawStringValue().c_str(),
                 now.c_str(),
                 now.c_str());
@@ -150,13 +152,15 @@ class DBCarriedOver : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string dDescription = delimitSingleQuotes(description);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
                 accountId,
                 date.shortDate().c_str(),
-                description.c_str(),
+                dDescription.c_str(),
                 balance.rawStringValue().c_str(),
                 now.c_str(),
                 id);

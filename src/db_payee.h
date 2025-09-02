@@ -92,12 +92,14 @@ class DBPayee : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string dName = delimitSingleQuotes(name);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
                 code.c_str(),
-                name.c_str(),
+                dName.c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -109,12 +111,14 @@ class DBPayee : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string dName = delimitSingleQuotes(name);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
                 code.c_str(),
-                name.c_str(),
+                dName.c_str(),
                 now.c_str(),
                 id);
 

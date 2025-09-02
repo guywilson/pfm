@@ -371,6 +371,9 @@ class DBTransaction : public DBPayment {
 
             string now = StrDate::getTimestamp();
 
+            string dDescription = delimitSingleQuotes(description);
+            string dReference = delimitSingleQuotes(reference);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
@@ -380,8 +383,8 @@ class DBTransaction : public DBPayment {
                 payeeId,
                 recurringChargeId,
                 date.shortDate().c_str(),
-                reference.c_str(),
-                description.c_str(),
+                dReference.c_str(),
+                dDescription.c_str(),
                 getCreditDebitValue().c_str(),
                 amount.rawStringValue().c_str(),
                 getIsReconciledValue(),
@@ -396,6 +399,9 @@ class DBTransaction : public DBPayment {
 
             string now = StrDate::getTimestamp();
 
+            string dDescription = delimitSingleQuotes(description);
+            string dReference = delimitSingleQuotes(reference);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
@@ -404,8 +410,8 @@ class DBTransaction : public DBPayment {
                 payeeId,
                 recurringChargeId,
                 date.shortDate().c_str(),
-                reference.c_str(),
-                description.c_str(),
+                dReference.c_str(),
+                dDescription.c_str(),
                 getCreditDebitValue().c_str(),
                 amount.rawStringValue().c_str(),
                 getIsReconciledValue(),

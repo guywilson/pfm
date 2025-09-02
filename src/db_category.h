@@ -92,11 +92,13 @@ class DBCategory : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string dDescription = delimitSingleQuotes(description);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                description.c_str(),
+                dDescription.c_str(),
                 code.c_str(),
                 now.c_str(),
                 now.c_str());
@@ -109,12 +111,14 @@ class DBCategory : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string dDescription = delimitSingleQuotes(description);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
                 code.c_str(),
-                description.c_str(),
+                dDescription.c_str(),
                 now.c_str(),
                 id);
 

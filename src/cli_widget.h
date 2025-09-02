@@ -26,7 +26,6 @@ using namespace std;
 #define LIST_VIEW_AMOUNT_WIDTH                  14
 
 #define CLI_CANCEL_KEY                         'x'
-#define SINGLE_QUOTE_CHAR                       39
 
 
 #if defined(__APPLE__) || defined(__unix__)
@@ -219,35 +218,6 @@ class CLITextField : public CLIField {
     private:
         string defaultValue;
 
-        uint64_t findSingleQuotePos(string & s, int startingPos = 0) {
-            uint64_t pos = s.find(SINGLE_QUOTE_CHAR, startingPos);
-
-            if (pos != string::npos) {
-                if (s.at(pos + 1) != SINGLE_QUOTE_CHAR) {
-                    return pos;
-                }
-            }
-
-            return string::npos;
-        }
-
-        int delimitSingleQuotes(string & s) {
-            uint64_t searchPos = 0;
-            int numQuotesFound = 0;
-
-            searchPos = findSingleQuotePos(s);
-
-            while (searchPos != string::npos) {
-                numQuotesFound++;
-
-                s.insert(searchPos, 1, SINGLE_QUOTE_CHAR);
-
-                searchPos = findSingleQuotePos(s, searchPos + 2);
-            }
-
-            return numQuotesFound;
-        }
-
     protected:
         int maxLength = FIELD_STRING_LEN;
 
@@ -308,7 +278,6 @@ class CLITextField : public CLIField {
         void show() override {
             rl_utils::setLineLength(maxLength);
             string line = readLine();
-            delimitSingleQuotes(line);
             _setValue(line);
         }
 };

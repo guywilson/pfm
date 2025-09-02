@@ -19,7 +19,8 @@ using namespace std;
 #ifndef __INCL_DB_BASE
 #define __INCL_DB_BASE
 
-#define LIMIT_CLAUSE_BUFFER_LEN                    32
+#define LIMIT_CLAUSE_BUFFER_LEN                 32
+#define SINGLE_QUOTE_CHAR                       39
 
 template <class T> class DBResult;
 
@@ -27,6 +28,8 @@ class DBEntity {
     private:
         pfm_id_t insert();
         void update();
+
+        uint64_t findSingleQuotePos(string & s, int startingPos);
 
     protected:
         virtual void beforeInsert() {
@@ -52,6 +55,8 @@ class DBEntity {
         virtual void afterRemove() {
             return;
         }
+
+        string delimitSingleQuotes(string & s);
 
     public:
         pfm_id_t id;

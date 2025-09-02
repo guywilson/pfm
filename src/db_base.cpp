@@ -46,6 +46,31 @@ void DBEntity::update() {
     log.exit("DBEntity::update()");
 }
 
+uint64_t DBEntity::findSingleQuotePos(string & s, int startingPos = 0) {
+    uint64_t pos = s.find(SINGLE_QUOTE_CHAR, startingPos);
+
+    if (pos != string::npos) {
+        if (s.at(pos + 1) != SINGLE_QUOTE_CHAR) {
+            return pos;
+        }
+    }
+
+    return string::npos;
+}
+
+string DBEntity::delimitSingleQuotes(string & s) {
+    string delimited = s;
+
+    uint64_t searchPos = findSingleQuotePos(delimited);
+
+    while (searchPos != string::npos) {
+        delimited.insert(searchPos, 1, SINGLE_QUOTE_CHAR);
+        searchPos = findSingleQuotePos(delimited, searchPos + 2);
+    }
+
+    return delimited;
+}
+
 void DBEntity::retrieve() {
     retrieve(this->id);
 }

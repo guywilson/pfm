@@ -217,6 +217,8 @@ class DBRecurringCharge : public DBPayment {
 
             string now = StrDate::getTimestamp();
 
+            string dDescription = delimitSingleQuotes(description);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
@@ -226,7 +228,7 @@ class DBRecurringCharge : public DBPayment {
                 payeeId,
                 date.shortDate().c_str(),
                 endDate.shortDate().c_str(),
-                description.c_str(),
+                dDescription.c_str(),
                 amount.rawStringValue().c_str(),
                 frequency.c_str(),
                 now.c_str(),
@@ -240,6 +242,8 @@ class DBRecurringCharge : public DBPayment {
 
             string now = StrDate::getTimestamp();
 
+            string dDescription = delimitSingleQuotes(description);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
@@ -248,7 +252,7 @@ class DBRecurringCharge : public DBPayment {
                 payeeId,
                 date.shortDate().c_str(),
                 endDate.shortDate().c_str(),
-                description.c_str(),
+                dDescription.c_str(),
                 amount.rawStringValue().c_str(),
                 frequency.c_str(),
                 now.c_str(),

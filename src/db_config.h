@@ -99,13 +99,16 @@ class DBConfig : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string dDescription = delimitSingleQuotes(description);
+            string dValue = delimitSingleQuotes(value);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
                 key.c_str(),
-                value.c_str(),
-                description.c_str(),
+                dValue.c_str(),
+                dDescription.c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -117,13 +120,16 @@ class DBConfig : public DBEntity {
 
             string now = StrDate::getTimestamp();
 
+            string dDescription = delimitSingleQuotes(description);
+            string dValue = delimitSingleQuotes(value);
+
             snprintf(
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
                 key.c_str(),
-                value.c_str(),
-                description.c_str(),
+                dValue.c_str(),
+                dDescription.c_str(),
                 now.c_str(),
                 id);
 
