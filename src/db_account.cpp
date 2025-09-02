@@ -45,8 +45,6 @@ void DBAccount::retrieveByCode(string & code) {
 
     set(result.at(0));
 
-    doBalancePrerequisites();
-
     log.exit("DBAccount::retrieveByCode()");
 }
 

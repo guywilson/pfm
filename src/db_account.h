@@ -49,6 +49,8 @@ class DBAccount : public DBEntity {
                         "updated = '%s' " \
                         "WHERE id = %lld;";
 
+        void doBalancePrerequisites();
+        
         void createRecurringTransactions();
         void createCarriedOverLogs();
 
@@ -98,9 +100,9 @@ class DBAccount : public DBEntity {
             return r;
         }
 
-        // void onRowComplete(int sequence) override {
-        //     doBalancePrerequisites();
-        // }
+        void onRowComplete(int sequence) override {
+            doBalancePrerequisites();
+        }
 
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
@@ -180,8 +182,6 @@ class DBAccount : public DBEntity {
             return szStatement;
         }
 
-        void doBalancePrerequisites();
-        
         void beforeUpdate() override;
         Money calculateCurrentBalance();
         Money calculateBalanceAfterBills();
