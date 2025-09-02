@@ -55,6 +55,8 @@ int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
 
     string cycleEnd = cfg.getValue("cycle.end");
 
+    log.info("Value of config item 'cycle.end' is '%s'", cycleEnd.c_str());
+
     int periodEnd;
 
     if (isNumeric(cycleEnd)) {
@@ -93,7 +95,7 @@ int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
         periodEnd = lastDay.day();
     }
 
-    log.debug("Got period end day as %d for date '%s'", referenceDate.shortDate().c_str());
+    log.debug("Got period end day as %d for date '%s'", periodEnd, referenceDate.shortDate().c_str());
 
     log.exit("DBRecurringCharge::getPeriodEndDay()");
 
