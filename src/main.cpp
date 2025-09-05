@@ -67,7 +67,7 @@ static void printUsage(void) {
     cout << "pfm [options]" << endl;
     cout << "Options:" << endl;
     cout << "\t-db <db name> if not specified, defaults to '.pfm' in the current dir" << endl;
-    cout << "\t-h displays the help" << endl;
+    cout << "\t-h displays the usage information" << endl;
     cout << "\t--license, -l print the license" << endl;
     cout << "\t--version, -v print the program version" << endl << endl;
 }

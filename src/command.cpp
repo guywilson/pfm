@@ -1281,7 +1281,7 @@ bool Command::process(const string & command) {
     else {
         throw pfm_validation_error(
                     pfm_error::buildMsg(
-                        "Sorry, I do not understand command '%s', type help to see the list of commands", 
+                        "Sorry, I do not understand command '%s', please see the manual for supported commands.", 
                         command.c_str()));
     }
 

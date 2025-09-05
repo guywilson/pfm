@@ -189,7 +189,7 @@ Print the pfm version string.
 
 **help**
 
-Display some help information.
+Display some usage information.
 
 **exit, quit, q**
 
