@@ -32,6 +32,8 @@ class CacheMgr {
         unordered_map<int, DBTransaction> transactionBySequence;
         unordered_map<int, DBTransactionReport> reportBySequence;
 
+        string findCriteria;
+
     public:
         ~CacheMgr() {}
 
@@ -45,6 +47,10 @@ class CacheMgr {
 
         void clearReports() {
             reportBySequence.clear();
+        }
+
+        void clearFindCriteria() {
+            findCriteria.clear();
         }
 
         void addRecurringCharge(int sequence, DBRecurringCharge & charge) {
@@ -87,6 +93,19 @@ class CacheMgr {
             }
 
             throw pfm_error("DBTransactionReport not found in cache.");
+        }
+
+        void addFindCriteria(const string & criteria) {
+            findCriteria = criteria;
+        }
+
+        string getFindCriteria() {
+
+            if (findCriteria.length() > 0) {
+                return findCriteria;
+            }
+
+            throw pfm_error("No find criteria found in cache.");
         }
 };
 

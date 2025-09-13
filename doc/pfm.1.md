@@ -136,6 +136,8 @@ Parameters are listed below, any parameters that accept wildcards recognise * as
 - a:[amount] - transactions where the amount is less than this
 - A:[amount]|A:[amount] - transactions where the amount is between these 
 
+The query used in the **find** command can be saved as a report by issuing the **save-report** or **save** command.
+
 **use [account-code]**
 
 Set the current account context to the account specified with account-code. The list-accounts command will show which account is the *primary* account, the initial state will set this account as the current account context until it is changed with the use command.

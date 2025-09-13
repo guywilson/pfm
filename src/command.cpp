@@ -744,6 +744,8 @@ void Command::findTransactions(const string & criteria) {
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }
 
+    cacheMgr.addFindCriteria(criteria);
+
     TransactionListView view;
     view.addTotal();
     view.addResults(result);
@@ -889,6 +891,20 @@ void Command::deleteReport(DBTransactionReport & report) {
 
 void Command::runReport(DBTransactionReport & report) {
     findTransactions(report.sqlWhereClause);
+}
+
+void Command::saveReport() {
+    SaveReportView view;
+    view.show();
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    DBTransactionReport report = view.getReport();
+    report.sqlWhereClause = cacheMgr.getFindCriteria();
+
+    report.save();
+
+    cacheMgr.clearFindCriteria();
 }
 
 void Command::listCarriedOverLogs() {
@@ -1325,6 +1341,9 @@ bool Command::process(const string & command) {
 
         DBTransactionReport report = getReport(atoi(sequence.c_str()));
         runReport(report);
+    }
+    else if (isCommand("save-report") || isCommand("save")) {
+        saveReport();
     }
     else if (isCommand("list-carried-over-logs") || isCommand("lco")) {
         listCarriedOverLogs();

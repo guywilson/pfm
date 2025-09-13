@@ -140,4 +140,29 @@ class UpdateReportView : public CLIView {
         }
 };
 
+class SaveReportView : public CLIView {
+    private:
+        CLITextField descriptionField = CLITextField("Description: ");
+
+    public:
+        SaveReportView() : SaveReportView("Save report") {}
+
+        SaveReportView(const char * title) : CLIView(title) {
+        }
+
+        void show() override {
+            CLIView::show();
+
+            descriptionField.show();
+        }
+
+        DBTransactionReport getReport() {
+            DBTransactionReport report;
+
+            report.description = descriptionField.getValue();
+
+            return report;
+        }
+};
+
 #endif
