@@ -55,10 +55,10 @@ class ReportListView : public CLIListView {
             CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
             headerRow.addColumn(column1);
 
-            CLIListColumn column2 = CLIListColumn("Description.", 25, CLIListColumn::leftAligned);
+            CLIListColumn column2 = CLIListColumn("Description.", 24, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
-            CLIListColumn column3 = CLIListColumn("Where Clause", 40, CLIListColumn::leftAligned);
+            CLIListColumn column3 = CLIListColumn("Where Clause", 73, CLIListColumn::leftAligned);
             headerRow.addColumn(column3);
 
             addHeaderRow(headerRow);
