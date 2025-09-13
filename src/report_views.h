@@ -3,6 +3,9 @@
 #include <string.h>
 #include <vector>
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
 #include "pfm_error.h"
 #include "cli_widget.h"
 #include "custom_widgets.h"
@@ -97,13 +100,17 @@ class ReportListView : public CLIListView {
 class UpdateReportView : public CLIView {
     private:
         pfm_id_t reportId;
+        string sql;
 
         CLITextField descriptionField;
         CLITextField sqlField;
 
     public:
         UpdateReportView() : UpdateReportView("Update report") {}
-        UpdateReportView(const char * title) : CLIView(title) {}
+
+        UpdateReportView(const char * title) : CLIView(title) {
+            sqlField.setLengthLimit(REPORT_PROMPT_LENGTH);
+        }
 
         void setReport(DBTransactionReport & report) {
             char szPrompt[REPORT_PROMPT_LENGTH];
@@ -119,12 +126,18 @@ class UpdateReportView : public CLIView {
             snprintf(szPrompt, REPORT_PROMPT_LENGTH, "SQL ['%s']: ", report.sqlWhereClause.c_str());
             sqlField.setLabel(szPrompt);
             sqlField.setDefaultValue(report.sqlWhereClause);
+
+            sql = report.sqlWhereClause;
         }
 
         void show() override {
             CLIView::show();
 
             descriptionField.show();
+
+            clear_history();
+            add_history(sql.c_str());
+            
             sqlField.show();
         }
 

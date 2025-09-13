@@ -1089,8 +1089,15 @@ void Command::parse(const string & command) {
 }
 
 bool Command::process(const string & command) {
+    clear_history();
+
+    for (string & cmd : commandHistory) {
+        add_history(cmd.c_str());
+    }
+
     parse(command);
 
+    add_history(command.c_str());
     commandHistory.push_back(command);
 
     bool isContinue = true;
