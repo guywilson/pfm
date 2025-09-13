@@ -11,6 +11,7 @@
 #include "db_v_transaction.h"
 #include "db_transaction.h"
 #include "db_carried_over.h"
+#include "db_transaction_report.h"
 #include "transaction_criteria.h"
 
 using namespace std;
@@ -125,6 +126,13 @@ class Command {
         void importTransactions(string & jsonFileName);
         void exportTransactions(string & jsonFileName);
         void exportTransactionsAsCSV(string & csvFileName);
+
+        void addReport();
+        void listReports();
+        DBTransactionReport getReport(int sequence);
+        void updateReport(DBTransactionReport & report);
+        void deleteReport(DBTransactionReport & report);
+        void runReport(DBTransactionReport & report);
 
         void listCarriedOverLogs();
 

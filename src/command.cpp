@@ -837,6 +837,56 @@ void Command::exportTransactionsAsCSV(string & csvFileName) {
     out.close();
 }
 
+void Command::addReport() {
+    AddReportView view;
+    view.show();
+
+    DBTransactionReport report = view.getReport();
+    report.save();
+}
+
+void Command::listReports() {
+    DBResult<DBTransactionReport> result;
+    result.retrieveAll();
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    for (int i = 0;i < result.size();i++) {
+        DBTransactionReport report = result[i];
+        cacheMgr.addReport(report.sequence, report);
+    }
+
+    ReportListView view;
+    view.addResults(result);
+    view.show();
+}
+
+DBTransactionReport Command::getReport(int sequence) {
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    DBTransactionReport report = cacheMgr.getReport(sequence);
+
+    return report;
+}
+
+void Command::updateReport(DBTransactionReport & report) {
+    UpdateReportView view;
+    view.setReport(report);
+    view.show();
+
+    DBTransactionReport updatedReport = view.getReport();
+    updatedReport.save();
+}
+
+void Command::deleteReport(DBTransactionReport & report) {
+    report.remove();
+    report.clear();
+}
+
+void Command::runReport(DBTransactionReport & report) {
+    findTransactions(report.sqlWhereClause);
+}
+
 void Command::listCarriedOverLogs() {
     DBResult<DBCarriedOverView> result;
     result.retrieveAll();
@@ -1247,6 +1297,30 @@ bool Command::process(const string & command) {
     else if (isCommand("export-transactions-csv") || isCommand("xtc")) {
         string filename = getParameter(0);
         exportTransactionsAsCSV(filename);
+    }
+    else if (isCommand("add-report") || isCommand("arp")) {
+        addReport();
+    }
+    else if (isCommand("list-reports") || isCommand("show-reports") || isCommand("lrp")) {
+        listReports();
+    }
+    else if (isCommand("update-report") || isCommand("urp")) {
+        string sequence = getParameter(0);
+
+        DBTransactionReport report = getReport(atoi(sequence.c_str()));
+        updateReport(report);
+    }
+    else if (isCommand("delete-report") || isCommand("drp")) {
+        string sequence = getParameter(0);
+
+        DBTransactionReport report = getReport(atoi(sequence.c_str()));
+        deleteReport(report);
+    }
+    else if (isCommand("run-report") || isCommand("run")) {
+        string sequence = getParameter(0);
+
+        DBTransactionReport report = getReport(atoi(sequence.c_str()));
+        runReport(report);
     }
     else if (isCommand("list-carried-over-logs") || isCommand("lco")) {
         listCarriedOverLogs();

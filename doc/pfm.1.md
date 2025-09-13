@@ -66,6 +66,13 @@ The full list of ‘standard’ CRUD commands are as follows, commands outside o
 **update-transaction, ut**
 **delete-transaction, dt**
 
+**add-report, arp**
+**list-reports, show-reports, lrp**
+**update-report, urp**
+**delete-report, drp**
+
+Run a report after using **list-reports** using the **run-report or run** command with the sequence number of the report.
+
 PFM also supports import and export of entities via the following commands, these all accept/output files in JSON format, other than the **export-transasctions-csv** command which will output a CSV file, useful; for analysis in a spreadsheet program for example:
 
 **import-categories, ic**

@@ -5,3 +5,4 @@
 #include "transaction_views.h"
 #include "debug_views.h"
 #include "config_views.h"
+#include "report_views.h"

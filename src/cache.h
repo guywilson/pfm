@@ -11,6 +11,7 @@
 #include "db_recurring_charge.h"
 #include "db_v_transaction.h"
 #include "db_transaction.h"
+#include "db_transaction_report.h"
 
 using namespace std;
 
@@ -29,6 +30,7 @@ class CacheMgr {
 
         unordered_map<int, DBRecurringCharge> recurringChargeBySequence;
         unordered_map<int, DBTransaction> transactionBySequence;
+        unordered_map<int, DBTransactionReport> reportBySequence;
 
     public:
         ~CacheMgr() {}
@@ -41,12 +43,20 @@ class CacheMgr {
             transactionBySequence.clear();
         }
 
+        void clearReports() {
+            reportBySequence.clear();
+        }
+
         void addRecurringCharge(int sequence, DBRecurringCharge & charge) {
             recurringChargeBySequence.insert({sequence, charge});
         }
 
         void addTransaction(int sequence, DBTransaction & transaction) {
             transactionBySequence.insert({sequence, transaction});
+        }
+
+        void addReport(int sequence, DBTransactionReport & report) {
+            reportBySequence.insert({sequence, report});
         }
 
         DBRecurringCharge getRecurringCharge(int sequence) {
@@ -67,6 +77,16 @@ class CacheMgr {
             }
 
             throw pfm_error("DBTransaction not found in cache.");
+        }
+
+        DBTransactionReport getReport(int sequence) {
+            unordered_map<int, DBTransactionReport>::const_iterator item = reportBySequence.find(sequence);
+
+            if (item != reportBySequence.end()) {
+                return item->second;
+            }
+
+            throw pfm_error("DBTransactionReport not found in cache.");
         }
 };
 

@@ -655,6 +655,7 @@ void PFM_DB::createSchema() {
         createTable(pszCreateRCTable);
         createTable(pszCreateTransationTable);
         createTable(pszCreateCarriedOverTable);
+        createTable(pszCreateReportTable);
 
         createView(pszCreateCOView);
         createView(pszCreateListRCView);

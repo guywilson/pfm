@@ -337,6 +337,14 @@ static const char * pszCreateCarriedOverTable =
     "updated TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id));";
 
+static const char * pszCreateReportTable = 
+    "CREATE TABLE transaction_report (" \
+    "id INTEGER PRIMARY KEY," \
+    "description TEXT NOT NULL," \
+    "sql_where_clause TEXT NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL;";
+
 /*
 ** Create views, do this last...
 */
