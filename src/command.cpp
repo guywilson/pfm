@@ -483,16 +483,18 @@ void Command::listRecurringCharges() {
     DBRecurringChargeView chargeInstance;
     DBResult<DBRecurringChargeView> result = chargeInstance.retrieveByAccountID(selectedAccount.id);
 
-    RecurringChargeListView view;
-    view.addResults(result, selectedAccount.code);
-    view.show();
-
     CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    cacheMgr.clearRecurringCharges();
 
     for (int i = 0;i < result.size();i++) {
         DBRecurringCharge charge = result.at(i);
         cacheMgr.addRecurringCharge(charge.sequence, charge);
     }
+
+    RecurringChargeListView view;
+    view.addResults(result, selectedAccount.code);
+    view.show();
 }
 
 DBRecurringCharge Command::getRecurringCharge(int sequence) {
@@ -733,11 +735,6 @@ void Command::findTransactions(const string & criteria) {
     DBTransactionView tr;
     DBResult<DBTransactionView> result = tr.findTransactionsForCriteria(criteria);
 
-    TransactionListView view;
-    view.addTotal();
-    view.addResults(result);
-    view.show();
-
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
     cacheMgr.clearTransactions();
@@ -746,6 +743,11 @@ void Command::findTransactions(const string & criteria) {
         DBTransactionView transaction = result.at(i);
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }
+
+    TransactionListView view;
+    view.addTotal();
+    view.addResults(result);
+    view.show();
 }
 
 DBTransaction Command::getTransaction(int sequence) {
@@ -850,6 +852,8 @@ void Command::listReports() {
     result.retrieveAll();
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    cacheMgr.clearReports();
 
     for (int i = 0;i < result.size();i++) {
         DBTransactionReport report = result[i];
