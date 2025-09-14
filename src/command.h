@@ -133,7 +133,7 @@ class Command {
         void updateReport(DBTransactionReport & report);
         void deleteReport(DBTransactionReport & report);
         void runReport(DBTransactionReport & report);
-        void saveReport();
+        void saveReport(const string & description);
 
         void listCarriedOverLogs();
 

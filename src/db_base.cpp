@@ -50,7 +50,18 @@ uint64_t DBEntity::findSingleQuotePos(string & s, int startingPos = 0) {
     uint64_t pos = s.find(SINGLE_QUOTE_CHAR, startingPos);
 
     if (pos != string::npos) {
-        if (s.at(pos + 1) != SINGLE_QUOTE_CHAR) {
+        /*
+        ** If the single quote is before the end of the string, check that 
+        ** we haven't already got a double single quote. Otherwise, if the 
+        ** single quote is at the end of the string, return the position. 
+        ** This avoids out-of-range run-time exceptions...
+        */
+        if (pos < s.length() - 1) {
+            if (s.at(pos + 1) != SINGLE_QUOTE_CHAR) {
+                return pos;
+            }
+        }
+        else {
             return pos;
         }
     }

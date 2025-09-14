@@ -8,8 +8,6 @@ using namespace std;
 #ifndef _INCL_LOGGER
 #define _INCL_LOGGER
 
-#define MAX_LOG_LENGTH          250
-
 /*
 ** Supported log levels...
 */

@@ -893,14 +893,22 @@ void Command::runReport(DBTransactionReport & report) {
     findTransactions(report.sqlWhereClause);
 }
 
-void Command::saveReport() {
-    SaveReportView view;
-    view.show();
-
+void Command::saveReport(const string & description) {
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
-    DBTransactionReport report = view.getReport();
-    report.sqlWhereClause = cacheMgr.getFindCriteria();
+    DBTransactionReport report;
+
+    if (description.length() == 0) {
+        SaveReportView view;
+        view.show();
+
+        report = view.getReport();
+        report.sqlWhereClause = cacheMgr.getFindCriteria();
+    }
+    else {
+        report.description = description;
+        report.sqlWhereClause = cacheMgr.getFindCriteria();
+    }
 
     report.save();
 
@@ -1350,7 +1358,13 @@ bool Command::process(const string & command) {
         runReport(report);
     }
     else if (isCommand("save-report") || isCommand("save")) {
-        saveReport();
+        string description;
+
+        if (hasParameters()) {
+            description = getParameter(0);
+        }
+
+        saveReport(description);
     }
     else if (isCommand("list-carried-over-logs") || isCommand("lco")) {
         listCarriedOverLogs();
