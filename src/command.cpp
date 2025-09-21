@@ -532,12 +532,8 @@ void Command::updateRecurringCharge(DBRecurringCharge & charge) {
 void Command::deleteRecurringCharge(DBRecurringCharge & charge) {
     PFM_DB & db = PFM_DB::getInstance();
 
-    DBTransaction tr;
-
     try {
         db.begin();
-
-        tr.deleteByRecurringChargeId(charge.id);
 
         charge.remove();
         charge.clear();

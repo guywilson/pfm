@@ -193,6 +193,7 @@ class DBRecurringCharge : public DBPayment {
             return (endDate.isNull() || (!endDate.isNull() && endDate >= today));
         }
 
+        void beforeRemove() override;
         void beforeUpdate() override;
         
         int getFrequencyValue();

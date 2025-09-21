@@ -364,6 +364,23 @@ void DBRecurringCharge::setNextPaymentDate() {
     log.exit("DBRecurringCharge::setNextPaymentDate()");
 }
 
+void DBRecurringCharge::beforeRemove() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::beforeRemove()");
+
+    DBTransaction tr;
+    DBResult<DBTransaction> recurringTransactions = tr.retrieveByRecurringChargeID(this->id);
+
+    for (int i = 0;i < recurringTransactions.size();i++) {
+        DBTransaction recurringTransaction = recurringTransactions[i];
+
+        recurringTransaction.recurringChargeId = 0;
+        recurringTransaction.save();
+    }
+
+    log.exit("DBRecurringCharge::beforeRemove()");
+}
+
 void DBRecurringCharge::beforeUpdate() {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::beforeUpdate()");
