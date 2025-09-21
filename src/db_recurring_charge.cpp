@@ -240,7 +240,7 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
 
     StrDate nextPaymentDate;
 
-    if (this->date <= dateToday && this->isActive()) {
+    if (this->isActive()) {
         nextPaymentDate = this->date;
 
         switch (frequencyUnit) {
