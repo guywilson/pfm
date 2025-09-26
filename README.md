@@ -37,6 +37,11 @@ The full list of ‘standard’ CRUD commands are as follows, commands outside o
 **update-account, ua**
 **delete-account, da**
 
+**add-config-item, acfg**
+**list-config-items, lcfg**
+**update-config-item, ucfg**
+**delete-config-item, dcfg**
+
 **add-category, ac**
 **list-categories, lc**
 **update-category, uc**
@@ -56,6 +61,13 @@ The full list of ‘standard’ CRUD commands are as follows, commands outside o
 **list-transactions, list, lt** (*See extended forms below*)
 **update-transaction, ut**
 **delete-transaction, dt**
+
+**add-report, arp**
+**list-reports, show-reports, lrp**
+**update-report, urp**
+**delete-report, drp**
+
+Run a report after using **list-reports** using the **run-report or run** command with the sequence number of the report.
 
 PFM also supports import and export of entities via the following commands, these all accept/output files in JSON format, other than the **export-transasctions-csv** command which will output a CSV file, useful; for analysis in a spreadsheet program for example:
 
@@ -119,6 +131,8 @@ Parameters are listed below, any parameters that accept wildcards recognise * as
 - cr - transactions that are a credit
 - a:[amount] - transactions where the amount is less than this
 - A:[amount]|A:[amount] - transactions where the amount is between these 
+
+The query used in the **find** command can be saved as a report by issuing the **save-report** or **save** command.
 
 **use [account-code]**
 
