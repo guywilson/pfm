@@ -178,4 +178,29 @@ class SaveReportView : public CLIView {
         }
 };
 
+
+class ShowReportView : public CLIView {
+    private:
+        DBTransactionReport rp;
+
+    public:
+        ShowReportView() : ShowReportView("Show report") {}
+
+        ShowReportView(const char * title) : CLIView(title) {}
+
+        void setReport(DBTransactionReport & report) {
+            char szPrompt[REPORT_PROMPT_LENGTH];
+
+            rp = report;
+            rp.retrieve();
+        }
+
+        void show() override {
+            CLIView::show();
+
+            printf("Description: '%s'\n", rp.description.c_str());
+            printf("SQL: '%s'\n", rp.sqlWhereClause.c_str());
+        }
+};
+
 #endif

@@ -128,12 +128,14 @@ class Command {
         void exportTransactionsAsCSV(string & csvFileName);
 
         void addReport();
+        void copyReport(DBTransactionReport & report);
         void listReports();
         DBTransactionReport getReport(int sequence);
         void updateReport(DBTransactionReport & report);
         void deleteReport(DBTransactionReport & report);
         void runReport(DBTransactionReport & report);
         void saveReport(const string & description);
+        void showReport(DBTransactionReport & report);
 
         void listCarriedOverLogs();
 

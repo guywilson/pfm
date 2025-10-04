@@ -845,6 +845,11 @@ void Command::addReport() {
     report.save();
 }
 
+void Command::copyReport(DBTransactionReport & report) {
+    report.id = 0;
+    report.save();
+}
+
 void Command::listReports() {
     DBResult<DBTransactionReport> result;
     result.retrieveAll();
@@ -909,6 +914,12 @@ void Command::saveReport(const string & description) {
     report.save();
 
     cacheMgr.clearFindCriteria();
+}
+
+void Command::showReport(DBTransactionReport & report) {
+    ShowReportView view;
+    view.setReport(report);
+    view.show();
 }
 
 void Command::listCarriedOverLogs() {
@@ -1332,6 +1343,12 @@ bool Command::process(const string & command) {
     else if (isCommand("add-report") || isCommand("arp")) {
         addReport();
     }
+    else if (isCommand("copy-report") || isCommand("crp")) {
+        string sequence = getParameter(0);
+
+        DBTransactionReport report = getReport(atoi(sequence.c_str()));
+        copyReport(report);
+    }
     else if (isCommand("list-reports") || isCommand("show-reports") || isCommand("lrp")) {
         listReports();
     }
@@ -1361,6 +1378,12 @@ bool Command::process(const string & command) {
         }
 
         saveReport(description);
+    }
+    else if (isCommand("show-report") || isCommand("srp")) {
+        string sequence = getParameter(0);
+
+        DBTransactionReport report = getReport(atoi(sequence.c_str()));
+        showReport(report);
     }
     else if (isCommand("list-carried-over-logs") || isCommand("lco")) {
         listCarriedOverLogs();
