@@ -178,7 +178,6 @@ class SaveReportView : public CLIView {
         }
 };
 
-
 class ShowReportView : public CLIView {
     private:
         DBTransactionReport rp;
