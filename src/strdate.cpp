@@ -19,8 +19,6 @@ using namespace std;
 #define EPOCH_MONTH                    1
 #define EPOCH_DAY                      1
 
-static string _todayTestDate;
-
 StrDate::StrDate() {
     this->_date = StrDate::today();
 }
@@ -49,14 +47,6 @@ StrDate::StrDate(int year, int month, int day) {
         day);
 
     this->set(dateStr);
-}
-
-void StrDate::setToday(const string & today) {
-    _todayTestDate = today;
-}
-
-void StrDate::clearToday() {
-    _todayTestDate.clear();
 }
 
 bool StrDate::isYear(string & part) {
@@ -152,24 +142,19 @@ StrDate::YMD StrDate::splitDate(const string & date) {
 string StrDate::today() {
     char today[DATE_STAMP_BUFFER_LEN];
 
-    if (_todayTestDate.length() == 0) {
-        struct timeval tv;
+    struct timeval tv;
 
-        gettimeofday(&tv, NULL);
-        time_t t = tv.tv_sec;
-        struct tm * localTime = localtime(&t);
+    gettimeofday(&tv, NULL);
+    time_t t = tv.tv_sec;
+    struct tm * localTime = localtime(&t);
 
-        snprintf(
-            today, 
-            DATE_STAMP_BUFFER_LEN, 
-            "%d-%02d-%02d", 
-            localTime->tm_year + 1900, 
-            localTime->tm_mon + 1, 
-            localTime->tm_mday);
-    }
-    else {
-        strncpy(today, _todayTestDate.c_str(), _todayTestDate.length());
-    }
+    snprintf(
+        today, 
+        DATE_STAMP_BUFFER_LEN, 
+        "%d-%02d-%02d", 
+        localTime->tm_year + 1900, 
+        localTime->tm_mon + 1, 
+        localTime->tm_mday);
 
     return string(today);
 }

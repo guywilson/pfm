@@ -1388,13 +1388,6 @@ bool Command::process(const string & command) {
     else if (isCommand("change-password")) {
         changePassword();
     }
-    else if (isCommand("set-today")) {
-        string today = getParameter(0);
-        StrDate::setToday(today);
-    }
-    else if (isCommand("clear-today")) {
-        StrDate::clearToday();
-    }
     else if (isCommand("clear-recurring-transactions")) {
         clearRecurringTransactions();
     }
