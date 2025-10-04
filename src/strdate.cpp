@@ -102,8 +102,8 @@ StrDate::YMD StrDate::splitDate(const string & date) {
     if (date.length() != DATE_STRING_LENGTH) {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
-                    "Invalid date '%s': Invalid date length, date must be in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'",
-                    date.c_str()),
+                    "Invalid date '%s' [%u]: Invalid date length, date must be in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'",
+                    date.c_str(), date.length()),
                 __FILE__,
                 __LINE__);
     }
@@ -317,14 +317,10 @@ string StrDate::getDisplayDate() const {
 }
 
 void StrDate::set(const string & date) {
-    set(date.c_str());
-}
-
-void StrDate::set(const char * date) {
-    if (strncmp(date, _nullDate.c_str(), 3) == 0) {
+    if (date.compare(_nullDate) == 0) {
         clear();
     }
-    else if (strlen(date) > 0) {
+    else if (date.length() > 0) {
         validateDateString(date);
 
         StrDate::YMD dateComponents = splitDate(date);
@@ -333,6 +329,11 @@ void StrDate::set(const char * date) {
     else {
         clear();
     }
+}
+
+void StrDate::set(const char * date) {
+    string dt(date);
+    set(dt);
 }
 
 void StrDate::set(int year, int month, int day) {

@@ -265,20 +265,86 @@ void DBTransaction::reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDa
     log.exit("reconcileAllForAccountIDBeforeDate");
 }
 
+void DBTransaction::createTransferSource(const DBRecurringCharge & src, StrDate & transactionDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::createTransferSource()");
+
+    DBTransaction transaction;
+
+    transaction.setFromRecurringCharge(src);
+
+    transaction.date = transactionDate;
+    transaction.isCredit = false;
+    transaction.isReconciled = true;
+
+    DBAccount account;
+    account.id = src.transferToAccountId;
+
+    account.retrieve();
+
+    transaction.reference = "TR > " +  account.code;
+
+    transaction.save();
+
+    log.exit("DBTransaction::createTransferSource()");
+}
+
+void DBTransaction::createTransferTarget(const DBRecurringCharge & src, StrDate & transactionDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::createTransferTarget()");
+
+    DBTransaction transaction;
+
+    transaction.setFromRecurringCharge(src);
+
+    transaction.date = transactionDate;
+    transaction.isCredit = true;
+    transaction.isReconciled = true;
+
+    DBAccount account;
+    account.id = src.accountId;
+
+    account.retrieve();
+
+    transaction.reference = "TR < " +  account.code;
+
+    transaction.save();
+
+    log.exit("DBTransaction::createTransferTarget()");
+}
+
 void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::createFromRecurringChargeAndDate()");
 
     log.debug("Creating recurring transaction '%s' for date '%s'", src.description.c_str(), transactionDate.shortDate().c_str());
 
-    DBTransaction tr;
-    tr.setFromRecurringCharge(src);
+    PFM_DB & db = PFM_DB::getInstance();
 
-    tr.date = transactionDate;
-    tr.isCredit = false;
-    tr.isReconciled = true;
+    try {
+        db.begin();
 
-    tr.save();
+        if (src.transferToAccountId != 0) {
+            createTransferSource(src, transactionDate);
+            createTransferTarget(src, transactionDate);
+        }
+        else {
+            DBTransaction tr;
+            tr.setFromRecurringCharge(src);
+
+            tr.date = transactionDate;
+            tr.isCredit = false;
+            tr.isReconciled = true;
+
+            tr.save();
+        }
+
+        db.commit();
+    }
+    catch (exception & e) {
+        log.error("DBTransaction::createFromRecurringChargeAndDate() - Error '%s'", e.what());
+        throw pfm_error(pfm_error::buildMsg("Failed to create transaction from recurring charge - '%s'", e.what()));
+    }
 
     log.exit("DBTransaction::createFromRecurringChargeAndDate()");
 }

@@ -25,6 +25,7 @@ class AddRecurringChargeView : public CLIView {
         CLITextField descriptionField = CLITextField("Description: ");
         FrequencyField frequencyField = FrequencyField("Frequency (N[wmy]): ");
         CLICurrencyField amountField = CLICurrencyField("Amount: ");
+        AccountSpinField transferToAccountField = AccountSpinField("Transfer to account: ");
 
     public:
         AddRecurringChargeView() : AddRecurringChargeView("Add recurring charge") {}
@@ -44,11 +45,15 @@ class AddRecurringChargeView : public CLIView {
             descriptionField.show();
             frequencyField.show();
             amountField.show();
+            transferToAccountField.show();
         }
 
         DBRecurringCharge getRecurringCharge() {
             DBRecurringCharge charge;
 
+            DBAccount trAccount = transferToAccountField.getAccount();
+
+            charge.transferToAccountId = trAccount.id;
             charge.category = categoryField.getCategory();
             charge.categoryId = charge.category.id;
 
@@ -164,6 +169,7 @@ class UpdateRecurringChargeView : public CLIView {
         CLITextField descriptionField;
         FrequencyField frequencyField;
         CLICurrencyField amountField;
+        AccountSpinField transferToAccountField;
 
     public:
         UpdateRecurringChargeView() : UpdateRecurringChargeView("Update recurring charge") {}
@@ -201,6 +207,17 @@ class UpdateRecurringChargeView : public CLIView {
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%s]: ", charge.amount.rawStringValue().c_str());
             amountField.setLabel(szPrompt);
             amountField.setDefaultValue(charge.amount.rawStringValue());
+
+            DBAccount trAccount;
+
+            if (charge.transferToAccountId != 0) {
+                trAccount.id = charge.transferToAccountId;
+                trAccount.retrieve();
+            }
+
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Transfer to account [%s]: ", trAccount.code.c_str());
+            transferToAccountField.setLabel(szPrompt);
+            transferToAccountField.setDefaultValue(trAccount.code);
         }
 
         void show() override {
@@ -213,6 +230,7 @@ class UpdateRecurringChargeView : public CLIView {
             descriptionField.show();
             frequencyField.show();
             amountField.show();
+            transferToAccountField.show();
         }
 
         DBRecurringCharge getRecurringCharge() {
@@ -231,6 +249,9 @@ class UpdateRecurringChargeView : public CLIView {
             charge.description = descriptionField.getValue();
             charge.frequency = frequencyField.getValue();
             charge.amount = amountField.getValue();
+
+            DBAccount trAccount = transferToAccountField.getAccount();
+            charge.transferToAccountId = trAccount.id;
 
             return charge;
         }

@@ -225,6 +225,9 @@ class DBTransaction : public DBPayment {
 
         DBResult<DBTransaction> retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
+        static void createTransferSource(const DBRecurringCharge & src, StrDate & transactionDate);
+        static void createTransferTarget(const DBRecurringCharge & src, StrDate & transactionDate);
+
     public:
         pfm_id_t recurringChargeId;
         string reference;
