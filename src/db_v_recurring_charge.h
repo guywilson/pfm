@@ -26,6 +26,8 @@ class DBRecurringChargeView : public DBRecurringCharge {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "transfer_to_account_id," \
+                        "transfer_account_code," \
                         "category_id," \
                         "category_code," \
                         "payee_id," \
@@ -44,6 +46,8 @@ class DBRecurringChargeView : public DBRecurringCharge {
                         "SELECT " \
                         "id," \
                         "account_id," \
+                        "transfer_to_account_id," \
+                        "transfer_account_code," \
                         "category_id," \
                         "payee_id," \
                         "date," \
@@ -59,6 +63,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
                         "AND date < '%s';";
 
     public:
+        string transferToAccountCode;
         string payeeCode;
         string categoryCode;
 
@@ -73,6 +78,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
         void clear() {
             DBRecurringCharge::clear();
 
+            this->transferToAccountCode = "";
             this->payeeCode = "";
             this->categoryCode = "";
         }
@@ -80,6 +86,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
         void set(const DBRecurringChargeView & src) {
             DBRecurringCharge::set(src);
 
+            this->transferToAccountCode = src.transferToAccountCode;
             this->payeeCode = src.payeeCode;
             this->categoryCode = src.categoryCode;
         }
@@ -87,6 +94,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
         void print() {
             DBRecurringCharge::print();
 
+            cout << "TransferToAccountCode: '" << transferToAccountCode << "'" << endl;
             cout << "PayeeCode: '" << payeeCode << "'" << endl;
             cout << "CategoryCode: '" << categoryCode << "'" << endl;
         }
@@ -94,7 +102,10 @@ class DBRecurringChargeView : public DBRecurringCharge {
         void assignColumn(DBColumn & column) override {
             DBRecurringCharge::assignColumn(column);
             
-            if (column.getName() == "payee_code") {
+            if (column.getName() == "transfer_account_code") {
+                transferToAccountCode = column.getValue();
+            }
+            else if (column.getName() == "payee_code") {
                 payeeCode = column.getValue();
             }
             else if (column.getName() == "category_code") {

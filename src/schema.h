@@ -368,6 +368,8 @@ const char * pszCreateListRCView =
     "CREATE VIEW v_recurring_charge_list AS SELECT " \
     "rc.id," \
     "rc.account_id," \
+    "rc.transfer_to_account_id," \
+    "ta.code AS transfer_account_code," \
     "rc.date," \
     "rc.end_date," \
     "rc.description," \
@@ -380,6 +382,7 @@ const char * pszCreateListRCView =
     "rc.created," \
     "rc.updated " \
     "FROM recurring_charge rc " \
+    "LEFT JOIN account ta ON ta.id = rc.transfer_to_account_id " \
     "LEFT JOIN payee p ON p.id = rc.payee_id " \
     "LEFT JOIN category c ON c.id = rc.category_id " \
     "ORDER BY rc.date ASC;";
