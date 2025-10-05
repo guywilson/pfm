@@ -156,7 +156,8 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM account_transaction " \
-                        "WHERE recurring_charge_id = %lld;";
+                        "WHERE account_id = %lld " \
+                        "AND recurring_charge_id = %lld;";
 
         const char * sqlSelectLatestByChargeID = 
                         "SELECT " \
@@ -174,7 +175,8 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM account_transaction " \
-                        "WHERE recurring_charge_id = %lld " \
+                        "WHERE account_id = %lld " \
+                        "AND recurring_charge_id = %lld " \
                         "ORDER BY date DESC " \
                         "LIMIT 1;";
 
@@ -218,7 +220,7 @@ class DBTransaction : public DBPayment {
                         "AND is_reconciled = 'N';";
 
         const char * sqlDeleteByRecurringCharge = 
-                        "DELETE FROM account_transaction WHERE recurring_charge_id = %lld;";
+                        "DELETE FROM account_transaction WHERE account_id = %lld AND recurring_charge_id = %lld;";
 
         const char * sqlDeleteAllRecurringForAccount = 
                         "DELETE FROM account_transaction WHERE account_id = %lld AND recurring_charge_id <> 0;";
@@ -428,10 +430,10 @@ class DBTransaction : public DBPayment {
         void beforeUpdate() override;
         void afterRemove() override;
 
-        int findLatestByRecurringChargeID(pfm_id_t chargeId);
+        int findLatestByRecurringChargeIDForAccount(pfm_id_t accountId, pfm_id_t chargeId);
         int createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate);
 
-        void deleteByRecurringChargeId(pfm_id_t recurringChargeId);
+        void deleteByRecurringChargeIdForAccount(pfm_id_t accountId, pfm_id_t recurringChargeId);
         void deleteAllRecurringTransactionsForAccount(pfm_id_t accountId);
 
         void reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDate & referenceDate);
@@ -441,7 +443,7 @@ class DBTransaction : public DBPayment {
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
         DBResult<DBTransaction> retrieveReconciledByAccountID(pfm_id_t accountId);
-        DBResult<DBTransaction> retrieveByRecurringChargeID(pfm_id_t recurringChargeId);
+        DBResult<DBTransaction> retrieveByRecurringChargeIDForAccount(pfm_id_t accountId, pfm_id_t recurringChargeId);
         DBResult<DBTransaction> retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransaction> retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransaction> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);

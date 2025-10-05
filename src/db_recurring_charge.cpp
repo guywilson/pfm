@@ -369,7 +369,7 @@ void DBRecurringCharge::beforeRemove() {
     log.entry("DBRecurringCharge::beforeRemove()");
 
     DBTransaction tr;
-    DBResult<DBTransaction> recurringTransactions = tr.retrieveByRecurringChargeID(this->id);
+    DBResult<DBTransaction> recurringTransactions = tr.retrieveByRecurringChargeIDForAccount(accountId, id);
 
     for (int i = 0;i < recurringTransactions.size();i++) {
         DBTransaction recurringTransaction = recurringTransactions[i];
@@ -396,7 +396,7 @@ void DBRecurringCharge::beforeUpdate() {
         log.debug("Updating transactions for charge '%s'", this->description.c_str());
         
         DBTransaction tr;
-        DBResult<DBTransaction> trResult = tr.retrieveByRecurringChargeID(id);
+        DBResult<DBTransaction> trResult = tr.retrieveByRecurringChargeIDForAccount(accountId, id);
 
         for (int i = 0;i < trResult.size();i++) {
             DBTransaction transaction = trResult.at(i);
