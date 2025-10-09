@@ -168,19 +168,19 @@ void testAccount() {
     ** Check that we have the right number of transactions created...
     */
     DBTransaction tr;
-    DBResult<DBTransaction> trResult1 = tr.retrieveByRecurringChargeIDForAccount(accountId, charge1.id);
+    DBResult<DBTransaction> trResult1 = tr.retrieveByRecurringChargeID(charge1.id);
 
     if (trResult1.size() != 8) {
         throw pfm_error(pfm_error::buildMsg("Expected 8 transactions, got %d", trResult1.size()));
     }
 
-    DBResult<DBTransaction> trResult2 = tr.retrieveByRecurringChargeIDForAccount(accountId, charge2.id);
+    DBResult<DBTransaction> trResult2 = tr.retrieveByRecurringChargeID(charge2.id);
 
     if (trResult2.size() != 7) {
         throw pfm_error(pfm_error::buildMsg("Expected 7 transactions, got %d", trResult2.size()));
     }
 
-    DBResult<DBTransaction> trResult3 = tr.retrieveByRecurringChargeIDForAccount(accountId, charge3.id);
+    DBResult<DBTransaction> trResult3 = tr.retrieveByRecurringChargeID(charge3.id);
 
     if (trResult3.size() != 5) {
         throw pfm_error(pfm_error::buildMsg("Expected 5 transactions, got %d", trResult3.size()));

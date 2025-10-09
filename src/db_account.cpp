@@ -72,7 +72,7 @@ void DBAccount::createRecurringTransactions() {
 
             if (charge.isActive()) {
                 DBTransaction transaction;
-                int numRows = transaction.findLatestByRecurringChargeIDForAccount(this->id, charge.id);
+                int numRows = transaction.findLatestByRecurringChargeID(charge.id);
 
                 if (numRows == 0) {
                     log.debug("Found no exisiting transactions for charge %lld", charge.id);
@@ -147,7 +147,7 @@ void DBAccount::beforeUpdate() {
             DBRecurringCharge charge = chResult.at(i);
 
             DBTransaction tr;
-            tr.deleteByRecurringChargeIdForAccount(this->id, charge.id);
+            tr.deleteByRecurringChargeId(charge.id);
         }
     }
 
