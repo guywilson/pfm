@@ -15,9 +15,6 @@ using namespace std;
 #define DATE_STAMP_BUFFER_LEN               32
 #define DATE_STRING_LENGTH                  10
 
-void setOverrideDate(const char * date);
-void clearOverrideDate(const char * date);
-
 class StrDate {
     private:
         string _date;
