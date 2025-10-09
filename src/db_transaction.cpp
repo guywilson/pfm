@@ -297,7 +297,6 @@ void DBTransaction::createTransferTarget(const DBRecurringCharge & src, StrDate 
 
     transaction.setFromRecurringCharge(src);
 
-    transaction.accountId = src.transferToAccountId;
     transaction.date = transactionDate;
     transaction.isCredit = true;
     transaction.isReconciled = true;
@@ -326,8 +325,6 @@ void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringCharge & s
         db.begin();
 
         if (src.transferToAccountId != 0) {
-            log.debug("Creating transfer transactions for recurring charge '%s'", src.description.c_str());
-
             createTransferSource(src, transactionDate);
             createTransferTarget(src, transactionDate);
         }
