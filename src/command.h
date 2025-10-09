@@ -19,38 +19,6 @@ using namespace std;
 #ifndef __INCL_COMMAND
 #define __INCL_COMMAND
 
-#include <iostream>
-#include <string>
-
-class Tokenizer {
-    private:
-        string text;
-        size_t pos;
-
-    public:
-        Tokenizer(const string & str) : text(str), pos(0) {}
-
-        // get next token using given delimiters
-        string next(const string & delims) {
-            if (pos >= text.size()) {
-                return "";
-            }
-
-            // skip leading delimiters
-            pos = text.find_first_not_of(delims, pos);
-            if (pos == string::npos) {
-                return "";
-            }
-
-            size_t end = text.find_first_of(delims, pos);
-            string token = text.substr(pos, end - pos);
-
-            pos = (end == string::npos) ? text.size() : end + 1;
-
-            return token;
-        }
-};
-
 class Command {
     private:
         string command;

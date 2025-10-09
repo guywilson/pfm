@@ -188,6 +188,8 @@ class ShowReportView : public CLIView {
         ShowReportView(const char * title) : CLIView(title) {}
 
         void setReport(DBTransactionReport & report) {
+            char szPrompt[REPORT_PROMPT_LENGTH];
+
             rp = report;
             rp.retrieve();
         }

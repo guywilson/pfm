@@ -1079,15 +1079,18 @@ void Command::saveJsonTemplate() {
     delete entity;
 }
 
-void Command::parse(const string & cmd) {
+void Command::parse(const string & command) {
+    const char * parameterDelimiters = ";:|";
+
     this->command.clear();
     this->parameters.clear();
 
-    Tokenizer t(cmd);
-    string part = t.next(" ");
+    char * cmdString = strdup(command.c_str());;
+
+    char * part = strtok(cmdString, " ");
 
     int i = 0;
-    while (part.length() > 0) {
+    while (part != NULL) {
         if (i == 0) {
             this->command = part;
         }
@@ -1095,7 +1098,7 @@ void Command::parse(const string & cmd) {
             this->parameters.push_back(part);
         }
 
-        part = t.next(";:|");
+        part = strtok(NULL, parameterDelimiters);
         i++;
     }
 }

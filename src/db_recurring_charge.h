@@ -28,7 +28,6 @@ class DBRecurringCharge : public DBPayment {
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "transfer_to_account_id," \
                         "category_id," \
                         "payee_id," \
                         "date," \
@@ -45,7 +44,6 @@ class DBRecurringCharge : public DBPayment {
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "transfer_to_account_id," \
                         "category_id," \
                         "payee_id," \
                         "date," \
@@ -63,7 +61,6 @@ class DBRecurringCharge : public DBPayment {
         const char * sqlInsert = 
                         "INSERT INTO recurring_charge (" \
                         "account_id," \
-                        "transfer_to_account_id," \
                         "category_id," \
                         "payee_id," \
                         "date," \
@@ -73,13 +70,12 @@ class DBRecurringCharge : public DBPayment {
                         "frequency," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, %lld, %lld, %lld, '%s', '%s'," \
+                        "VALUES (%lld, %lld, %lld, '%s', '%s'," \
                         "'%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
-                        "UPDATE recurring_charge SET " \
-                        "transfer_to_account_id = %lld," \
-                        "category_id = %lld," \
+                        "UPDATE recurring_charge " \
+                        "SET category_id = %lld," \
                         "payee_id = %lld," \
                         "date = '%s'," \
                         "end_date = '%s'," \
@@ -95,21 +91,9 @@ class DBRecurringCharge : public DBPayment {
         int getPeriodEndDay();
         int getPeriodEndDay(StrDate & referenceDate);
 
-        string getTransferAccountCode() {
-            if (transferToAccountId == 0) {
-                return "";
-            }
-
-            DBAccount account;
-            account.retrieve(this->transferToAccountId);
-
-            return account.code;
-        }
-
     public:
         StrDate nextPaymentDate;    // Not persistent
 
-        pfm_id_t transferToAccountId;
         string frequency;
         StrDate endDate;
 
@@ -128,7 +112,6 @@ class DBRecurringCharge : public DBPayment {
         string getCSVRecord() {
             string record = 
                     "\"" + getAccountCode() + "\"," + 
-                    "\"" + getTransferAccountCode() + "\"," + 
                     "\"" + category.code + "\"," +
                     "\"" + payee.code + "\"," +
                     "\"" + date.shortDate() + "\"," +
@@ -143,7 +126,6 @@ class DBRecurringCharge : public DBPayment {
         void clear() {
             DBPayment::clear();
 
-            this->transferToAccountId = 0;
             this->frequency = "";
             this->nextPaymentDate.clear();
             this->endDate.clear();
@@ -152,7 +134,6 @@ class DBRecurringCharge : public DBPayment {
         void set(const DBRecurringCharge & src) {
             DBPayment::set(src);
 
-            this->transferToAccountId = src.transferToAccountId;
             this->nextPaymentDate = src.nextPaymentDate;
             this->frequency = src.frequency;
             this->endDate = src.endDate;
@@ -161,10 +142,6 @@ class DBRecurringCharge : public DBPayment {
         void set(JRecord & record) {
             DBPayment::set(record);
 
-            string accountCode = record.get("transferToAccountCode");
-            DBAccount trAccount;
-            trAccount.retrieveByCode(accountCode);
-
             this->frequency = record.get("frequency");
             this->endDate = record.get("endDate");
         }
@@ -172,12 +149,6 @@ class DBRecurringCharge : public DBPayment {
         JRecord getRecord() override  {
             JRecord r = DBPayment::getRecord();
 
-            DBAccount trAccount;
-            trAccount.id = this->transferToAccountId;
-
-            trAccount.retrieve();
-
-            r.add("transferToAccountCode", trAccount.code);
             r.add("endDate", this->endDate.shortDate());
             r.add("frequency", this->frequency);
 
@@ -187,7 +158,6 @@ class DBRecurringCharge : public DBPayment {
         void print() {
             DBPayment::print();
 
-            cout << "TransferToAccount: '" << getTransferAccountCode() << "'" << endl;
             cout << "Frequency: '" << frequency << "'" << endl;
             cout << "EndDate: '" << endDate.shortDate() << "'" << endl;
             cout << "NextPaymentDate: '" << nextPaymentDate.shortDate() << "'" << endl;
@@ -198,9 +168,6 @@ class DBRecurringCharge : public DBPayment {
             
             if (column.getName() == "end_date") {
                 endDate = column.getValue();
-            }
-            else if (column.getName() == "transfer_to_account_id") {
-                transferToAccountId = column.getIDValue();
             }
             else if (column.getName() == "frequency") {
                 frequency = column.getValue();
@@ -258,7 +225,6 @@ class DBRecurringCharge : public DBPayment {
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
                 accountId,
-                transferToAccountId,
                 categoryId,
                 payeeId,
                 date.shortDate().c_str(),
@@ -283,7 +249,6 @@ class DBRecurringCharge : public DBPayment {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
-                transferToAccountId,
                 categoryId,
                 payeeId,
                 date.shortDate().c_str(),
