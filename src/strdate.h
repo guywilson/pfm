@@ -81,6 +81,9 @@ class StrDate {
         
         bool isNull();
 
+        static void setToday(const string & today);
+        static void clearToday();
+
         static string today();
         static string getTimestamp();
         static string getTimestampToMicrosecond();
