@@ -22,6 +22,64 @@ using namespace std;
 #define CHARGE_OK                   0
 #define CHARGE_NOT_DUE              -1
 
+enum class FrequencyUnit { Days, Weeks, Months, Years };
+
+struct Frequency {
+    string _fstr;
+
+    int count;
+    FrequencyUnit unit;
+
+    const char * c_str() {
+        return _fstr.c_str();
+    }
+
+    string toString() {
+        return _fstr;
+    }
+
+    void set(const string & freqStr) {
+        _fstr = freqStr;
+    }
+
+    static Frequency parse(const string & freqStr) {
+        if (freqStr.empty()) {
+            throw std::invalid_argument("Empty frequency string");
+        }
+
+        int count = 0;
+        size_t i = 0;
+
+        while (i < freqStr.size() && isdigit(freqStr[i])) {
+            count = count * 10 + (freqStr[i] - '0');
+            ++i;
+        }
+
+        if (count <= 0 || i >= freqStr.size()) {
+            throw std::invalid_argument("Invalid frequency format: " + freqStr);
+        }
+
+        char unitChar = freqStr[i];
+
+        switch (unitChar) {
+            case 'd': 
+                return { freqStr, count, FrequencyUnit::Days };
+
+            case 'w': 
+                return { freqStr, count, FrequencyUnit::Weeks };
+
+            case 'm': 
+                return { freqStr, count, FrequencyUnit::Months };
+
+            case 'y': 
+                return { freqStr, count, FrequencyUnit::Years };
+
+            default: 
+                throw std::invalid_argument("Unknown frequency unit: " + std::string(1, unitChar));
+        }
+    }
+};
+
 class DBRecurringCharge : public DBPayment {
     private:
         const char * sqlSelectByAccountID = 
@@ -94,7 +152,7 @@ class DBRecurringCharge : public DBPayment {
     public:
         StrDate nextPaymentDate;    // Not persistent
 
-        string frequency;
+        Frequency frequency;
         StrDate endDate;
 
         DBRecurringCharge() : DBPayment() {
@@ -117,7 +175,7 @@ class DBRecurringCharge : public DBPayment {
                     "\"" + date.shortDate() + "\"," +
                     "\"" + endDate.shortDate() + "\"," +
                     "\"" + description + "\"," +
-                    "\"" + frequency + "\"," +
+                    "\"" + frequency.toString() + "\"," +
                     "" + amount.rawStringValue() + "\n";
 
             return record;
@@ -126,7 +184,7 @@ class DBRecurringCharge : public DBPayment {
         void clear() {
             DBPayment::clear();
 
-            this->frequency = "";
+            this->frequency.set("");
             this->nextPaymentDate.clear();
             this->endDate.clear();
         }
@@ -142,7 +200,7 @@ class DBRecurringCharge : public DBPayment {
         void set(JRecord & record) {
             DBPayment::set(record);
 
-            this->frequency = record.get("frequency");
+            this->frequency = Frequency::parse(record.get("frequency"));
             this->endDate = record.get("endDate");
         }
 
@@ -150,7 +208,7 @@ class DBRecurringCharge : public DBPayment {
             JRecord r = DBPayment::getRecord();
 
             r.add("endDate", this->endDate.shortDate());
-            r.add("frequency", this->frequency);
+            r.add("frequency", this->frequency.toString());
 
             return r;
         }
@@ -158,7 +216,7 @@ class DBRecurringCharge : public DBPayment {
         void print() {
             DBPayment::print();
 
-            cout << "Frequency: '" << frequency << "'" << endl;
+            cout << "Frequency: '" << frequency.toString() << "'" << endl;
             cout << "EndDate: '" << endDate.shortDate() << "'" << endl;
             cout << "NextPaymentDate: '" << nextPaymentDate.shortDate() << "'" << endl;
         }
@@ -170,7 +228,7 @@ class DBRecurringCharge : public DBPayment {
                 endDate = column.getValue();
             }
             else if (column.getName() == "frequency") {
-                frequency = column.getValue();
+                frequency = Frequency::parse(column.getValue());
             }
         }
 
@@ -196,9 +254,6 @@ class DBRecurringCharge : public DBPayment {
         void beforeRemove() override;
         void beforeUpdate() override;
         
-        int getFrequencyValue();
-        char getFrequencyUnit();
-
         bool isChargeDueThisPeriod();
         bool isChargeDueThisPeriod(StrDate & referenceDate);
         StrDate calculateNextPaymentDate();

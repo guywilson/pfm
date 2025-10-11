@@ -58,7 +58,7 @@ class AddRecurringChargeView : public CLIView {
             charge.date = startDateField.getValue();
             charge.endDate = endDateField.getValue();
             charge.description = descriptionField.getValue();
-            charge.frequency = frequencyField.getValue();
+            charge.frequency = Frequency::parse(frequencyField.getValue());
             charge.amount = amountField.getDoubleValue();
 
             return charge;
@@ -138,7 +138,7 @@ class RecurringChargeListView : public CLIListView {
                 row.addCellValue(charge.description);
                 row.addCellValue(charge.categoryCode);
                 row.addCellValue(charge.payeeCode);
-                row.addCellValue(charge.frequency);
+                row.addCellValue(charge.frequency.toString());
                 row.addCellValue(charge.amount);
 
                 total += charge.amount;
@@ -196,7 +196,7 @@ class UpdateRecurringChargeView : public CLIView {
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Frequency (x[d|w|m|y]) ['%s']: ", charge.frequency.c_str());
             frequencyField.setLabel(szPrompt);
-            frequencyField.setDefaultValue(charge.frequency);
+            frequencyField.setDefaultValue(charge.frequency.toString());
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%s]: ", charge.amount.rawStringValue().c_str());
             amountField.setLabel(szPrompt);
@@ -229,7 +229,7 @@ class UpdateRecurringChargeView : public CLIView {
             charge.date = startDateField.getValue();
             charge.endDate = endDateField.getValue();
             charge.description = descriptionField.getValue();
-            charge.frequency = frequencyField.getValue();
+            charge.frequency = Frequency::parse(frequencyField.getValue());
             charge.amount = amountField.getValue();
 
             return charge;

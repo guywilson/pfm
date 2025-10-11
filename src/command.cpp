@@ -74,7 +74,7 @@ static DBRecurringCharge * createSampleCharge() {
     charge->date = "2025-07-05";
     charge->description = "Sample charge";
     charge->endDate = "";
-    charge->frequency = "1m";
+    charge->frequency = Frequency::parse("1m");
     charge->payee = *payee;
 
     return charge;

@@ -102,7 +102,7 @@ void DBAccount::createRecurringTransactions() {
 
                 while (transactionDate <= dateToday) {
                     if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
-                        cout << "| " << transactionDate.shortDate() << " | " << charge.frequency << " | " << setw(16) << right << charge.amount.localeFormattedStringValue() << " | " << charge.description << endl;
+                        cout << "| " << transactionDate.shortDate() << " | " << charge.frequency.toString() << " | " << setw(16) << right << charge.amount.localeFormattedStringValue() << " | " << charge.description << endl;
                     }
 
                     DBTransaction::createFromRecurringChargeAndDate(charge, transactionDate);

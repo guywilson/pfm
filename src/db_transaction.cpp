@@ -292,23 +292,23 @@ int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, St
     if (latestDate <= dateToday) {
         StrDate nextPaymentDate = latestDate;
 
-        char frequencyValue = charge.getFrequencyValue();
-        char frequencyUnit = charge.getFrequencyUnit();
+        char frequencyValue = charge.frequency.count;
+        FrequencyUnit frequencyUnit = charge.frequency.unit;
 
         switch (frequencyUnit) {
-            case 'y':
+            case FrequencyUnit::Years:
                 nextPaymentDate.addYears(frequencyValue);
                 break;
 
-            case 'm':
+            case FrequencyUnit::Months:
                 nextPaymentDate.addMonths(frequencyValue);
                 break;
 
-            case 'w':
+            case FrequencyUnit::Weeks:
                 nextPaymentDate.addWeeks(frequencyValue);
                 break;
 
-            case 'd':
+            case FrequencyUnit::Days:
                 nextPaymentDate.addDays(frequencyValue);
                 break;
         }
