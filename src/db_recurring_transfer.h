@@ -1,0 +1,133 @@
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <vector>
+
+#include <sqlcipher/sqlite3.h>
+
+#include "pfm_error.h"
+#include "db_base.h"
+#include "db.h"
+#include "strdate.h"
+
+using namespace std;
+
+#ifndef __INCL_RECURRING_TRANSFER
+#define __INCL_RECURRING_TRANSFER
+
+class DBRecurringTransfer : public DBEntity {
+    private:
+        const char * sqlSelectByRecurringChargeId = 
+                        "SELECT id, " \
+                        "recurring_charge_id," \
+                        "account_to_id," \
+                        "created," \
+                        "updated " \
+                        "FROM recurring_transfer " \
+                        "WHERE recurring_charge_id = %lld;";
+
+        const char * sqlInsert = 
+                        "INSERT INTO recurring_transfer (" \
+                        "recurring_charge_id," \
+                        "account_to_id," \
+                        "created," \
+                        "updated) " \
+                        "VALUES (%lld, %lld, '%s', '%s');";
+
+        const char * sqlUpdate = 
+                        "UPDATE recurring_transfer SET " \
+                        "recurring_charge_id = %lld," \
+                        "account_to_id = %lld," \
+                        "updated = '%s' " \
+                        "WHERE id = %lld;";
+
+    public:
+        pfm_id_t recurringChargeId;
+        pfm_id_t accountToId;
+
+        DBRecurringTransfer() : DBEntity() {
+            clear();
+        }
+
+        DBRecurringTransfer(const DBRecurringTransfer & src) : DBEntity(src) {
+            set(src);
+        }
+
+        void clear() {
+            DBEntity::clear();
+
+            this->recurringChargeId = 0;
+            this->accountToId = 0;
+        }
+
+        void set(const DBRecurringTransfer & src) {
+            DBEntity::set(src);
+
+            this->recurringChargeId = src.recurringChargeId;
+            this->accountToId = src.accountToId;
+        }
+
+        void print() {
+            DBEntity::print();
+
+            cout << "RecurringChargeId: " << recurringChargeId << endl;
+            cout << "AccountToId: " << accountToId << endl;
+        }
+
+        const char * getTableName() override {
+            return "recurring_transfer";
+        }
+
+        const char * getClassName() override {
+            return "DBRecurringTransfer";
+        }
+
+        const char * getInsertStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            string now = StrDate::getTimestamp();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlInsert,
+                recurringChargeId,
+                accountToId,
+                now.c_str(),
+                now.c_str());
+
+            return szStatement;
+        }
+
+        const char * getUpdateStatement() override {
+            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+
+            string now = StrDate::getTimestamp();
+
+            snprintf(
+                szStatement, 
+                SQL_STATEMENT_BUFFER_LEN,
+                sqlUpdate,
+                recurringChargeId,
+                accountToId,
+                now.c_str(),
+                id);
+
+            return szStatement;
+        }
+
+        void assignColumn(DBColumn & column) override {
+            DBEntity::assignColumn(column);
+            
+            if (column.getName() == "recurring_charge_id") {
+                recurringChargeId = column.getIDValue();
+            }
+            else if (column.getName() == "account_to_id") {
+                accountToId = column.getIDValue();
+            }
+        }
+
+        int retrieveByRecurringChargeId(pfm_id_t recurringChargeId);
+};
+
+#endif

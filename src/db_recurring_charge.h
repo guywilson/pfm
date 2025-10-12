@@ -92,6 +92,7 @@ class DBRecurringCharge : public DBPayment {
                         "end_date," \
                         "description," \
                         "amount," \
+                        "last_payment_date," \
                         "frequency," \
                         "created," \
                         "updated " \
@@ -108,6 +109,7 @@ class DBRecurringCharge : public DBPayment {
                         "end_date," \
                         "description," \
                         "amount," \
+                        "last_payment_date," \
                         "frequency," \
                         "created," \
                         "updated " \
@@ -125,11 +127,12 @@ class DBRecurringCharge : public DBPayment {
                         "end_date," \
                         "description," \
                         "amount," \
+                        "last_payment_date," \
                         "frequency," \
                         "created," \
                         "updated) " \
                         "VALUES (%lld, %lld, %lld, '%s', '%s'," \
-                        "'%s', '%s', '%s', '%s', '%s');";
+                        "'%s', '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE recurring_charge " \
@@ -139,6 +142,7 @@ class DBRecurringCharge : public DBPayment {
                         "end_date = '%s'," \
                         "description = '%s'," \
                         "amount = '%s'," \
+                        "last_payment_date = '%s'," \
                         "frequency = '%s'," \
                         "updated = '%s' " \
                         "WHERE id = %lld;";
@@ -152,6 +156,7 @@ class DBRecurringCharge : public DBPayment {
     public:
         StrDate nextPaymentDate;    // Not persistent
 
+        StrDate lastPaymentDate;
         Frequency frequency;
         StrDate endDate;
 
@@ -175,6 +180,7 @@ class DBRecurringCharge : public DBPayment {
                     "\"" + date.shortDate() + "\"," +
                     "\"" + endDate.shortDate() + "\"," +
                     "\"" + description + "\"," +
+                    "\"" + lastPaymentDate.shortDate() + "\"," +
                     "\"" + frequency.toString() + "\"," +
                     "" + amount.rawStringValue() + "\n";
 
@@ -184,8 +190,9 @@ class DBRecurringCharge : public DBPayment {
         void clear() {
             DBPayment::clear();
 
-            this->frequency.set("");
             this->nextPaymentDate.clear();
+            this->lastPaymentDate.clear();
+            this->frequency.set("");
             this->endDate.clear();
         }
 
@@ -193,6 +200,7 @@ class DBRecurringCharge : public DBPayment {
             DBPayment::set(src);
 
             this->nextPaymentDate = src.nextPaymentDate;
+            this->lastPaymentDate = src.lastPaymentDate;
             this->frequency = src.frequency;
             this->endDate = src.endDate;
         }
@@ -200,6 +208,7 @@ class DBRecurringCharge : public DBPayment {
         void set(JRecord & record) {
             DBPayment::set(record);
 
+            this->lastPaymentDate = record.get("lastPaymentDate");
             this->frequency = Frequency::parse(record.get("frequency"));
             this->endDate = record.get("endDate");
         }
@@ -207,6 +216,7 @@ class DBRecurringCharge : public DBPayment {
         JRecord getRecord() override  {
             JRecord r = DBPayment::getRecord();
 
+            r.add("lastPaymentDate", this->lastPaymentDate.shortDate());
             r.add("endDate", this->endDate.shortDate());
             r.add("frequency", this->frequency.toString());
 
@@ -216,6 +226,7 @@ class DBRecurringCharge : public DBPayment {
         void print() {
             DBPayment::print();
 
+            cout << "LastPaymentDate: '" << lastPaymentDate.shortDate() << "'" << endl;
             cout << "Frequency: '" << frequency.toString() << "'" << endl;
             cout << "EndDate: '" << endDate.shortDate() << "'" << endl;
             cout << "NextPaymentDate: '" << nextPaymentDate.shortDate() << "'" << endl;
@@ -229,6 +240,9 @@ class DBRecurringCharge : public DBPayment {
             }
             else if (column.getName() == "frequency") {
                 frequency = Frequency::parse(column.getValue());
+            }
+            else if (column.getName() == "last_payment_date") {
+                lastPaymentDate = column.getValue();
             }
         }
 
