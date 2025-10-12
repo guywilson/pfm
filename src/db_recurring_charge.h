@@ -9,6 +9,7 @@
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_payment.h"
+#include "db_recurring_transfer.h"
 #include "db.h"
 #include "db_base.h"
 #include "jfile.h"
@@ -154,6 +155,7 @@ class DBRecurringCharge : public DBPayment {
         int getPeriodEndDay(StrDate & referenceDate);
 
     public:
+        DBRecurringTransfer * transfer = nullptr;
         StrDate nextPaymentDate;    // Not persistent
 
         StrDate lastPaymentDate;
@@ -166,6 +168,10 @@ class DBRecurringCharge : public DBPayment {
 
         DBRecurringCharge(const DBRecurringCharge & src) : DBPayment(src) {
             set(src);
+        }
+
+        ~DBRecurringCharge() {
+            clear();
         }
 
         static const string getCSVHeader() {
@@ -190,6 +196,11 @@ class DBRecurringCharge : public DBPayment {
         void clear() {
             DBPayment::clear();
 
+            if (this->transfer != nullptr) {
+                delete this->transfer;
+                this->transfer = nullptr;
+            }
+
             this->nextPaymentDate.clear();
             this->lastPaymentDate.clear();
             this->frequency.set("");
@@ -199,6 +210,7 @@ class DBRecurringCharge : public DBPayment {
         void set(const DBRecurringCharge & src) {
             DBPayment::set(src);
 
+            this->transfer = src.transfer;
             this->nextPaymentDate = src.nextPaymentDate;
             this->lastPaymentDate = src.lastPaymentDate;
             this->frequency = src.frequency;
@@ -254,9 +266,20 @@ class DBRecurringCharge : public DBPayment {
                 payee.retrieve(payeeId);
             }
 
+            DBRecurringTransfer tr;
+            int numTransferRecords = tr.retrieveByRecurringChargeId(id);
+
+            if (numTransferRecords != 0) {
+                transfer = new DBRecurringTransfer(tr);
+            }
+
             this->sequence = sequence;
             
             setNextPaymentDate();
+        }
+
+        bool isTransfer() {
+            return (transfer != nullptr ? true : false);
         }
 
         bool isActive() {
@@ -267,6 +290,7 @@ class DBRecurringCharge : public DBPayment {
 
         void beforeRemove() override;
         void beforeUpdate() override;
+        void afterInsert() override;
         
         bool isChargeDueThisPeriod();
         bool isChargeDueThisPeriod(StrDate & referenceDate);
@@ -300,6 +324,7 @@ class DBRecurringCharge : public DBPayment {
                 endDate.shortDate().c_str(),
                 dDescription.c_str(),
                 amount.rawStringValue().c_str(),
+                lastPaymentDate.shortDate().c_str(),
                 frequency.c_str(),
                 now.c_str(),
                 now.c_str());
@@ -324,6 +349,7 @@ class DBRecurringCharge : public DBPayment {
                 endDate.shortDate().c_str(),
                 dDescription.c_str(),
                 amount.rawStringValue().c_str(),
+                lastPaymentDate.shortDate().c_str(),
                 frequency.c_str(),
                 now.c_str(),
                 id);

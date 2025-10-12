@@ -7,6 +7,7 @@
 #include "cli_widget.h"
 #include "custom_widgets.h"
 #include "db_recurring_charge.h"
+#include "db_recurring_transfer.h"
 #include "db_v_recurring_charge.h"
 #include "money.h"
 #include "cfgmgr.h"
@@ -25,6 +26,7 @@ class AddRecurringChargeView : public CLIView {
         CLITextField descriptionField = CLITextField("Description: ");
         FrequencyField frequencyField = FrequencyField("Frequency (N[wmy]): ");
         CLICurrencyField amountField = CLICurrencyField("Amount: ");
+        AccountSpinField transferToAccountField = AccountSpinField("Transfer to: ");
 
     public:
         AddRecurringChargeView() : AddRecurringChargeView("Add recurring charge") {}
@@ -44,6 +46,7 @@ class AddRecurringChargeView : public CLIView {
             descriptionField.show();
             frequencyField.show();
             amountField.show();
+            transferToAccountField.show();
         }
 
         DBRecurringCharge getRecurringCharge() {
@@ -60,6 +63,11 @@ class AddRecurringChargeView : public CLIView {
             charge.description = descriptionField.getValue();
             charge.frequency = Frequency::parse(frequencyField.getValue());
             charge.amount = amountField.getDoubleValue();
+
+            if (transferToAccountField.getValue().length() > 0) {
+                charge.transfer = new DBRecurringTransfer();
+                charge.transfer->accountTo = transferToAccountField.getAccount();
+            }
 
             return charge;
         }

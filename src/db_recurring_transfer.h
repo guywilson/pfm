@@ -8,6 +8,7 @@
 #include "pfm_error.h"
 #include "db_base.h"
 #include "db.h"
+#include "db_account.h"
 #include "strdate.h"
 
 using namespace std;
@@ -42,6 +43,8 @@ class DBRecurringTransfer : public DBEntity {
                         "WHERE id = %lld;";
 
     public:
+        DBAccount accountTo;
+        
         pfm_id_t recurringChargeId;
         pfm_id_t accountToId;
 

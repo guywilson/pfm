@@ -399,5 +399,25 @@ void DBRecurringCharge::beforeUpdate() {
         }
     }
 
+    if (isTransfer()) {
+        if (this->transfer->accountToId != currentCharge.transfer->accountToId) {
+            this->transfer->save();
+        }
+    }
+
     log.exit("DBRecurringCharge::beforeUpdate()");
+}
+
+void DBRecurringCharge::afterInsert() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::afterInsert()");
+
+    if (isTransfer()) {
+        transfer->accountToId = transfer->accountTo.id;
+        transfer->recurringChargeId = id;
+
+        transfer->save();
+    }
+
+    log.exit("DBRecurringCharge::afterInsert()");
 }

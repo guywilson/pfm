@@ -11,8 +11,6 @@
 #include "strdate.h"
 #include "logger.h"
 #include "db_recurring_transfer.h"
-#include "db_account.h"
-#include "db_recurring_charge.h"
 
 using namespace std;
 
