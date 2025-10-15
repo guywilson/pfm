@@ -19,7 +19,39 @@ using namespace std;
 #define EPOCH_MONTH                    1
 #define EPOCH_DAY                      1
 
-static string _todayTestDate;
+#define CURRENT_DATE_BUFFER_LENGTH    11
+
+static char _currentDate[CURRENT_DATE_BUFFER_LENGTH];
+static bool _isDateOverride = false;
+
+static char * getCurrentDate() {
+    if (!_isDateOverride) {
+        struct timeval tv;
+
+        gettimeofday(&tv, NULL);
+        time_t t = tv.tv_sec;
+        struct tm * localTime = localtime(&t);
+
+        snprintf(
+            _currentDate, 
+            CURRENT_DATE_BUFFER_LENGTH, 
+            "%d-%02d-%02d", 
+            localTime->tm_year + 1900, 
+            localTime->tm_mon + 1, 
+            localTime->tm_mday);
+    }
+
+    return _currentDate;
+}
+
+void setOverrideDate(const char * date) {
+    strncpy(_currentDate, date, CURRENT_DATE_BUFFER_LENGTH - 1);
+    _isDateOverride = true;
+}
+
+void clearOverrideDate(const char * date) {
+    _isDateOverride = false;
+}
 
 StrDate::StrDate() {
     this->_date = StrDate::today();
@@ -49,14 +81,6 @@ StrDate::StrDate(int year, int month, int day) {
         day);
 
     this->set(dateStr);
-}
-
-void StrDate::setToday(const string & today) {
-    _todayTestDate = today;
-}
-
-void StrDate::clearToday() {
-    _todayTestDate.clear();
 }
 
 bool StrDate::isYear(string & part) {
@@ -150,28 +174,8 @@ StrDate::YMD StrDate::splitDate(const string & date) {
 }
 
 string StrDate::today() {
-    char today[DATE_STAMP_BUFFER_LEN];
-
-    if (_todayTestDate.length() == 0) {
-        struct timeval tv;
-
-        gettimeofday(&tv, NULL);
-        time_t t = tv.tv_sec;
-        struct tm * localTime = localtime(&t);
-
-        snprintf(
-            today, 
-            DATE_STAMP_BUFFER_LEN, 
-            "%d-%02d-%02d", 
-            localTime->tm_year + 1900, 
-            localTime->tm_mon + 1, 
-            localTime->tm_mday);
-    }
-    else {
-        strncpy(today, _todayTestDate.c_str(), _todayTestDate.length());
-    }
-
-    return string(today);
+    char * t = getCurrentDate();
+    return string(t);
 }
 
 string StrDate::getTimestamp() {
