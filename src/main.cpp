@@ -148,7 +148,7 @@ int main(int argc, char ** argv) {
         else if (arg.compare("-date") == 0) {
             setOverrideDate(cmdarg.nextArg().c_str());
         }
-         else if (arg.compare("-v") == 0 || arg.compare("--version") == 0) {
+        else if (arg.compare("-v") == 0 || arg.compare("--version") == 0) {
             Command::version();
             return 0;
         }
