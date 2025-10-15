@@ -154,6 +154,16 @@ class DBRecurringCharge : public DBPayment {
         int getPeriodEndDay();
         int getPeriodEndDay(StrDate & referenceDate);
 
+        // Step forward by this charge's frequency (no weekend adjustment).
+        StrDate nextByFrequency(StrDate & from);
+
+        // Next *scheduled* (nominal) date, without weekend adjustment.
+        // Starts strictly after `from` to avoid infinite loops on equal dates.
+        StrDate nextScheduledNoWeekend(StrDate & from);
+
+        // Move forward to Monday if the given day is a weekend.
+        static StrDate adjustForwardToBusinessDay(StrDate & d);
+
     public:
         DBRecurringTransfer * transfer = nullptr;
         StrDate nextPaymentDate;    // Not persistent
@@ -282,16 +292,15 @@ class DBRecurringCharge : public DBPayment {
             return (transfer != nullptr ? true : false);
         }
 
-        bool isActive() {
-            StrDate today;
-
-            return (endDate.isNull() || (!endDate.isNull() && endDate >= today));
-        }
+        bool isActive();
 
         void beforeRemove() override;
         void beforeUpdate() override;
         void afterInsert() override;
-        
+
+        // Expose a nominal next date helper if you want to inspect schedules elsewhere.
+        StrDate getNextRecurringScheduledDate(StrDate & startDate);
+
         bool isChargeDueThisPeriod();
         bool isChargeDueThisPeriod(StrDate & referenceDate);
         StrDate calculateNextPaymentDate();
