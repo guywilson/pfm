@@ -154,10 +154,10 @@ bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::isDateWithinCurrentPeriod()");
 
-    const int startDay = getPeriodStartDay();
-    const int endDay = getPeriodEndDay();
-
     StrDate today;
+    const int startDay = getPeriodStartDay();
+    const int endDay = getPeriodEndDay(today);
+
     StrDate periodStart(today.year(), today.month(), startDay);
     StrDate periodEnd(today.year(), today.month(), endDay);
 
@@ -346,8 +346,14 @@ StrDate DBRecurringCharge::nextScheduledNoWeekend(StrDate & from) {
 
 StrDate DBRecurringCharge::adjustForwardToBusinessDay(StrDate& d) {
     StrDate x = d;
-    if (x.isSaturday()) return x.addDays(2);
-    if (x.isSunday())   return x.addDays(1);
+
+    if (x.isSaturday()) {
+        return x.addDays(2);
+    }
+    else if (x.isSunday()) {
+       return x.addDays(1);
+    }
+
     return x;
 }
 
