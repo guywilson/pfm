@@ -246,18 +246,14 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
 
     StrDate today;
     if (!this->isActive()) {
-        StrDate none; none.clear();
-        this->nextPaymentDate = none;
-        log.debug("Charge '%s' inactive; nextPaymentDate cleared", this->description.c_str());
+        StrDate none;
+        none.clear();
         log.exit("DBRecurringCharge::calculateNextPaymentDate()");
         return none;
     }
 
     // Nominal next date on/after today
     StrDate nominal = nextScheduledNoWeekend(today);
-
-    // Store nominal (non-persistent) for display; keep behavior explicit
-    this->nextPaymentDate = nominal;
 
     log.debug("Calculated nominal nextPaymentDate of charge '%s' as '%s'",
               this->description.c_str(), nominal.shortDate().c_str());
@@ -271,14 +267,7 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::getNextRecurringTransactionDate()");
 
-    if (!isActive()) {
-        StrDate none; none.clear();
-        log.exit("DBRecurringCharge::getNextRecurringTransactionDate()");
-        return none;
-    }
-
-    // Next *nominal* schedule after startDate…
-    StrDate nominal = nextScheduledNoWeekend(startDate);
+    StrDate nominal = calculateNextPaymentDate();
 
     // …then adjusted forward to a business day for the actual transaction date.
     StrDate txnDate = adjustForwardToBusinessDay(nominal);
@@ -292,7 +281,7 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
     return txnDate;
 }
 
-StrDate DBRecurringCharge::getNextRecurringScheduledDate(StrDate& startDate) {
+StrDate DBRecurringCharge::getNextRecurringScheduledDate(StrDate & startDate) {
     return nextScheduledNoWeekend(startDate);
 }
 
