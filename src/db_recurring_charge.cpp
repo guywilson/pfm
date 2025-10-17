@@ -221,8 +221,6 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
         (nominalNext <= periodEnd);
 
     if (inThisPeriod) {
-        // Keep nextPaymentDate (non-persistent) aligned for display/use elsewhere:
-        this->nextPaymentDate = nominalNext; // nominal for clarity in UIs
         log.debug("Charge '%s' is due this period on nominal date '%s'",
                   this->description.c_str(), nominalNext.shortDate().c_str());
         log.exit("DBRecurringCharge::isChargeDueThisPeriod()");
@@ -352,15 +350,6 @@ StrDate DBRecurringCharge::adjustForwardToBusinessDay(StrDate& d) {
     }
 
     return x;
-}
-
-void DBRecurringCharge::setNextPaymentDate() {
-    Logger & log = Logger::getInstance();
-    log.entry("DBRecurringCharge::setNextPaymentDate()");
-
-    this->nextPaymentDate = calculateNextPaymentDate();
-
-    log.exit("DBRecurringCharge::setNextPaymentDate()");
 }
 
 void DBRecurringCharge::beforeRemove() {

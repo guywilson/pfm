@@ -104,8 +104,6 @@ class DBRecurringChargeView : public DBRecurringCharge {
 
         void onRowComplete(int sequence) override {
             this->sequence = sequence;
-            
-            setNextPaymentDate();
         }
 
         const char * getTableName() override {

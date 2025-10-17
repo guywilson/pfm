@@ -112,10 +112,10 @@ class RecurringChargeListView : public CLIListView {
             CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
             headerRow.addColumn(column1);
 
-            CLIListColumn column2 = CLIListColumn("Start Dt", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
+            CLIListColumn column2 = CLIListColumn("Start", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
-            CLIListColumn column3 = CLIListColumn("Nxt Pmnt", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
+            CLIListColumn column3 = CLIListColumn("Last Paid", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
             headerRow.addColumn(column3);
 
             CLIListColumn column4 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
@@ -142,7 +142,7 @@ class RecurringChargeListView : public CLIListView {
 
                 row.addCellValue(charge.sequence);
                 row.addCellValue(charge.date.shortDate());
-                row.addCellValue(charge.nextPaymentDate.shortDate());
+                row.addCellValue(charge.lastPaymentDate.shortDate());
                 row.addCellValue(charge.description);
                 row.addCellValue(charge.categoryCode);
                 row.addCellValue(charge.payeeCode);

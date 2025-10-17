@@ -166,7 +166,6 @@ class DBRecurringCharge : public DBPayment {
 
     public:
         DBRecurringTransfer * transfer = nullptr;
-        StrDate nextPaymentDate;    // Not persistent
 
         StrDate lastPaymentDate;
         Frequency frequency;
@@ -211,7 +210,6 @@ class DBRecurringCharge : public DBPayment {
                 this->transfer = nullptr;
             }
 
-            this->nextPaymentDate.clear();
             this->lastPaymentDate.clear();
             this->frequency.set("");
             this->endDate.clear();
@@ -221,7 +219,6 @@ class DBRecurringCharge : public DBPayment {
             DBPayment::set(src);
 
             this->transfer = src.transfer;
-            this->nextPaymentDate = src.nextPaymentDate;
             this->lastPaymentDate = src.lastPaymentDate;
             this->frequency = src.frequency;
             this->endDate = src.endDate;
@@ -251,7 +248,6 @@ class DBRecurringCharge : public DBPayment {
             cout << "LastPaymentDate: '" << lastPaymentDate.shortDate() << "'" << endl;
             cout << "Frequency: '" << frequency.toString() << "'" << endl;
             cout << "EndDate: '" << endDate.shortDate() << "'" << endl;
-            cout << "NextPaymentDate: '" << nextPaymentDate.shortDate() << "'" << endl;
         }
 
         void assignColumn(DBColumn & column) override {
@@ -284,8 +280,6 @@ class DBRecurringCharge : public DBPayment {
             }
 
             this->sequence = sequence;
-            
-            setNextPaymentDate();
         }
 
         bool isTransfer() {
@@ -306,7 +300,6 @@ class DBRecurringCharge : public DBPayment {
         bool isChargeDueThisPeriod();
         bool isChargeDueThisPeriod(StrDate & referenceDate);
         StrDate calculateNextPaymentDate();
-        void setNextPaymentDate();
         StrDate getNextRecurringTransactionDate(StrDate & startDate);
 
         const char * getTableName() override {

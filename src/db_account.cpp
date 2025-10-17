@@ -425,7 +425,7 @@ Money DBAccount::calculateBalanceAfterBills() {
             if (charge.isChargeDueThisPeriod(dateToday)) {
                 log.debug(
                         "calculateBalanceAfterBills(): Including charge '%s' | '%s' | '%s'", 
-                        charge.nextPaymentDate.shortDate().c_str(), 
+                        charge.lastPaymentDate.shortDate().c_str(), 
                         charge.description.c_str(), 
                         charge.amount.localeFormattedStringValue().c_str());
 
