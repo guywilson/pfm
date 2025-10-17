@@ -34,6 +34,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
                         "end_date," \
                         "description," \
                         "amount," \
+                        "last_payment_date," \
                         "frequency," \
                         "created," \
                         "updated " \
@@ -50,6 +51,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
                         "end_date," \
                         "description," \
                         "amount," \
+                        "last_payment_date," \
                         "frequency," \
                         "created," \
                         "updated " \
