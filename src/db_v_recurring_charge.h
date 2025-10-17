@@ -102,9 +102,6 @@ class DBRecurringChargeView : public DBRecurringCharge {
             else if (column.getName() == "category_code") {
                 categoryCode = column.getValue();
             }
-            else if (column.getName() == "last_payment_date") {
-                lastPaymentDate = column.getValue();
-            }
         }
 
         void onRowComplete(int sequence) override {
