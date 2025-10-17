@@ -110,11 +110,7 @@ void DBAccount::createRecurringTransactions() {
                     DBTransaction::createFromRecurringChargeAndDate(charge, transactionDate);
 
                     // Persist lastPaymentDate on the recurring charge (this makes it robust/idempotent)
-                    DBRecurringCharge rcToUpdate;
-                    rcToUpdate.id = charge.id;
-                    rcToUpdate.retrieve();                 // load current row
-                    rcToUpdate.lastPaymentDate = transactionDate;
-                    rcToUpdate.save();                     // existing INSERT/UPDATE already includes last_payment_date
+                    charge.updateLastPaymentDate(transactionDate);
 
                     // Move to next occurrence
                     transactionDate = charge.getNextRecurringTransactionDate(transactionDate);

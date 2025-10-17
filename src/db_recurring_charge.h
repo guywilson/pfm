@@ -294,6 +294,8 @@ class DBRecurringCharge : public DBPayment {
 
         bool isActive();
 
+        void updateLastPaymentDate(StrDate & date);
+
         void beforeRemove() override;
         void beforeUpdate() override;
         void afterInsert() override;

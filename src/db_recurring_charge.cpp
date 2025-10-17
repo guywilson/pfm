@@ -146,8 +146,16 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(p
 
 bool DBRecurringCharge::isActive() {
     StrDate today;
-
     return (endDate.isNull() || (!endDate.isNull() && endDate >= today));
+}
+
+void DBRecurringCharge::updateLastPaymentDate(StrDate & date) {
+    DBRecurringCharge rc;
+    rc.id = this->id;
+
+    rc.retrieve();
+    rc.lastPaymentDate = date;
+    rc.save();
 }
 
 bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
