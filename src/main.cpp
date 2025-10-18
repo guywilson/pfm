@@ -221,8 +221,6 @@ int main(int argc, char ** argv) {
     command.process("use " + primaryAccountCode);
 
     command.process("list 12:all:desc");
-    
-    // command.process("add d:17-10-2025|c:GIFTS|p:ROUGH|ds:Test purchase|db|a:24.75");
 
     bool loop = true;
 
