@@ -774,6 +774,23 @@ void Command::updateTransaction(DBTransaction & transaction) {
     view.show();
 
     DBTransaction updatedTransaction = view.getTransaction();
+
+    DBTransaction currentTransaction;
+    currentTransaction.id = updatedTransaction.id;
+    currentTransaction.retrieve();
+
+    /*
+    ** If the transaction date has been updated, it is safest
+    ** to removed the transactionand clear the id of the updated
+    ** transaction to force an INSERT. Both of these actions will
+    ** trigger the appropriate carried over logs to be updated.
+    */
+    if (currentTransaction.date != updatedTransaction.date) {
+        currentTransaction.remove();
+
+        updatedTransaction.id.clear();
+    }
+
     updatedTransaction.save();
 }
 

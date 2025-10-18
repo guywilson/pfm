@@ -326,29 +326,6 @@ int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, St
     return CHARGE_NOT_DUE;
 }
 
-void DBTransaction::beforeSave() {
-    Logger & log = Logger::getInstance();
-    log.entry("DBTransaction::beforeSave()");
-
-    if (!id.isNull()) {
-        // DBTransaction transaction;
-        // transaction.retrieve(id);
-
-        // /*
-        // ** If the date has been updated, the safest option is to
-        // ** delete the record and clear the id. Then, the record
-        // ** will be inserted. Both the delete and insert will trigger
-        // ** the update of the carried over logs.
-        // */
-        // if (this->date != transaction.date) {
-        //     remove();
-        //     id.clear();
-        // }
-    }
-
-    log.exit("DBTransaction::beforeSave()");
-}
-
 void DBTransaction::afterInsert() {
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::afterInsert()");
