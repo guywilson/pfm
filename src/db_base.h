@@ -32,6 +32,14 @@ class DBEntity {
         uint64_t findSingleQuotePos(string & s, int startingPos);
 
     protected:
+        virtual void beforeSave() {
+            return;
+        }
+
+        virtual void afterSave() {
+            return;
+        }
+        
         virtual void beforeInsert() {
             return;
         }

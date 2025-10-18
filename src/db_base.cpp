@@ -217,6 +217,8 @@ void DBEntity::save() {
     try {
         db.begin();
 
+        beforeSave();
+
         if (id.isNull()) {
             beforeInsert();
             id = insert();
@@ -228,6 +230,8 @@ void DBEntity::save() {
             afterUpdate();
         }
 
+        afterSave();
+        
         db.commit();
     }
     catch (pfm_error & e) {
