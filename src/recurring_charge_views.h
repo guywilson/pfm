@@ -169,6 +169,7 @@ class UpdateRecurringChargeView : public CLIView {
         PayeeSpinField payeeField;
         DateField startDateField;
         DateField endDateField;
+        DateField lastPaymentDateField;
         CLITextField descriptionField;
         FrequencyField frequencyField;
         CLICurrencyField amountField;
@@ -198,6 +199,10 @@ class UpdateRecurringChargeView : public CLIView {
             endDateField.setLabel(szPrompt);
             endDateField.setDefaultValue(charge.endDate.shortDate());
 
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Last payment date ['%s']: ", charge.lastPaymentDate.shortDate().c_str());
+            lastPaymentDateField.setLabel(szPrompt);
+            lastPaymentDateField.setDefaultValue(charge.lastPaymentDate.shortDate());
+
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Description ['%s']: ", charge.description.c_str());
             descriptionField.setLabel(szPrompt);
             descriptionField.setDefaultValue(charge.description);
@@ -218,6 +223,7 @@ class UpdateRecurringChargeView : public CLIView {
             payeeField.show();
             startDateField.show();
             endDateField.show();
+            lastPaymentDateField.show();
             descriptionField.show();
             frequencyField.show();
             amountField.show();
@@ -236,6 +242,7 @@ class UpdateRecurringChargeView : public CLIView {
 
             charge.date = startDateField.getValue();
             charge.endDate = endDateField.getValue();
+            charge.lastPaymentDate = lastPaymentDateField.getValue();
             charge.description = descriptionField.getValue();
             charge.frequency = Frequency::parse(frequencyField.getValue());
             charge.amount = amountField.getValue();
