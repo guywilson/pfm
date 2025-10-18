@@ -25,7 +25,7 @@ class DBConfig : public DBEntity {
                         "INSERT INTO config (key, value, description, is_read_only, is_visible, created, updated) VALUES ('%s', '%s', '%s', 'N', 'Y', '%s', '%s');";
 
         const char * sqlUpdate = 
-                        "UPDATE config SET key = '%s', value = '%s', description = '%s', updated = '%s' WHERE id = %lld;";
+                        "UPDATE config SET key = '%s', value = '%s', description = '%s', updated = '%s' WHERE id = %s;";
 
     public:
         string                  key;
@@ -131,7 +131,7 @@ class DBConfig : public DBEntity {
                 dValue.c_str(),
                 dDescription.c_str(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

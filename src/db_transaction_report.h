@@ -31,7 +31,7 @@ class DBTransactionReport : public DBEntity {
                         "description = '%s'," \
                         "sql_where_clause = '%s'," \
                         "updated = '%s' " \
-                        "WHERE id = %lld;";
+                        "WHERE id = %s;";
 
     public:
         string                  description;
@@ -113,7 +113,7 @@ class DBTransactionReport : public DBEntity {
                 dDescription.c_str(),
                 dSQL.c_str(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

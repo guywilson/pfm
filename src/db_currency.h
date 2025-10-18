@@ -22,7 +22,7 @@ class DBCurrency : public DBEntity {
                         "INSERT INTO currency (code, name, symbol, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
-                        "UPDATE currency SET code = '%s', name = '%s', symbol = '%s', updated = '%s' WHERE id = %lld;";
+                        "UPDATE currency SET code = '%s', name = '%s', symbol = '%s', updated = '%s' WHERE id = %s;";
 
     public:
         string                  code;
@@ -114,7 +114,7 @@ class DBCurrency : public DBEntity {
                 dName.c_str(),
                 symbol.c_str(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

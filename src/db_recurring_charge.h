@@ -98,7 +98,7 @@ class DBRecurringCharge : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM recurring_charge " \
-                        "WHERE account_id = %lld;";
+                        "WHERE account_id = %s;";
 
         const char * sqlSelectByAccountIDBetweenDates = 
                         "SELECT " \
@@ -115,7 +115,7 @@ class DBRecurringCharge : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM recurring_charge " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "AND date >= '%s' " \
                         "AND date < '%s';";
 
@@ -132,13 +132,13 @@ class DBRecurringCharge : public DBPayment {
                         "frequency," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, %lld, %lld, '%s', '%s'," \
+                        "VALUES (%s, %s, %s, '%s', '%s'," \
                         "'%s', '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE recurring_charge " \
-                        "SET category_id = %lld," \
-                        "payee_id = %lld," \
+                        "SET category_id = %s," \
+                        "payee_id = %s," \
                         "date = '%s'," \
                         "end_date = '%s'," \
                         "description = '%s'," \
@@ -146,7 +146,7 @@ class DBRecurringCharge : public DBPayment {
                         "last_payment_date = '%s'," \
                         "frequency = '%s'," \
                         "updated = '%s' " \
-                        "WHERE id = %lld;";
+                        "WHERE id = %s;";
 
         bool isDateWithinCurrentPeriod(StrDate & date);
 
@@ -265,10 +265,10 @@ class DBRecurringCharge : public DBPayment {
         }
 
         void onRowComplete(int sequence) override {
-            if (categoryId != 0) {
+            if (!categoryId.isNull()) {
                 category.retrieve(categoryId);
             }
-            if (payeeId != 0) {
+            if (!payeeId.isNull()) {
                 payee.retrieve(payeeId);
             }
 
@@ -321,9 +321,9 @@ class DBRecurringCharge : public DBPayment {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                accountId,
-                categoryId,
-                payeeId,
+                accountId.c_str(),
+                categoryId.c_str(),
+                payeeId.c_str(),
                 date.shortDate().c_str(),
                 endDate.shortDate().c_str(),
                 dDescription.c_str(),
@@ -347,8 +347,8 @@ class DBRecurringCharge : public DBPayment {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
-                categoryId,
-                payeeId,
+                categoryId.c_str(),
+                payeeId.c_str(),
                 date.shortDate().c_str(),
                 endDate.shortDate().c_str(),
                 dDescription.c_str(),
@@ -356,7 +356,7 @@ class DBRecurringCharge : public DBPayment {
                 lastPaymentDate.shortDate().c_str(),
                 frequency.c_str(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

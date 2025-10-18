@@ -22,7 +22,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByStatementAndID(const ch
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelect, 
-        id);
+        id.c_str());
 
     result.retrieve(szStatement);
 
@@ -51,7 +51,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t acco
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIDSortedByDate, 
-        accountId,
+        accountId.c_str(),
         (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
 
     if (rowLimit > 0) {
@@ -93,7 +93,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(p
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectNonRecurringByAccountIDSortedByDate, 
-        accountId,
+        accountId.c_str(),
         (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
 
     if (rowLimit > 0) {
@@ -151,7 +151,7 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountID, 
-        accountId);
+        accountId.c_str());
 
     if (criteria.length() > 0) {
         /*
@@ -191,7 +191,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIDBetweenDates, 
-        accountId,
+        accountId.c_str(),
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());
 
@@ -213,7 +213,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForP
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectReconciledByAccountIDBetweenDates, 
-        accountId,
+        accountId.c_str(),
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());
 
@@ -235,7 +235,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDFo
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectNonRecurringByAccountIDBetweenDates, 
-        accountId,
+        accountId.c_str(),
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());
 

@@ -421,7 +421,7 @@ class FindTransactionByPayeeView : public CLIFindView {
             }
 
             char buffer[CRITERIA_BUFFER_LENGTH];
-            snprintf(buffer, CRITERIA_BUFFER_LENGTH, "payee_id = %lld", payee.id);
+            snprintf(buffer, CRITERIA_BUFFER_LENGTH, "payee_id = %s", payee.id.c_str());
 
             criteria += buffer;
 
@@ -440,7 +440,7 @@ class FindTransactionByPayeeView : public CLIFindView {
                     criteria += " AND recurring_charge_id <> 0";
                 }
                 else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring_charge_id = 0";
+                    criteria += " AND recurring_charge_id IS NULL";
                 }
                 else if (recurringIncludeType.getValue().compare("yes") == 0) {
                 }
@@ -494,7 +494,7 @@ class FindTransactionByCategoryView : public CLIFindView {
             }
 
             char buffer[CRITERIA_BUFFER_LENGTH];
-            snprintf(buffer, CRITERIA_BUFFER_LENGTH, "category_id = %lld", category.id);
+            snprintf(buffer, CRITERIA_BUFFER_LENGTH, "category_id = %s", category.id.c_str());
 
             criteria += buffer;
 
@@ -513,7 +513,7 @@ class FindTransactionByCategoryView : public CLIFindView {
                     criteria += " AND recurring_charge_id <> 0";
                 }
                 else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring_charge_id = 0";
+                    criteria += " AND recurring_charge_id IS NULL";
                 }
                 else if (recurringIncludeType.getValue().compare("yes") == 0) {
                 }
@@ -583,7 +583,7 @@ class FindTransactionByDescriptionView : public CLIFindView {
                     criteria += " AND recurring_charge_id <> 0";
                 }
                 else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring_charge_id = 0";
+                    criteria += " AND recurring_charge_id IS NULL";
                 }
                 else if (recurringIncludeType.getValue().compare("yes") == 0) {
                 }
@@ -653,7 +653,7 @@ class FindTransactionByDateView : public CLIFindView {
                     criteria += " AND recurring_charge_id <> 0";
                 }
                 else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring_charge_id = 0";
+                    criteria += " AND recurring_charge_id IS NULL";
                 }
                 else if (recurringIncludeType.getValue().compare("yes") == 0) {
                 }

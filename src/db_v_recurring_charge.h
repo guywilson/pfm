@@ -39,7 +39,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
                         "created," \
                         "updated " \
                         "FROM v_recurring_charge_list " \
-                        "WHERE account_id = %lld;";
+                        "WHERE account_id = %s;";
 
         const char * sqlSelectByAccountIDBetweenDates = 
                         "SELECT " \
@@ -56,7 +56,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
                         "created," \
                         "updated " \
                         "FROM v_recurring_charge_list " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "AND date >= '%s' " \
                         "AND date < '%s';";
 

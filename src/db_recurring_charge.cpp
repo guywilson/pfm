@@ -113,7 +113,7 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t acco
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountID, 
-        accountId);
+        accountId.c_str());
 
     result.retrieve(szStatement);
 
@@ -133,7 +133,7 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(p
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIDBetweenDates, 
-        accountId,
+        accountId.c_str(),
         dateAfter.shortDate().c_str(),
         dateBefore.shortDate().c_str());
 
@@ -362,7 +362,7 @@ void DBRecurringCharge::beforeRemove() {
     for (int i = 0;i < recurringTransactions.size();i++) {
         DBTransaction recurringTransaction = recurringTransactions[i];
 
-        recurringTransaction.recurringChargeId = 0;
+        recurringTransaction.recurringChargeId.clear();
         recurringTransaction.save();
     }
 

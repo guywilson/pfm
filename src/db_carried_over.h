@@ -28,7 +28,7 @@ class DBCarriedOver : public DBEntity {
                         "created," \
                         "updated " \
                         "FROM carried_over_log " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "ORDER BY date DESC;";
 
         const char * sqlSelectByAccountIdAfterDate = 
@@ -40,7 +40,7 @@ class DBCarriedOver : public DBEntity {
                         "created," \
                         "updated " \
                         "FROM carried_over_log " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "AND date >= '%s'";
 
         const char * sqlSelectLatestByAccountId = 
@@ -52,7 +52,7 @@ class DBCarriedOver : public DBEntity {
                         "created," \
                         "updated " \
                         "FROM carried_over_log " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "ORDER BY date DESC " \
                         "LIMIT 1;";
 
@@ -64,16 +64,16 @@ class DBCarriedOver : public DBEntity {
                         "balance," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, '%s', '%s', '%s', '%s', '%s');";
+                        "VALUES (%s, '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE carried_over_log SET " \
-                        "account_id = %lld," \
+                        "account_id = %s," \
                         "date = '%s'," \
                         "description = '%s'," \
                         "balance = '%s'," \
                         "updated = '%s' " \
-                        "WHERE id = %lld;";
+                        "WHERE id = %s;";
 
     public:
         pfm_id_t                accountId;
@@ -92,7 +92,7 @@ class DBCarriedOver : public DBEntity {
         void clear() {
             DBEntity::clear();
 
-            this->accountId = 0;
+            this->accountId.clear();
             this->date.clear();
             this->description = "";
             this->balance = 0.0;
@@ -110,7 +110,7 @@ class DBCarriedOver : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "AccountId: " << accountId << endl;
+            cout << "AccountId: " << accountId.getValue() << endl;
             cout << "Date: '" << date.shortDate() << "'" << endl;
             cout << "Description: '" << description << "'" << endl;
 
@@ -137,7 +137,7 @@ class DBCarriedOver : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                accountId,
+                accountId.c_str(),
                 date.shortDate().c_str(),
                 dDescription.c_str(),
                 balance.rawStringValue().c_str(),
@@ -158,12 +158,12 @@ class DBCarriedOver : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
-                accountId,
+                accountId.c_str(),
                 date.shortDate().c_str(),
                 dDescription.c_str(),
                 balance.rawStringValue().c_str(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

@@ -26,7 +26,7 @@ DBResult<DBTransaction> DBTransaction::retrieveByStatementAndID(const char * sql
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelect, 
-        id);
+        id.c_str());
 
     result.retrieve(szStatement);
 
@@ -66,7 +66,7 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, d
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIDSortedByDate, 
-        accountId,
+        accountId.c_str(),
         (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
 
     if (rowLimit > 0) {
@@ -132,7 +132,7 @@ DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(pfm_id_t acc
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountID, 
-        accountId);
+        accountId.c_str());
 
     if (criteria.length() > 0) {
         /*
@@ -168,7 +168,7 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDForPeriod(pfm_id_t acc
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIDBetweenDates, 
-        accountId,
+        accountId.c_str(),
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());
 
@@ -190,7 +190,7 @@ DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountIDForPeriod(pf
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectReconciledByAccountIDBetweenDates, 
-        accountId,
+        accountId.c_str(),
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());
 
@@ -212,7 +212,7 @@ DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectNonRecurringByAccountIDBetweenDates, 
-        accountId,
+        accountId.c_str(),
         firstDate.shortDate().c_str(),
         secondDate.shortDate().c_str());
 
@@ -233,16 +233,16 @@ void DBTransaction::reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDa
     string now = StrDate::getTimestamp();
 
     log.debug(
-        "Reconciling all transactions before '%s' for account ID %lld", 
+        "Reconciling all transactions before '%s' for account ID %s", 
         referenceDate.shortDate().c_str(), 
-        accountId);
+        accountId.c_str());
 
     snprintf(
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlReconcileByAccountIDBeforeDate, 
         now.c_str(),
-        accountId,
+        accountId.c_str(),
         referenceDate.shortDate().c_str());
 
     PFM_DB & db = PFM_DB::getInstance();
@@ -400,7 +400,7 @@ void DBTransaction::deleteByRecurringChargeId(pfm_id_t recurringChargeId) {
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlDeleteByRecurringCharge, 
-        recurringChargeId);
+        recurringChargeId.c_str());
 
     remove(szStatement);
 
@@ -417,7 +417,7 @@ void DBTransaction::deleteAllRecurringTransactionsForAccount(pfm_id_t accountId)
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlDeleteAllRecurringForAccount, 
-        accountId);
+        accountId.c_str());
 
     remove(szStatement);
 

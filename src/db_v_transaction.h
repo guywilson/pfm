@@ -58,7 +58,7 @@ class DBTransactionView : public DBTransaction {
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
-                        "WHERE account_id = %lld;";
+                        "WHERE account_id = %s;";
 
         const char * sqlSelectReconciledByAccountID = 
                         "SELECT " \
@@ -79,7 +79,7 @@ class DBTransactionView : public DBTransaction {
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "AND is_reconciled = 'Y'";
 
         const char * sqlSelectByAccountIDSortedByDate = 
@@ -101,7 +101,7 @@ class DBTransactionView : public DBTransaction {
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "ORDER BY date %s";
 
         const char * sqlSelectNonRecurringByAccountIDSortedByDate = 
@@ -123,8 +123,8 @@ class DBTransactionView : public DBTransaction {
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
-                        "WHERE account_id = %lld " \
-                        "AND recurring_charge_id = 0 " \
+                        "WHERE account_id = %s " \
+                        "AND recurring_charge_id IS NULL " \
                         "ORDER BY date %s";
 
         const char * sqlSelectByAccountIDBetweenDates = 
@@ -146,7 +146,7 @@ class DBTransactionView : public DBTransaction {
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 
@@ -169,7 +169,7 @@ class DBTransactionView : public DBTransaction {
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "AND is_reconciled = 'Y' " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
@@ -193,8 +193,8 @@ class DBTransactionView : public DBTransaction {
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
-                        "WHERE account_id = %lld " \
-                        "AND recurring_charge_id = 0 " \
+                        "WHERE account_id = %s " \
+                        "AND recurring_charge_id IS NULL " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 

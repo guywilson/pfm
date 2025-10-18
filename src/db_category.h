@@ -23,7 +23,7 @@ class DBCategory : public DBEntity {
                         "INSERT INTO category (description, code, created, updated) VALUES ('%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
-                        "UPDATE category SET code = '%s', description = '%s', updated = '%s' WHERE id = %lld;";
+                        "UPDATE category SET code = '%s', description = '%s', updated = '%s' WHERE id = %s;";
 
     public:
         string                  description;
@@ -120,7 +120,7 @@ class DBCategory : public DBEntity {
                 code.c_str(),
                 dDescription.c_str(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

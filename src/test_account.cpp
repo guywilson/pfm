@@ -208,7 +208,7 @@ void testAccount() {
     trTest.isCredit = false;
     trTest.isReconciled = false;
     trTest.payeeId = getPayeeId("WASAB");
-    trTest.recurringChargeId = 0;
+    trTest.recurringChargeId.clear();
     trTest.save();
 
     DBResult<DBCarriedOver> coResultAfterInsert = co.retrieveByAccountId(accountId);
@@ -217,7 +217,7 @@ void testAccount() {
         DBCarriedOver coBefore = coResultBeforeInsert.at(i);
         DBCarriedOver coAfter = coResultAfterInsert.at(i);
 
-        if (coAfter.id >= 3) {
+        if (coAfter.id.intValue() >= 3) {
             Money expected = (coBefore.balance - trTest.amount);
 
             if (coAfter.balance != expected) {
@@ -244,7 +244,7 @@ void testAccount() {
         DBCarriedOver coBefore = coResultBeforeInsert.at(i);
         DBCarriedOver coAfter = coResultAfterUpdate.at(i);
 
-        if (coAfter.id >= 3) {
+        if (coAfter.id.intValue() >= 3) {
             Money expected = (coBefore.balance - trTest.amount);
 
             if (coAfter.balance != expected) {
@@ -271,7 +271,7 @@ void testAccount() {
         DBCarriedOver coBefore = coResultBeforeInsert.at(i);
         DBCarriedOver coAfter = coResultAfterUpdate2.at(i);
 
-        if (coAfter.id >= 3) {
+        if (coAfter.id.intValue() >= 3) {
             Money expected = (coBefore.balance + trTest.amount);
 
             if (coAfter.balance != expected) {
@@ -297,7 +297,7 @@ void testAccount() {
         DBCarriedOver coBefore = coResultBeforeInsert.at(i);
         DBCarriedOver coAfter = coResultAfterDelete.at(i);
 
-        if (coAfter.id >= 3) {
+        if (coAfter.id.intValue() >= 3) {
             Money expected = coBefore.balance;
 
             if (coAfter.balance != expected) {

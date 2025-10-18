@@ -130,7 +130,7 @@ void Command::addAccount() {
         primaryAccount.save();
     }
 
-    cout << "Created account with ID " << account.id << endl;
+    cout << "Created account with ID " << account.id.getValue() << endl;
 }
 
 void Command::listAccounts() {
@@ -604,7 +604,7 @@ void Command::addTransaction(AddTransactionCriteriaBuilder & builder) {
         transaction.categoryId = category.id;
     }
     catch (pfm_error & e) {
-        transaction.categoryId = 0;
+        transaction.categoryId.clear();
     }
 
     try {
@@ -613,7 +613,7 @@ void Command::addTransaction(AddTransactionCriteriaBuilder & builder) {
         transaction.payeeId = payee.id;
     }
     catch (pfm_error & e) {
-        transaction.payeeId = 0;
+        transaction.payeeId.clear();
     }
 
     transaction.accountId = selectedAccount.id;
@@ -846,7 +846,7 @@ void Command::addReport() {
 }
 
 void Command::copyReport(DBTransactionReport & report) {
-    report.id = 0;
+    report.id.clear();
     report.save();
 }
 

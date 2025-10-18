@@ -28,7 +28,7 @@ class DBPrimaryAccount : public DBEntity {
                         "UPDATE primary_account SET " \
                         "account_code = '%s'," \
                         "updated = '%s' " \
-                        "WHERE id = %lld;";
+                        "WHERE id = %s;";
 
     public:
         string                  code;
@@ -110,7 +110,7 @@ class DBPrimaryAccount : public DBEntity {
                 sqlUpdate,
                 code.c_str(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

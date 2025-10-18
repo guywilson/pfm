@@ -25,7 +25,7 @@ class DBRecurringTransfer : public DBEntity {
                         "created," \
                         "updated " \
                         "FROM recurring_transfer " \
-                        "WHERE recurring_charge_id = %lld;";
+                        "WHERE recurring_charge_id = %s;";
 
         const char * sqlInsert = 
                         "INSERT INTO recurring_transfer (" \
@@ -33,14 +33,14 @@ class DBRecurringTransfer : public DBEntity {
                         "account_to_id," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, %lld, '%s', '%s');";
+                        "VALUES (%s, %s, '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE recurring_transfer SET " \
-                        "recurring_charge_id = %lld," \
-                        "account_to_id = %lld," \
+                        "recurring_charge_id = %s," \
+                        "account_to_id = %s," \
                         "updated = '%s' " \
-                        "WHERE id = %lld;";
+                        "WHERE id = %s;";
 
     public:
         DBAccount accountTo;
@@ -59,8 +59,8 @@ class DBRecurringTransfer : public DBEntity {
         void clear() {
             DBEntity::clear();
 
-            this->recurringChargeId = 0;
-            this->accountToId = 0;
+            this->recurringChargeId.clear();
+            this->accountToId.clear();
         }
 
         void set(const DBRecurringTransfer & src) {
@@ -73,8 +73,8 @@ class DBRecurringTransfer : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "RecurringChargeId: " << recurringChargeId << endl;
-            cout << "AccountToId: " << accountToId << endl;
+            cout << "RecurringChargeId: " << recurringChargeId.getValue() << endl;
+            cout << "AccountToId: " << accountToId.getValue() << endl;
         }
 
         const char * getTableName() override {
@@ -94,8 +94,8 @@ class DBRecurringTransfer : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                recurringChargeId,
-                accountToId,
+                recurringChargeId.c_str(),
+                accountToId.c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -111,10 +111,10 @@ class DBRecurringTransfer : public DBEntity {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
-                recurringChargeId,
-                accountToId,
+                recurringChargeId.c_str(),
+                accountToId.c_str(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

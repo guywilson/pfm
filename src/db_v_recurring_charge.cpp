@@ -24,7 +24,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_i
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountID, 
-        accountId);
+        accountId.c_str());
 
     result.retrieve(szStatement);
 
@@ -44,7 +44,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetwee
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIDBetweenDates, 
-        accountId,
+        accountId.c_str(),
         dateAfter.shortDate().c_str(),
         dateBefore.shortDate().c_str());
 

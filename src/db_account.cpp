@@ -75,7 +75,7 @@ void DBAccount::createRecurringTransactions() {
                 int numRows = transaction.findLatestByRecurringChargeID(charge.id);
 
                 if (numRows == 0) {
-                    log.debug("Found no exisiting transactions for charge %lld", charge.id);
+                    log.debug("Found no exisiting transactions for charge %s", charge.id.c_str());
 
                     if (charge.date < openingDate) {
                         transactionDate = charge.date;
@@ -89,14 +89,14 @@ void DBAccount::createRecurringTransactions() {
                     }
                 }
                 else {
-                    log.debug("Found latest transactions for charge %lld with date '%s'", charge.id, transaction.date.shortDate().c_str());
+                    log.debug("Found latest transactions for charge %s with date '%s'", charge.id.c_str(), transaction.date.shortDate().c_str());
                     
                     transactionDate = charge.getNextRecurringTransactionDate(transaction.date);
                 }
 
                 log.debug(
-                    "Got transaction date for charge %lld - '%s' as '%s'", 
-                    charge.id, 
+                    "Got transaction date for charge %s - '%s' as '%s'", 
+                    charge.id.c_str(), 
                     charge.description.c_str(), 
                     transactionDate.shortDate().c_str());
 

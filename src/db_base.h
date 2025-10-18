@@ -91,7 +91,7 @@ class DBEntity {
         virtual const char * getSelectByIDStatement(pfm_id_t key) {
             static char statement[64];
 
-            snprintf(statement, 64, "SELECT * FROM %s WHERE id = %lld;", getTableName(), key); 
+            snprintf(statement, 64, "SELECT * FROM %s WHERE id = %s;", getTableName(), key.c_str()); 
             return statement;
         }
 
@@ -105,7 +105,7 @@ class DBEntity {
         virtual const char * getDeleteByIDStatement(pfm_id_t key) {
             static char statement[64];
 
-            snprintf(statement, 64, "DELETE FROM %s WHERE id = %lld;", getTableName(), key); 
+            snprintf(statement, 64, "DELETE FROM %s WHERE id = %s;", getTableName(), key.c_str()); 
             return statement;
         }
 
@@ -137,7 +137,7 @@ class DBEntity {
         void retrieve(pfm_id_t id);
 
         void clear() {
-            this->id = 0;
+            this->id.clear();
             this->sequence = 0;
             this->createdDate = "";
             this->updatedDate = "";
@@ -167,7 +167,7 @@ class DBEntity {
         }
 
         void print() {
-            cout << "ID: " << id << endl;
+            cout << "ID: " << id.getValue() << endl;
             cout << "Sequence: " << sequence << endl;
 
             cout << "Created: " << createdDate << endl;

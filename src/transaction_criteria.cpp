@@ -289,7 +289,7 @@ string FindTransactionCriteriaBuilder::getCriteria() {
             criteria += "recurring_charge_id <> 0";
         }
         else if (recurringOrNonRecurring.compare("n") == 0) {
-            criteria += "recurring_charge_id = 0";
+            criteria += "recurring_charge_id IS NULL";
         }
     }
 

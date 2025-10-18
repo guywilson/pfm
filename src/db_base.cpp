@@ -147,7 +147,7 @@ void DBEntity::remove() {
     }
     catch (pfm_error & e) {
         db.rollback();
-        log.error("Failed to remove entity with id: %lld", id);
+        log.error("Failed to remove entity with id: %s", id.c_str());
 
         throw e;
     }
@@ -199,7 +199,7 @@ void DBEntity::removeAll() {
     }
     catch (pfm_error & e) {
         db.rollback();
-        log.error("Failed to remove entity with id: %lld", id);
+        log.error("Failed to remove entity with id: %s", id.c_str());
 
         throw e;
     }
@@ -217,7 +217,7 @@ void DBEntity::save() {
     try {
         db.begin();
 
-        if (id == 0) {
+        if (id.isNull()) {
             beforeInsert();
             id = insert();
             afterInsert();
@@ -232,7 +232,7 @@ void DBEntity::save() {
     }
     catch (pfm_error & e) {
         db.rollback();
-        log.error("Failed to save entity with id: %lld", id);
+        log.error("Failed to save entity with id: %s", id.c_str());
 
         throw e;
     }

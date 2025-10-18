@@ -26,7 +26,7 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectLatestByAccountId, 
-        accountId);
+        accountId.c_str());
 
     int rowsRetrievedCount = result.retrieve(szStatement);
 
@@ -50,7 +50,7 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountId, 
-        accountId);
+        accountId.c_str());
 
     result.retrieve(szStatement);
 
@@ -70,7 +70,7 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByAccountIdAfterDate, 
-        accountId,
+        accountId.c_str(),
         after.shortDate().c_str());
 
     result.retrieve(szStatement);

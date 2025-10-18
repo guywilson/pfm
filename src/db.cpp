@@ -812,7 +812,9 @@ pfm_id_t PFM_DB::executeInsert(const char * statement) {
 
     log.exit("PFM_DB::executeInsert()");
 
-    return sqlite3_last_insert_rowid(dbHandle);
+    pfm_id_t id = sqlite3_last_insert_rowid(dbHandle);
+
+    return id;
 }
 
 void PFM_DB::executeUpdate(const char * statement) {

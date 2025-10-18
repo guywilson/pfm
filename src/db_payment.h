@@ -54,9 +54,9 @@ class DBPayment : public DBEntity {
         void clear() {
             DBEntity::clear();
 
-            this->accountId = 0;
-            this->categoryId = 0;
-            this->payeeId = 0;
+            this->accountId.clear();
+            this->categoryId.clear();
+            this->payeeId.clear();
 
             this->account.clear();
             this->category.clear();
@@ -118,9 +118,9 @@ class DBPayment : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "AccountID: " << accountId << endl;
-            cout << "CategoryID: " << categoryId << endl;
-            cout << "PayeeID: " << payeeId << endl;
+            cout << "AccountID: " << accountId.getValue() << endl;
+            cout << "CategoryID: " << categoryId.getValue() << endl;
+            cout << "PayeeID: " << payeeId.getValue() << endl;
 
             cout << "Date: '" << date.shortDate() << "'" << endl;
             cout << "Description: '" << description << "'" << endl;

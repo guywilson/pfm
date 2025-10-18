@@ -39,7 +39,7 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM account_transaction " \
-                        "WHERE account_id = %lld;";
+                        "WHERE account_id = %s;";
 
         const char * sqlSelectByAccountIDSortedByDate = 
                         "SELECT " \
@@ -57,7 +57,7 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM account_transaction " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "ORDER BY date %s";
 
         const char * sqlSelectByAccountIDBetweenDates = 
@@ -76,7 +76,7 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM account_transaction " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 
@@ -96,7 +96,7 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM account_transaction " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "AND is_reconciled = 'Y';";
 
         const char * sqlSelectReconciledByAccountIDBetweenDates = 
@@ -115,7 +115,7 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM account_transaction " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "AND is_reconciled = 'Y' " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
@@ -135,8 +135,8 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM account_transaction " \
-                        "WHERE account_id = %lld " \
-                        "AND recurring_charge_id = 0 " \
+                        "WHERE account_id = %s " \
+                        "AND recurring_charge_id IS NULL " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 
@@ -156,7 +156,7 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM account_transaction " \
-                        "WHERE recurring_charge_id = %lld;";
+                        "WHERE recurring_charge_id = %s;";
 
         const char * sqlSelectLatestByChargeID = 
                         "SELECT " \
@@ -174,7 +174,7 @@ class DBTransaction : public DBPayment {
                         "created," \
                         "updated " \
                         "FROM account_transaction " \
-                        "WHERE recurring_charge_id = %lld " \
+                        "WHERE recurring_charge_id = %s " \
                         "ORDER BY date DESC " \
                         "LIMIT 1;";
 
@@ -192,14 +192,14 @@ class DBTransaction : public DBPayment {
                         "is_reconciled," \
                         "created," \
                         "updated) " \
-                        "VALUES (%lld, %lld, %lld, %lld, '%s', '%s', " \
+                        "VALUES (%s, %s, %s, %s, '%s', '%s', " \
                         "'%s', '%s', '%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE account_transaction " \
-                        "SET category_id = %lld," \
-                        "payee_id = %lld," \
-                        "recurring_charge_id = %lld,"
+                        "SET category_id = %s," \
+                        "payee_id = %s," \
+                        "recurring_charge_id = %s,"
                         "date = '%s'," \
                         "reference = '%s'," \
                         "description = '%s'," \
@@ -207,21 +207,21 @@ class DBTransaction : public DBPayment {
                         "amount = '%s'," \
                         "is_reconciled = '%s'," \
                         "updated = '%s' " \
-                        "WHERE id = %lld;";
+                        "WHERE id = %s;";
 
         const char * sqlReconcileByAccountIDBeforeDate = 
                         "UPDATE account_transaction " \
                         "SET is_reconciled = 'Y'," \
                         "updated = '%s' " \
-                        "WHERE account_id = %lld " \
+                        "WHERE account_id = %s " \
                         "AND date <= '%s'" \
                         "AND is_reconciled = 'N';";
 
         const char * sqlDeleteByRecurringCharge = 
-                        "DELETE FROM account_transaction WHERE recurring_charge_id = %lld;";
+                        "DELETE FROM account_transaction WHERE recurring_charge_id = %s;";
 
         const char * sqlDeleteAllRecurringForAccount = 
-                        "DELETE FROM account_transaction WHERE account_id = %lld AND recurring_charge_id <> 0;";
+                        "DELETE FROM account_transaction WHERE account_id = %s AND recurring_charge_id <> 0;";
 
         DBResult<DBTransaction> retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
@@ -257,7 +257,7 @@ class DBTransaction : public DBPayment {
         void clear() {
             DBPayment::clear();
 
-            this->recurringChargeId = 0;
+            this->recurringChargeId.clear();
             this->reference = "";
             this->isCredit = false;
             this->isReconciled = false;
@@ -293,14 +293,14 @@ class DBTransaction : public DBPayment {
         void setFromRecurringCharge(const DBRecurringCharge & src) {
             DBPayment::set(src);
 
-            this->id = 0;
+            this->id.clear();
             this->recurringChargeId = src.id;
         }
 
         void print() {
             DBPayment::print();
 
-            cout << "RecurringChargeId: " << recurringChargeId << endl;
+            cout << "RecurringChargeId: " << recurringChargeId.getValue() << endl;
             cout << "Reference: '" << reference << "'" << endl;
             cout << "Debit/Credit: '" << (isCredit ? "CR" : "DB") << "'" << endl;
             cout << "isReconciled: " << isReconciled << endl;
@@ -324,10 +324,10 @@ class DBTransaction : public DBPayment {
         }
 
         void onRowComplete(int sequence) override {
-            if (categoryId != 0) {
+            if (!categoryId.isNull()) {
                 category.retrieve(categoryId);
             }
-            if (payeeId != 0) {
+            if (!payeeId.isNull()) {
                 payee.retrieve(payeeId);
             }
 
@@ -378,10 +378,10 @@ class DBTransaction : public DBPayment {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlInsert,
-                accountId,
-                categoryId,
-                payeeId,
-                recurringChargeId,
+                accountId.c_str(),
+                categoryId.c_str(),
+                payeeId.c_str(),
+                recurringChargeId.c_str(),
                 date.shortDate().c_str(),
                 dReference.c_str(),
                 dDescription.c_str(),
@@ -406,9 +406,9 @@ class DBTransaction : public DBPayment {
                 szStatement, 
                 SQL_STATEMENT_BUFFER_LEN,
                 sqlUpdate,
-                categoryId,
-                payeeId,
-                recurringChargeId,
+                categoryId.c_str(),
+                payeeId.c_str(),
+                recurringChargeId.c_str(),
                 date.shortDate().c_str(),
                 dReference.c_str(),
                 dDescription.c_str(),
@@ -416,7 +416,7 @@ class DBTransaction : public DBPayment {
                 amount.rawStringValue().c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

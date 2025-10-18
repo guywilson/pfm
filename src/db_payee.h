@@ -23,7 +23,7 @@ class DBPayee : public DBEntity {
                         "INSERT INTO payee (code, name, created, updated) VALUES ('%s', '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
-                        "UPDATE payee SET code = '%s', name = '%s', updated = '%s' WHERE id = %lld;";
+                        "UPDATE payee SET code = '%s', name = '%s', updated = '%s' WHERE id = %s;";
 
     public:
         string                  name;
@@ -120,7 +120,7 @@ class DBPayee : public DBEntity {
                 code.c_str(),
                 dName.c_str(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

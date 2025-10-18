@@ -47,7 +47,7 @@ class DBAccount : public DBEntity {
                         "opening_date = '%s'," \
                         "opening_balance = '%s'," \
                         "updated = '%s' " \
-                        "WHERE id = %lld;";
+                        "WHERE id = %s;";
 
         void doBalancePrerequisites();
         
@@ -177,7 +177,7 @@ class DBAccount : public DBEntity {
                 openingDate.shortDate().c_str(),
                 openingBalance.rawStringValue().c_str(),
                 now.c_str(),
-                id);
+                id.c_str());
 
             return szStatement;
         }

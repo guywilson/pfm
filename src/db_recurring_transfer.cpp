@@ -25,7 +25,7 @@ int DBRecurringTransfer::retrieveByRecurringChargeId(pfm_id_t recurringChargeId)
         szStatement, 
         SQL_STATEMENT_BUFFER_LEN, 
         sqlSelectByRecurringChargeId, 
-        recurringChargeId);
+        recurringChargeId.c_str());
 
     int rowsRetrievedCount = result.retrieve(szStatement);
 
