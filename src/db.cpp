@@ -553,7 +553,7 @@ void PFM_DB::clearIsTransactionActive() {
 void PFM_DB::_executeSQLNoCallback(const char * sql) {
     log.entry("PFM_DB::_executeSQLNoCallback()");
 
-    log.debug("Executing SQL '%s'", sql);
+    log.sql("Executing SQL '%s'", sql);
     
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, sql, NULL, NULL, &pszErrorMsg);
@@ -576,7 +576,7 @@ void PFM_DB::_executeSQLNoCallback(const char * sql) {
 void PFM_DB::_executeSQLCallback(const char * sql, vector<DBRow> * rows) {
     log.entry("PFM_DB::_executeSQLCallback()");
 
-    log.debug("Executing SQL '%s'", sql);
+    log.sql("Executing SQL '%s'", sql);
 
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, sql, _retrieveCallback, rows, &pszErrorMsg);
@@ -599,7 +599,7 @@ void PFM_DB::_executeSQLCallback(const char * sql, vector<DBRow> * rows) {
 void PFM_DB::createTable(const char * sql) {
     log.entry("PFM_DB::createTable()");
     
-    log.debug("Creating table with sql %s", sql);
+    log.sql("Creating table with sql %s", sql);
 
     try {
         _executeSQLNoCallback(sql);
@@ -622,7 +622,7 @@ void PFM_DB::createTable(const char * sql) {
 void PFM_DB::createView(const char * sql) {
     log.entry("PFM_DB::createView()");
     
-    log.debug("Creating view with sql %s", sql);
+    log.sql("Creating view with sql %s", sql);
 
     try {
         _executeSQLNoCallback(sql);
@@ -841,7 +841,7 @@ void PFM_DB::begin() {
         return;
     }
 
-    log.debug("BEGIN TRANSACTION");
+    log.sql("BEGIN TRANSACTION");
 
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, "BEGIN DEFERRED TRANSACTION;", NULL, NULL, &pszErrorMsg);
@@ -870,7 +870,7 @@ void PFM_DB::commit() {
         return;
     }
     
-    log.debug("COMMIT TRANSACTION");
+    log.sql("COMMIT TRANSACTION");
 
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, "COMMIT TRANSACTION;", NULL, NULL, &pszErrorMsg);
@@ -899,7 +899,7 @@ void PFM_DB::rollback() {
         return;
     }
 
-    log.debug("ROLLBACK TRANSACTION");
+    log.sql("ROLLBACK TRANSACTION");
 
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, "ROLLBACK TRANSACTION;", NULL, NULL, &pszErrorMsg);

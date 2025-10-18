@@ -14,8 +14,9 @@ using namespace std;
 #define LOG_LEVEL_INFO          0x01
 #define LOG_LEVEL_STATUS        0x02
 #define LOG_LEVEL_DEBUG         0x04
-#define LOG_LEVEL_ENTRY         0x08
-#define LOG_LEVEL_EXIT          0x10
+#define LOG_LEVEL_SQL           0x08
+#define LOG_LEVEL_ENTRY         0x10
+#define LOG_LEVEL_EXIT          0x20
 #define LOG_LEVEL_ENTRYEXIT     (LOG_LEVEL_ENTRY | LOG_LEVEL_EXIT)
 #define LOG_LEVEL_ERROR         0x40
 #define LOG_LEVEL_FATAL         0x80
@@ -59,6 +60,7 @@ class Logger {
         int info(const char * fmt, ...);
         int status(const char * fmt, ...);
         int debug(const char * fmt, ...);
+        int sql(const char * fmt, ...);
         int entry(const char * fmt, ...);
         int exit(const char * fmt, ...);
         int error(const char * fmt, ...);

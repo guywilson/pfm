@@ -21,7 +21,7 @@ pfm_id_t DBEntity::insert() {
 
     const char * statement = getInsertStatement();
 
-    log.debug("Executing INSERT statement '%s'", statement);
+    log.sql("Executing INSERT statement '%s'", statement);
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -37,7 +37,7 @@ void DBEntity::update() {
 
     const char * statement = getUpdateStatement();
 
-    log.debug("Executing UPDATE statement '%s'", statement);
+    log.sql("Executing UPDATE statement '%s'", statement);
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -97,7 +97,7 @@ void DBEntity::retrieve(pfm_id_t id) {
 
     vector<DBRow> rows;
 
-    log.debug("Executing SELECT BY id statement '%s'", statement);
+    log.sql("Executing SELECT BY id statement '%s'", statement);
     int rowsRetrievedCount = db.executeSelect(statement, &rows);
 
     if (rowsRetrievedCount != 1) {
@@ -138,7 +138,7 @@ void DBEntity::remove() {
 
         beforeRemove();
 
-        log.debug("Executing DELETE statement '%s'", statement);
+        log.sql("Executing DELETE statement '%s'", statement);
         db.executeDelete(statement);
 
         afterRemove();
@@ -165,7 +165,7 @@ void DBEntity::remove(const char * statement) {
     try {
         db.begin();
 
-        log.debug("Executing DELETE statement '%s'", statement);
+        log.sql("Executing DELETE statement '%s'", statement);
         db.executeDelete(statement);
 
         db.commit();
@@ -192,7 +192,7 @@ void DBEntity::removeAll() {
     try {
         db.begin();
 
-        log.debug("Executing DELETE statement '%s'", statement);
+        log.sql("Executing DELETE statement '%s'", statement);
         db.executeDelete(statement);
 
         db.commit();
@@ -231,7 +231,7 @@ void DBEntity::save() {
         }
 
         afterSave();
-        
+
         db.commit();
     }
     catch (pfm_error & e) {

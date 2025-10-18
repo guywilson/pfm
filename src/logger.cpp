@@ -106,6 +106,9 @@ int Logger::getLogLevelFromString(string & logLevel) {
         else if (strncmp(pszToken, "LOG_LEVEL_DEBUG", 15) == 0) {
             level |= LOG_LEVEL_DEBUG;
         }
+        else if (strncmp(pszToken, "LOG_LEVEL_SQL", 13) == 0) {
+            level |= LOG_LEVEL_SQL;
+        }
         else if (strncmp(pszToken, "LOG_LEVEL_ERROR", 15) == 0) {
             level |= LOG_LEVEL_ERROR;
         }
@@ -132,6 +135,10 @@ int Logger::logMessage(int logLevel, const char * fmt, va_list args) {
         switch (logLevel) {
             case LOG_LEVEL_DEBUG:
                 buffer += "[DEBUG]";
+                break;
+
+            case LOG_LEVEL_SQL:
+                buffer += "[SQL]";
                 break;
 
             case LOG_LEVEL_STATUS:
@@ -210,6 +217,19 @@ int Logger::debug(const char * fmt, ...) {
     va_start (args, fmt);
     
     bytesWritten = logMessage(LOG_LEVEL_DEBUG, fmt, args);
+    
+    va_end(args);
+    
+    return bytesWritten;
+}
+
+int Logger::sql(const char * fmt, ...) {
+    va_list     args;
+    int         bytesWritten;
+
+    va_start (args, fmt);
+    
+    bytesWritten = logMessage(LOG_LEVEL_SQL, fmt, args);
     
     va_end(args);
     
