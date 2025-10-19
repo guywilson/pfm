@@ -97,7 +97,7 @@ void DBEntity::retrieve(pfm_id_t id) {
 
     vector<DBRow> rows;
 
-    log.sql("Executing SELECT BY id statement '%s'", statement);
+    log.debug("Executing SELECT BY id statement '%s'", statement);
     int rowsRetrievedCount = db.executeSelect(statement, &rows);
 
     if (rowsRetrievedCount != 1) {
@@ -138,7 +138,7 @@ void DBEntity::remove() {
 
         beforeRemove();
 
-        log.sql("Executing DELETE statement '%s'", statement);
+        log.debug("Executing DELETE statement '%s'", statement);
         db.executeDelete(statement);
 
         afterRemove();
@@ -165,7 +165,7 @@ void DBEntity::remove(const char * statement) {
     try {
         db.begin();
 
-        log.sql("Executing DELETE statement '%s'", statement);
+        log.debug("Executing DELETE statement '%s'", statement);
         db.executeDelete(statement);
 
         db.commit();
@@ -192,7 +192,7 @@ void DBEntity::removeAll() {
     try {
         db.begin();
 
-        log.sql("Executing DELETE statement '%s'", statement);
+        log.debug("Executing DELETE statement '%s'", statement);
         db.executeDelete(statement);
 
         db.commit();
