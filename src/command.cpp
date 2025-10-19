@@ -653,6 +653,22 @@ void Command::addTransferTransaction() {
     }
 }
 
+void Command::migrateCharge(DBRecurringCharge & charge) {
+    MigrateChargeView view;
+    view.setCharge(charge);
+    view.show();
+
+    DBRecurringCharge updatedCharge = view.getCharge();
+
+    updatedCharge.migrateToTransferCharge(updatedCharge.transfer.accountToId);
+
+    DBRecurringTransfer tr;
+    tr.accountToId = updatedCharge.transfer.accountToId;
+    tr.recurringChargeId = updatedCharge.id;
+
+    tr.save();
+}
+
 void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool includeRecurring) {
     checkAccountSelected();
 
@@ -1275,6 +1291,12 @@ bool Command::process(const string & command) {
     else if (isCommand("export-recurring-charges") || isCommand("xrc")) {
         string filename = getParameter(0);
         exportRecurringCharges(filename);
+    }
+    else if (isCommand("migrate-recurring-charge") || isCommand("mrc")) {
+        string sequence = getParameter(0);
+
+        DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
+        migrateCharge(charge);
     }
     else if (isCommand("add-transaction") || isCommand("at") || isCommand("add")) {
         if (hasParameters()) {

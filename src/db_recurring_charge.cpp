@@ -102,7 +102,7 @@ int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
     return periodEnd;
 }
 
-DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t accountId) {
+DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::retrieveByAccountID()");
 
@@ -122,7 +122,7 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t acco
     return result;
 }
 
-DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & dateAfter, StrDate & dateBefore) {
+DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(pfm_id_t & accountId, StrDate & dateAfter, StrDate & dateBefore) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::retrieveByAccountIDBetweenDates()");
 
@@ -352,6 +352,43 @@ StrDate DBRecurringCharge::adjustForwardToBusinessDay(StrDate& d) {
     return x;
 }
 
+void DBRecurringCharge::migrateToTransferCharge(pfm_id_t & accountToId) {
+    DBTransaction tr;
+    DBResult<DBTransaction> recurringTransactions = tr.retrieveByRecurringChargeID(id);
+
+    for (int i = 0;i < recurringTransactions.size();i++) {
+        DBTransaction sourceTransaction = recurringTransactions[i];
+
+        DBAccount accountTo;
+        accountTo.id = accountToId;
+        accountTo.retrieve();
+
+        sourceTransaction.reference = "TR > " + accountTo.code;
+
+        sourceTransaction.save();
+
+        DBTransaction targetTransaction;
+
+        targetTransaction.accountId = accountToId;
+        targetTransaction.categoryId = categoryId;
+
+        targetTransaction.date = sourceTransaction.date;
+        targetTransaction.description = sourceTransaction.description;
+
+        DBAccount accountFrom;
+        accountFrom.id = accountId;
+        accountFrom.retrieve();
+
+        targetTransaction.reference = "TR < " + accountFrom.code;
+
+        targetTransaction.isCredit = true;
+        targetTransaction.amount = sourceTransaction.amount;
+        targetTransaction.isReconciled = true;
+
+        targetTransaction.save();
+    }
+}
+
 void DBRecurringCharge::beforeRemove() {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::beforeRemove()");
@@ -398,8 +435,8 @@ void DBRecurringCharge::beforeUpdate() {
     }
 
     if (isTransfer()) {
-        if (this->transfer->accountToId != currentCharge.transfer->accountToId) {
-            this->transfer->save();
+        if (this->transfer.accountToId != currentCharge.transfer.accountToId) {
+            this->transfer.save();
         }
     }
 
@@ -411,10 +448,10 @@ void DBRecurringCharge::afterInsert() {
     log.entry("DBRecurringCharge::afterInsert()");
 
     if (isTransfer()) {
-        transfer->accountToId = transfer->accountTo.id;
-        transfer->recurringChargeId = id;
+        transfer.accountToId = transfer.accountTo.id;
+        transfer.recurringChargeId = id;
 
-        transfer->save();
+        transfer.save();
     }
 
     log.exit("DBRecurringCharge::afterInsert()");

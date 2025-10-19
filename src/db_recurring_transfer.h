@@ -77,6 +77,10 @@ class DBRecurringTransfer : public DBEntity {
             cout << "AccountToId: " << accountToId.getValue() << endl;
         }
 
+        bool inline isNull() {
+            return (id.isNull() && accountToId.isNull() && recurringChargeId.isNull());
+        }
+
         const char * getTableName() override {
             return "recurring_transfer";
         }

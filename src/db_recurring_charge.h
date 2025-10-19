@@ -165,7 +165,7 @@ class DBRecurringCharge : public DBPayment {
         static StrDate adjustForwardToBusinessDay(StrDate & d);
 
     public:
-        DBRecurringTransfer * transfer = nullptr;
+        DBRecurringTransfer transfer;
 
         StrDate lastPaymentDate;
         Frequency frequency;
@@ -205,11 +205,7 @@ class DBRecurringCharge : public DBPayment {
         void clear() {
             DBPayment::clear();
 
-            if (this->transfer != nullptr) {
-                delete this->transfer;
-                this->transfer = nullptr;
-            }
-
+            this->transfer.clear();
             this->lastPaymentDate.clear();
             this->frequency.set("");
             this->endDate.clear();
@@ -272,18 +268,13 @@ class DBRecurringCharge : public DBPayment {
                 payee.retrieve(payeeId);
             }
 
-            DBRecurringTransfer tr;
-            int numTransferRecords = tr.retrieveByRecurringChargeId(id);
-
-            if (numTransferRecords != 0) {
-                transfer = new DBRecurringTransfer(tr);
-            }
+            transfer.retrieveByRecurringChargeId(id);
 
             this->sequence = sequence;
         }
 
         bool isTransfer() {
-            return (transfer != nullptr ? true : false);
+            return (!transfer.isNull() ? true : false);
         }
 
         bool isActive();
@@ -301,6 +292,8 @@ class DBRecurringCharge : public DBPayment {
         bool isChargeDueThisPeriod(StrDate & referenceDate);
         StrDate calculateNextPaymentDate();
         StrDate getNextRecurringTransactionDate(StrDate & startDate);
+
+        void migrateToTransferCharge(pfm_id_t & accountToId);
 
         const char * getTableName() override {
             return "recurring_charge";
@@ -361,8 +354,8 @@ class DBRecurringCharge : public DBPayment {
             return szStatement;
         }
 
-        DBResult<DBRecurringCharge> retrieveByAccountID(pfm_id_t accountId);
-        DBResult<DBRecurringCharge> retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & dateAfter, StrDate & dateBefore);
+        DBResult<DBRecurringCharge> retrieveByAccountID(pfm_id_t & accountId);
+        DBResult<DBRecurringCharge> retrieveByAccountIDBetweenDates(pfm_id_t & accountId, StrDate & dateAfter, StrDate & dateBefore);
 };
 
 #endif

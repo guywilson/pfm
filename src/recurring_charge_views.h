@@ -65,8 +65,8 @@ class AddRecurringChargeView : public CLIView {
             charge.amount = amountField.getDoubleValue();
 
             if (transferToAccountField.getValue().length() > 0) {
-                charge.transfer = new DBRecurringTransfer();
-                charge.transfer->accountTo = transferToAccountField.getAccount();
+                charge.transfer.accountTo = transferToAccountField.getAccount();
+                charge.transfer.accountToId = charge.transfer.accountTo.id;
             }
 
             return charge;
@@ -158,6 +158,39 @@ class RecurringChargeListView : public CLIListView {
             CLIListView::showNoExtraCR();
 
             showTotal(7, total.localeFormattedStringValue());
+        }
+};
+
+class MigrateChargeView : public CLIView {
+    private:
+        string sourceAccountCode;
+        DBRecurringCharge charge;
+
+        AccountSpinField accountField = AccountSpinField("Account to transfer to (max. 5 chars): ");
+
+    public:
+        MigrateChargeView() : MigrateChargeView("Migrate charge") {}
+
+        MigrateChargeView(const char * title) : CLIView(title) {
+        }
+
+        void show() override {
+            CLIView::show();
+
+            accountField.show();
+        }
+
+        void setCharge(DBRecurringCharge & charge) {
+            this->charge = charge;
+        }
+
+        DBRecurringCharge getCharge() {
+            DBAccount accountTo = accountField.getAccount();
+
+            charge.transfer.accountToId = accountTo.id;
+            charge.transfer.recurringChargeId = charge.id;
+
+            return charge;
         }
 };
 
