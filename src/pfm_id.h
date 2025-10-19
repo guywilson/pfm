@@ -33,7 +33,7 @@ class pfm_id_t {
         }
 
         void checkForNumericString(const char * s) {
-            for (int i = 0;i < strlen(s);i++) {
+            for (int i = 0;i < (int)strlen(s);i++) {
                 char c = s[i];
 
                 checkForNumericChar(c);
@@ -44,7 +44,7 @@ class pfm_id_t {
         void set(sqlite3_int64 id) {
             char buffer[40];
 
-            snprintf(buffer, sizeof(buffer), "%" PRId64, id);
+            snprintf(buffer, sizeof(buffer), "%lld", (long long)id);
 
             _value.assign(buffer);
             _isNull = false;

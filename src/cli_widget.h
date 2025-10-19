@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <inttypes.h>
 
 #include "money.h"
 #include "cfgmgr.h"
@@ -612,7 +613,7 @@ class CLIListRow : public CLIWidget {
         void addCellValue(int64_t val) {
             char buffer[32];
 
-            snprintf(buffer, 32, "%lld", val);
+            snprintf(buffer, 32, "%" PRId64, val);
             string value = buffer;
             columnValues.push_back(value);
         }
@@ -620,7 +621,7 @@ class CLIListRow : public CLIWidget {
         void addCellValue(uint64_t val) {
             char buffer[32];
 
-            snprintf(buffer, 32, "%llu", val);
+            snprintf(buffer, 32, "%" PRIu64, val);
             string value = buffer;
             columnValues.push_back(value);
         }
