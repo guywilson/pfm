@@ -159,7 +159,7 @@ class DBRecurringCharge : public DBPayment {
 
         // Next *scheduled* (nominal) date, without weekend adjustment.
         // Starts strictly after `from` to avoid infinite loops on equal dates.
-        StrDate nextScheduledNoWeekend(StrDate & from);
+        StrDate getNextScheduledDate(StrDate & from);
 
         // Move forward to Monday if the given day is a weekend.
         static StrDate adjustForwardToBusinessDay(StrDate & d);

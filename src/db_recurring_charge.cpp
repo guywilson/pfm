@@ -204,7 +204,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
 
     // Find the next *nominal* (no weekend adjustment) scheduled date
     // that comes on or after 'referenceDate'.
-    StrDate nominalNext = nextScheduledNoWeekend(referenceDate);
+    StrDate nominalNext = getNextScheduledDate(periodStart);
 
     // If there is no next occurrence, it's not due.
     if (nominalNext.isNull()) {
@@ -251,7 +251,7 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
     }
 
     // Nominal next date on/after today
-    StrDate nominal = nextScheduledNoWeekend(today);
+    StrDate nominal = getNextScheduledDate(today);
 
     log.debug("Calculated nominal nextPaymentDate of charge '%s' as '%s'",
               this->description.c_str(), nominal.shortDate().c_str());
@@ -280,7 +280,7 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
 }
 
 StrDate DBRecurringCharge::getNextRecurringScheduledDate(StrDate & startDate) {
-    return nextScheduledNoWeekend(startDate);
+    return getNextScheduledDate(startDate);
 }
 
 StrDate DBRecurringCharge::nextByFrequency(StrDate & from) {
@@ -309,7 +309,10 @@ StrDate DBRecurringCharge::nextByFrequency(StrDate & from) {
     }
 }
 
-StrDate DBRecurringCharge::nextScheduledNoWeekend(StrDate & from) {
+StrDate DBRecurringCharge::getNextScheduledDate(StrDate & from) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::getNextScheduledDate()");
+
     // Nominal schedule is independent of "business day" movement.
     // Start from the *initial* schedule anchor (this->date) or after `from`.
     if (!isActive()) {
@@ -328,12 +331,18 @@ StrDate DBRecurringCharge::nextScheduledNoWeekend(StrDate & from) {
     }
 
     // Ensure d is at least the anchor (start date)
-    if (d < this->date) d = this->date;
+    if (d < this->date) {
+        d = this->date;
+    }
 
     // If 'd' is not strictly after 'from', step forward until it is.
-    while (!(d > from)) {
+    while (d <= from) {
         d = nextByFrequency(d);
     }
+
+    log.debug("Next scheduled date for charge '%s' is '%s'", this->description.c_str(), d.shortDate().c_str());
+
+    log.exit("DBRecurringCharge::getNextScheduledDate()");
 
     // IMPORTANT: do not adjust weekends here; this is the *nominal* schedule.
     return d;
