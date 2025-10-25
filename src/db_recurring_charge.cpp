@@ -132,36 +132,33 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(p
     return result;
 }
 
-bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
+const bool DBRecurringCharge::isWithinCurrentPeriod(StrDate & referenceDate) {
     Logger & log = Logger::getInstance();
-    log.entry("DBRecurringCharge::isDateWithinCurrentPeriod()");
+    log.entry("DBRecurringCharge::isWithinCurrentPeriod()");
 
-    StrDate today;
-    const int startDay = getPeriodStartDay();
-    const int endDay = getPeriodEndDay(today);
+    StrDate periodStart = getPeriodStartDate();
+    StrDate periodEnd = getPeriodEndDate();
 
-    StrDate periodStart(today.year(), today.month(), startDay);
-    StrDate periodEnd(today.year(), today.month(), endDay);
-
-    const bool within = (date >= periodStart && date <= periodEnd);
+    const bool inThisPeriod =
+        (referenceDate >= periodStart) &&
+        (referenceDate <= periodEnd);
 
     log.debug("The date '%s' is %swithin the current period [%s..%s]",
-              date.shortDate().c_str(),
-              within ? "" : "NOT ",
-              periodStart.shortDate().c_str(),
-              periodEnd.shortDate().c_str());
+            date.shortDate().c_str(),
+            inThisPeriod ? "" : "NOT ",
+            periodStart.shortDate().c_str(),
+            periodEnd.shortDate().c_str());
 
-    log.exit("DBRecurringCharge::isDateWithinCurrentPeriod()");
+    log.exit("DBRecurringCharge::isWithinCurrentPeriod()");
 
-    return within;
+    return inThisPeriod;
 }
 
 StrDate DBRecurringCharge::getNextScheduledDate() {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::getNextScheduledDate()");
 
-    StrDate today;
-    StrDate periodStart(today.year(), today.month(), getPeriodStartDay());
+    StrDate periodStart = getPeriodStartDate();
 
     StrDate d = this->date;
 
@@ -197,11 +194,6 @@ StrDate DBRecurringCharge::getNextScheduledDate() {
 }
 
 bool DBRecurringCharge::isChargeDueThisPeriod() {
-    StrDate today;
-    return isChargeDueThisPeriod(today);
-}
-
-bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::isChargeDueThisPeriod()");
 
@@ -210,11 +202,8 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
         return false;
     }
 
-    const int periodStartDay = getPeriodStartDay();
-    const int periodEndDay = getPeriodEndDay(referenceDate);
-
-    StrDate periodStart(referenceDate.year(), referenceDate.month(), periodStartDay);
-    StrDate periodEnd(referenceDate.year(), referenceDate.month(), periodEndDay);
+    StrDate periodStart = getPeriodStartDate();
+    StrDate periodEnd = getPeriodEndDate();
 
     // Find the next *nominal* (no weekend adjustment) scheduled date
     StrDate nominalNext = getNextScheduledDate();
@@ -225,9 +214,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
         return false;
     }
 
-    const bool inThisPeriod =
-        (nominalNext >= periodStart) &&
-        (nominalNext <= periodEnd);
+    const bool inThisPeriod = isWithinCurrentPeriod(nominalNext);
 
     if (inThisPeriod) {
         log.debug(
@@ -257,8 +244,6 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
 
     if (isActive()) {
         StrDate nominal = getNextScheduledDate();
-
-        // …then adjusted forward to a business day for the actual transaction date.
         txnDate = adjustForwardToBusinessDay(nominal);
 
         log.debug("Next transaction date for charge '%s' is '%s' (nominal: %s)",

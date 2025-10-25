@@ -200,7 +200,29 @@ class DBRecurringCharge : public DBPayment {
             return x;
         }
 
-        bool isDateWithinCurrentPeriod(StrDate & date);
+        StrDate inline getPeriodStartDate() {
+            StrDate today;
+            return getPeriodStartDate(today);
+        }
+
+        StrDate inline getPeriodEndDate() {
+            StrDate today;
+            return getPeriodEndDate(today);
+        }
+
+        StrDate inline getPeriodStartDate(StrDate & referenceDate) {
+            const int periodStartDay = getPeriodStartDay();
+            StrDate periodStart(referenceDate.year(), referenceDate.month(), periodStartDay);
+
+            return periodStart;
+        }
+
+        StrDate inline getPeriodEndDate(StrDate & referenceDate) {
+            const int periodEndDay = getPeriodEndDay(referenceDate);
+            StrDate periodEnd(referenceDate.year(), referenceDate.month(), periodEndDay);
+
+            return periodEnd;
+        }
 
         int getPeriodStartDay();
         int getPeriodEndDay();
@@ -340,8 +362,9 @@ class DBRecurringCharge : public DBPayment {
         void beforeUpdate() override;
         void afterInsert() override;
 
+        const bool isWithinCurrentPeriod(StrDate & referenceDate);
+
         bool isChargeDueThisPeriod();
-        bool isChargeDueThisPeriod(StrDate & referenceDate);
 
         StrDate getNextRecurringTransactionDate(StrDate & startDate);
 

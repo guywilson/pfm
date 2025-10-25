@@ -423,7 +423,7 @@ Money DBAccount::calculateBalanceAfterBills() {
         for (int i = 0;i < chargeResult.size();i++) {
             DBRecurringCharge charge = chargeResult.at(i);
 
-            if (charge.isChargeDueThisPeriod(dateToday)) {
+            if (charge.isChargeDueThisPeriod()) {
                 log.debug(
                         "calculateBalanceAfterBills(): Including charge '%s' | '%s' | '%s'", 
                         charge.lastPaymentDate.shortDate().c_str(), 
