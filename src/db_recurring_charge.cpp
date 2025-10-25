@@ -132,14 +132,14 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(p
     return result;
 }
 
-const bool DBRecurringCharge::isWithinCurrentPeriod(StrDate & referenceDate) {
+bool DBRecurringCharge::isWithinCurrentPeriod(StrDate & referenceDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::isWithinCurrentPeriod()");
 
     StrDate periodStart = getPeriodStartDate();
     StrDate periodEnd = getPeriodEndDate();
 
-    const bool inThisPeriod =
+    bool inThisPeriod =
         (referenceDate >= periodStart) &&
         (referenceDate <= periodEnd);
 
@@ -159,13 +159,11 @@ StrDate DBRecurringCharge::getNextScheduledDate() {
     log.entry("DBRecurringCharge::getNextScheduledDate()");
 
     StrDate periodStart = getPeriodStartDate();
-
     StrDate d = this->date;
 
     // If a lastPaymentDate exists, we should advance from there so we don't
     // re-produce already-paid occurrences.
     if (!this->lastPaymentDate.isNull()) {
-        // We want the first occurrence strictly *after* lastPaymentDate
         d = this->lastPaymentDate;
         log.debug("Last payment date for charge '%s' is '%s'", this->description.c_str(), d.shortDate().c_str());
     }
@@ -197,38 +195,32 @@ bool DBRecurringCharge::isChargeDueThisPeriod() {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::isChargeDueThisPeriod()");
 
-    if (!isActive()) {
-        log.exit("DBRecurringCharge::isChargeDueThisPeriod()");
-        return false;
-    }
+    bool inThisPeriod = false;
 
-    StrDate periodStart = getPeriodStartDate();
-    StrDate periodEnd = getPeriodEndDate();
+    if (isActive()) {
+        StrDate periodStart = getPeriodStartDate();
+        StrDate periodEnd = getPeriodEndDate();
 
-    // Find the next *nominal* (no weekend adjustment) scheduled date
-    StrDate nominalNext = getNextScheduledDate();
+        // Find the next *nominal* (no weekend adjustment) scheduled date
+        StrDate nominalNext = getNextScheduledDate();
 
-    // If there is no next occurrence, it's not due.
-    if (nominalNext.isNull()) {
-        log.exit("DBRecurringCharge::isChargeDueThisPeriod()");
-        return false;
-    }
+        // If there is no next occurrence, it's not due.
+        if (!nominalNext.isNull()) {
+            inThisPeriod = isWithinCurrentPeriod(nominalNext);
 
-    const bool inThisPeriod = isWithinCurrentPeriod(nominalNext);
-
-    if (inThisPeriod) {
-        log.debug(
-            "Charge '%s' is due this period on nominal date '%s'",
-            this->description.c_str(), 
-            nominalNext.shortDate().c_str());
-    }
-    else {
-        log.debug(
-            "Charge '%s' is NOT due this period (nominal next: %s, period: %s..%s)",
-            this->description.c_str(),
-            nominalNext.shortDate().c_str(),
-            periodStart.shortDate().c_str(),
-            periodEnd.shortDate().c_str());
+            if (inThisPeriod) {
+                log.debug(
+                    "Charge '%s' is due this period on nominal date '%s'",
+                    this->description.c_str(), 
+                    nominalNext.shortDate().c_str());
+            }
+            else {
+                log.debug(
+                    "Charge '%s' is NOT due this period on nominal date '%s'",
+                    this->description.c_str(), 
+                    nominalNext.shortDate().c_str());
+            }
+        }
     }
 
     log.exit("DBRecurringCharge::isChargeDueThisPeriod()");

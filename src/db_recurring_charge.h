@@ -362,8 +362,7 @@ class DBRecurringCharge : public DBPayment {
         void beforeUpdate() override;
         void afterInsert() override;
 
-        const bool isWithinCurrentPeriod(StrDate & referenceDate);
-
+        bool isWithinCurrentPeriod(StrDate & referenceDate);
         bool isChargeDueThisPeriod();
 
         StrDate getNextRecurringTransactionDate(StrDate & startDate);
