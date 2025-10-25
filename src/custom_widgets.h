@@ -40,7 +40,7 @@ class CategorySpinField : public CLISpinTextField {
 
             category.retrieveByCode(code);
 
-            if (category.id == 0) {
+            if (category.id.isNull()) {
                 category.code = code;
 
                 rl_utils::setLineLength(FIELD_STRING_LEN);
@@ -84,7 +84,7 @@ class PayeeSpinField : public CLISpinTextField {
 
             payee.retrieveByCode(code);
 
-            if (payee.id == 0) {
+            if (payee.id.isNull()) {
                 payee.code = code;
 
                 rl_utils::setLineLength(FIELD_STRING_LEN);
