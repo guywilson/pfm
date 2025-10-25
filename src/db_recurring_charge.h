@@ -148,21 +148,66 @@ class DBRecurringCharge : public DBPayment {
                         "updated = '%s' " \
                         "WHERE id = %s;";
 
+        bool inline isNumeric(string & cfgDate) {
+            bool isNumeric = true;
+            for (int i = 0;i < (int)cfgDate.length();i++) {
+                if (!isdigit(cfgDate.at(i))) {
+                    isNumeric = false;
+                    break;
+                }
+            }
+
+            return isNumeric;
+        }
+
+        StrDate inline advanceDateByFrequency(StrDate & from) {
+            StrDate d = from;
+            const int n = frequency.count;
+            const FrequencyUnit u = frequency.unit;
+
+            switch (u) {
+                case FrequencyUnit::Years:
+                    return d.addYears(n);
+
+                case FrequencyUnit::Months:
+                    return d.addMonths(n);
+
+                case FrequencyUnit::Weeks:
+                    return d.addWeeks(n);
+
+                case FrequencyUnit::Days:
+                    return d.addDays(n);
+
+                default:
+                    throw pfm_error(
+                            "Unknown frequency unit when stepping date",
+                            __FILE__, 
+                            __LINE__);
+            }
+        }
+ 
+        // Move forward to Monday if the given day is a weekend.
+        StrDate inline adjustForwardToBusinessDay(StrDate& d) {
+            StrDate x = d;
+
+            if (x.isSaturday()) {
+                return x.addDays(2);
+            }
+            else if (x.isSunday()) {
+            return x.addDays(1);
+            }
+
+            return x;
+        }
+
         bool isDateWithinCurrentPeriod(StrDate & date);
 
         int getPeriodStartDay();
         int getPeriodEndDay();
         int getPeriodEndDay(StrDate & referenceDate);
 
-        // Step forward by this charge's frequency (no weekend adjustment).
-        StrDate nextByFrequency(StrDate & from);
-
         // Next *scheduled* (nominal) date, without weekend adjustment.
-        // Starts strictly after `from` to avoid infinite loops on equal dates.
-        StrDate getNextScheduledDate(StrDate & from);
-
-        // Move forward to Monday if the given day is a weekend.
-        static StrDate adjustForwardToBusinessDay(StrDate & d);
+        StrDate getNextScheduledDate();
 
     public:
         DBRecurringTransfer transfer;
@@ -277,20 +322,27 @@ class DBRecurringCharge : public DBPayment {
             return (!transfer.isNull() ? true : false);
         }
 
-        bool isActive();
+        bool inline isActive() {
+            StrDate today;
+            return (endDate.isNull() || (!endDate.isNull() && endDate >= today));
+        }
 
-        void updateLastPaymentDate(StrDate & date);
+        void inline updateLastPaymentDate(StrDate & date) {
+            DBRecurringCharge rc;
+            rc.id = this->id;
+
+            rc.retrieve();
+            rc.lastPaymentDate = date;
+            rc.save();
+        }
 
         void beforeRemove() override;
         void beforeUpdate() override;
         void afterInsert() override;
 
-        // Expose a nominal next date helper if you want to inspect schedules elsewhere.
-        StrDate getNextRecurringScheduledDate(StrDate & startDate);
-
         bool isChargeDueThisPeriod();
         bool isChargeDueThisPeriod(StrDate & referenceDate);
-        StrDate calculateNextPaymentDate();
+
         StrDate getNextRecurringTransactionDate(StrDate & startDate);
 
         void migrateToTransferCharge(pfm_id_t & accountToId);

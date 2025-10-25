@@ -17,18 +17,6 @@
 
 using namespace std;
 
-static bool isNumeric(string & cfgDate) {
-    bool isNumeric = true;
-    for (int i = 0;i < (int)cfgDate.length();i++) {
-        if (!isdigit(cfgDate.at(i))) {
-            isNumeric = false;
-            break;
-        }
-    }
-
-    return isNumeric;
-}
-
 int DBRecurringCharge::getPeriodStartDay() {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::getPeriodStartDay()");
@@ -144,20 +132,6 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(p
     return result;
 }
 
-bool DBRecurringCharge::isActive() {
-    StrDate today;
-    return (endDate.isNull() || (!endDate.isNull() && endDate >= today));
-}
-
-void DBRecurringCharge::updateLastPaymentDate(StrDate & date) {
-    DBRecurringCharge rc;
-    rc.id = this->id;
-
-    rc.retrieve();
-    rc.lastPaymentDate = date;
-    rc.save();
-}
-
 bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::isDateWithinCurrentPeriod()");
@@ -182,6 +156,46 @@ bool DBRecurringCharge::isDateWithinCurrentPeriod(StrDate & date) {
     return within;
 }
 
+StrDate DBRecurringCharge::getNextScheduledDate() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::getNextScheduledDate()");
+
+    StrDate today;
+    StrDate periodStart(today.year(), today.month(), getPeriodStartDay());
+
+    StrDate d = this->date;
+
+    // If a lastPaymentDate exists, we should advance from there so we don't
+    // re-produce already-paid occurrences.
+    if (!this->lastPaymentDate.isNull()) {
+        // We want the first occurrence strictly *after* lastPaymentDate
+        d = this->lastPaymentDate;
+        log.debug("Last payment date for charge '%s' is '%s'", this->description.c_str(), d.shortDate().c_str());
+    }
+
+    // Ensure d is at least the anchor (start date)
+    if (d < this->date) {
+        d = this->date;
+    }
+
+    while (d < periodStart) {
+        d = advanceDateByFrequency(d);
+    }
+
+    if (!lastPaymentDate.isNull()) {
+        if (d <= lastPaymentDate) {
+            d = advanceDateByFrequency(d);
+        }
+    }
+
+    log.debug("Next scheduled date for charge '%s' is '%s'", this->description.c_str(), d.shortDate().c_str());
+
+    log.exit("DBRecurringCharge::getNextScheduledDate()");
+
+    // IMPORTANT: do not adjust weekends here; this is the *nominal* schedule.
+    return d;
+}
+
 bool DBRecurringCharge::isChargeDueThisPeriod() {
     StrDate today;
     return isChargeDueThisPeriod(today);
@@ -203,8 +217,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
     StrDate periodEnd(referenceDate.year(), referenceDate.month(), periodEndDay);
 
     // Find the next *nominal* (no weekend adjustment) scheduled date
-    // that comes on or after 'referenceDate'.
-    StrDate nominalNext = getNextScheduledDate(periodStart);
+    StrDate nominalNext = getNextScheduledDate();
 
     // If there is no next occurrence, it's not due.
     if (nominalNext.isNull()) {
@@ -212,163 +225,51 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
         return false;
     }
 
-    // Weekend fix:
-    // - We judge the *period* membership using the nominal date.
-    // - We include items due *today* (>=).
     const bool inThisPeriod =
-        // (nominalNext >= referenceDate) &&
-        (nominalNext >= periodStart)   &&
+        (nominalNext >= periodStart) &&
         (nominalNext <= periodEnd);
 
     if (inThisPeriod) {
-        log.debug("Charge '%s' is due this period on nominal date '%s'",
-                  this->description.c_str(), nominalNext.shortDate().c_str());
-        log.exit("DBRecurringCharge::isChargeDueThisPeriod()");
-        return true;
+        log.debug(
+            "Charge '%s' is due this period on nominal date '%s'",
+            this->description.c_str(), 
+            nominalNext.shortDate().c_str());
     }
-
-    log.debug("Charge '%s' is NOT due this period (nominal next: %s, period: %s..%s)",
-              this->description.c_str(),
-              nominalNext.shortDate().c_str(),
-              periodStart.shortDate().c_str(),
-              periodEnd.shortDate().c_str());
+    else {
+        log.debug(
+            "Charge '%s' is NOT due this period (nominal next: %s, period: %s..%s)",
+            this->description.c_str(),
+            nominalNext.shortDate().c_str(),
+            periodStart.shortDate().c_str(),
+            periodEnd.shortDate().c_str());
+    }
 
     log.exit("DBRecurringCharge::isChargeDueThisPeriod()");
 
-    return false;
-}
-
-StrDate DBRecurringCharge::calculateNextPaymentDate() {
-    Logger & log = Logger::getInstance();
-    log.entry("DBRecurringCharge::calculateNextPaymentDate()");
-
-    StrDate today;
-    if (!this->isActive()) {
-        StrDate none;
-        none.clear();
-        log.exit("DBRecurringCharge::calculateNextPaymentDate()");
-        return none;
-    }
-
-    const int periodStartDay = getPeriodStartDay();
-    StrDate periodStart(today.year(), today.month(), periodStartDay);
-
-    // Nominal next date on/after today
-    StrDate nominal = getNextScheduledDate(periodStart);
-
-    log.debug("Calculated nominal nextPaymentDate of charge '%s' as '%s'",
-              this->description.c_str(), nominal.shortDate().c_str());
-
-    log.exit("DBRecurringCharge::calculateNextPaymentDate()");
-
-    return nominal;
+    return inThisPeriod;
 }
 
 StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::getNextRecurringTransactionDate()");
 
-    StrDate nominal = calculateNextPaymentDate();
+    StrDate txnDate;
 
-    // …then adjusted forward to a business day for the actual transaction date.
-    StrDate txnDate = adjustForwardToBusinessDay(nominal);
+    if (isActive()) {
+        StrDate nominal = getNextScheduledDate();
 
-    log.debug("Next transaction date for charge '%s' is '%s' (nominal: %s)",
-              this->description.c_str(),
-              txnDate.shortDate().c_str(),
-              nominal.shortDate().c_str());
+        // …then adjusted forward to a business day for the actual transaction date.
+        txnDate = adjustForwardToBusinessDay(nominal);
+
+        log.debug("Next transaction date for charge '%s' is '%s' (nominal: %s)",
+                this->description.c_str(),
+                txnDate.shortDate().c_str(),
+                nominal.shortDate().c_str());
+    }
 
     log.exit("DBRecurringCharge::getNextRecurringTransactionDate()");
+
     return txnDate;
-}
-
-StrDate DBRecurringCharge::getNextRecurringScheduledDate(StrDate & startDate) {
-    return getNextScheduledDate(startDate);
-}
-
-StrDate DBRecurringCharge::nextByFrequency(StrDate & from) {
-    StrDate d = from;
-    const int n = frequency.count;
-    const FrequencyUnit u = frequency.unit;
-
-    switch (u) {
-        case FrequencyUnit::Years:
-            return d.addYears(n);
-
-        case FrequencyUnit::Months:
-            return d.addMonths(n);
-
-        case FrequencyUnit::Weeks:
-            return d.addWeeks(n);
-
-        case FrequencyUnit::Days:
-            return d.addDays(n);
-
-        default:
-            throw pfm_error(
-                    "Unknown frequency unit when stepping date",
-                    __FILE__, 
-                    __LINE__);
-    }
-}
-
-StrDate DBRecurringCharge::getNextScheduledDate(StrDate & referenceDate) {
-    Logger & log = Logger::getInstance();
-    log.entry("DBRecurringCharge::getNextScheduledDate()");
-
-    // Nominal schedule is independent of "business day" movement.
-    // Start from the *initial* schedule anchor (this->date) or after `from`.
-    if (!isActive()) {
-        StrDate none;
-        none.clear();
-        return none;
-    }
-
-    StrDate d = this->date;
-
-    // If a lastPaymentDate exists, we should advance from there so we don't
-    // re-produce already-paid occurrences.
-    if (!this->lastPaymentDate.isNull()) {
-        // We want the first occurrence strictly *after* lastPaymentDate
-        d = this->lastPaymentDate;
-        log.debug("Last payment date for charge '%s' is '%s'", this->description.c_str(), d.shortDate().c_str());
-    }
-
-    // Ensure d is at least the anchor (start date)
-    if (d < this->date) {
-        d = this->date;
-    }
-
-    // If 'd' is not strictly after 'from', step forward until it is.
-    while (d < referenceDate) {
-        d = nextByFrequency(d);
-    }
-
-    if (!lastPaymentDate.isNull()) {
-        if (d <= lastPaymentDate) {
-            d = nextByFrequency(d);
-        }
-    }
-
-    log.debug("Next scheduled date for charge '%s' is '%s'", this->description.c_str(), d.shortDate().c_str());
-
-    log.exit("DBRecurringCharge::getNextScheduledDate()");
-
-    // IMPORTANT: do not adjust weekends here; this is the *nominal* schedule.
-    return d;
-}
-
-StrDate DBRecurringCharge::adjustForwardToBusinessDay(StrDate& d) {
-    StrDate x = d;
-
-    if (x.isSaturday()) {
-        return x.addDays(2);
-    }
-    else if (x.isSunday()) {
-       return x.addDays(1);
-    }
-
-    return x;
 }
 
 void DBRecurringCharge::migrateToTransferCharge(pfm_id_t & accountToId) {
