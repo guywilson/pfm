@@ -9,6 +9,7 @@
 #include "db_base.h"
 #include "db_transaction.h"
 #include "db_recurring_charge.h"
+#include "db_recurring_transfer.h"
 #include "db_config.h"
 #include "db.h"
 #include "cfgmgr.h"
@@ -283,6 +284,12 @@ void DBRecurringCharge::migrateToTransferCharge(pfm_id_t & accountToId) {
         targetTransaction.isReconciled = true;
 
         targetTransaction.save();
+
+        DBRecurringTransfer transfer;
+        transfer.accountToId = accountToId;
+        transfer.recurringChargeId = this->id;
+
+        transfer.save();
     }
 }
 
