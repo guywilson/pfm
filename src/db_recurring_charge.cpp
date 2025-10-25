@@ -284,13 +284,13 @@ void DBRecurringCharge::migrateToTransferCharge(pfm_id_t & accountToId) {
         targetTransaction.isReconciled = true;
 
         targetTransaction.save();
-
-        DBRecurringTransfer transfer;
-        transfer.accountToId = accountToId;
-        transfer.recurringChargeId = this->id;
-
-        transfer.save();
     }
+
+    DBRecurringTransfer transfer;
+    transfer.accountToId = accountToId;
+    transfer.recurringChargeId = this->id;
+
+    transfer.save();
 }
 
 void DBRecurringCharge::beforeRemove() {

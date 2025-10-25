@@ -661,12 +661,6 @@ void Command::migrateCharge(DBRecurringCharge & charge) {
     DBRecurringCharge updatedCharge = view.getCharge();
 
     updatedCharge.migrateToTransferCharge(updatedCharge.transfer.accountToId);
-
-    DBRecurringTransfer tr;
-    tr.accountToId = updatedCharge.transfer.accountToId;
-    tr.recurringChargeId = updatedCharge.id;
-
-    tr.save();
 }
 
 void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool includeRecurring) {
