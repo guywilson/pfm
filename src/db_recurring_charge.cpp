@@ -200,7 +200,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
     const int periodEndDay = getPeriodEndDay(referenceDate);
 
     StrDate periodStart(referenceDate.year(), referenceDate.month(), periodStartDay);
-    StrDate periodEnd  (referenceDate.year(), referenceDate.month(), periodEndDay);
+    StrDate periodEnd(referenceDate.year(), referenceDate.month(), periodEndDay);
 
     // Find the next *nominal* (no weekend adjustment) scheduled date
     // that comes on or after 'referenceDate'.
@@ -216,7 +216,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod(StrDate & referenceDate) {
     // - We judge the *period* membership using the nominal date.
     // - We include items due *today* (>=).
     const bool inThisPeriod =
-        (nominalNext >= referenceDate) &&
+        // (nominalNext >= referenceDate) &&
         (nominalNext >= periodStart)   &&
         (nominalNext <= periodEnd);
 
@@ -250,8 +250,11 @@ StrDate DBRecurringCharge::calculateNextPaymentDate() {
         return none;
     }
 
+    const int periodStartDay = getPeriodStartDay();
+    StrDate periodStart(today.year(), today.month(), periodStartDay);
+
     // Nominal next date on/after today
-    StrDate nominal = getNextScheduledDate(today);
+    StrDate nominal = getNextScheduledDate(periodStart);
 
     log.debug("Calculated nominal nextPaymentDate of charge '%s' as '%s'",
               this->description.c_str(), nominal.shortDate().c_str());
@@ -309,7 +312,7 @@ StrDate DBRecurringCharge::nextByFrequency(StrDate & from) {
     }
 }
 
-StrDate DBRecurringCharge::getNextScheduledDate(StrDate & from) {
+StrDate DBRecurringCharge::getNextScheduledDate(StrDate & referenceDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::getNextScheduledDate()");
 
@@ -328,6 +331,7 @@ StrDate DBRecurringCharge::getNextScheduledDate(StrDate & from) {
     if (!this->lastPaymentDate.isNull()) {
         // We want the first occurrence strictly *after* lastPaymentDate
         d = this->lastPaymentDate;
+        log.debug("Last payment date for charge '%s' is '%s'", this->description.c_str(), d.shortDate().c_str());
     }
 
     // Ensure d is at least the anchor (start date)
@@ -336,8 +340,14 @@ StrDate DBRecurringCharge::getNextScheduledDate(StrDate & from) {
     }
 
     // If 'd' is not strictly after 'from', step forward until it is.
-    while (d <= from) {
+    while (d < referenceDate) {
         d = nextByFrequency(d);
+    }
+
+    if (!lastPaymentDate.isNull()) {
+        if (d <= lastPaymentDate) {
+            d = nextByFrequency(d);
+        }
     }
 
     log.debug("Next scheduled date for charge '%s' is '%s'", this->description.c_str(), d.shortDate().c_str());

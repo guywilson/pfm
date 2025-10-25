@@ -111,6 +111,7 @@ void DBAccount::createRecurringTransactions() {
 
                     // Persist lastPaymentDate on the recurring charge (this makes it robust/idempotent)
                     charge.updateLastPaymentDate(transactionDate);
+                    charge.retrieve();
 
                     // Move to next occurrence
                     transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
