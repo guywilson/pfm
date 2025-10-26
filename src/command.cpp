@@ -759,34 +759,20 @@ void Command::findTransactions(const string & criteria) {
 }
 
 void Command::transactionsByCategory() {
-    checkAccountSelected();
-
-    StrDate firstDate;
-    StrDate secondDate;
-
-    firstDate = firstDate.addMonths(-3);
-
     DBTransactionView tr;
-    DBResult<DBTransactionView> result = tr.reportByCategoryByAccountIDForPeriod(selectedAccount.id, firstDate, secondDate);
+    DBResult<DBTransactionView> result = tr.reportByCategory();
 
     TransactionCategoryReportListView view;
-    view.addResults(result, selectedAccount.code);
+    view.addResults(result);
     view.show();
 }
 
 void Command::transactionsByPayee() {
-    checkAccountSelected();
-
-    StrDate firstDate;
-    StrDate secondDate;
-
-    firstDate = firstDate.addMonths(-3);
-
     DBTransactionView tr;
-    DBResult<DBTransactionView> result = tr.reportByPayeeByAccountIDForPeriod(selectedAccount.id, firstDate, secondDate);
+    DBResult<DBTransactionView> result = tr.reportByPayee();
 
     TransactionPayeeReportListView view;
-    view.addResults(result, selectedAccount.code);
+    view.addResults(result);
     view.show();
 }
 

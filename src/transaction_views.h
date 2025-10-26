@@ -268,17 +268,32 @@ class TransactionCategoryReportListView : public CLIListView {
             CLIListColumn column2 = CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
             headerRow.addColumn(column2);
 
+            CLIListColumn column3 = CLIListColumn("% of Total", 15, CLIListColumn::rightAligned);
+            headerRow.addColumn(column3);
+
             addHeaderRow(headerRow);
 
             for (int i = 0;i < result.size();i++) {
-                DBTransactionView transaction = result.at(i);
+                DBTransactionView transaction = result[i];
+                total += transaction.total;
+            }
+
+            char percentOfTotal[8];
+
+            for (int i = 0;i < result.size();i++) {
+                DBTransactionView transaction = result[i];
+
+                snprintf(
+                    percentOfTotal, 
+                    8, 
+                    "%.2f%%", ((float)transaction.total.doubleValue() / (float)total.doubleValue() * 100.0f));
 
                 CLIListRow row(headerRow);
 
                 row.addCellValue(transaction.categoryCode);
                 row.addCellValue(transaction.total);
+                row.addCellValue(percentOfTotal);
 
-                total += transaction.total;
                 addRow(row);
             }
         }
@@ -287,10 +302,10 @@ class TransactionCategoryReportListView : public CLIListView {
         TransactionCategoryReportListView() : CLIListView() {
         }
 
-        void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
+        void addResults(DBResult<DBTransactionView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Category report for account: %s (%d)", accountCode.c_str(), result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Category report (%d)", result.size());
             setTitle(szTitle);
 
             showResultsTable(result);
@@ -316,17 +331,32 @@ class TransactionPayeeReportListView : public CLIListView {
             CLIListColumn column2 = CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
             headerRow.addColumn(column2);
 
+            CLIListColumn column3 = CLIListColumn("% of Total", 15, CLIListColumn::rightAligned);
+            headerRow.addColumn(column3);
+
             addHeaderRow(headerRow);
 
             for (int i = 0;i < result.size();i++) {
+                DBTransactionView transaction = result[i];
+                total += transaction.total;
+            }
+
+            char percentOfTotal[8];
+
+            for (int i = 0;i < result.size();i++) {
                 DBTransactionView transaction = result.at(i);
+
+                snprintf(
+                    percentOfTotal, 
+                    8, 
+                    "%.2f%%", ((float)transaction.total.doubleValue() / (float)total.doubleValue() * 100.0f));
 
                 CLIListRow row(headerRow);
 
                 row.addCellValue(transaction.payeeCode);
                 row.addCellValue(transaction.total);
+                row.addCellValue(percentOfTotal);
 
-                total += transaction.total;
                 addRow(row);
             }
         }
@@ -335,10 +365,10 @@ class TransactionPayeeReportListView : public CLIListView {
         TransactionPayeeReportListView() : CLIListView() {
         }
 
-        void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
+        void addResults(DBResult<DBTransactionView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Payee report for account: %s (%d)", accountCode.c_str(), result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Payee report (%d)", result.size());
             setTitle(szTitle);
 
             showResultsTable(result);

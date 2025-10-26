@@ -198,26 +198,20 @@ class DBTransactionView : public DBTransaction {
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 
-        const char * sqlReportByCategoryByAccountIDNonRecurring =
+        const char * sqlReportByCategoryNonRecurring =
                         "SELECT category_code," \
                         "SUM(amount) AS total " \
                         "FROM v_transaction_list " \
-                        "WHERE account_id = %s " \
-                        "AND recurring_charge_id IS NULL " \
+                        "WHERE recurring_charge_id IS NULL " \
                         "AND credit_debit = 'DB' " \
-                        "AND date >= '%s' " \
-                        "AND date <= '%s' " \
                         "GROUP BY category_code;";
 
-        const char * sqlReportByPayeeByAccountIDNonRecurring =
+        const char * sqlReportByPayeeNonRecurring =
                         "SELECT payee_code," \
                         "SUM(amount) as total " \
                         "FROM v_transaction_list " \
-                        "WHERE account_id = %s " \
-                        "AND recurring_charge_id IS NULL " \
+                        "WHERE recurring_charge_id IS NULL " \
                         "AND credit_debit = 'DB' " \
-                        "AND date >= '%s' " \
-                        "AND date <= '%s' " \
                         "GROUP BY payee_code;";
 
         DBResult<DBTransactionView> retrieveByStatementAndID(const char * statement, pfm_id_t id);
@@ -295,8 +289,8 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> findTransactionsForCriteria(const string & criteria);
         DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t accountId, const string & criteria);
-        DBResult<DBTransactionView> reportByCategoryByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransactionView> reportByPayeeByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransactionView> reportByCategory();
+        DBResult<DBTransactionView> reportByPayee();
 };
 
 #endif
