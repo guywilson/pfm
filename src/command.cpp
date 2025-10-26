@@ -758,6 +758,38 @@ void Command::findTransactions(const string & criteria) {
     view.show();
 }
 
+void Command::transactionsByCategory() {
+    checkAccountSelected();
+
+    StrDate firstDate;
+    StrDate secondDate;
+
+    firstDate = firstDate.addMonths(-3);
+
+    DBTransactionView tr;
+    DBResult<DBTransactionView> result = tr.reportByCategoryByAccountIDForPeriod(selectedAccount.id, firstDate, secondDate);
+
+    TransactionCategoryReportListView view;
+    view.addResults(result, selectedAccount.code);
+    view.show();
+}
+
+void Command::transactionsByPayee() {
+    checkAccountSelected();
+
+    StrDate firstDate;
+    StrDate secondDate;
+
+    firstDate = firstDate.addMonths(-3);
+
+    DBTransactionView tr;
+    DBResult<DBTransactionView> result = tr.reportByPayeeByAccountIDForPeriod(selectedAccount.id, firstDate, secondDate);
+
+    TransactionPayeeReportListView view;
+    view.addResults(result, selectedAccount.code);
+    view.show();
+}
+
 DBTransaction Command::getTransaction(int sequence) {
     int selectedSequence;
 
@@ -1342,6 +1374,12 @@ bool Command::process(const string & command) {
         else {
             findTransactions();
         }
+    }
+    else if (isCommand("category-report") || isCommand("cr")) {
+        transactionsByCategory();
+    }
+    else if (isCommand("payee-report") || isCommand("pr")) {
+        transactionsByPayee();
     }
     else if (isCommand("update-transaction") || isCommand("ut")) {
         string sequence = getParameter(0);

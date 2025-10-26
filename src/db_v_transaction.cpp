@@ -245,3 +245,47 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDFo
 
     return result;
 }
+
+DBResult<DBTransactionView> DBTransactionView::reportByCategoryByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::reportByCategoryByAccountIDForPeriod()");
+
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBTransactionView> result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlReportByCategoryByAccountIDNonRecurring, 
+        accountId.c_str(),
+        firstDate.shortDate().c_str(),
+        secondDate.shortDate().c_str());
+
+    result.retrieve(szStatement);
+
+    log.exit("DBTransactionView::reportByCategoryByAccountIDForPeriod()");
+
+    return result;
+}
+
+DBResult<DBTransactionView> DBTransactionView::reportByPayeeByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::reportByPayeeByAccountIDForPeriod()");
+
+    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBResult<DBTransactionView> result;
+
+    snprintf(
+        szStatement, 
+        SQL_STATEMENT_BUFFER_LEN, 
+        sqlReportByPayeeByAccountIDNonRecurring, 
+        accountId.c_str(),
+        firstDate.shortDate().c_str(),
+        secondDate.shortDate().c_str());
+
+    result.retrieve(szStatement);
+
+    log.exit("DBTransactionView::reportByPayeeByAccountIDForPeriod()");
+
+    return result;
+}

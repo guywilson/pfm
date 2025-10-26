@@ -119,6 +119,8 @@ class Command {
         void listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool includeRecurring);
         void findTransactions();
         void findTransactions(const string & criteria);
+        void transactionsByCategory();
+        void transactionsByPayee();
         string buildFindTransactionCriteria();
         DBTransaction getTransaction(int sequence);
         void updateTransaction(DBTransaction & transaction);

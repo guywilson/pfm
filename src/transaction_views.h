@@ -255,6 +255,102 @@ class TransactionListView : public CLIListView {
         }
 };
 
+class TransactionCategoryReportListView : public CLIListView {
+    private:
+        Money total = 0.0;
+
+        void showResultsTable(DBResult<DBTransactionView> & result) {
+            CLIListRow headerRow;
+
+            CLIListColumn column1 = CLIListColumn("Category", 15, CLIListColumn::leftAligned);
+            headerRow.addColumn(column1);
+
+            CLIListColumn column2 = CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
+            headerRow.addColumn(column2);
+
+            addHeaderRow(headerRow);
+
+            for (int i = 0;i < result.size();i++) {
+                DBTransactionView transaction = result.at(i);
+
+                CLIListRow row(headerRow);
+
+                row.addCellValue(transaction.categoryCode);
+                row.addCellValue(transaction.total);
+
+                total += transaction.total;
+                addRow(row);
+            }
+        }
+
+    public:
+        TransactionCategoryReportListView() : CLIListView() {
+        }
+
+        void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Category report for account: %s (%d)", accountCode.c_str(), result.size());
+            setTitle(szTitle);
+
+            showResultsTable(result);
+        }
+
+        void show() override {
+            CLIListView::showNoExtraCR();
+
+            showTotal(1, total.localeFormattedStringValue());
+        }
+};
+
+class TransactionPayeeReportListView : public CLIListView {
+    private:
+        Money total = 0.0;
+
+        void showResultsTable(DBResult<DBTransactionView> & result) {
+            CLIListRow headerRow;
+
+            CLIListColumn column1 = CLIListColumn("Payee", 15, CLIListColumn::leftAligned);
+            headerRow.addColumn(column1);
+
+            CLIListColumn column2 = CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
+            headerRow.addColumn(column2);
+
+            addHeaderRow(headerRow);
+
+            for (int i = 0;i < result.size();i++) {
+                DBTransactionView transaction = result.at(i);
+
+                CLIListRow row(headerRow);
+
+                row.addCellValue(transaction.payeeCode);
+                row.addCellValue(transaction.total);
+
+                total += transaction.total;
+                addRow(row);
+            }
+        }
+
+    public:
+        TransactionPayeeReportListView() : CLIListView() {
+        }
+
+        void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Payee report for account: %s (%d)", accountCode.c_str(), result.size());
+            setTitle(szTitle);
+
+            showResultsTable(result);
+        }
+
+        void show() override {
+            CLIListView::showNoExtraCR();
+
+            showTotal(1, total.localeFormattedStringValue());
+        }
+};
+
 class ChooseTransactionView : public CLIView {
     private:
         CLITextField sequenceField = CLITextField("Sequence: ");
