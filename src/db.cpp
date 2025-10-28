@@ -654,7 +654,8 @@ void PFM_DB::createSchema() {
         createTable(pszCreatePayeeTable);
         createTable(pszCreateRCTable);
         createTable(pszCreateRecurringTransferTable);
-        createTable(pszCreateTransationTable);
+        createTable(pszCreateTransactionTable);
+        createTable(pszCreateTransferTransactionRecordTable);
         createTable(pszCreateCarriedOverTable);
         createTable(pszCreateReportTable);
 

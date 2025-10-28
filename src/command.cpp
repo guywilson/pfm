@@ -26,6 +26,7 @@
 #include "db_transaction.h"
 #include "db_carried_over.h"
 #include "db_v_carried_over.h"
+#include "db_transfer_transaction_record.h"
 #include "jfile.h"
 #include "transaction_criteria.h"
 #include "command.h"
@@ -645,6 +646,8 @@ void Command::addTransferTransaction() {
 
         sourceTransaction.save();
         targetTransaction.save();
+
+        DBTransferTransactionRecord::createFromTransactions(targetTransaction, sourceTransaction);
 
         db.commit();
     }

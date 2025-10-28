@@ -317,7 +317,7 @@ const char * pszCreateRecurringTransferTable =
     "FOREIGN KEY(account_to_id) REFERENCES account(id)," \
     "FOREIGN KEY(recurring_charge_id) REFERENCES category(id));";
 
-static const char * pszCreateTransationTable = 
+static const char * pszCreateTransactionTable = 
     "CREATE TABLE account_transaction (" \
     "id INTEGER PRIMARY KEY," \
     "account_id INTEGER," \
@@ -337,6 +337,16 @@ static const char * pszCreateTransationTable =
     "FOREIGN KEY(payee_id) REFERENCES payee(id)," \
     "FOREIGN KEY(recurring_charge_id) REFERENCES recurring_charge(id));";
 
+static const char * pszCreateTransferTransactionRecordTable =
+    "CREATE TABLE transfer_transaction_record (" \
+    "id INTEGER PRIMARY KEY," \
+    "transaction_to_id INTEGER," \
+    "transaction_from_id INTEGER," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
+    "FOREIGN KEY(transaction_to_id) REFERENCES account_transaction(id)," \
+    "FOREIGN KEY(transaction_from_id) REFERENCES account_transaction(id));";
+
 static const char * pszCreateCarriedOverTable = 
     "CREATE TABLE carried_over_log (" \
     "id INTEGER PRIMARY KEY," \
@@ -354,7 +364,7 @@ static const char * pszCreateReportTable =
     "description TEXT NOT NULL," \
     "sql_where_clause TEXT NOT NULL," \
     "created TEXT NOT NULL," \
-    "updated TEXT NOT NULL;";
+    "updated TEXT NOT NULL);";
 
 /*
 ** Create views, do this last...
