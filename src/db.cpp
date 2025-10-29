@@ -663,6 +663,7 @@ void PFM_DB::createSchema() {
         createView(pszCreateListRCView);
         createView(pszCreateListTransationView);
         createView(pszCreateRecurringTransactionsView);
+        createView(pszCreateTransferRecordView);
 
         createCurrencies();
         createDefaultCategories();

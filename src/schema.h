@@ -455,4 +455,26 @@ static const char * pszCreateRecurringTransactionsView =
     "WHERE tr.recurring_charge_id <> 0 " \
     "ORDER BY tr.description, tr.date DESC";
 
+static const char * pszCreateTransferRecordView =
+    "CREATE VIEW v_transfer_record AS " \
+    "SELECT r.id," \
+    "af.code AS account_from," \
+    "at.code AS account_to," \
+    "trf.date," \
+    "trf.description," \
+    "p.code AS payee_code," \
+    "c.code AS category_code," \
+    "trf.amount," \
+    "trf.is_reconciled," \
+    "trf.created," \
+    "trf.updated " \
+    "FROM transfer_transaction_record r " \
+    "LEFT JOIN account_transaction trf ON trf.id = r.transaction_from_id " \
+    "LEFT JOIN account_transaction trt ON trt.id = r.transaction_to_id " \
+    "LEFT JOIN payee p ON p.id = trf.payee_id " \
+    "LEFT JOIN category c ON c.id = trf.category_id " \
+    "LEFT JOIN account af ON af.id = trf.account_id " \
+    "LEFT JOIN account at ON at.id = trt.account_id " \
+    "ORDER BY trf.date ASC;";
+
 #endif
