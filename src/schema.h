@@ -460,6 +460,8 @@ static const char * pszCreateTransferRecordView =
     "SELECT r.id," \
     "af.code AS account_from," \
     "at.code AS account_to," \
+    "trf.id AS transaction_from_id," \
+    "trt.id AS transaction_to_id," \
     "trf.date," \
     "trf.description," \
     "p.code AS payee_code," \
