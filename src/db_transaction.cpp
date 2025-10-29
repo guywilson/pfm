@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <exception>
 
 #include <sqlcipher/sqlite3.h>
 
@@ -13,6 +14,7 @@
 #include "db_transaction.h"
 #include "db_account.h"
 #include "db_carried_over.h"
+#include "db_transfer_transaction_record.h"
 #include "db.h"
 #include "strdate.h"
 
@@ -265,22 +267,84 @@ void DBTransaction::reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDa
     log.exit("reconcileAllForAccountIDBeforeDate");
 }
 
-void DBTransaction::createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate) {
+void DBTransaction::createFromRecurringChargeAndDate(DBRecurringCharge & src, StrDate & transactionDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::createFromRecurringChargeAndDate()");
 
     log.debug("Creating recurring transaction '%s' for date '%s'", src.description.c_str(), transactionDate.shortDate().c_str());
 
-    DBTransaction tr;
-    tr.setFromRecurringCharge(src);
+    PFM_DB & db = PFM_DB::getInstance();
 
-    tr.date = transactionDate;
-    tr.isCredit = false;
-    tr.isReconciled = true;
+    try {
+        db.begin();
 
-    tr.save();
+        DBTransaction tr;
+        tr.setFromRecurringCharge(src);
+
+        tr.date = transactionDate;
+        tr.isCredit = false;
+        tr.isReconciled = true;
+
+        tr.save();
+
+        if (src.isTransfer()) {
+            log.debug("Creating transfer records for charge '%s'", src.description.c_str());
+
+            DBAccount accountTo;
+            accountTo.id = src.transfer.accountToId;
+            accountTo.retrieve();
+
+            DBTransaction::createTransferPairFromSource(tr, accountTo);
+        }
+
+        db.commit();
+    }
+    catch (exception & e) {
+        log.error("Failed to create transaction from recurring charge: %s", e.what());
+        db.rollback();
+    }
 
     log.exit("DBTransaction::createFromRecurringChargeAndDate()");
+}
+
+void DBTransaction::createTransferPairFromSource(DBTransaction & source, DBAccount & accountTo) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::createTransferPairFromSource()");
+
+    log.debug("Creating transfer pair '%s' for date '%s'", source.description.c_str(), source.date.shortDate().c_str());
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    try {
+        db.begin();
+
+        DBTransaction target;
+        target.set(source);
+
+        target.id.clear();
+        target.isCredit = true;
+        target.accountId = accountTo.id;
+
+        DBAccount accountFrom;
+        accountFrom.id = source.accountId;
+        accountFrom.retrieve();
+
+        source.reference = "TR > " + accountTo.code;
+        target.reference = "TR < " + accountFrom.code;
+
+        target.save();
+        source.save();
+
+        DBTransferTransactionRecord::createFromTransactions(target, source);
+
+        db.commit();
+    }
+    catch (exception & e) {
+        log.error("Failed to create transfer transaction pair: %s", e.what());
+        db.rollback();
+    }
+
+    log.exit("DBTransaction::createTransferPairFromSource()");
 }
 
 int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate) {

@@ -105,7 +105,7 @@ class DBRecurringChargeView : public DBRecurringCharge {
         }
 
         void onRowComplete(int sequence) override {
-            this->sequence = sequence;
+            DBRecurringCharge::onRowComplete(sequence);
         }
 
         const char * getTableName() override {

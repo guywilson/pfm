@@ -433,7 +433,9 @@ class DBTransaction : public DBPayment {
 
         void reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDate & referenceDate);
 
-        static void createFromRecurringChargeAndDate(const DBRecurringCharge & src, StrDate & transactionDate);
+        static void createFromRecurringChargeAndDate(DBRecurringCharge & src, StrDate & transactionDate);
+
+        static void createTransferPairFromSource(DBTransaction & source, DBAccount & accountTo);
 
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);

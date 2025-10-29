@@ -142,6 +142,11 @@ void Command::listAccounts() {
 
     view.addResults(result);
     view.show();
+
+    for (int i = 0;i < result.size();i++) {
+        DBAccount account = result[i];
+        account.doBalancePrerequisites();
+    }
 }
 
 void Command::chooseAccount(string & accountCode) {
@@ -637,23 +642,9 @@ void Command::addTransferTransaction() {
     DBTransaction sourceTransaction = view.getSourceTransaction();
     sourceTransaction.accountId = selectedAccount.id;
 
-    DBTransaction targetTransaction = view.getTargetTransaction();
+    DBAccount accountTo = view.getAccountTo();
 
-    PFM_DB & db = PFM_DB::getInstance();
-
-    try {
-        db.begin();
-
-        sourceTransaction.save();
-        targetTransaction.save();
-
-        DBTransferTransactionRecord::createFromTransactions(targetTransaction, sourceTransaction);
-
-        db.commit();
-    }
-    catch (pfm_error & e) {
-        db.rollback();
-    }
+    DBTransaction::createTransferPairFromSource(sourceTransaction, accountTo);
 }
 
 void Command::migrateCharge(DBRecurringCharge & charge) {

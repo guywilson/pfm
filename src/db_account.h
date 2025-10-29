@@ -48,8 +48,6 @@ class DBAccount : public DBEntity {
                         "opening_balance = '%s'," \
                         "updated = '%s' " \
                         "WHERE id = %s;";
-
-        void doBalancePrerequisites();
         
         void createRecurringTransactions();
         void createCarriedOverLogs();
@@ -98,10 +96,6 @@ class DBAccount : public DBEntity {
             r.add("openingBalance", openingBalance.rawStringValue());
 
             return r;
-        }
-
-        void onRowComplete(int sequence) override {
-            doBalancePrerequisites();
         }
 
         void assignColumn(DBColumn & column) override {
@@ -181,6 +175,8 @@ class DBAccount : public DBEntity {
 
             return szStatement;
         }
+
+        void doBalancePrerequisites();
 
         void beforeUpdate() override;
         Money calculateCurrentBalance();

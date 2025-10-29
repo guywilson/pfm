@@ -24,6 +24,7 @@ class DBTransferTransactionRecord : public DBEntity {
                         "SELECT id, " \
                         "transaction_to_id," \
                         "transaction_from_id," \
+                        "transaction_date," \
                         "created," \
                         "updated " \
                         "FROM transfer_transaction_record " \
@@ -33,6 +34,7 @@ class DBTransferTransactionRecord : public DBEntity {
                         "SELECT id, " \
                         "transaction_to_id," \
                         "transaction_from_id," \
+                        "transaction_date," \
                         "created," \
                         "updated " \
                         "FROM transfer_transaction_record " \
@@ -42,20 +44,23 @@ class DBTransferTransactionRecord : public DBEntity {
                         "INSERT INTO transfer_transaction_record (" \
                         "transaction_to_id," \
                         "transaction_from_id," \
+                        "transaction_date," \
                         "created," \
                         "updated) " \
-                        "VALUES (%s, %s, '%s', '%s');";
+                        "VALUES (%s, %s, '%s', '%s', '%s');";
 
         const char * sqlUpdate = 
                         "UPDATE transfer_transaction_record SET " \
                         "transaction_to_id = %s," \
                         "transaction_from_id = %s," \
+                        "transaction_date = '%s'" \
                         "updated = '%s' " \
                         "WHERE id = %s;";
 
     public:
         pfm_id_t transactionToId;
         pfm_id_t transactionFromId;
+        StrDate transactionDate;
 
         DBTransferTransactionRecord() : DBEntity() {
             clear();
@@ -70,6 +75,7 @@ class DBTransferTransactionRecord : public DBEntity {
 
             this->transactionFromId.clear();
             this->transactionToId.clear();
+            this->transactionDate.clear();
         }
 
         void set(const DBTransferTransactionRecord & src) {
@@ -77,6 +83,7 @@ class DBTransferTransactionRecord : public DBEntity {
 
             this->transactionFromId = src.transactionFromId;
             this->transactionToId = src.transactionToId;
+            this->transactionDate = src.transactionDate;
         }
 
         void print() {
@@ -84,6 +91,7 @@ class DBTransferTransactionRecord : public DBEntity {
 
             cout << "TransactionFromId: " << transactionFromId.getValue() << endl;
             cout << "TransactionToId: " << transactionToId.getValue() << endl;
+            cout << "TransactionDate: " << transactionDate.shortDate() << endl;
         }
 
         const char * getTableName() override {
@@ -105,6 +113,7 @@ class DBTransferTransactionRecord : public DBEntity {
                 sqlInsert,
                 transactionToId.c_str(),
                 transactionFromId.c_str(),
+                transactionDate.shortDate().c_str(),
                 now.c_str(),
                 now.c_str());
 
@@ -122,6 +131,7 @@ class DBTransferTransactionRecord : public DBEntity {
                 sqlUpdate,
                 transactionToId.c_str(),
                 transactionFromId.c_str(),
+                transactionDate.shortDate().c_str(),
                 now.c_str(),
                 id.c_str());
 
@@ -136,6 +146,9 @@ class DBTransferTransactionRecord : public DBEntity {
             }
             else if (column.getName() == "transaction_from_id") {
                 transactionFromId = column.getIDValue();
+            }
+            else if (column.getName() == "transaction_date") {
+                transactionDate = column.getValue();
             }
         }
 

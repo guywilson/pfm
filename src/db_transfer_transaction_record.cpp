@@ -72,11 +72,12 @@ DBTransferTransactionRecord DBTransferTransactionRecord::createFromTransactions(
 
     PFM_DB & db = PFM_DB::getInstance();
 
-    db.begin();
-
     try {
+        db.begin();
+
         record.transactionToId = transactionTo.id;
         record.transactionFromId = transactionFrom.id;
+        record.transactionDate = transactionFrom.date;
         record.save();
 
         db.commit();

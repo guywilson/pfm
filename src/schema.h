@@ -340,8 +340,9 @@ static const char * pszCreateTransactionTable =
 static const char * pszCreateTransferTransactionRecordTable =
     "CREATE TABLE transfer_transaction_record (" \
     "id INTEGER PRIMARY KEY," \
-    "transaction_to_id INTEGER," \
-    "transaction_from_id INTEGER," \
+    "transaction_to_id INTEGER NOT NULL," \
+    "transaction_from_id INTEGER NOT NULL," \
+    "transaction_date TEXT NOT NULL," \
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
     "FOREIGN KEY(transaction_to_id) REFERENCES account_transaction(id)," \

@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <exception>
 
 #include <sqlcipher/sqlite3.h>
 
@@ -10,6 +11,7 @@
 #include "db_transaction.h"
 #include "db_recurring_charge.h"
 #include "db_recurring_transfer.h"
+#include "db_transfer_transaction_record.h"
 #include "db_config.h"
 #include "db.h"
 #include "cfgmgr.h"
@@ -261,29 +263,7 @@ void DBRecurringCharge::migrateToTransferCharge(pfm_id_t & accountToId) {
         accountTo.id = accountToId;
         accountTo.retrieve();
 
-        sourceTransaction.reference = "TR > " + accountTo.code;
-
-        sourceTransaction.save();
-
-        DBTransaction targetTransaction;
-
-        targetTransaction.accountId = accountToId;
-        targetTransaction.categoryId = categoryId;
-
-        targetTransaction.date = sourceTransaction.date;
-        targetTransaction.description = sourceTransaction.description;
-
-        DBAccount accountFrom;
-        accountFrom.id = accountId;
-        accountFrom.retrieve();
-
-        targetTransaction.reference = "TR < " + accountFrom.code;
-
-        targetTransaction.isCredit = true;
-        targetTransaction.amount = sourceTransaction.amount;
-        targetTransaction.isReconciled = true;
-
-        targetTransaction.save();
+        DBTransaction::createTransferPairFromSource(sourceTransaction, accountTo);
     }
 
     DBRecurringTransfer transfer;
@@ -351,11 +331,23 @@ void DBRecurringCharge::afterInsert() {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::afterInsert()");
 
-    if (isTransfer()) {
-        transfer.accountToId = transfer.accountTo.id;
-        transfer.recurringChargeId = id;
+    PFM_DB & db = PFM_DB::getInstance();
 
-        transfer.save();
+    if (isTransfer()) {
+        try {
+            db.begin();
+
+            transfer.accountToId = transfer.accountTo.id;
+            transfer.recurringChargeId = id;
+
+            transfer.save();
+
+            db.commit();
+        }
+        catch (exception & e) {
+            log.error("Failed to create transfer record for charge '%s'", this->description.c_str());
+            db.rollback();
+        }
     }
 
     log.exit("DBRecurringCharge::afterInsert()");

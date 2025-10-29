@@ -126,31 +126,14 @@ class TransferToAccountView : public CLIView {
 
             transaction.date = dateField.getValue();
             transaction.description = descriptionField.getValue();
-            transaction.reference = "TR > " + accountField.getAccount().code;
-
-            transaction.isCredit = false;
             transaction.amount = amountField.getDoubleValue();
             transaction.isReconciled = false;
 
             return transaction;
         }
 
-        DBTransaction getTargetTransaction() {
-            DBTransaction transaction;
-
-            transaction.accountId = accountField.getAccount().id;
-            transaction.category = categoryField.getCategory();
-            transaction.categoryId = transaction.category.id;
-
-            transaction.date = dateField.getValue();
-            transaction.description = descriptionField.getValue();
-            transaction.reference = "TR < " + sourceAccountCode;
-
-            transaction.isCredit = true;
-            transaction.amount = amountField.getDoubleValue();
-            transaction.isReconciled = false;
-
-            return transaction;
+        DBAccount getAccountTo() {
+            return accountField.getAccount();
         }
 };
 
