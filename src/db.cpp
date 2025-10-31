@@ -170,13 +170,16 @@ static string getKeyFromPassword(const string & password) {
 	return key;
 }
 
-string PFM_DB::getKey(const string & prompt) {
-    string password = getPassword(prompt);
-    string key = getKeyFromPassword(password);
-	
-	return key;
-}
-
+/******************************************************************************
+**
+** Handles SELECT from the sqlite interface, this function is called by the
+** sqlite3_exec() function with the results of an SQL query.
+**
+** The pointer p is a vector of DBRow, which this function populates from the
+** columns and columnNames arrays. Thus, the vector<DBRow> contains the results
+** of the query.
+**
+******************************************************************************/
 static inline int _retrieveCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
     vector<DBRow> * rows = (vector<DBRow> *)p;
     vector<DBColumn> columnVector;
@@ -191,6 +194,13 @@ static inline int _retrieveCallback(void * p, int numColumns, char ** columns, c
     rows->push_back(row);
 
     return SQLITE_OK;
+}
+
+string PFM_DB::getKey(const string & prompt) {
+    string password = getPassword(prompt);
+    string key = getKeyFromPassword(password);
+	
+	return key;
 }
 
 int PFM_DB::openReadWrite(const string & dbName) {
