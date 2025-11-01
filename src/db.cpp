@@ -172,10 +172,12 @@ static string getKeyFromPassword(const string & password) {
 
 /******************************************************************************
 **
-** Handles SELECT from the sqlite interface, this function is called by the
-** sqlite3_exec() function with the results of an SQL query.
+** _retrieveCallback() - sqlite3 callback function
 **
-** The pointer p is a vector of DBRow, which this function populates from the
+** Handles SELECT queries from the sqlite interface, this function is called 
+** by the sqlite3_exec() function with the results of an SQL query.
+**
+** A vector<DBRow> is passed to pointer p, which this function populates from the
 ** columns and columnNames arrays. Thus, the vector<DBRow> contains the results
 ** of the query.
 **
@@ -588,6 +590,9 @@ void PFM_DB::_executeSQLCallback(const char * sql, vector<DBRow> * rows) {
 
     log.sql("Executing SQL '%s'", sql);
 
+    /*
+    ** Use the callback function to populate the rows vector...
+    */
     char * pszErrorMsg;
     int error = sqlite3_exec(dbHandle, sql, _retrieveCallback, rows, &pszErrorMsg);
 

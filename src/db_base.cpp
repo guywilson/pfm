@@ -107,8 +107,14 @@ void DBEntity::retrieve(pfm_id_t id) {
                 __LINE__);
     }
 
+    /*
+    ** As we're retrieving by ID, there will be only 1 row...
+    */
     DBRow row = rows[0];
 
+    /*
+    ** Call the assignColumn() method to populate the object...
+    */
     for (size_t i = 0;i < row.getNumColumns();i++) {
         DBColumn column = row.getColumnAt(i);
 
