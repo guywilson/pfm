@@ -142,11 +142,6 @@ void Command::listAccounts() {
 
     view.addResults(result);
     view.show();
-
-    for (int i = 0;i < result.size();i++) {
-        DBAccount account = result[i];
-        account.doBalancePrerequisites();
-    }
 }
 
 void Command::chooseAccount(string & accountCode) {
@@ -199,10 +194,14 @@ void Command::updateAccount() {
 }
 
 void Command::showAccountBalances(DBAccount & account) {
+    account.doBalancePrerequisites();
+
     Money currentBalance = account.calculateCurrentBalance();
+    Money reconciledBalance = account.calculateReconciledBalance();
     Money balanceAfterBills = account.calculateBalanceAfterBills();
 
     cout << "Current balance:     " << right << setw(13) << currentBalance.localeFormattedStringValue() << endl;
+    cout << "Reconciled balance:  " << right << setw(13) << reconciledBalance.localeFormattedStringValue() << endl;
     cout << "Balance after bills: " << right << setw(13) << balanceAfterBills.localeFormattedStringValue() << endl;
 }
 

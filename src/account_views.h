@@ -113,6 +113,8 @@ class AccountListView : public CLIListView {
 
                 CLIListRow row(headerRow);
 
+                account.doBalancePrerequisites();
+                
                 Money currentBalance = account.calculateCurrentBalance();
                 Money reconciledBalance = account.calculateReconciledBalance();
                 Money balanceAfterBills = account.calculateBalanceAfterBills();
