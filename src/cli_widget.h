@@ -30,6 +30,8 @@ using namespace std;
 
 
 #if defined(__APPLE__) || defined(__unix__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 std::ostream& bold_on(std::ostream& os) {
     return os << "\e[1m";
 }
@@ -37,6 +39,7 @@ std::ostream& bold_on(std::ostream& os) {
 std::ostream& bold_off(std::ostream& os) {
     return os << "\e[0m";
 }
+#pragma GCC diagnostic pop
 #else
 std::ostream& bold_on(std::ostream& os) {
     return os << "";
