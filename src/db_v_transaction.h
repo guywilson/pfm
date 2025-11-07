@@ -22,18 +22,19 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "account_code," \
+                        "account," \
                         "category_id," \
-                        "category_code," \
+                        "category," \
                         "payee_id," \
-                        "payee_code," \
+                        "payee," \
                         "recurring_charge_id," \
+                        "recurring," \
                         "date," \
                         "reference," \
                         "description," \
-                        "credit_debit," \
+                        "type," \
                         "amount," \
-                        "is_reconciled," \
+                        "reconciled," \
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
@@ -43,18 +44,19 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "account_code," \
+                        "account," \
                         "category_id," \
-                        "category_code," \
+                        "category," \
                         "payee_id," \
-                        "payee_code," \
+                        "payee," \
                         "recurring_charge_id," \
+                        "recurring," \
                         "date," \
                         "reference," \
                         "description," \
-                        "credit_debit," \
+                        "type," \
                         "amount," \
-                        "is_reconciled," \
+                        "reconciled," \
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
@@ -64,40 +66,42 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "account_code," \
+                        "account," \
                         "category_id," \
-                        "category_code," \
+                        "category," \
                         "payee_id," \
-                        "payee_code," \
+                        "payee," \
                         "recurring_charge_id," \
+                        "recurring," \
                         "date," \
                         "reference," \
                         "description," \
-                        "credit_debit," \
+                        "type," \
                         "amount," \
-                        "is_reconciled," \
+                        "reconciled," \
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
                         "WHERE account_id = %s " \
-                        "AND is_reconciled = 'Y'";
+                        "AND reconciled = 'Y'";
 
         const char * sqlSelectByAccountIDSortedByDate = 
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "account_code," \
+                        "account," \
                         "category_id," \
-                        "category_code," \
+                        "category," \
                         "payee_id," \
-                        "payee_code," \
+                        "payee," \
                         "recurring_charge_id," \
+                        "recurring," \
                         "date," \
                         "reference," \
                         "description," \
-                        "credit_debit," \
+                        "type," \
                         "amount," \
-                        "is_reconciled," \
+                        "reconciled," \
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
@@ -108,41 +112,43 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "account_code," \
+                        "account," \
                         "category_id," \
-                        "category_code," \
+                        "category," \
                         "payee_id," \
-                        "payee_code," \
+                        "payee," \
                         "recurring_charge_id," \
+                        "recurring," \
                         "date," \
                         "reference," \
                         "description," \
-                        "credit_debit," \
+                        "type," \
                         "amount," \
-                        "is_reconciled," \
+                        "reconciled," \
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
                         "WHERE account_id = %s " \
-                        "AND recurring_charge_id IS NULL " \
+                        "AND recurring = 'N' " \
                         "ORDER BY date %s";
 
         const char * sqlSelectByAccountIDBetweenDates = 
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "account_code," \
+                        "account," \
                         "category_id," \
-                        "category_code," \
+                        "category," \
                         "payee_id," \
-                        "payee_code," \
+                        "payee," \
                         "recurring_charge_id," \
+                        "recurring," \
                         "date," \
                         "reference," \
                         "description," \
-                        "credit_debit," \
+                        "type," \
                         "amount," \
-                        "is_reconciled," \
+                        "reconciled," \
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
@@ -154,23 +160,24 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "account_code," \
+                        "account," \
                         "category_id," \
-                        "category_code," \
+                        "category," \
                         "payee_id," \
-                        "payee_code," \
+                        "payee," \
                         "recurring_charge_id," \
+                        "recurring," \
                         "date," \
                         "reference," \
                         "description," \
-                        "credit_debit," \
+                        "type," \
                         "amount," \
-                        "is_reconciled," \
+                        "reconciled," \
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
                         "WHERE account_id = %s " \
-                        "AND is_reconciled = 'Y' " \
+                        "AND reconciled = 'Y' " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 
@@ -178,48 +185,50 @@ class DBTransactionView : public DBTransaction {
                         "SELECT " \
                         "id," \
                         "account_id," \
-                        "account_code," \
+                        "account," \
                         "category_id," \
-                        "category_code," \
+                        "category," \
                         "payee_id," \
-                        "payee_code," \
+                        "payee," \
                         "recurring_charge_id," \
+                        "recurring," \
                         "date," \
                         "reference," \
                         "description," \
-                        "credit_debit," \
+                        "type," \
                         "amount," \
-                        "is_reconciled," \
+                        "reconciled," \
                         "created," \
                         "updated " \
                         "FROM v_transaction_list " \
                         "WHERE account_id = %s " \
-                        "AND recurring_charge_id IS NULL " \
+                        "AND recurring = 'N' " \
                         "AND date >= '%s' " \
                         "AND date <= '%s';";
 
         const char * sqlReportByCategoryNonRecurring =
-                        "SELECT category_code," \
+                        "SELECT category," \
                         "SUM(amount) AS total " \
                         "FROM v_transaction_list " \
-                        "WHERE recurring_charge_id IS NULL " \
-                        "AND credit_debit = 'DB' " \
-                        "GROUP BY category_code;";
+                        "WHERE recurring = 'N' " \
+                        "AND type = 'DB' " \
+                        "GROUP BY category;";
 
         const char * sqlReportByPayeeNonRecurring =
-                        "SELECT payee_code," \
+                        "SELECT payee," \
                         "SUM(amount) as total " \
                         "FROM v_transaction_list " \
-                        "WHERE recurring_charge_id IS NULL " \
-                        "AND credit_debit = 'DB' " \
-                        "GROUP BY payee_code;";
+                        "WHERE recurring = 'N' " \
+                        "AND type = 'DB' " \
+                        "GROUP BY payee;";
 
         DBResult<DBTransactionView> retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
     public:
-        string accountCode;
-        string payeeCode;
-        string categoryCode;
+        string account;
+        string payee;
+        string category;
+        bool isRecurring;
 
         Money total; // For category, payee reports
 
@@ -230,38 +239,50 @@ class DBTransactionView : public DBTransaction {
         void clear() {
             DBTransaction::clear();
 
-            this->accountCode = "";
-            this->payeeCode = "";
-            this->categoryCode = "";
+            this->account = "";
+            this->payee = "";
+            this->category = "";
+            this->isRecurring = false;
         }
 
         void set(const DBTransactionView & src) {
             DBTransaction::set(src);
 
-            this->accountCode = src.accountCode;
-            this->payeeCode = src.payeeCode;
-            this->categoryCode = src.categoryCode;
+            this->account = src.account;
+            this->payee = src.payee;
+            this->category = src.category;
+            this->isRecurring = src.isRecurring;
         }
 
         void print() {
             DBTransaction::print();
 
-            cout << "AccountCode: '" << accountCode << "'" << endl;
-            cout << "PayeeCode: '" << payeeCode << "'" << endl;
-            cout << "CategoryCode: '" << categoryCode << "'" << endl;
+            cout << "Account: '" << account << "'" << endl;
+            cout << "IsRecurring: '" << isRecurring << "'" << endl;
+            cout << "Payee: '" << payee << "'" << endl;
+            cout << "Category: '" << category << "'" << endl;
         }
 
         void assignColumn(DBColumn & column) override {
             DBTransaction::assignColumn(column);
             
-            if (column.getName() == "payee_code") {
-                payeeCode = column.getValue();
+            if (column.getName() == "payee") {
+                payee = column.getValue();
             }
-            else if (column.getName() == "category_code") {
-                categoryCode = column.getValue();
+            else if (column.getName() == "category") {
+                category = column.getValue();
             }
-            else if (column.getName() == "account_code") {
-                accountCode = column.getValue();
+            else if (column.getName() == "account") {
+                account = column.getValue();
+            }
+            else if (column.getName() == "type") {
+                isCredit = getIsCredit(column.getValue());
+            }
+            else if (column.getName() == "reconciled") {
+                isReconciled = column.getBoolValue();
+            }
+            else if (column.getName() == "recurring") {
+                isRecurring = column.getBoolValue();
             }
             else if (column.getName() == "total") {
                 total = column.doubleValue();

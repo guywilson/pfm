@@ -154,26 +154,29 @@ class TransactionListView : public CLIListView {
             CLIListColumn column3 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
             headerRow.addColumn(column3);
 
-            CLIListColumn column4 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
+            CLIListColumn column4 = CLIListColumn("RC", 2, CLIListColumn::leftAligned);
             headerRow.addColumn(column4);
 
-            CLIListColumn column5 = CLIListColumn("Reference", 9, CLIListColumn::leftAligned);
+            CLIListColumn column5 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
             headerRow.addColumn(column5);
 
-            CLIListColumn column6 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
+            CLIListColumn column6 = CLIListColumn("Reference", 9, CLIListColumn::leftAligned);
             headerRow.addColumn(column6);
 
-            CLIListColumn column7 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
+            CLIListColumn column7 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column7);
 
-            CLIListColumn column8 = CLIListColumn("CD", 2, CLIListColumn::leftAligned);
+            CLIListColumn column8 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column8);
 
-            CLIListColumn column9 = CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
+            CLIListColumn column9 = CLIListColumn("Typ", 3, CLIListColumn::leftAligned);
             headerRow.addColumn(column9);
 
-            CLIListColumn column10 = CLIListColumn("R", 1, CLIListColumn::leftAligned);
+            CLIListColumn column10 = CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
             headerRow.addColumn(column10);
+
+            CLIListColumn column11 = CLIListColumn("R", 1, CLIListColumn::leftAligned);
+            headerRow.addColumn(column11);
 
             addHeaderRow(headerRow);
 
@@ -183,12 +186,13 @@ class TransactionListView : public CLIListView {
                 CLIListRow row(headerRow);
 
                 row.addCellValue(transaction.sequence);
-                row.addCellValue(transaction.accountCode);
+                row.addCellValue(transaction.account);
                 row.addCellValue(transaction.date.shortDate());
+                row.addCellValue(transaction.isRecurring);
                 row.addCellValue(transaction.description);
                 row.addCellValue(transaction.reference);
-                row.addCellValue(transaction.categoryCode);
-                row.addCellValue(transaction.payeeCode);
+                row.addCellValue(transaction.category);
+                row.addCellValue(transaction.payee);
                 row.addCellValue(transaction.getCreditDebitValue());
                 row.addCellValue(transaction.amount);
                 row.addCellValue(transaction.getIsReconciledValue());
@@ -273,7 +277,7 @@ class TransactionCategoryReportListView : public CLIListView {
 
                 CLIListRow row(headerRow);
 
-                row.addCellValue(transaction.categoryCode);
+                row.addCellValue(transaction.category);
                 row.addCellValue(transaction.total);
                 row.addCellValue(percentOfTotal);
 
@@ -336,7 +340,7 @@ class TransactionPayeeReportListView : public CLIListView {
 
                 CLIListRow row(headerRow);
 
-                row.addCellValue(transaction.payeeCode);
+                row.addCellValue(transaction.payee);
                 row.addCellValue(transaction.total);
                 row.addCellValue(percentOfTotal);
 
@@ -494,8 +498,8 @@ class UpdateTransactionView : public CLIView {
 
 class FindTransactionByPayeeView : public CLIFindView {
     private:
-        AccountSpinField accountField = AccountSpinField("Account code: ");
-        PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
+        AccountSpinField accountField = AccountSpinField("Account: ");
+        PayeeSpinField payeeField = PayeeSpinField("Payee (max. 5 chars): ");
         DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
         CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
@@ -526,7 +530,7 @@ class FindTransactionByPayeeView : public CLIFindView {
             DBPayee payee = payeeField.getPayee();
 
             if (accountField.getValue().length() > 0) {
-                criteria += "account_code = '" + account.code + "' AND ";
+                criteria += "account = '" + account.code + "' AND ";
             }
 
             char buffer[CRITERIA_BUFFER_LENGTH];
@@ -546,10 +550,10 @@ class FindTransactionByPayeeView : public CLIFindView {
 
             if (recurringIncludeType.getValue().length() > 0) {
                 if (recurringIncludeType.getValue().compare("only") == 0) {
-                    criteria += " AND recurring_charge_id <> 0";
+                    criteria += " AND recurring = 'Y'";
                 }
                 else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring_charge_id IS NULL";
+                    criteria += " AND recurring = 'N'";
                 }
                 else if (recurringIncludeType.getValue().compare("yes") == 0) {
                 }
@@ -567,8 +571,8 @@ class FindTransactionByPayeeView : public CLIFindView {
 
 class FindTransactionByCategoryView : public CLIFindView {
     private:
-        AccountSpinField accountField = AccountSpinField("Account code: ");
-        CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
+        AccountSpinField accountField = AccountSpinField("Account: ");
+        CategorySpinField categoryField = CategorySpinField("Category (max. 5 chars): ");
         DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
         CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
@@ -599,7 +603,7 @@ class FindTransactionByCategoryView : public CLIFindView {
             DBCategory category = categoryField.getCategory();
 
             if (accountField.getValue().length() > 0) {
-                criteria += "account_code = '" + account.code + "' AND ";
+                criteria += "account = '" + account.code + "' AND ";
             }
 
             char buffer[CRITERIA_BUFFER_LENGTH];
@@ -619,10 +623,10 @@ class FindTransactionByCategoryView : public CLIFindView {
 
             if (recurringIncludeType.getValue().length() > 0) {
                 if (recurringIncludeType.getValue().compare("only") == 0) {
-                    criteria += " AND recurring_charge_id <> 0";
+                    criteria += " AND recurring = 'Y'";
                 }
                 else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring_charge_id IS NULL";
+                    criteria += " AND recurring = 'N'";
                 }
                 else if (recurringIncludeType.getValue().compare("yes") == 0) {
                 }
@@ -640,7 +644,7 @@ class FindTransactionByCategoryView : public CLIFindView {
 
 class FindTransactionByDescriptionView : public CLIFindView {
     private:
-        AccountSpinField accountField = AccountSpinField("Account code: ");
+        AccountSpinField accountField = AccountSpinField("Account: ");
         CLITextField descriptionField = CLITextField("Transaction description: ");
         DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
@@ -672,7 +676,7 @@ class FindTransactionByDescriptionView : public CLIFindView {
             string description = descriptionField.getValue();
 
             if (accountField.getValue().length() > 0) {
-                criteria += "account_code = '" + account.code + "' AND ";
+                criteria += "account = '" + account.code + "' AND ";
             }
 
             criteria += "description LIKE '%" + description + "%'";
@@ -689,10 +693,10 @@ class FindTransactionByDescriptionView : public CLIFindView {
             
             if (recurringIncludeType.getValue().length() > 0) {
                 if (recurringIncludeType.getValue().compare("only") == 0) {
-                    criteria += " AND recurring_charge_id <> 0";
+                    criteria += " AND recurring = 'Y'";
                 }
                 else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring_charge_id IS NULL";
+                    criteria += " AND recurring = 'N'";
                 }
                 else if (recurringIncludeType.getValue().compare("yes") == 0) {
                 }
@@ -739,7 +743,7 @@ class FindTransactionByDateView : public CLIFindView {
             DBAccount account = accountField.getAccount();
 
             if (accountField.getValue().length() > 0) {
-                criteria += "account_code = '" + account.code + "' AND ";
+                criteria += "account = '" + account.code + "' AND ";
             }
  
             if (afterDateField.getValue().length() > 0) {
@@ -759,10 +763,10 @@ class FindTransactionByDateView : public CLIFindView {
 
             if (recurringIncludeType.getValue().length() > 0) {
                 if (recurringIncludeType.getValue().compare("only") == 0) {
-                    criteria += " AND recurring_charge_id <> 0";
+                    criteria += " AND recurring = 'Y'";
                 }
                 else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring_charge_id IS NULL";
+                    criteria += " AND recurring = 'N'";
                 }
                 else if (recurringIncludeType.getValue().compare("yes") == 0) {
                 }

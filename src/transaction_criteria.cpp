@@ -269,7 +269,7 @@ string FindTransactionCriteriaBuilder::getCriteria() {
             criteria += " AND ";
         }
 
-        criteria += "credit_debit = '" + debitOrCredit + "'";
+        criteria += "type = '" + debitOrCredit + "'";
     }
 
     if (lessThanThisAmount > 0.0) {
@@ -286,10 +286,10 @@ string FindTransactionCriteriaBuilder::getCriteria() {
         }
 
         if (recurringOrNonRecurring.compare("r") == 0) {
-            criteria += "recurring_charge_id <> 0";
+            criteria += "recurring = 'Y'";
         }
         else if (recurringOrNonRecurring.compare("n") == 0) {
-            criteria += "recurring_charge_id IS NULL";
+            criteria += "recurring = 'N'";
         }
     }
 

@@ -409,18 +409,22 @@ static const char * pszCreateListTransationView =
     "CREATE VIEW v_transaction_list AS SELECT " \
     "tr.id," \
     "tr.account_id," \
-    "a.code AS account_code," \
+    "a.code AS account," \
     "tr.recurring_charge_id," \
+    "CASE " \
+    "    WHEN tr.recurring_charge_id IS NOT NULL THEN 'Y' " \
+    "    ELSE 'N' " \
+    "END AS recurring," \
     "tr.date," \
     "tr.reference," \
     "tr.description," \
     "tr.payee_id," \
-    "p.code AS payee_code," \
+    "p.code AS payee," \
     "tr.category_id," \
-    "c.code AS category_code," \
-    "tr.credit_debit," \
+    "c.code AS category," \
+    "tr.credit_debit AS type," \
     "tr.amount," \
-    "tr.is_reconciled," \
+    "tr.is_reconciled AS reconciled," \
     "tr.created," \
     "tr.updated " \
     "FROM account_transaction tr " \

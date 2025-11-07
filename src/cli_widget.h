@@ -627,6 +627,10 @@ class CLIListRow : public CLIWidget {
             columnValues.push_back(value);
         }
 
+        void addCellValue(bool val) {
+            columnValues.push_back(val ? "Y" : "N");
+        }
+
         void showHeaderRow() {
             printTopBorder();
 

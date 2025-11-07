@@ -136,6 +136,25 @@ Parameters are listed below, any parameters that accept wildcards recognise * as
 - a:[amount] - transactions where the amount is less than this
 - A:[amount]|A:[amount] - transactions where the amount is between these 
 
+- sql:[where clause parameters] - find transactions specified by the criteria
+
+This option will likely be useful only to those familiar with SQL (Structured Query Language). The **find** command
+queries a view with the following column names:
+
+- account - the account code of the transaction
+- recurring - whether the transaction is a recurring charge ('Y' or 'N')
+- date - the date the transaction was posted for
+- reference - the transaction reference
+- description
+- payee - the transaction payee code
+- category - the transaction category code
+- type - whether this transacion is a CRedit or a DeBit ('CR' or 'DB')
+- amount
+- reconciled - whether the transaction has been reconciled ('Y' or 'N')
+
+An example:
+    find sql:category = 'BOOKS' AND amount > 25 AND recurring = 'N'
+
 The query used in the **find** command can be saved as a report by issuing the **save-report** or **save** command.
 
 **use [account-code]**
