@@ -180,7 +180,7 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_id_t accountId, db_sort_t dateSortDirection, StrDate & firstDate, StrDate & secondDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveByAccountIDForPeriod()");
 
@@ -193,7 +193,8 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_
         sqlSelectByAccountIDBetweenDates, 
         accountId.c_str(),
         firstDate.shortDate().c_str(),
-        secondDate.shortDate().c_str());
+        secondDate.shortDate().c_str(),
+        (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
 
     result.retrieve(szStatement);
 

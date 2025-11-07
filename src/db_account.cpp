@@ -193,21 +193,12 @@ void DBAccount::createCarriedOverLogs() {
         DBCarriedOver co;
         int hasCO = co.retrieveLatestByAccountId(this->id);
 
-        if (hasCO > 0) {
+        if (hasCO) {
             log.debug("Latest DBCarriedOverLog date '%s'", co.date.shortDate().c_str());
         }
         else {
-            DBTransactionView transaction;
-            DBResult<DBTransactionView> result = transaction.retrieveByAccountID(this->id, sort_ascending, 1);
-
-            if (result.size() == 0) {
-                return;
-            }
-            
-            DBTransaction firstTransaction = result.at(0);
-
-            StrDate firstDate = firstTransaction.date.firstDayInMonth();
-            StrDate secondDate = firstTransaction.date.lastDayInMonth();
+            StrDate firstDate = openingDate;
+            StrDate secondDate = openingDate.lastDayInMonth();
 
             co = DBCarriedOver::createForPeriod(this->id, openingBalance, firstDate, secondDate);
         }
@@ -268,7 +259,7 @@ Money DBAccount::calculateCurrentBalance() {
         StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
 
         DBTransactionView tr;
-        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, periodStartDate, dateToday);
+        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, sort_ascending, periodStartDate, dateToday);
 
         for (int i = 0;i < transactionResult.size();i++) {
             DBTransaction transaction = transactionResult.at(i);
@@ -398,7 +389,7 @@ Money DBAccount::calculateBalanceAfterBills() {
         StrDate periodStartDate = dateToday.firstDayInMonth();
 
         DBTransactionView tr;
-        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, periodStartDate, dateToday);
+        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, sort_ascending, periodStartDate, dateToday);
 
         for (int i = 0;i < transactionResult.size();i++) {
             DBTransaction transaction = transactionResult.at(i);

@@ -154,7 +154,8 @@ class DBTransactionView : public DBTransaction {
                         "FROM v_transaction_list " \
                         "WHERE account_id = %s " \
                         "AND date >= '%s' " \
-                        "AND date <= '%s';";
+                        "AND date <= '%s' " \
+                        "ORDER BY date %s;";
 
         const char * sqlSelectReconciledByAccountIDBetweenDates = 
                         "SELECT " \
@@ -305,7 +306,7 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
         DBResult<DBTransactionView> retrieveReconciledByAccountID(pfm_id_t accountId);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
-        DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t accountId, db_sort_t dateSortDirection, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> findTransactionsForCriteria(const string & criteria);

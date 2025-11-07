@@ -92,7 +92,7 @@ DBCarriedOver DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startin
 
     try {
         DBTransactionView tr;
-        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(accountId, startDate, endDate);
+        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(accountId, sort_ascending, startDate, endDate);
 
         Money total = startingBalance;
 
