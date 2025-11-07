@@ -153,7 +153,9 @@ queries a view with the following column names:
 - reconciled - whether the transaction has been reconciled ('Y' or 'N')
 
 An example:
-    find sql:category = 'BOOKS' AND amount > 25 AND recurring = 'N'
+```
+find sql:category = 'BOOKS' AND amount > 25 AND recurring = 'N'
+```
 
 The query used in the **find** command can be saved as a report by issuing the **save-report** or **save** command.
 
