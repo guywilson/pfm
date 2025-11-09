@@ -31,7 +31,7 @@ class DBCriteria {
     private:
         deque<string> whereClauses;
         deque<string> orderClauses;
-        uint32_t rowLimit;
+        int rowLimit;
 
         string appendString(string & clause, const string & value) {
             clause.append("'");
@@ -176,7 +176,7 @@ class DBCriteria {
             orderClauses.push_back(clause);
         }
 
-        void setRowLimit(uint32_t numRows) {
+        void setRowLimit(int numRows) {
             rowLimit = numRows;
         }
 
@@ -223,8 +223,8 @@ class DBCriteria {
                 return "";
             }
 
-            char limitString[32];
-            snprintf(limitString, 32, " LIMIT %u", rowLimit);
+            char limitString[16];
+            snprintf(limitString, 16, " LIMIT %d", rowLimit);
 
             return string(limitString);
         }
