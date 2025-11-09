@@ -17,16 +17,14 @@ void DBConfig::retrieveByKey(const string & key) {
     Logger & log = Logger::getInstance();
     log.entry("DBConfig::retrieveByKey()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("key", DBCriteria::equal_to, key);
+    criteria.add("is_visible", true);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBConfig> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByKey, 
-        key.c_str());
-
-    int rowsRetrievedCount = result.retrieve(szStatement);
+    int rowsRetrievedCount = result.retrieve(statement);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
@@ -44,9 +42,13 @@ DBResult<DBConfig> DBConfig::retrieveAllVisible() {
     Logger & log = Logger::getInstance();
     log.entry("DBConfig>::retrieveAllVisible()");
 
+    DBCriteria criteria;
+    criteria.add("is_visible", true);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBConfig> result;
 
-    result.retrieve(sqlSelectVisible);
+    result.retrieve(statement);
 
     log.exit("DBConfig>::retrieveAllVisible()");
 

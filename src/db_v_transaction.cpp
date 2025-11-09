@@ -14,57 +14,40 @@
 
 using namespace std;
 
-DBResult<DBTransactionView> DBTransactionView::retrieveByStatementAndID(const char * sqlSelect, pfm_id_t id) {
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBResult<DBTransactionView> result;
-
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelect, 
-        id.c_str());
-
-    result.retrieve(szStatement);
-
-    return result;
-}
-
 DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveByAccountID()");
 
-    DBResult<DBTransactionView> result = retrieveByStatementAndID(sqlSelectByAccountID, accountId);
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    DBResult<DBTransactionView> result;
+
+    result.retrieve(statement);
 
     log.exit("DBTransactionView::retrieveByAccountID()");
 
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
+DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveByAccountID()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBResult<DBTransactionView> result;
-
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountIDSortedByDate, 
-        accountId.c_str(),
-        (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.addOrderBy("date", dateSortDirection);
 
     if (rowLimit > 0) {
-        char szLimit[LIMIT_CLAUSE_BUFFER_LEN];
-
-        snprintf(szLimit, LIMIT_CLAUSE_BUFFER_LEN, " LIMIT %d;", rowLimit);
-        strcat(szStatement, szLimit);
-    }
-    else {
-        strcat(szStatement, ";");
+        criteria.setRowLimit(rowLimit);
     }
 
-    result.retrieve(szStatement);
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
+    DBResult<DBTransactionView> result;
+
+    result.retrieve(statement);
 
     log.exit("DBTransactionView::retrieveByAccountID()");
 
@@ -75,38 +58,38 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveReconciledByAccountID()");
 
-    DBResult<DBTransactionView> result = retrieveByStatementAndID(sqlSelectReconciledByAccountID, accountId);
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("reconciled", true);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    DBResult<DBTransactionView> result;
+
+    result.retrieve(statement);
 
     log.exit("DBTransactionView::retrieveReconciledByAccountID()");
 
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
+DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveNonRecurringByAccountID()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBResult<DBTransactionView> result;
-
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectNonRecurringByAccountIDSortedByDate, 
-        accountId.c_str(),
-        (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("recurring", false);
+    criteria.addOrderBy("date", dateSortDirection);
 
     if (rowLimit > 0) {
-        char szLimit[LIMIT_CLAUSE_BUFFER_LEN];
-
-        snprintf(szLimit, LIMIT_CLAUSE_BUFFER_LEN, " LIMIT %d;", rowLimit);
-        strcat(szStatement, szLimit);
-    }
-    else {
-        strcat(szStatement, ";");
+        criteria.setRowLimit(rowLimit);
     }
 
-    result.retrieve(szStatement);
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
+    DBResult<DBTransactionView> result;
+
+    result.retrieve(statement);
 
     log.exit("DBTransactionView::retrieveNonRecurringByAccountID()");
 
@@ -114,27 +97,22 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(p
 }
 
 DBResult<DBTransactionView> DBTransactionView::findTransactionsForCriteria(const string & criteria) {
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int sqlRowLimit = SQL_ROW_LIMIT;
     DBResult<DBTransactionView> result;
 
-    strncpy(szStatement, sqlSelectByCriteria, SQL_STATEMENT_BUFFER_LEN - 1);
+    DBCriteria c;
+    c.addOrderBy("date", DBCriteria::descending);
+    c.setRowLimit(SQL_ROW_LIMIT);
+
+    string statement = getSelectStatement();
 
     if (criteria.length() > 0) {
-        strcat(szStatement, criteria.c_str());
+        statement.append(" WHERE ");
+        statement.append(criteria);
+        statement.append(c.getOrderBy());
+        statement.append(c.getLimitClause());
     }
-    
-    char szOrderBy[SQL_ORDER_BY_BUFFER_LEN];
 
-    snprintf(
-        szOrderBy, 
-        SQL_ORDER_BY_BUFFER_LEN - 1, 
-        " ORDER BY date DESC LIMIT %d;", 
-        sqlRowLimit);
-
-    strcat(szStatement, szOrderBy);
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     return result;
 }
@@ -143,60 +121,43 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::findTransactionsForAccountID()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int sqlRowLimit = SQL_ROW_LIMIT;
-    DBResult<DBTransactionView> result;
+    DBCriteria c;
+    c.add("account_id", DBCriteria::equal_to, accountId);
+    c.addOrderBy("date", DBCriteria::descending);
+    c.setRowLimit(SQL_ROW_LIMIT);
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountID, 
-        accountId.c_str());
+    string statement = getSelectStatement() + c.getWhereClause();
 
     if (criteria.length() > 0) {
-        /*
-        ** Remove the trailing ';' from the statement...
-        */
-        szStatement[strlen(szStatement) - 1] = 0;
-
-        strcat(szStatement, " AND ");
-        strcat(szStatement, criteria.c_str());
+        statement.append(" AND ");
+        statement.append(criteria);
+        statement.append(c.getOrderBy());
+        statement.append(c.getLimitClause());
     }
-        
-    char szOrderBy[SQL_ORDER_BY_BUFFER_LEN];
 
-    snprintf(
-        szOrderBy, 
-        SQL_ORDER_BY_BUFFER_LEN - 1, 
-        " ORDER BY date DESC LIMIT %d;", 
-        sqlRowLimit);
-
-    strcat(szStatement, szOrderBy);
-
-    result.retrieve(szStatement);
+    DBResult<DBTransactionView> result;
+    result.retrieve(statement);
 
     log.exit("DBTransactionView::findTransactionsForAccountID()");
 
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_id_t accountId, db_sort_t dateSortDirection, StrDate & firstDate, StrDate & secondDate) {
+DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, StrDate & firstDate, StrDate & secondDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveByAccountIDForPeriod()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+    criteria.addOrderBy("date", dateSortDirection);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
     DBResult<DBTransactionView> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountIDBetweenDates, 
-        accountId.c_str(),
-        firstDate.shortDate().c_str(),
-        secondDate.shortDate().c_str(),
-        (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     log.exit("DBTransactionView::retrieveByAccountIDForPeriod()");
 
@@ -207,18 +168,17 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForP
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveReconciledByAccountIDForPeriod()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("reconciled", true);
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
     DBResult<DBTransactionView> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectReconciledByAccountIDBetweenDates, 
-        accountId.c_str(),
-        firstDate.shortDate().c_str(),
-        secondDate.shortDate().c_str());
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     log.exit("DBTransactionView::retrieveReconciledByAccountIDForPeriod()");
 
@@ -229,18 +189,17 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDFo
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveNonRecurringByAccountIDForPeriod()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("recurring", false);
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
     DBResult<DBTransactionView> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectNonRecurringByAccountIDBetweenDates, 
-        accountId.c_str(),
-        firstDate.shortDate().c_str(),
-        secondDate.shortDate().c_str());
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     log.exit("DBTransactionView::retrieveNonRecurringByAccountIDForPeriod()");
 

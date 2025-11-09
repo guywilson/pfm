@@ -20,26 +20,17 @@
 
 using namespace std;
 
-DBResult<DBTransaction> DBTransaction::retrieveByStatementAndID(const char * sqlSelect, pfm_id_t id) {
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBResult<DBTransaction> result;
-
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelect, 
-        id.c_str());
-
-    result.retrieve(szStatement);
-
-    return result;
-}
-
 DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::retrieveByAccountID()");
 
-    DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectByAccountID, accountId);
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    DBResult<DBTransaction> result;
+
+    result.retrieve(statement);
 
     log.exit("DBTransaction::retrieveByAccountID()");
 
@@ -50,38 +41,37 @@ DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountID(pfm_id_t ac
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::retrieveReconciledByAccountID()");
 
-    DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectReconciledByAccountID, accountId);
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("is_reconciled", true);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    DBResult<DBTransaction> result;
+
+    result.retrieve(statement);
 
     log.exit("DBTransaction::retrieveReconciledByAccountID()");
 
     return result;
 }
 
-DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit) {
+DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::retrieveByAccountID()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-    DBResult<DBTransaction> result;
-
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountIDSortedByDate, 
-        accountId.c_str(),
-        (dateSortDirection == sort_ascending ? "ASC" : "DESC"));
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.addOrderBy("date", dateSortDirection);
 
     if (rowLimit > 0) {
-        char szLimit[LIMIT_CLAUSE_BUFFER_LEN];
-
-        snprintf(szLimit, LIMIT_CLAUSE_BUFFER_LEN, " LIMIT %d;", rowLimit);
-        strcat(szStatement, szLimit);
-    }
-    else {
-        strcat(szStatement, ";");
+        criteria.setRowLimit(rowLimit);
     }
 
-    result.retrieve(szStatement);
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
+    DBResult<DBTransaction> result;
+
+    result.retrieve(statement);
 
     log.exit("DBTransaction::retrieveByAccountID()");
 
@@ -92,7 +82,13 @@ DBResult<DBTransaction> DBTransaction::retrieveByRecurringChargeID(pfm_id_t recu
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::retrieveByRecurringChargeID()");
 
-    DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectByRecurringChargeID, recurringChargeId);
+    DBCriteria criteria;
+    criteria.add("recurring_charge_id", DBCriteria::equal_to, recurringChargeId);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    DBResult<DBTransaction> result;
+
+    result.retrieve(statement);
 
     log.exit("DBTransaction::retrieveByRecurringChargeID()");
 
@@ -103,7 +99,16 @@ int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::findLatestByRecurringChargeID()");
 
-    DBResult<DBTransaction> result = retrieveByStatementAndID(sqlSelectLatestByChargeID, chargeId);
+    DBCriteria criteria;
+    criteria.add("recurring_charge_id", DBCriteria::equal_to, chargeId);
+    criteria.addOrderBy("date", DBCriteria::descending);
+    criteria.setRowLimit(1);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
+    DBResult<DBTransaction> result;
+
+    result.retrieve(statement);
 
     if (result.size() == 1) {
         set(result.at(0));
@@ -126,33 +131,22 @@ DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(pfm_id_t acc
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::findTransactionsForAccountID()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
-    int sqlRowLimit = SQL_ROW_LIMIT;
-    DBResult<DBTransaction> result;
+    DBCriteria c;
+    c.add("account_id", DBCriteria::equal_to, accountId);
+    c.addOrderBy("date", DBCriteria::descending);
+    c.setRowLimit(SQL_ROW_LIMIT);
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountID, 
-        accountId.c_str());
+    string statement = getSelectStatement() + c.getWhereClause();
 
     if (criteria.length() > 0) {
-        /*
-        ** Remove the trailing ';' from the statement...
-        */
-        szStatement[strlen(szStatement) - 1] = 0;
-
-        strcat(szStatement, " AND ");
-        strcat(szStatement, criteria.c_str());
+        statement.append(" AND ");
+        statement.append(criteria);
+        statement.append(c.getOrderBy());
+        statement.append(c.getLimitClause());
     }
-    
-    snprintf(
-        &szStatement[strlen(szStatement)], 
-        SQL_STATEMENT_BUFFER_LEN, 
-        " ORDER BY date DESC LIMIT %d;", 
-        sqlRowLimit);
 
-    result.retrieve(szStatement);
+    DBResult<DBTransaction> result;
+    result.retrieve(statement);
 
     log.exit("DBTransaction::findTransactionsForAccountID()");
 
@@ -163,18 +157,16 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDForPeriod(pfm_id_t acc
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::retrieveByAccountIDForPeriod()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
     DBResult<DBTransaction> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountIDBetweenDates, 
-        accountId.c_str(),
-        firstDate.shortDate().c_str(),
-        secondDate.shortDate().c_str());
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     log.exit("DBTransaction::retrieveByAccountIDForPeriod()");
 
@@ -185,18 +177,17 @@ DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountIDForPeriod(pf
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::retrieveReconciledByAccountIDForPeriod()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("is_reconciled", true);
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
     DBResult<DBTransaction> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectReconciledByAccountIDBetweenDates, 
-        accountId.c_str(),
-        firstDate.shortDate().c_str(),
-        secondDate.shortDate().c_str());
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     log.exit("DBTransaction::retrieveReconciledByAccountIDForPeriod()");
 
@@ -207,18 +198,17 @@ DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::retrieveNonRecurringByAccountIDForPeriod()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("recurring_charge_id", DBCriteria::is_null);
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
     DBResult<DBTransaction> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectNonRecurringByAccountIDBetweenDates, 
-        accountId.c_str(),
-        firstDate.shortDate().c_str(),
-        secondDate.shortDate().c_str());
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     log.exit("DBTransaction::retrieveNonRecurringByAccountIDForPeriod()");
 
@@ -458,15 +448,12 @@ void DBTransaction::deleteByRecurringChargeId(pfm_id_t recurringChargeId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::deleteByRecurringChargeId()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("recurring_charge_id", DBCriteria::equal_to, recurringChargeId);
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlDeleteByRecurringCharge, 
-        recurringChargeId.c_str());
+    string statement = getDeleteStatement() + ' ' + criteria.getStatementCriteria();
 
-    remove(szStatement);
+    remove(statement);
 
     log.exit("DBTransaction::deleteByRecurringChargeId()");
 }
@@ -475,15 +462,13 @@ void DBTransaction::deleteAllRecurringTransactionsForAccount(pfm_id_t accountId)
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::deleteAllRecurringTransactionsForAccount()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("recurring_charge_id", DBCriteria::is_not_null);
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlDeleteAllRecurringForAccount, 
-        accountId.c_str());
+    string statement = getDeleteStatement() + ' ' + criteria.getStatementCriteria();
 
-    remove(szStatement);
+    remove(statement);
 
     log.exit("DBTransaction::deleteAllRecurringTransactionsForAccount()");
 }

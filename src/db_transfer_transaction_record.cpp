@@ -20,16 +20,13 @@ int DBTransferTransactionRecord::retrieveByTransactionToId(pfm_id_t transactionT
     Logger & log = Logger::getInstance();
     log.entry("DBTransferTransactionRecord::retrieveByTransactionToId()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("transaction_to_id", DBCriteria::equal_to, transactionToId);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransferTransactionRecord> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByTransactionToId, 
-        transactionToId.c_str());
-
-    int rowsRetrievedCount = result.retrieve(szStatement);
+    int rowsRetrievedCount = result.retrieve(statement);
 
     if (rowsRetrievedCount == 1) {
         set(result.at(0));
@@ -44,16 +41,13 @@ int DBTransferTransactionRecord::retrieveByTransactionFromId(pfm_id_t transactio
     Logger & log = Logger::getInstance();
     log.entry("DBTransferTransactionRecord::retrieveByTransactionFromId()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("transaction_from_id", DBCriteria::equal_to, transactionFromId);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransferTransactionRecord> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByTransactionFromId, 
-        transactionFromId.c_str());
-
-    int rowsRetrievedCount = result.retrieve(szStatement);
+    int rowsRetrievedCount = result.retrieve(statement);
 
     if (rowsRetrievedCount == 1) {
         set(result.at(0));

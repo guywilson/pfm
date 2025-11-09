@@ -83,7 +83,7 @@ class DBPrimaryAccount : public DBEntity {
             return "DBPrimaryAccount";
         }
 
-        const char * getInsertStatement() override {
+        const string getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -96,10 +96,10 @@ class DBPrimaryAccount : public DBEntity {
                 now.c_str(),
                 now.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
-        const char * getUpdateStatement() override {
+        const string getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -112,7 +112,7 @@ class DBPrimaryAccount : public DBEntity {
                 now.c_str(),
                 id.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
         static string getPrimaryAccountCode();

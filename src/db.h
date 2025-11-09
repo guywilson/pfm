@@ -23,12 +23,6 @@ using namespace std;
 
 #define SQL_ROW_LIMIT                                80
 
-typedef enum {
-    sort_descending,
-    sort_ascending
-}
-db_sort_t;
-
 class DBColumn {
     private:
         string name;
@@ -134,8 +128,8 @@ class PFM_DB {
         string readKeyFile(const string & keyFileName);
 
         void createAccessKeyRecord(const string & key);
-        void _executeSQLNoCallback(const char * sql);
-        void _executeSQLCallback(const char * sql, vector<DBRow> * rows);
+        void _executeSQLNoCallback(const string & sql);
+        void _executeSQLCallback(const string & sql, vector<DBRow> * rows);
 
         bool getIsTransactionActive();
         void setIsTransactionActive();
@@ -163,12 +157,12 @@ class PFM_DB {
         void createTable(const char * sql);
         void createView(const char * sql);
 
-        int executeSelect(const char * statement, vector<DBRow> * rows);
+        int executeSelect(const string & statement, vector<DBRow> * rows);
         
-        pfm_id_t executeInsert(const char * statement);
+        pfm_id_t executeInsert(const string & statement);
 
-        void executeUpdate(const char * statement);
-        void executeDelete(const char * statement);
+        void executeUpdate(const string & statement);
+        void executeDelete(const string & statement);
 
         void begin();
         void commit();

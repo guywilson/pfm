@@ -15,12 +15,6 @@ using namespace std;
 
 class DBConfig : public DBEntity {
     private:
-        const char * sqlSelectByKey = 
-                        "SELECT id, key, value, description, is_read_only, created, updated FROM config where key = '%s' AND is_visible = 'Y';";
-
-        const char * sqlSelectVisible = 
-                        "SELECT id, key, value, description, is_read_only, is_visible, created, updated FROM config where is_visible = 'Y';";
-
         const char * sqlInsert = 
                         "INSERT INTO config (key, value, description, is_read_only, is_visible, created, updated) VALUES ('%s', '%s', '%s', 'N', 'Y', '%s', '%s');";
 
@@ -94,7 +88,7 @@ class DBConfig : public DBEntity {
             return "DBConfig";
         }
 
-        const char * getInsertStatement() override {
+        const string getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -112,10 +106,10 @@ class DBConfig : public DBEntity {
                 now.c_str(),
                 now.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
-        const char * getUpdateStatement() override {
+        const string getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -133,7 +127,7 @@ class DBConfig : public DBEntity {
                 now.c_str(),
                 id.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
         void retrieveByKey(const string & key);

@@ -18,15 +18,6 @@ using namespace std;
 
 class DBRecurringTransfer : public DBEntity {
     private:
-        const char * sqlSelectByRecurringChargeId = 
-                        "SELECT id, " \
-                        "recurring_charge_id," \
-                        "account_to_id," \
-                        "created," \
-                        "updated " \
-                        "FROM recurring_transfer " \
-                        "WHERE recurring_charge_id = %s;";
-
         const char * sqlInsert = 
                         "INSERT INTO recurring_transfer (" \
                         "recurring_charge_id," \
@@ -89,7 +80,7 @@ class DBRecurringTransfer : public DBEntity {
             return "DBRecurringTransfer";
         }
 
-        const char * getInsertStatement() override {
+        const string getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -103,10 +94,10 @@ class DBRecurringTransfer : public DBEntity {
                 now.c_str(),
                 now.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
-        const char * getUpdateStatement() override {
+        const string getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -120,7 +111,7 @@ class DBRecurringTransfer : public DBEntity {
                 now.c_str(),
                 id.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
         void assignColumn(DBColumn & column) override {

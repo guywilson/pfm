@@ -19,17 +19,6 @@ using namespace std;
 
 class DBAccount : public DBEntity {
     private:
-        const char * sqlSelectByCode = 
-                        "SELECT id," \
-                        "name," \
-                        "code," \
-                        "opening_date," \
-                        "opening_balance," \
-                        "created," \
-                        "updated " \
-                        "FROM account " \
-                        "WHERE code = '%s';";
-
         const char * sqlInsert = 
                         "INSERT INTO account (" \
                         "name," \
@@ -134,7 +123,7 @@ class DBAccount : public DBEntity {
             return "DBAccount";
         }
 
-        const char * getInsertStatement() override {
+        const string getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -152,10 +141,10 @@ class DBAccount : public DBEntity {
                 now.c_str(),
                 now.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
-        const char * getUpdateStatement() override {
+        const string getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -173,7 +162,7 @@ class DBAccount : public DBEntity {
                 now.c_str(),
                 id.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
         void doBalancePrerequisites();

@@ -15,9 +15,6 @@ using namespace std;
 
 class DBCurrency : public DBEntity {
     private:
-        const char * sqlSelectByCode = 
-                        "SELECT id, code, name, symbol, created, updated FROM currency where code = '%s';";
-
         const char * sqlInsert = 
                         "INSERT INTO currency (code, name, symbol, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s');";
 
@@ -79,7 +76,7 @@ class DBCurrency : public DBEntity {
             return "DBCurrency";
         }
 
-        const char * getInsertStatement() override {
+        const string getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -96,10 +93,10 @@ class DBCurrency : public DBEntity {
                 now.c_str(),
                 now.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
-        const char * getUpdateStatement() override {
+        const string getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -116,7 +113,7 @@ class DBCurrency : public DBEntity {
                 now.c_str(),
                 id.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
         void retrieveByCode(string & code);

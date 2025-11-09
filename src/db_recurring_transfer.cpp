@@ -18,16 +18,13 @@ int DBRecurringTransfer::retrieveByRecurringChargeId(pfm_id_t recurringChargeId)
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringTransfer::retrieveByRecurringChargeId");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("recurring_charge_id", DBCriteria::equal_to, recurringChargeId);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringTransfer> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByRecurringChargeId, 
-        recurringChargeId.c_str());
-
-    int rowsRetrievedCount = result.retrieve(szStatement);
+    int rowsRetrievedCount = result.retrieve(statement);
 
     if (rowsRetrievedCount == 1) {
         set(result.at(0));

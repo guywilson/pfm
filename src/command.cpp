@@ -644,7 +644,7 @@ void Command::migrateCharge(DBRecurringCharge & charge) {
     updatedCharge.migrateToTransferCharge(updatedCharge.transfer.accountToId);
 }
 
-void Command::listTransactions(uint32_t rowLimit, db_sort_t sortDirection, bool includeRecurring) {
+void Command::listTransactions(uint32_t rowLimit, DBCriteria::sql_order sortDirection, bool includeRecurring) {
     checkAccountSelected();
 
     DBTransactionView transactionInstance;
@@ -1307,7 +1307,7 @@ bool Command::process(const string & command) {
     else if (isCommand("list-transactions") || isCommand("lt") || isCommand("list")) {
         bool includeRecurringTransactions = false;
         uint32_t rowLimit = 25;
-        db_sort_t sortDirection = sort_descending;
+        DBCriteria::sql_order sortDirection = DBCriteria::descending;
 
         if (hasParameters()) {
             for (string & parameter : parameters) {
@@ -1322,10 +1322,10 @@ bool Command::process(const string & command) {
                         includeRecurringTransactions = false;
                     }
                     else if (parameter.compare("asc") == 0) {
-                        sortDirection = sort_ascending;
+                        sortDirection = DBCriteria::ascending;
                     }
                     else if (parameter.compare("desc") == 0) {
-                        sortDirection = sort_descending;
+                        sortDirection = DBCriteria::descending;
                     }
                 }
             }

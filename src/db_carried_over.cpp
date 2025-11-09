@@ -19,16 +19,16 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBCarriedOver::retrieveLatestByAccountId()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.addOrderBy("date", DBCriteria::descending);
+    criteria.setRowLimit(1);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+
     DBResult<DBCarriedOver> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectLatestByAccountId, 
-        accountId.c_str());
-
-    int rowsRetrievedCount = result.retrieve(szStatement);
+    int rowsRetrievedCount = result.retrieve(statement);
 
     if (rowsRetrievedCount == 1) {
         set(result.at(0));
@@ -43,16 +43,15 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBCarriedOver::retrieveByAccountId()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.addOrderBy("date", DBCriteria::descending);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+
     DBResult<DBCarriedOver> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountId, 
-        accountId.c_str());
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     log.exit("DBCarriedOver::retrieveByAccountId()");
 
@@ -63,17 +62,15 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
     Logger & log = Logger::getInstance();
     log.entry("DBCarriedOver::retrieveByAccountIdAfterDate()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("date", DBCriteria::greater_than_or_equal, after.shortDate());
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+
     DBResult<DBCarriedOver> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountIdAfterDate, 
-        accountId.c_str(),
-        after.shortDate().c_str());
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     log.exit("DBCarriedOver::retrieveByAccountIdAfterDate()");
 
@@ -92,7 +89,7 @@ DBCarriedOver DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startin
 
     try {
         DBTransactionView tr;
-        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(accountId, sort_ascending, startDate, endDate);
+        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(accountId, DBCriteria::ascending, startDate, endDate);
 
         Money total = startingBalance;
 

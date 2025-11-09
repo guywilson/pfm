@@ -19,43 +19,6 @@ using namespace std;
 
 class DBCarriedOver : public DBEntity {
     private:
-        const char * sqlSelectByAccountId = 
-                        "SELECT id, " \
-                        "account_id," \
-                        "date," \
-                        "description," \
-                        "balance," \
-                        "created," \
-                        "updated " \
-                        "FROM carried_over_log " \
-                        "WHERE account_id = %s " \
-                        "ORDER BY date DESC;";
-
-        const char * sqlSelectByAccountIdAfterDate = 
-                        "SELECT id, " \
-                        "account_id," \
-                        "date," \
-                        "description," \
-                        "balance," \
-                        "created," \
-                        "updated " \
-                        "FROM carried_over_log " \
-                        "WHERE account_id = %s " \
-                        "AND date >= '%s'";
-
-        const char * sqlSelectLatestByAccountId = 
-                        "SELECT id, " \
-                        "account_id," \
-                        "date," \
-                        "description," \
-                        "balance," \
-                        "created," \
-                        "updated " \
-                        "FROM carried_over_log " \
-                        "WHERE account_id = %s " \
-                        "ORDER BY date DESC " \
-                        "LIMIT 1;";
-
         const char * sqlInsert = 
                         "INSERT INTO carried_over_log (" \
                         "account_id," \
@@ -126,7 +89,7 @@ class DBCarriedOver : public DBEntity {
             return "DBCarriedOver";
         }
 
-        const char * getInsertStatement() override {
+        const string getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -144,10 +107,10 @@ class DBCarriedOver : public DBEntity {
                 now.c_str(),
                 now.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
-        const char * getUpdateStatement() override {
+        const string getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -165,7 +128,7 @@ class DBCarriedOver : public DBEntity {
                 now.c_str(),
                 id.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
         void assignColumn(DBColumn & column) override {

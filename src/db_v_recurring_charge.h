@@ -21,45 +21,6 @@ using namespace std;
 #define __INCL_RECURRING_CHARGE_VIEW
 
 class DBRecurringChargeView : public DBRecurringCharge {
-    private:
-        const char * sqlSelectByAccountID = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "category_code," \
-                        "payee_id," \
-                        "payee_code," \
-                        "date," \
-                        "end_date," \
-                        "description," \
-                        "amount," \
-                        "last_payment_date," \
-                        "frequency," \
-                        "created," \
-                        "updated " \
-                        "FROM v_recurring_charge_list " \
-                        "WHERE account_id = %s;";
-
-        const char * sqlSelectByAccountIDBetweenDates = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "date," \
-                        "end_date," \
-                        "description," \
-                        "amount," \
-                        "last_payment_date," \
-                        "frequency," \
-                        "created," \
-                        "updated " \
-                        "FROM v_recurring_charge_list " \
-                        "WHERE account_id = %s " \
-                        "AND date >= '%s' " \
-                        "AND date < '%s';";
-
     public:
         string payeeCode;
         string categoryCode;

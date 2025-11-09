@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <list>
+#include <deque>
 #include <stdint.h>
 
 #include <sqlcipher/sqlite3.h>
@@ -19,10 +20,225 @@ using namespace std;
 #ifndef __INCL_DB_BASE
 #define __INCL_DB_BASE
 
+#define SQL_STATEMENT_LENGTH                   256
 #define LIMIT_CLAUSE_BUFFER_LEN                 32
 #define SINGLE_QUOTE_CHAR                       39
+#define NULL_ROW_LIMIT                          -1
 
 template <class T> class DBResult;
+
+class DBCriteria {
+    private:
+        deque<string> whereClauses;
+        deque<string> orderClauses;
+        uint32_t rowLimit;
+
+        string appendString(string & clause, const string & value) {
+            clause.append("'");
+            clause.append(value);
+            clause.append("'");
+
+            return clause;
+        }
+
+        string appendBoolean(string & clause, const bool value) {
+            clause.append("'");
+            clause.append(value ? "Y" : "N");
+            clause.append("'");
+
+            return clause;
+        }
+
+    public:
+        enum sql_operator {
+            less_than,
+            less_than_or_equal,
+            greater_than,
+            greater_than_or_equal,
+            equal_to,
+            not_equal_to,
+            is_null,
+            is_not_null
+        };
+
+        enum sql_order {
+            descending,
+            ascending
+        };
+
+        DBCriteria() {
+            clear();
+        }
+
+        void clear() {
+            whereClauses.clear();
+            orderClauses.clear();
+            rowLimit = NULL_ROW_LIMIT;
+        }
+
+        void add(const string & columnName, enum sql_operator op, const string & value = "") {
+            string clause = columnName;
+
+            switch (op) {
+                case less_than:
+                    clause.append(" < ");
+                    clause = appendString(clause, value);
+                    break;
+
+                case less_than_or_equal:
+                    clause.append(" <= ");
+                    clause = appendString(clause, value);
+                    break;
+
+                case greater_than:
+                    clause.append(" > ");
+                    clause = appendString(clause, value);
+                    break;
+
+                case greater_than_or_equal:
+                    clause.append(" >= ");
+                    clause = appendString(clause, value);
+                    break;
+
+                case equal_to:
+                    clause.append(" = ");
+                    clause = appendString(clause, value);
+                    break;
+
+                case not_equal_to:
+                    clause.append(" != ");
+                    clause = appendString(clause, value);
+                    break;
+
+                case is_null:
+                    clause.append(" IS NULL");
+                    break;
+
+                case is_not_null:
+                    clause.append(" IS NOT NULL");
+                    break;
+            }
+
+            whereClauses.push_back(clause);
+        }
+
+        void add(const string & columnName, enum sql_operator op, pfm_id_t & id) {
+            string clause = columnName;
+
+            switch (op) {
+                case equal_to:
+                    clause.append(" = ");
+                    clause.append(id.getValue());
+                    break;
+
+                case not_equal_to:
+                    clause.append(" != ");
+                    clause.append(id.getValue());
+                    break;
+
+                case is_null:
+                    clause.append(" IS NULL");
+                    break;
+
+                case is_not_null:
+                    clause.append(" IS NOT NULL");
+                    break;
+
+                default:
+                    throw pfm_error("DBCriteria::add() - Illegal operation for an ID field");
+            }
+
+            whereClauses.push_back(clause);
+        }
+
+        void add(const string & columnName, const bool value) {
+            string clause = columnName;
+
+            clause.append(" = ");
+            clause = appendBoolean(clause, value);
+
+            whereClauses.push_back(clause);
+        }
+
+        void addOrderBy(const string & columnName, enum sql_order order) {
+            string clause = columnName + ' ';
+
+            switch (order) {
+                case descending:
+                    clause.append("DESC");
+                    break;
+
+                case ascending:
+                    clause.append("ASC");
+                    break;
+            }
+
+            orderClauses.push_back(clause);
+        }
+
+        void setRowLimit(uint32_t numRows) {
+            rowLimit = numRows;
+        }
+
+        const string getWhereClause() {
+            if (whereClauses.empty()) {
+                return "";
+            }
+
+            string where = " WHERE ";
+
+            while (!whereClauses.empty()) {
+                where += whereClauses.front();
+                whereClauses.pop_front();
+
+                if (!whereClauses.empty()) {
+                    where += " AND ";
+                }
+            }
+
+            return where;
+        }
+
+        const string getOrderBy() {
+            if (orderClauses.empty()) {
+                return "";
+            }
+
+            string orderBy = " ORDER BY ";
+
+            while (!orderClauses.empty()) {
+                orderBy += orderClauses.front();
+                orderClauses.pop_front();
+
+                if (!orderClauses.empty()) {
+                    orderBy += ", ";
+                }
+            }
+
+            return orderBy;
+        }
+
+        const string getLimitClause() {
+            if (rowLimit == NULL_ROW_LIMIT) {
+                return "";
+            }
+
+            char limitString[32];
+            snprintf(limitString, 32, " LIMIT %u", rowLimit);
+
+            return string(limitString);
+        }
+
+        const string getStatementCriteria() {
+            string criteria =
+                getWhereClause() + 
+                getOrderBy() + 
+                getLimitClause() + 
+                ';';
+
+            return criteria;
+        }
+};
 
 class DBEntity {
     private:
@@ -64,6 +280,13 @@ class DBEntity {
             return;
         }
 
+        const string getFromClause() {
+            string from = "FROM ";
+            from.append(getTableName());
+
+            return from;
+        }
+
         string delimitSingleQuotes(string & s);
 
     public:
@@ -96,48 +319,54 @@ class DBEntity {
             return "DBEntity";
         }
 
-        virtual const char * getSelectByIDStatement(pfm_id_t key) {
-            static char statement[64];
-
-            snprintf(statement, 64, "SELECT * FROM %s WHERE id = %s;", getTableName(), key.c_str()); 
+        virtual const string getSelectStatement() {
+            string statement = "SELECT * " + getFromClause();
             return statement;
         }
 
-        virtual const char * getSelectAllStatement() {
-            static char statement[64];
+        virtual const string getSelectByIDStatement(pfm_id_t key) {
+            DBCriteria criteria;
+            criteria.add("id", DBCriteria::equal_to, key);
 
-            snprintf(statement, 64, "SELECT * FROM %s;", getTableName()); 
+            string statement = getSelectStatement() + criteria.getStatementCriteria();
+
             return statement;
         }
 
-        virtual const char * getDeleteByIDStatement(pfm_id_t key) {
-            static char statement[64];
-
-            snprintf(statement, 64, "DELETE FROM %s WHERE id = %s;", getTableName(), key.c_str()); 
+        virtual const string getSelectAllStatement() {
+            string statement = getSelectStatement() + ';';
             return statement;
         }
 
-        virtual const char * getDeleteAllStatement() {
-            static char statement[64];
+        virtual const string getDeleteByIDStatement(pfm_id_t key) {
+            DBCriteria criteria;
+            criteria.add("id", DBCriteria::equal_to, key.c_str());
 
-            snprintf(statement, 64, "DELETE FROM %s;", getTableName()); 
+            string statement = "DELETE " + getFromClause() + criteria.getStatementCriteria();
+
             return statement;
+        }
+
+        virtual const string getDeleteAllStatement() {
+            return getDeleteStatement();
         }
         
-        virtual const char * getInsertStatement() {
+        virtual const string getInsertStatement() {
             return "";
         }
 
-        virtual const char * getUpdateStatement() {
+        virtual const string getUpdateStatement() {
             return "";
         }
 
-        virtual const char * getDeleteStatement() {
-            return "";
+        virtual const string getDeleteStatement() {
+            string statement = "DELETE " + getFromClause() + ';';
+
+            return statement;
         }
 
         void remove();
-        void remove(const char * statement);
+        void remove(const string & statement);
         void removeAll();
 
         void save();
@@ -255,7 +484,7 @@ class DBResult : public Result {
             log.exit("DBResult::reverse()");
         }
         
-        int retrieve(const char * sqlStatement);
+        int retrieve(const string & sqlStatement);
         int retrieveAll();
 
         T & at(int i) {
@@ -322,7 +551,7 @@ int DBResult<T>::retrieveAll() {
 }
 
 template <class T>
-int DBResult<T>::retrieve(const char * sqlStatement) {
+int DBResult<T>::retrieve(const string & sqlStatement) {
     Logger & log = Logger::getInstance();
     log.entry("DBResult::retrieve()");
 

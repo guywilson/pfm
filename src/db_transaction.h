@@ -23,161 +23,6 @@ using namespace std;
 
 class DBTransaction : public DBPayment {
     private:
-        const char * sqlSelectByAccountID = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "recurring_charge_id," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "credit_debit," \
-                        "amount," \
-                        "is_reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM account_transaction " \
-                        "WHERE account_id = %s;";
-
-        const char * sqlSelectByAccountIDSortedByDate = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "recurring_charge_id," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "credit_debit," \
-                        "amount," \
-                        "is_reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM account_transaction " \
-                        "WHERE account_id = %s " \
-                        "ORDER BY date %s";
-
-        const char * sqlSelectByAccountIDBetweenDates = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "recurring_charge_id," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "credit_debit," \
-                        "amount," \
-                        "is_reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM account_transaction " \
-                        "WHERE account_id = %s " \
-                        "AND date >= '%s' " \
-                        "AND date <= '%s';";
-
-        const char * sqlSelectReconciledByAccountID = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "recurring_charge_id," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "credit_debit," \
-                        "amount," \
-                        "is_reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM account_transaction " \
-                        "WHERE account_id = %s " \
-                        "AND is_reconciled = 'Y';";
-
-        const char * sqlSelectReconciledByAccountIDBetweenDates = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "recurring_charge_id," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "credit_debit," \
-                        "amount," \
-                        "is_reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM account_transaction " \
-                        "WHERE account_id = %s " \
-                        "AND is_reconciled = 'Y' " \
-                        "AND date >= '%s' " \
-                        "AND date <= '%s';";
-
-        const char * sqlSelectNonRecurringByAccountIDBetweenDates = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "credit_debit," \
-                        "amount," \
-                        "is_reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM account_transaction " \
-                        "WHERE account_id = %s " \
-                        "AND recurring_charge_id IS NULL " \
-                        "AND date >= '%s' " \
-                        "AND date <= '%s';";
-
-        const char * sqlSelectByRecurringChargeID = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "recurring_charge_id," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "credit_debit," \
-                        "amount," \
-                        "is_reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM account_transaction " \
-                        "WHERE recurring_charge_id = %s;";
-
-        const char * sqlSelectLatestByChargeID = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "recurring_charge_id," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "credit_debit," \
-                        "amount," \
-                        "is_reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM account_transaction " \
-                        "WHERE recurring_charge_id = %s " \
-                        "ORDER BY date DESC " \
-                        "LIMIT 1;";
-
         const char * sqlInsert = 
                         "INSERT INTO account_transaction (" \
                         "account_id," \
@@ -216,14 +61,6 @@ class DBTransaction : public DBPayment {
                         "WHERE account_id = %s " \
                         "AND date <= '%s'" \
                         "AND is_reconciled = 'N';";
-
-        const char * sqlDeleteByRecurringCharge = 
-                        "DELETE FROM account_transaction WHERE recurring_charge_id = %s;";
-
-        const char * sqlDeleteAllRecurringForAccount = 
-                        "DELETE FROM account_transaction WHERE account_id = %s AND recurring_charge_id <> 0;";
-
-        DBResult<DBTransaction> retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
     public:
         pfm_id_t recurringChargeId;
@@ -366,7 +203,7 @@ class DBTransaction : public DBPayment {
             return "DBTransaction";
         }
 
-        const char * getInsertStatement() override {
+        const string getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -391,10 +228,10 @@ class DBTransaction : public DBPayment {
                 now.c_str(),
                 now.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
-        const char * getUpdateStatement() override {
+        const string getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -418,7 +255,7 @@ class DBTransaction : public DBPayment {
                 now.c_str(),
                 id.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
         void afterInsert() override;
@@ -438,7 +275,7 @@ class DBTransaction : public DBPayment {
         static void createTransferPairFromSource(DBTransaction & source, DBAccount & accountTo);
 
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
-        DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
+        DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
         DBResult<DBTransaction> retrieveReconciledByAccountID(pfm_id_t accountId);
         DBResult<DBTransaction> retrieveByRecurringChargeID(pfm_id_t recurringChargeId);
         DBResult<DBTransaction> retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);

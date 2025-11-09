@@ -16,9 +16,6 @@ using namespace std;
 
 class DBCategory : public DBEntity {
     private:
-        const char * sqlSelectByCode = 
-                        "SELECT id, code, description, created, updated FROM category where code = '%s';";
-
         const char * sqlInsert = 
                         "INSERT INTO category (description, code, created, updated) VALUES ('%s', '%s', '%s', '%s');";
 
@@ -87,7 +84,7 @@ class DBCategory : public DBEntity {
             return "DBCategory";
         }
 
-        const char * getInsertStatement() override {
+        const string getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -103,10 +100,10 @@ class DBCategory : public DBEntity {
                 now.c_str(),
                 now.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
-        const char * getUpdateStatement() override {
+        const string getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -122,7 +119,7 @@ class DBCategory : public DBEntity {
                 now.c_str(),
                 id.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
         void retrieveByCode(string & code);

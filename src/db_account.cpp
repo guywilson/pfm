@@ -25,16 +25,13 @@ void DBAccount::retrieveByCode(string & code) {
     Logger & log = Logger::getInstance();
     log.entry("DBAccount::retrieveByCode()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("code", DBCriteria::equal_to, code);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBAccount> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByCode, 
-        code.c_str());
-
-    int rowsRetrievedCount = result.retrieve(szStatement);
+    int rowsRetrievedCount = result.retrieve(statement);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(
@@ -259,7 +256,7 @@ Money DBAccount::calculateCurrentBalance() {
         StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
 
         DBTransactionView tr;
-        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, sort_ascending, periodStartDate, dateToday);
+        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, DBCriteria::ascending, periodStartDate, dateToday);
 
         for (int i = 0;i < transactionResult.size();i++) {
             DBTransaction transaction = transactionResult.at(i);
@@ -389,7 +386,7 @@ Money DBAccount::calculateBalanceAfterBills() {
         StrDate periodStartDate = dateToday.firstDayInMonth();
 
         DBTransactionView tr;
-        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, sort_ascending, periodStartDate, dateToday);
+        DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, DBCriteria::ascending, periodStartDate, dateToday);
 
         for (int i = 0;i < transactionResult.size();i++) {
             DBTransaction transaction = transactionResult.at(i);

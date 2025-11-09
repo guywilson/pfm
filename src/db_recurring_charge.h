@@ -83,42 +83,6 @@ struct Frequency {
 
 class DBRecurringCharge : public DBPayment {
     private:
-        const char * sqlSelectByAccountID = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "date," \
-                        "end_date," \
-                        "description," \
-                        "amount," \
-                        "last_payment_date," \
-                        "frequency," \
-                        "created," \
-                        "updated " \
-                        "FROM recurring_charge " \
-                        "WHERE account_id = %s;";
-
-        const char * sqlSelectByAccountIDBetweenDates = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "date," \
-                        "end_date," \
-                        "description," \
-                        "amount," \
-                        "last_payment_date," \
-                        "frequency," \
-                        "created," \
-                        "updated " \
-                        "FROM recurring_charge " \
-                        "WHERE account_id = %s " \
-                        "AND date >= '%s' " \
-                        "AND date < '%s';";
-
         const char * sqlInsert = 
                         "INSERT INTO recurring_charge (" \
                         "account_id," \
@@ -377,7 +341,7 @@ class DBRecurringCharge : public DBPayment {
             return "DBRecurringCharge";
         }
 
-        const char * getInsertStatement() override {
+        const string getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -400,10 +364,10 @@ class DBRecurringCharge : public DBPayment {
                 now.c_str(),
                 now.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
-        const char * getUpdateStatement() override {
+        const string getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -425,7 +389,7 @@ class DBRecurringCharge : public DBPayment {
                 now.c_str(),
                 id.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
         DBResult<DBRecurringCharge> retrieveByAccountID(pfm_id_t & accountId);

@@ -18,195 +18,6 @@ using namespace std;
 
 class DBTransactionView : public DBTransaction {
     private:
-        const char * sqlSelectByCriteria = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "account," \
-                        "category_id," \
-                        "category," \
-                        "payee_id," \
-                        "payee," \
-                        "recurring_charge_id," \
-                        "recurring," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "type," \
-                        "amount," \
-                        "reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM v_transaction_list " \
-                        "WHERE ";
-
-        const char * sqlSelectByAccountID = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "account," \
-                        "category_id," \
-                        "category," \
-                        "payee_id," \
-                        "payee," \
-                        "recurring_charge_id," \
-                        "recurring," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "type," \
-                        "amount," \
-                        "reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM v_transaction_list " \
-                        "WHERE account_id = %s;";
-
-        const char * sqlSelectReconciledByAccountID = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "account," \
-                        "category_id," \
-                        "category," \
-                        "payee_id," \
-                        "payee," \
-                        "recurring_charge_id," \
-                        "recurring," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "type," \
-                        "amount," \
-                        "reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM v_transaction_list " \
-                        "WHERE account_id = %s " \
-                        "AND reconciled = 'Y'";
-
-        const char * sqlSelectByAccountIDSortedByDate = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "account," \
-                        "category_id," \
-                        "category," \
-                        "payee_id," \
-                        "payee," \
-                        "recurring_charge_id," \
-                        "recurring," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "type," \
-                        "amount," \
-                        "reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM v_transaction_list " \
-                        "WHERE account_id = %s " \
-                        "ORDER BY date %s";
-
-        const char * sqlSelectNonRecurringByAccountIDSortedByDate = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "account," \
-                        "category_id," \
-                        "category," \
-                        "payee_id," \
-                        "payee," \
-                        "recurring_charge_id," \
-                        "recurring," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "type," \
-                        "amount," \
-                        "reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM v_transaction_list " \
-                        "WHERE account_id = %s " \
-                        "AND recurring = 'N' " \
-                        "ORDER BY date %s";
-
-        const char * sqlSelectByAccountIDBetweenDates = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "account," \
-                        "category_id," \
-                        "category," \
-                        "payee_id," \
-                        "payee," \
-                        "recurring_charge_id," \
-                        "recurring," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "type," \
-                        "amount," \
-                        "reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM v_transaction_list " \
-                        "WHERE account_id = %s " \
-                        "AND date >= '%s' " \
-                        "AND date <= '%s' " \
-                        "ORDER BY date %s;";
-
-        const char * sqlSelectReconciledByAccountIDBetweenDates = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "account," \
-                        "category_id," \
-                        "category," \
-                        "payee_id," \
-                        "payee," \
-                        "recurring_charge_id," \
-                        "recurring," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "type," \
-                        "amount," \
-                        "reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM v_transaction_list " \
-                        "WHERE account_id = %s " \
-                        "AND reconciled = 'Y' " \
-                        "AND date >= '%s' " \
-                        "AND date <= '%s';";
-
-        const char * sqlSelectNonRecurringByAccountIDBetweenDates = 
-                        "SELECT " \
-                        "id," \
-                        "account_id," \
-                        "account," \
-                        "category_id," \
-                        "category," \
-                        "payee_id," \
-                        "payee," \
-                        "recurring_charge_id," \
-                        "recurring," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "type," \
-                        "amount," \
-                        "reconciled," \
-                        "created," \
-                        "updated " \
-                        "FROM v_transaction_list " \
-                        "WHERE account_id = %s " \
-                        "AND recurring = 'N' " \
-                        "AND date >= '%s' " \
-                        "AND date <= '%s';";
-
         const char * sqlReportByCategoryNonRecurring =
                         "SELECT category," \
                         "SUM(amount) AS total " \
@@ -222,8 +33,6 @@ class DBTransactionView : public DBTransaction {
                         "WHERE recurring = 'N' " \
                         "AND type = 'DB' " \
                         "GROUP BY payee;";
-
-        DBResult<DBTransactionView> retrieveByStatementAndID(const char * statement, pfm_id_t id);
 
     public:
         string account;
@@ -295,7 +104,7 @@ class DBTransactionView : public DBTransaction {
         }
 
         const char * getTableName() override {
-            return "v_transaction_view";
+            return "v_transaction_list";
         }
 
         const char * getClassName() override {
@@ -303,10 +112,10 @@ class DBTransactionView : public DBTransaction {
         }
 
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId);
-        DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
+        DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
         DBResult<DBTransactionView> retrieveReconciledByAccountID(pfm_id_t accountId);
-        DBResult<DBTransactionView> retrieveNonRecurringByAccountID(pfm_id_t accountId, db_sort_t dateSortDirection, int rowLimit);
-        DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t accountId, db_sort_t dateSortDirection, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransactionView> retrieveNonRecurringByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
+        DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> findTransactionsForCriteria(const string & criteria);

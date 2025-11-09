@@ -7,8 +7,8 @@
 ###############################################################################
 
 # Version number for pfm
-MAJOR_VERSION = 1
-MINOR_VERSION = 9
+MAJOR_VERSION = 2
+MINOR_VERSION = 0
 
 # Directories
 SOURCE = src

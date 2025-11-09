@@ -19,9 +19,9 @@ pfm_id_t DBEntity::insert() {
     
     log.entry("DBEntity::insert()");
 
-    const char * statement = getInsertStatement();
+    const string statement = getInsertStatement();
 
-    log.sql("Executing INSERT statement '%s'", statement);
+    log.sql("Executing INSERT statement '%s'", statement.c_str());
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -35,9 +35,9 @@ void DBEntity::update() {
     
     log.entry("DBEntity::update()");
 
-    const char * statement = getUpdateStatement();
+    const string statement = getUpdateStatement();
 
-    log.sql("Executing UPDATE statement '%s'", statement);
+    log.sql("Executing UPDATE statement '%s'", statement.c_str());
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -91,13 +91,13 @@ void DBEntity::retrieve(pfm_id_t id) {
     
     log.entry("DBEntity::retrieve()");
 
-    const char * statement = getSelectByIDStatement(id);
+    const string statement = getSelectByIDStatement(id);
 
     PFM_DB & db = PFM_DB::getInstance();
 
     vector<DBRow> rows;
 
-    log.debug("Executing SELECT BY id statement '%s'", statement);
+    log.debug("Executing SELECT BY id statement '%s'", statement.c_str());
     int rowsRetrievedCount = db.executeSelect(statement, &rows);
 
     if (rowsRetrievedCount != 1) {
@@ -135,7 +135,7 @@ void DBEntity::remove() {
     
     log.entry("DBEntity::remove()");
 
-    const char * statement = getDeleteByIDStatement(id);
+    const string statement = getDeleteByIDStatement(id);
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -144,7 +144,7 @@ void DBEntity::remove() {
 
         beforeRemove();
 
-        log.debug("Executing DELETE statement '%s'", statement);
+        log.debug("Executing DELETE statement '%s'", statement.c_str());
         db.executeDelete(statement);
 
         afterRemove();
@@ -161,7 +161,7 @@ void DBEntity::remove() {
     log.exit("DBEntity::remove()");
 }
 
-void DBEntity::remove(const char * statement) {
+void DBEntity::remove(const string & statement) {
     Logger & log = Logger::getInstance();
     
     log.entry("DBEntity::remove()");
@@ -171,14 +171,14 @@ void DBEntity::remove(const char * statement) {
     try {
         db.begin();
 
-        log.debug("Executing DELETE statement '%s'", statement);
+        log.debug("Executing DELETE statement '%s'", statement.c_str());
         db.executeDelete(statement);
 
         db.commit();
     }
     catch (pfm_error & e) {
         db.rollback();
-        log.error("Failed to remove entities with sql statement '%s'", statement);
+        log.error("Failed to remove entities with sql statement '%s'", statement.c_str());
 
         throw e;
     }
@@ -191,14 +191,14 @@ void DBEntity::removeAll() {
     
     log.entry("DBEntity::remove()");
 
-    const char * statement = getDeleteAllStatement();
+    const string statement = getDeleteAllStatement();
 
     PFM_DB & db = PFM_DB::getInstance();
 
     try {
         db.begin();
 
-        log.debug("Executing DELETE statement '%s'", statement);
+        log.debug("Executing DELETE statement '%s'", statement.c_str());
         db.executeDelete(statement);
 
         db.commit();

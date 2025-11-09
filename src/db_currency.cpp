@@ -17,16 +17,13 @@ void DBCurrency::retrieveByCode(string & code) {
     Logger & log = Logger::getInstance();
     log.entry("DBCurrency::retrieveByCode()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("code", DBCriteria::equal_to, code);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBCurrency> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByCode, 
-        code.c_str());
-
-    int rowsRetrievedCount = result.retrieve(szStatement);
+    int rowsRetrievedCount = result.retrieve(statement);
 
     if (rowsRetrievedCount != 1) {
         throw pfm_error(

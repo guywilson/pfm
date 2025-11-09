@@ -17,16 +17,13 @@ void DBCategory::retrieveByCode(string & code) {
     Logger & log = Logger::getInstance();
     log.entry("DBCategory::retrieveByCode()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("code", DBCriteria::equal_to, code);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBCategory> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByCode, 
-        code.c_str());
-
-    int rowsRetrievedCount = result.retrieve(szStatement);
+    int rowsRetrievedCount = result.retrieve(statement);
 
     if (rowsRetrievedCount == 1) {
         set(result.at(0));

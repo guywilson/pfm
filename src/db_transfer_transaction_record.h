@@ -20,26 +20,6 @@ using namespace std;
 
 class DBTransferTransactionRecord : public DBEntity {
     private:
-        const char * sqlSelectByTransactionToId = 
-                        "SELECT id, " \
-                        "transaction_to_id," \
-                        "transaction_from_id," \
-                        "transaction_date," \
-                        "created," \
-                        "updated " \
-                        "FROM transfer_transaction_record " \
-                        "WHERE transaction_to_id = %s;";
-
-        const char * sqlSelectByTransactionFromId = 
-                        "SELECT id, " \
-                        "transaction_to_id," \
-                        "transaction_from_id," \
-                        "transaction_date," \
-                        "created," \
-                        "updated " \
-                        "FROM transfer_transaction_record " \
-                        "WHERE transaction_from_id = %s;";
-
         const char * sqlInsert = 
                         "INSERT INTO transfer_transaction_record (" \
                         "transaction_to_id," \
@@ -102,7 +82,7 @@ class DBTransferTransactionRecord : public DBEntity {
             return "DBTransferTransactionRecord";
         }
 
-        const char * getInsertStatement() override {
+        const string getInsertStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -117,10 +97,10 @@ class DBTransferTransactionRecord : public DBEntity {
                 now.c_str(),
                 now.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
-        const char * getUpdateStatement() override {
+        const string getUpdateStatement() override {
             static char szStatement[SQL_STATEMENT_BUFFER_LEN];
 
             string now = StrDate::getTimestamp();
@@ -135,7 +115,7 @@ class DBTransferTransactionRecord : public DBEntity {
                 now.c_str(),
                 id.c_str());
 
-            return szStatement;
+            return string(szStatement);
         }
 
         void assignColumn(DBColumn & column) override {

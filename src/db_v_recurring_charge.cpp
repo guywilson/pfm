@@ -17,16 +17,13 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_i
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringChargeView::retrieveByAccountID()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringChargeView> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountID, 
-        accountId.c_str());
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     log.exit("DBRecurringChargeView::retrieveByAccountID()");
 
@@ -37,18 +34,15 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetwee
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringChargeView::retrieveByAccountIDBetweenDates()");
 
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    DBCriteria criteria;
+    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add("date", DBCriteria::greater_than_or_equal, dateAfter.shortDate());
+    criteria.add("date", DBCriteria::less_than, dateBefore.shortDate());
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringChargeView> result;
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlSelectByAccountIDBetweenDates, 
-        accountId.c_str(),
-        dateAfter.shortDate().c_str(),
-        dateBefore.shortDate().c_str());
-
-    result.retrieve(szStatement);
+    result.retrieve(statement);
 
     log.exit("DBRecurringChargeView::retrieveByAccountIDBetweenDates()");
 

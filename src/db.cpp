@@ -562,21 +562,21 @@ void PFM_DB::clearIsTransactionActive() {
     log.exit("PFM_DB::clearIsTransactionActive()");
 }
 
-void PFM_DB::_executeSQLNoCallback(const char * sql) {
+void PFM_DB::_executeSQLNoCallback(const string & sql) {
     log.entry("PFM_DB::_executeSQLNoCallback()");
 
-    log.sql("Executing SQL '%s'", sql);
+    log.sql("Executing SQL '%s'", sql.c_str());
     
     char * pszErrorMsg;
-    int error = sqlite3_exec(dbHandle, sql, NULL, NULL, &pszErrorMsg);
+    int error = sqlite3_exec(dbHandle, sql.c_str(), NULL, NULL, &pszErrorMsg);
 
     if (error) {
-        log.error("Failed to execute statement '%s' with error '%s'", sql, pszErrorMsg);
+        log.error("Failed to execute statement '%s' with error '%s'", sql.c_str(), pszErrorMsg);
 
         throw pfm_error(
             pfm_error::buildMsg(
                 "Failed to execute statement '%s' with error %s",
-                sql,
+                sql.c_str(),
                 pszErrorMsg), 
             __FILE__, 
             __LINE__);
@@ -585,24 +585,24 @@ void PFM_DB::_executeSQLNoCallback(const char * sql) {
     log.exit("PFM_DB::_executeSQLNoCallback()");
 }
 
-void PFM_DB::_executeSQLCallback(const char * sql, vector<DBRow> * rows) {
+void PFM_DB::_executeSQLCallback(const string & sql, vector<DBRow> * rows) {
     log.entry("PFM_DB::_executeSQLCallback()");
 
-    log.sql("Executing SQL '%s'", sql);
+    log.sql("Executing SQL '%s'", sql.c_str());
 
     /*
     ** Use the callback function to populate the rows vector...
     */
     char * pszErrorMsg;
-    int error = sqlite3_exec(dbHandle, sql, _retrieveCallback, rows, &pszErrorMsg);
+    int error = sqlite3_exec(dbHandle, sql.c_str(), _retrieveCallback, rows, &pszErrorMsg);
 
     if (error) {
-        log.error("Failed to execute statement '%s' with error '%s'", sql, pszErrorMsg);
+        log.error("Failed to execute statement '%s' with error '%s'", sql.c_str(), pszErrorMsg);
 
         throw pfm_error(
             pfm_error::buildMsg(
                 "Failed to execute statement '%s' with error %s",
-                sql,
+                sql.c_str(),
                 pszErrorMsg), 
             __FILE__, 
             __LINE__);
@@ -810,7 +810,7 @@ void PFM_DB::createCurrencies() {
     log.exit("PFM_DB::createCurrencies()");
 }
 
-int PFM_DB::executeSelect(const char * statement, vector<DBRow> * rows) {
+int PFM_DB::executeSelect(const string & statement, vector<DBRow> * rows) {
     log.entry("PFM_DB::executeSelect()");
 
     _executeSQLCallback(statement, rows);
@@ -822,7 +822,7 @@ int PFM_DB::executeSelect(const char * statement, vector<DBRow> * rows) {
     return rows->size();
 }
 
-pfm_id_t PFM_DB::executeInsert(const char * statement) {
+pfm_id_t PFM_DB::executeInsert(const string & statement) {
     log.entry("PFM_DB::executeInsert()");
 
     _executeSQLNoCallback(statement);
@@ -834,7 +834,7 @@ pfm_id_t PFM_DB::executeInsert(const char * statement) {
     return id;
 }
 
-void PFM_DB::executeUpdate(const char * statement) {
+void PFM_DB::executeUpdate(const string & statement) {
     log.entry("PFM_DB::executeUpdate()");
 
     _executeSQLNoCallback(statement);
@@ -842,7 +842,7 @@ void PFM_DB::executeUpdate(const char * statement) {
     log.exit("PFM_DB::executeUpdate()");
 }
 
-void PFM_DB::executeDelete(const char * statement) {
+void PFM_DB::executeDelete(const string & statement) {
     log.entry("PFM_DB::executeDelete()");
 
     _executeSQLNoCallback(statement);
