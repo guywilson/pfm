@@ -145,38 +145,38 @@ class TransactionListView : public CLIListView {
         void showResultsTable(DBResult<DBTransactionView> & result) {
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
+            CLIListColumn column0 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
+            headerRow.addColumn(column0);
+
+            CLIListColumn column1 = CLIListColumn("Acct.", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column1);
 
-            CLIListColumn column2 = CLIListColumn("Acct.", 5, CLIListColumn::leftAligned);
+            CLIListColumn column2 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
-            CLIListColumn column3 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
+            CLIListColumn column3 = CLIListColumn("RC", 2, CLIListColumn::leftAligned);
             headerRow.addColumn(column3);
 
-            CLIListColumn column4 = CLIListColumn("RC", 2, CLIListColumn::leftAligned);
+            CLIListColumn column4 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
             headerRow.addColumn(column4);
 
-            CLIListColumn column5 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
+            CLIListColumn column5 = CLIListColumn("Reference", 9, CLIListColumn::leftAligned);
             headerRow.addColumn(column5);
 
-            CLIListColumn column6 = CLIListColumn("Reference", 9, CLIListColumn::leftAligned);
+            CLIListColumn column6 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column6);
 
-            CLIListColumn column7 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
+            CLIListColumn column7 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column7);
 
-            CLIListColumn column8 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
+            CLIListColumn column8 = CLIListColumn("Tp", 2, CLIListColumn::leftAligned);
             headerRow.addColumn(column8);
 
-            CLIListColumn column9 = CLIListColumn("Typ", 3, CLIListColumn::leftAligned);
+            CLIListColumn column9 = CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
             headerRow.addColumn(column9);
 
-            CLIListColumn column10 = CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
+            CLIListColumn column10 = CLIListColumn("R", 1, CLIListColumn::leftAligned);
             headerRow.addColumn(column10);
-
-            CLIListColumn column11 = CLIListColumn("R", 1, CLIListColumn::leftAligned);
-            headerRow.addColumn(column11);
 
             addHeaderRow(headerRow);
 
@@ -234,7 +234,7 @@ class TransactionListView : public CLIListView {
             CLIListView::showNoExtraCR();
 
             if (isTotalEnabled) {
-                showTotal(8, total.localeFormattedStringValue());
+                showTotal(9, total.localeFormattedStringValue());
             }
             else {
                 cout << endl;
