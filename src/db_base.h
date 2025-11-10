@@ -298,7 +298,7 @@ class DBCriteria {
 
             auto range = inClauses.equal_range(columnName);
 
-            int j = 0;
+            size_t j = 0;
             for (auto i = range.first; i != range.second; ++i, j++) {
                 clause.append(i->second);
 
