@@ -2,6 +2,7 @@
 #include <vector>
 #include <string.h>
 
+#include "db_base.h"
 #include "strdate.h"
 #include "money.h"
 
@@ -50,7 +51,9 @@ class FindTransactionCriteriaBuilder {
     public:
         FindTransactionCriteriaBuilder(vector<string> & parms);
 
-        string getCriteria();
+        bool hasRawSQL();
+        DBCriteria getCriteria();
+        string getRawSQL();
 };
 
 class AddTransactionCriteriaBuilder {

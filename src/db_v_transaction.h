@@ -118,8 +118,9 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransactionView> findTransactionsForCriteria(const string & criteria);
-        DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t accountId, const string & criteria);
+        DBResult<DBTransactionView> findTransactions(const string & sql);
+        DBResult<DBTransactionView> findTransactionsForCriteria(DBCriteria & criteria);
+        DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t accountId, DBCriteria & criteria);
         DBResult<DBTransactionView> reportByCategory();
         DBResult<DBTransactionView> reportByPayee();
 };

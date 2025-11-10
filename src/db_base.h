@@ -6,11 +6,14 @@
 #include <unordered_map>
 #include <list>
 #include <deque>
+#include <map>
 #include <stdint.h>
 
 #include <sqlcipher/sqlite3.h>
 
 #include "db.h"
+#include "strdate.h"
+#include "money.h"
 #include "jfile.h"
 #include "logger.h"
 #include "pfm_error.h"
@@ -31,6 +34,7 @@ class DBCriteria {
     private:
         deque<string> whereClauses;
         deque<string> orderClauses;
+        multimap<string, string> inClauses;
         int rowLimit;
 
         string appendString(string & clause, const string & value) {
@@ -57,6 +61,8 @@ class DBCriteria {
             greater_than_or_equal,
             equal_to,
             not_equal_to,
+            like,
+            not_like,
             is_null,
             is_not_null
         };
@@ -76,7 +82,7 @@ class DBCriteria {
             rowLimit = NULL_ROW_LIMIT;
         }
 
-        void add(const string & columnName, enum sql_operator op, const string & value = "") {
+        void add(const string & columnName, enum sql_operator op, const string & value) {
             string clause = columnName;
 
             switch (op) {
@@ -110,6 +116,16 @@ class DBCriteria {
                     clause = appendString(clause, value);
                     break;
 
+                case like:
+                    clause.append(" LIKE ");
+                    clause = appendString(clause, value);
+                    break;
+
+                case not_like:
+                    clause.append(" NOT LIKE ");
+                    clause = appendString(clause, value);
+                    break;
+
                 case is_null:
                     clause.append(" IS NULL");
                     break;
@@ -122,7 +138,60 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
-        void add(const string & columnName, enum sql_operator op, pfm_id_t & id) {
+        void add(const string & columnName, enum sql_operator op, const StrDate & value) {
+            add(columnName, op, value.shortDate());
+        }
+
+        void add(const string & columnName, enum sql_operator op, const Money & value) {
+            string clause = columnName;
+
+            switch (op) {
+                case less_than:
+                    clause.append(" < ");
+                    clause.append(value.rawStringValue());
+                    break;
+
+                case less_than_or_equal:
+                    clause.append(" <= ");
+                    clause.append(value.rawStringValue());
+                    break;
+
+                case greater_than:
+                    clause.append(" > ");
+                    clause.append(value.rawStringValue());
+                    break;
+
+                case greater_than_or_equal:
+                    clause.append(" >= ");
+                    clause.append(value.rawStringValue());
+                    break;
+
+                case equal_to:
+                    clause.append(" = ");
+                    clause.append(value.rawStringValue());
+                    break;
+
+                case not_equal_to:
+                    clause.append(" != ");
+                    clause.append(value.rawStringValue());
+                    break;
+
+                case is_null:
+                    clause.append(" IS NULL");
+                    break;
+
+                case is_not_null:
+                    clause.append(" IS NOT NULL");
+                    break;
+
+                default:
+                    throw pfm_error("DBCriteria::add() - Illegal operation for a Money field");
+            }
+
+            whereClauses.push_back(clause);
+        }
+
+        void add(const string & columnName, enum sql_operator op, const pfm_id_t & id) {
             string clause = columnName;
 
             switch (op) {
@@ -151,11 +220,94 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
+        void addFirst(const string & columnName, enum sql_operator op, const pfm_id_t & id) {
+            string clause = columnName;
+
+            switch (op) {
+                case equal_to:
+                    clause.append(" = ");
+                    clause.append(id.getValue());
+                    break;
+
+                case not_equal_to:
+                    clause.append(" != ");
+                    clause.append(id.getValue());
+                    break;
+
+                case is_null:
+                    clause.append(" IS NULL");
+                    break;
+
+                case is_not_null:
+                    clause.append(" IS NOT NULL");
+                    break;
+
+                default:
+                    throw pfm_error("DBCriteria::addFirst() - Illegal operation for an ID field");
+            }
+
+            whereClauses.push_front(clause);
+        }
+
         void add(const string & columnName, const bool value) {
             string clause = columnName;
 
             clause.append(" = ");
             clause = appendBoolean(clause, value);
+
+            whereClauses.push_back(clause);
+        }
+
+        void addToInClause(const string & columnName, const string & value) {
+            inClauses.insert(pair{columnName, value});
+        }
+
+        void addToInClause(const string & columnName, const StrDate & value) {
+            addToInClause(columnName, value.shortDate());
+        }
+
+        void addToInClause(const string & columnName, const pfm_id_t & value) {
+            addToInClause(columnName, value.getValue());
+        }
+
+        void endInClause_string(const string & columnName) {
+            string clause = columnName + " IN (";
+
+            auto range = inClauses.equal_range(columnName);
+
+            int j = 0;
+            for (auto i = range.first; i != range.second; ++i, j++) {
+                appendString(clause, i->second);
+
+                if (j < (inClauses.count(columnName) - 1)) {
+                    clause.append(", ");
+                }
+            }
+
+            clause += ')';
+
+            whereClauses.push_back(clause);
+        }
+
+        void endInClause_StrDate(const string & columnName) {
+            endInClause_string(columnName);
+        }
+
+        void endInClause_id(const string & columnName) {
+            string clause = columnName + " IN (";
+
+            auto range = inClauses.equal_range(columnName);
+
+            int j = 0;
+            for (auto i = range.first; i != range.second; ++i, j++) {
+                clause.append(i->second);
+
+                if (j < (inClauses.count(columnName) - 1)) {
+                    clause.append(", ");
+                }
+            }
+
+            clause += ')';
 
             whereClauses.push_back(clause);
         }
@@ -340,7 +492,7 @@ class DBEntity {
 
         virtual const string getDeleteByIDStatement(pfm_id_t key) {
             DBCriteria criteria;
-            criteria.add("id", DBCriteria::equal_to, key.c_str());
+            criteria.add("id", DBCriteria::equal_to, key);
 
             string statement = "DELETE " + getFromClause() + criteria.getStatementCriteria();
 

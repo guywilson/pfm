@@ -5,6 +5,7 @@
 #include "logger.h"
 #include "cfgmgr.h"
 #include "db.h"
+#include "db_base.h"
 #include "db_account.h"
 #include "db_config.h"
 #include "db_category.h"
@@ -118,7 +119,8 @@ class Command {
         void migrateCharge(DBRecurringCharge & charge);
         void listTransactions(uint32_t rowLimit, DBCriteria::sql_order sortDirection, bool includeRecurring);
         void findTransactions();
-        void findTransactions(const string & criteria);
+        void findTransactions(const string & where);
+        void findTransactions(DBCriteria & criteria);
         void transactionsByCategory();
         void transactionsByPayee();
         string buildFindTransactionCriteria();

@@ -159,8 +159,8 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDForPeriod(pfm_id_t acc
 
     DBCriteria criteria;
     criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
@@ -180,8 +180,8 @@ DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountIDForPeriod(pf
     DBCriteria criteria;
     criteria.add("account_id", DBCriteria::equal_to, accountId);
     criteria.add("is_reconciled", true);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
@@ -200,9 +200,9 @@ DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(
 
     DBCriteria criteria;
     criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("recurring_charge_id", DBCriteria::is_null);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+    criteria.add("recurring_charge_id", DBCriteria::is_null, recurringChargeId);
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
@@ -464,7 +464,7 @@ void DBTransaction::deleteAllRecurringTransactionsForAccount(pfm_id_t accountId)
 
     DBCriteria criteria;
     criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("recurring_charge_id", DBCriteria::is_not_null);
+    criteria.add("recurring_charge_id", DBCriteria::is_not_null, recurringChargeId);
 
     string statement = getDeleteStatement() + ' ' + criteria.getStatementCriteria();
 

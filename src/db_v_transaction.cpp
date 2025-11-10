@@ -96,44 +96,38 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(p
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::findTransactionsForCriteria(const string & criteria) {
+DBResult<DBTransactionView> DBTransactionView::findTransactions(const string & sql) {
     DBResult<DBTransactionView> result;
 
-    DBCriteria c;
-    c.addOrderBy("date", DBCriteria::descending);
-    c.setRowLimit(SQL_ROW_LIMIT);
-
-    string statement = getSelectStatement();
-
-    if (criteria.length() > 0) {
-        statement.append(" WHERE ");
-        statement.append(criteria);
-        statement.append(c.getOrderBy());
-        statement.append(c.getLimitClause());
-    }
+    string statement = getSelectStatement() + " WHERE " + sql;
 
     result.retrieve(statement);
 
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_id_t accountId, const string & criteria) {
+DBResult<DBTransactionView> DBTransactionView::findTransactionsForCriteria(DBCriteria & criteria) {
+    DBResult<DBTransactionView> result;
+
+    criteria.addOrderBy("date", DBCriteria::descending);
+    criteria.setRowLimit(SQL_ROW_LIMIT);
+
+    string statement = getSelectStatement() + criteria.getStatementCriteria();
+
+    result.retrieve(statement);
+
+    return result;
+}
+
+DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_id_t accountId, DBCriteria & criteria) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::findTransactionsForAccountID()");
 
-    DBCriteria c;
-    c.add("account_id", DBCriteria::equal_to, accountId);
-    c.addOrderBy("date", DBCriteria::descending);
-    c.setRowLimit(SQL_ROW_LIMIT);
+    criteria.addFirst("account_id", DBCriteria::equal_to, accountId);
+    criteria.addOrderBy("date", DBCriteria::descending);
+    criteria.setRowLimit(SQL_ROW_LIMIT);
 
-    string statement = getSelectStatement() + c.getWhereClause();
-
-    if (criteria.length() > 0) {
-        statement.append(" AND ");
-        statement.append(criteria);
-        statement.append(c.getOrderBy());
-        statement.append(c.getLimitClause());
-    }
+    string statement = getSelectStatement() + criteria.getStatementCriteria();
 
     DBResult<DBTransactionView> result;
     result.retrieve(statement);
@@ -149,8 +143,8 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_
 
     DBCriteria criteria;
     criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
     criteria.addOrderBy("date", dateSortDirection);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
@@ -171,8 +165,8 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForP
     DBCriteria criteria;
     criteria.add("account_id", DBCriteria::equal_to, accountId);
     criteria.add("reconciled", true);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
@@ -192,8 +186,8 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDFo
     DBCriteria criteria;
     criteria.add("account_id", DBCriteria::equal_to, accountId);
     criteria.add("recurring", false);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate.shortDate());
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate.shortDate());
+    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     

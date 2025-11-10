@@ -6,6 +6,7 @@
 #include "pfm_error.h"
 #include "cli_widget.h"
 #include "custom_widgets.h"
+#include "db_base.h"
 #include "db_transaction.h"
 #include "db_v_transaction.h"
 #include "cfgmgr.h"
@@ -496,164 +497,20 @@ class UpdateTransactionView : public CLIView {
         }
 };
 
-class FindTransactionByPayeeView : public CLIFindView {
-    private:
-        AccountSpinField accountField = AccountSpinField("Account: ");
-        PayeeSpinField payeeField = PayeeSpinField("Payee (max. 5 chars): ");
-        DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
-        DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
-        CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
-
-    public:
-        FindTransactionByPayeeView() : FindTransactionByPayeeView("Find transaction (by payee)") {}
-
-        FindTransactionByPayeeView(const char * title) : CLIFindView(title) {
-            string today = StrDate::today();
-            beforeDateField.setDefaultValue(today);
-            recurringIncludeType.setDefaultValue("no");
-        }
-
-        void show() override {
-            CLIFindView::show();
-
-            accountField.show();
-            payeeField.show();
-            afterDateField.show();
-            beforeDateField.show();
-            recurringIncludeType.show();
-        }
-
-        string getCriteria() override {
-            string criteria = "";
-
-            DBAccount account = accountField.getAccount();
-            DBPayee payee = payeeField.getPayee();
-
-            if (accountField.getValue().length() > 0) {
-                criteria += "account = '" + account.code + "' AND ";
-            }
-
-            char buffer[CRITERIA_BUFFER_LENGTH];
-            snprintf(buffer, CRITERIA_BUFFER_LENGTH, "payee_id = %s", payee.id.c_str());
-
-            criteria += buffer;
-
-            if (afterDateField.getValue().length() > 0) {
-                StrDate earliestDate = afterDateField.getValue();
-                criteria += " AND date > '" + earliestDate.shortDate() + "'";
-            }
-
-            if (beforeDateField.getValue().length() > 0) {
-                StrDate latestDate = beforeDateField.getValue();
-                criteria += " AND date <= '" + latestDate.shortDate() + "'";
-            }
-
-            if (recurringIncludeType.getValue().length() > 0) {
-                if (recurringIncludeType.getValue().compare("only") == 0) {
-                    criteria += " AND recurring = 'Y'";
-                }
-                else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring = 'N'";
-                }
-                else if (recurringIncludeType.getValue().compare("yes") == 0) {
-                }
-                else {
-                    throw pfm_validation_error(
-                                pfm_error::buildMsg(
-                                    "Invalid recurring include type '%s'", 
-                                    recurringIncludeType.getValue().c_str()));
-                }
-            }
-            
-            return criteria;
-        }
-};
-
-class FindTransactionByCategoryView : public CLIFindView {
+class FindTransactionView : public CLIView {
     private:
         AccountSpinField accountField = AccountSpinField("Account: ");
         CategorySpinField categoryField = CategorySpinField("Category (max. 5 chars): ");
-        DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
-        DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
-        CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
-
-    public:
-        FindTransactionByCategoryView() : FindTransactionByCategoryView("Find transaction (by category)") {}
-
-        FindTransactionByCategoryView(const char * title) : CLIFindView(title) {
-            string today = StrDate::today();
-            beforeDateField.setDefaultValue(today);
-            recurringIncludeType.setDefaultValue("no");
-        }
-
-        void show() override {
-            CLIFindView::show();
-
-            accountField.show();
-            categoryField.show();
-            afterDateField.show();
-            beforeDateField.show();
-            recurringIncludeType.show();
-        }
-
-        string getCriteria() override {
-            string criteria = "";
-
-            DBAccount account = accountField.getAccount();
-            DBCategory category = categoryField.getCategory();
-
-            if (accountField.getValue().length() > 0) {
-                criteria += "account = '" + account.code + "' AND ";
-            }
-
-            char buffer[CRITERIA_BUFFER_LENGTH];
-            snprintf(buffer, CRITERIA_BUFFER_LENGTH, "category_id = %s", category.id.c_str());
-
-            criteria += buffer;
-
-            if (afterDateField.getValue().length() > 0) {
-                StrDate earliestDate = afterDateField.getValue();
-                criteria += " AND date >= '" + earliestDate.shortDate() + "'";
-            }
-
-            if (beforeDateField.getValue().length() > 0) {
-                StrDate latestDate = beforeDateField.getValue();
-                criteria += " AND date <= '" + latestDate.shortDate() + "'";
-            }
-
-            if (recurringIncludeType.getValue().length() > 0) {
-                if (recurringIncludeType.getValue().compare("only") == 0) {
-                    criteria += " AND recurring = 'Y'";
-                }
-                else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring = 'N'";
-                }
-                else if (recurringIncludeType.getValue().compare("yes") == 0) {
-                }
-                else {
-                    throw pfm_validation_error(
-                                pfm_error::buildMsg(
-                                    "Invalid recurring include type '%s'", 
-                                    recurringIncludeType.getValue().c_str()));
-                }
-            }
-            
-            return criteria;
-        }
-};
-
-class FindTransactionByDescriptionView : public CLIFindView {
-    private:
-        AccountSpinField accountField = AccountSpinField("Account: ");
+        PayeeSpinField payeeField = PayeeSpinField("Payee (max. 5 chars): ");
         CLITextField descriptionField = CLITextField("Transaction description: ");
         DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
         DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
         CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
 
     public:
-        FindTransactionByDescriptionView() : FindTransactionByDescriptionView("Find transaction (by description)") {}
+        FindTransactionView() : FindTransactionView("Find transactions") {}
 
-        FindTransactionByDescriptionView(const char * title) : CLIFindView(title) {
+        FindTransactionView(const char * title) : CLIView(title) {
             string today = StrDate::today();
             beforeDateField.setDefaultValue(today);
             recurringIncludeType.setDefaultValue("no");
@@ -663,40 +520,55 @@ class FindTransactionByDescriptionView : public CLIFindView {
             CLIView::show();
 
             accountField.show();
+            categoryField.show();
+            payeeField.show();
             descriptionField.show();
             afterDateField.show();
             beforeDateField.show();
             recurringIncludeType.show();
         }
 
-        string getCriteria() override {
-            string criteria = "";
+        DBCriteria getCriteria() {
+            DBCriteria criteria;
 
             DBAccount account = accountField.getAccount();
+            DBCategory category = categoryField.getCategory();
+            DBPayee payee = payeeField.getPayee();
             string description = descriptionField.getValue();
+            StrDate afterDate = afterDateField.getValue();
+            StrDate beforeDate = beforeDateField.getValue();
 
             if (accountField.getValue().length() > 0) {
-                criteria += "account = '" + account.code + "' AND ";
+                criteria.add("account_id", DBCriteria::equal_to, account.id);
             }
 
-            criteria += "description LIKE '%" + description + "%'";
+            if (categoryField.getValue().length() > 0) {
+                criteria.add("category_id", DBCriteria::equal_to, category.id);
+            }
+
+            if (payeeField.getValue().length() > 0) {
+                criteria.add("payee_id", DBCriteria::equal_to, payee.id);
+            }
+
+            if (descriptionField.getValue().length() > 0) {
+                string d = '%' + description + '%';
+                criteria.add("description", DBCriteria::like, d);
+            }
 
             if (afterDateField.getValue().length() > 0) {
-                StrDate earliestDate = afterDateField.getValue();
-                criteria += " AND date >= '" + earliestDate.shortDate() + "'";
+                criteria.add("date", DBCriteria::greater_than, afterDate);
             }
 
             if (beforeDateField.getValue().length() > 0) {
-                StrDate latestDate = beforeDateField.getValue();
-                criteria += " AND date <= '" + latestDate.shortDate() + "'";
+                criteria.add("date", DBCriteria::less_than_or_equal, beforeDate);
             }
-            
+
             if (recurringIncludeType.getValue().length() > 0) {
                 if (recurringIncludeType.getValue().compare("only") == 0) {
-                    criteria += " AND recurring = 'Y'";
+                    criteria.add("recurring", true);
                 }
                 else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring = 'N'";
+                    criteria.add("recurring", false);
                 }
                 else if (recurringIncludeType.getValue().compare("yes") == 0) {
                 }
@@ -708,100 +580,6 @@ class FindTransactionByDescriptionView : public CLIFindView {
                 }
             }
             
-            return criteria;
-        }
-};
-
-class FindTransactionByDateView : public CLIFindView {
-    private:
-        AccountSpinField accountField = AccountSpinField("Account code: ");
-        DateField afterDateField = DateField("Earliest date (yyyy-mm-dd): ");
-        DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
-        CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
-
-    public:
-        FindTransactionByDateView() : FindTransactionByDateView("Find transaction (by date)") {}
-
-        FindTransactionByDateView(const char * title) : CLIFindView(title) {
-            string today = StrDate::today();
-            beforeDateField.setDefaultValue(today);
-            recurringIncludeType.setDefaultValue("no");
-        }
-
-        void show() override {
-            CLIView::show();
-
-            accountField.show();
-            afterDateField.show();
-            beforeDateField.show();
-            recurringIncludeType.show();
-        }
-
-        string getCriteria() override {
-            string criteria = "";
-
-            DBAccount account = accountField.getAccount();
-
-            if (accountField.getValue().length() > 0) {
-                criteria += "account = '" + account.code + "' AND ";
-            }
- 
-            if (afterDateField.getValue().length() > 0) {
-                StrDate earliestDate = afterDateField.getValue();
-                criteria += " date >= '" + earliestDate.shortDate() + "'";
-            }
-
-            if (beforeDateField.getValue().length() > 0) {
-                StrDate latestDate = beforeDateField.getValue();
-
-                if (afterDateField.getValue().length() > 0) {
-                    criteria += " AND";
-                }
-
-                criteria += " date <= '" + latestDate.shortDate() + "'";
-            }
-
-            if (recurringIncludeType.getValue().length() > 0) {
-                if (recurringIncludeType.getValue().compare("only") == 0) {
-                    criteria += " AND recurring = 'Y'";
-                }
-                else if (recurringIncludeType.getValue().compare("no") == 0) {
-                    criteria += " AND recurring = 'N'";
-                }
-                else if (recurringIncludeType.getValue().compare("yes") == 0) {
-                }
-                else {
-                    throw pfm_validation_error(
-                                pfm_error::buildMsg(
-                                    "Invalid recurring include type '%s'", 
-                                    recurringIncludeType.getValue().c_str()));
-                }
-            }
-            
-            return criteria;
-        }
-};
-
-class FindTransactionView : public CLIFindView {
-    private:
-        CLITextField criteriaField = CLITextField("WHERE: ");
-
-    public:
-        FindTransactionView() : FindTransactionView("Find transaction (by SQL criteria)") {}
-
-        FindTransactionView(const char * title) : CLIFindView(title) {
-            criteriaField.setLengthLimit(CRITERIA_FIELD_MAX_LEN);
-        }
-
-        void show() override {
-            CLIView::show();
-
-            criteriaField.show();
-        }
-
-        string getCriteria() override {
-            string criteria = criteriaField.getValue();
-
             return criteria;
         }
 };

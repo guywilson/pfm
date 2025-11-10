@@ -64,7 +64,7 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
 
     DBCriteria criteria;
     criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("date", DBCriteria::greater_than_or_equal, after.shortDate());
+    criteria.add("date", DBCriteria::greater_than_or_equal, after);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
 

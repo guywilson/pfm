@@ -116,8 +116,8 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(p
 
     DBCriteria criteria;
     criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("date", DBCriteria::greater_than_or_equal, dateAfter.shortDate());
-    criteria.add("date", DBCriteria::less_than, dateBefore.shortDate());
+    criteria.add("date", DBCriteria::greater_than_or_equal, dateAfter);
+    criteria.add("date", DBCriteria::less_than, dateBefore);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringCharge> result;

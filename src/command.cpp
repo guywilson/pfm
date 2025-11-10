@@ -672,53 +672,36 @@ void Command::listTransactions(uint32_t rowLimit, DBCriteria::sql_order sortDire
 }
 
 void Command::findTransactions() {
-    cout << "How do you want to search for transactions:" << endl;
-    cout << "1) By category" << endl;
-    cout << "2) By payee" << endl;
-    cout << "3) By description" << endl;
-    cout << "4) Between dates" << endl;
-
-    CLITextField optionField = CLITextField("Enter search option: ");
-    optionField.show();
-
-    int option = (int)optionField.getIntegerValue();
-
-    cout << "Option = " << option << endl;
-
-    CLIFindView * findView;
-
-    switch (option) {
-        case 1:
-            findView = new FindTransactionByCategoryView();
-            break;
-
-        case 2:
-            findView = new FindTransactionByPayeeView();
-            break;
-
-        case 3:
-            findView = new FindTransactionByDescriptionView();
-            break;
-
-        case 4:
-            findView = new FindTransactionByDateView();
-            break;
-
-        default:
-            findView = new FindTransactionView();
-            break;
-    }
-
-    findView->show();
+    FindTransactionView view;
+    view.show();
     
-    string criteria = findView->getCriteria();
-
-    delete findView;
+    DBCriteria criteria = view.getCriteria();
     
     findTransactions(criteria);
 }
 
-void Command::findTransactions(const string & criteria) {
+void Command::findTransactions(const string & where) {
+    DBTransactionView tr;
+    DBResult<DBTransactionView> result = tr.findTransactions(where);
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    cacheMgr.clearTransactions();
+    
+    for (int i = 0;i < result.size();i++) {
+        DBTransactionView transaction = result.at(i);
+        cacheMgr.addTransaction(transaction.sequence, transaction);
+    }
+
+    cacheMgr.addFindCriteria(where);
+
+    TransactionListView view;
+    view.addTotal();
+    view.addResults(result);
+    view.show();
+}
+
+void Command::findTransactions(DBCriteria & criteria) {
     DBTransactionView tr;
     DBResult<DBTransactionView> result = tr.findTransactionsForCriteria(criteria);
 
@@ -731,7 +714,7 @@ void Command::findTransactions(const string & criteria) {
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }
 
-    cacheMgr.addFindCriteria(criteria);
+    cacheMgr.addFindCriteria(criteria.getWhereClause());
 
     TransactionListView view;
     view.addTotal();
@@ -1336,7 +1319,14 @@ bool Command::process(const string & command) {
     else if (isCommand("find-transactions") || isCommand("find")) {
         if (hasParameters()) {
             FindTransactionCriteriaBuilder builder(this->parameters);
-            findTransactions(builder.getCriteria());
+
+            if (builder.hasRawSQL()) {
+                findTransactions(builder.getRawSQL());
+            }
+            else {
+                DBCriteria criteria = builder.getCriteria();
+                findTransactions(criteria);
+            }
         }
         else {
             findTransactions();

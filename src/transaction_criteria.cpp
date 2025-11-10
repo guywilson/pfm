@@ -2,6 +2,7 @@
 #include <vector>
 #include <string.h>
 
+#include "db_base.h"
 #include "strdate.h"
 #include "money.h"
 #include "transaction_criteria.h"
@@ -128,176 +129,105 @@ FindTransactionCriteriaBuilder::FindTransactionCriteriaBuilder(vector<string> & 
     parse();
 }
 
-string FindTransactionCriteriaBuilder::getCriteria() {
-    string criteria;
+bool FindTransactionCriteriaBuilder::hasRawSQL() {
+    if (sqlWhereClause.length() > 0) {
+        return true;
+    }
+
+    return false;
+}
+
+DBCriteria FindTransactionCriteriaBuilder::getCriteria() {
+    DBCriteria criteria;
 
     if (betweenTheseDatesList.size() == 1) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
-        criteria += "date > '" + betweenTheseDatesList[0].shortDate() + "'";
+        criteria.add("date", DBCriteria::greater_than, betweenTheseDatesList[0]);
     }
     else if (betweenTheseDatesList.size() >= 2) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
-        criteria += "date >= '" + betweenTheseDatesList[0].shortDate() + "' AND date <= '" + betweenTheseDatesList[1].shortDate() + "'";
+        criteria.add("date", DBCriteria::greater_than_or_equal, betweenTheseDatesList[0]);
+        criteria.add("date", DBCriteria::less_than_or_equal, betweenTheseDatesList[1]);
     }
 
     if (betweenTheseAmountList.size() == 1) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
-        criteria += "amount > " + betweenTheseAmountList[0].rawStringValue();
+        criteria.add("amount", DBCriteria::greater_than, betweenTheseAmountList[0]);
     }
     else if (betweenTheseAmountList.size() >= 2) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
-        criteria += "amount >= " + betweenTheseAmountList[0].rawStringValue() + " AND amount <= " + betweenTheseAmountList[1].rawStringValue();
+        criteria.add("amount", DBCriteria::greater_than_or_equal, betweenTheseAmountList[0]);
+        criteria.add("amount", DBCriteria::less_than_or_equal, betweenTheseAmountList[1]);
     }
 
     if (onTheseDatesList.size() > 0) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
-        bool hadFirstDate = false;
-        criteria += "date in (";
-
         for (StrDate & date : onTheseDatesList) {
-            if (hadFirstDate) {
-                criteria += ", ";
-            }
-
-            criteria += "'" + date.shortDate() + "'";
-            hadFirstDate = true;
+            criteria.addToInClause("date", date);
         }
 
-        criteria += ")";
+        criteria.endInClause_StrDate("date");
     }
 
     if (withTheseAccountsList.size() > 0) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
-        bool hadFirstAccount = false;
-        criteria += "account_code in (";
         for (string & account : withTheseAccountsList) {
-            if (hadFirstAccount) {
-                criteria += ", ";
-            }
-
-            criteria += "'" + account + "'";
-            hadFirstAccount = true;
+            criteria.addToInClause("account", account);
         }
 
-        criteria += ")";
+        criteria.endInClause_string("account");
     }
 
     if (withTheseCategoriesList.size() > 0) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
-        bool hadFirstCategory = false;
-        criteria += "category_code in (";
         for (string & category : withTheseCategoriesList) {
-            if (hadFirstCategory) {
-                criteria += ", ";
-            }
-
-            criteria += "'" + category + "'";
-            hadFirstCategory = true;
+            criteria.addToInClause("category", category);
         }
 
-        criteria += ")";
+        criteria.endInClause_string("category");
     }
 
     if (withThesePayeesList.size() > 0) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
-        bool hadFirstPayee = false;
-        criteria += "payee_code in (";
         for (string & payee : withThesePayeesList) {
-            if (hadFirstPayee) {
-                criteria += ", ";
-            }
-
-            criteria += "'" + payee + "'";
-            hadFirstPayee = true;
+            criteria.addToInClause("payee", payee);
         }
 
-        criteria += ")";
+        criteria.endInClause_string("payee");
     }
 
     if (description.length() > 0) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
         if (description.find_first_of('%') != string::npos || description.find_first_of('_') != string::npos) {
-            criteria += "description LIKE '" + description + "'";
+            criteria.add("description", DBCriteria::like, description);
         }
         else {
-            criteria += "description = '" + description + "'";
+            criteria.add("description", DBCriteria::equal_to, description);
         }
     }
 
     if (reference.length() > 0) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
         if (reference.find_first_of('%') != string::npos || reference.find_first_of('_') != string::npos) {
-            criteria += "reference LIKE '" + reference + "'";
+            criteria.add("reference", DBCriteria::like, reference);
         }
         else {
-            criteria += "reference = '" + reference + "'";
+            criteria.add("reference", DBCriteria::equal_to, reference);
         }
     }
 
     if (debitOrCredit.length() > 0) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
-        criteria += "type = '" + debitOrCredit + "'";
+        criteria.add("type", DBCriteria::equal_to, debitOrCredit);
     }
 
     if (lessThanThisAmount > 0.0) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
-        criteria += "amount < " + lessThanThisAmount.rawStringValue();
+        criteria.add("amount", DBCriteria::less_than, lessThanThisAmount);
     }
 
     if (recurringOrNonRecurring.length() > 0) {
-        if (criteria.length() > 0) {
-            criteria += " AND ";
-        }
-
         if (recurringOrNonRecurring.compare("r") == 0) {
-            criteria += "recurring = 'Y'";
+            criteria.add("recurring", true);
         }
         else if (recurringOrNonRecurring.compare("n") == 0) {
-            criteria += "recurring = 'N'";
+            criteria.add("recurring", false);
         }
-    }
-
-    if (sqlWhereClause.length() > 0) {
-        criteria = sqlWhereClause;
     }
 
     return criteria;
+}
+
+string FindTransactionCriteriaBuilder::getRawSQL() {
+    return sqlWhereClause;
 }
 
 string AddTransactionCriteriaBuilder::getParameter(int index) const {
