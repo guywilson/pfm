@@ -269,26 +269,26 @@ class DBTransaction : public DBPayment {
         void beforeUpdate() override;
         void afterRemove() override;
 
-        int findLatestByRecurringChargeID(pfm_id_t chargeId);
+        int findLatestByRecurringChargeID(pfm_id_t & chargeId);
         int createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate);
 
-        void deleteByRecurringChargeId(pfm_id_t recurringChargeId);
-        void deleteAllRecurringTransactionsForAccount(pfm_id_t accountId);
+        void deleteByRecurringChargeId(pfm_id_t & recurringChargeId);
+        void deleteAllRecurringTransactionsForAccount(pfm_id_t & accountId);
 
-        void reconcileAllForAccountIDBeforeDate(pfm_id_t accountId, StrDate & referenceDate);
+        void reconcileAllForAccountIDBeforeDate(pfm_id_t & accountId, StrDate & referenceDate);
 
         static void createFromRecurringChargeAndDate(DBRecurringCharge & src, StrDate & transactionDate);
 
         static void createTransferPairFromSource(DBTransaction & source, DBAccount & accountTo);
 
-        DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId);
-        DBResult<DBTransaction> retrieveByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
-        DBResult<DBTransaction> retrieveReconciledByAccountID(pfm_id_t accountId);
-        DBResult<DBTransaction> retrieveByRecurringChargeID(pfm_id_t recurringChargeId);
-        DBResult<DBTransaction> retrieveByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransaction> retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransaction> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransaction> findTransactionsForAccountID(pfm_id_t accountId, string & criteria);
+        DBResult<DBTransaction> retrieveByAccountID(pfm_id_t & accountId);
+        DBResult<DBTransaction> retrieveByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
+        DBResult<DBTransaction> retrieveReconciledByAccountID(pfm_id_t & accountId);
+        DBResult<DBTransaction> retrieveByRecurringChargeID(pfm_id_t & recurringChargeId);
+        DBResult<DBTransaction> retrieveByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransaction> retrieveReconciledByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransaction> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransaction> findTransactionsForAccountID(pfm_id_t & accountId, string & criteria);
 };
 
 #endif

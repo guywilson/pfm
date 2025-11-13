@@ -139,8 +139,8 @@ class DBTransferTransactionRecord : public DBEntity {
             }
         }
 
-        int retrieveByTransactionToId(pfm_id_t transactionToId);
-        int retrieveByTransactionFromId(pfm_id_t transactionFromId);
+        int retrieveByTransactionToId(pfm_id_t & transactionToId);
+        int retrieveByTransactionFromId(pfm_id_t & transactionFromId);
 
         static DBTransferTransactionRecord createFromTransactions(DBTransaction & transactionTo, DBTransaction & transactionFrom);
 };

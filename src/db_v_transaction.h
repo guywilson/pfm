@@ -122,16 +122,16 @@ class DBTransactionView : public DBTransaction {
             return "DBTransactionView";
         }
 
-        DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId);
-        DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
-        DBResult<DBTransactionView> retrieveReconciledByAccountID(pfm_id_t accountId);
-        DBResult<DBTransactionView> retrieveNonRecurringByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
-        DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransactionView> retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t & accountId);
+        DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
+        DBResult<DBTransactionView> retrieveReconciledByAccountID(pfm_id_t & accountId);
+        DBResult<DBTransactionView> retrieveNonRecurringByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
+        DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
+        DBResult<DBTransactionView> retrieveReconciledByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> findTransactions(const string & sql);
         DBResult<DBTransactionView> findTransactionsForCriteria(DBCriteria & criteria);
-        DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t accountId, DBCriteria & criteria);
+        DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t & accountId, DBCriteria & criteria);
         DBResult<DBTransactionView> reportByCategory();
         DBResult<DBTransactionView> reportByPayee();
 };

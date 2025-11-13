@@ -529,7 +529,7 @@ class DBEntity {
 
         void save();
         void retrieve();
-        void retrieve(pfm_id_t id);
+        void retrieve(pfm_id_t & id);
 
         void clear() {
             this->id.clear();

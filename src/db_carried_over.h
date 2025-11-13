@@ -156,11 +156,11 @@ class DBCarriedOver : public DBEntity {
             }
         }
 
-        int retrieveLatestByAccountId(pfm_id_t accountId);
-        DBResult<DBCarriedOver> retrieveByAccountId(pfm_id_t accountId);
-        DBResult<DBCarriedOver> retrieveByAccountIdAfterDate(pfm_id_t accountId, StrDate & after);
+        int retrieveLatestByAccountId(pfm_id_t & accountId);
+        DBResult<DBCarriedOver> retrieveByAccountId(pfm_id_t & accountId);
+        DBResult<DBCarriedOver> retrieveByAccountIdAfterDate(pfm_id_t & accountId, StrDate & after);
 
-        static DBCarriedOver createForPeriod(pfm_id_t accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate);
+        static DBCarriedOver createForPeriod(pfm_id_t & accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate);
 };
 
 #endif

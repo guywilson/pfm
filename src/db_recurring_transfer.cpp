@@ -14,7 +14,7 @@
 
 using namespace std;
 
-int DBRecurringTransfer::retrieveByRecurringChargeId(pfm_id_t recurringChargeId) {
+int DBRecurringTransfer::retrieveByRecurringChargeId(pfm_id_t & recurringChargeId) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringTransfer::retrieveByRecurringChargeId");
 

@@ -16,7 +16,7 @@
 
 using namespace std;
 
-int DBTransferTransactionRecord::retrieveByTransactionToId(pfm_id_t transactionToId) {
+int DBTransferTransactionRecord::retrieveByTransactionToId(pfm_id_t & transactionToId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransferTransactionRecord::retrieveByTransactionToId()");
 
@@ -37,7 +37,7 @@ int DBTransferTransactionRecord::retrieveByTransactionToId(pfm_id_t transactionT
     return rowsRetrievedCount;
 }
 
-int DBTransferTransactionRecord::retrieveByTransactionFromId(pfm_id_t transactionFromId) {
+int DBTransferTransactionRecord::retrieveByTransactionFromId(pfm_id_t & transactionFromId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransferTransactionRecord::retrieveByTransactionFromId()");
 

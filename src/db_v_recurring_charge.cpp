@@ -13,7 +13,7 @@
 
 using namespace std;
 
-DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_id_t accountId) {
+DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringChargeView::retrieveByAccountID()");
 
@@ -30,7 +30,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_i
     return result;
 }
 
-DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetweenDates(pfm_id_t accountId, StrDate & dateAfter, StrDate & dateBefore) {
+DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetweenDates(pfm_id_t & accountId, StrDate & dateAfter, StrDate & dateBefore) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringChargeView::retrieveByAccountIDBetweenDates()");
 

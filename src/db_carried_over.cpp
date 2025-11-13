@@ -15,7 +15,7 @@
 
 using namespace std;
 
-int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
+int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBCarriedOver::retrieveLatestByAccountId()");
 
@@ -39,7 +39,7 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
     return rowsRetrievedCount;
 }
 
-DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
+DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBCarriedOver::retrieveByAccountId()");
 
@@ -58,7 +58,7 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
     return result;
 }
 
-DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t accountId, StrDate & after) {
+DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t & accountId, StrDate & after) {
     Logger & log = Logger::getInstance();
     log.entry("DBCarriedOver::retrieveByAccountIdAfterDate()");
 
@@ -77,7 +77,7 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
     return result;
 }
 
-DBCarriedOver DBCarriedOver::createForPeriod(pfm_id_t accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate) {
+DBCarriedOver DBCarriedOver::createForPeriod(pfm_id_t & accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBCarriedOver::createForPeriod()");
 

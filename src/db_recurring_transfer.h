@@ -131,7 +131,7 @@ class DBRecurringTransfer : public DBEntity {
             }
         }
 
-        int retrieveByRecurringChargeId(pfm_id_t recurringChargeId);
+        int retrieveByRecurringChargeId(pfm_id_t & recurringChargeId);
 };
 
 #endif

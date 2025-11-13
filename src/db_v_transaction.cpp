@@ -14,7 +14,7 @@
 
 using namespace std;
 
-DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t accountId) {
+DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveByAccountID()");
 
@@ -31,7 +31,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t acco
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit) {
+DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveByAccountID()");
 
@@ -54,7 +54,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t acco
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm_id_t accountId) {
+DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveReconciledByAccountID()");
 
@@ -72,7 +72,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, int rowLimit) {
+DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveNonRecurringByAccountID()");
 
@@ -119,7 +119,7 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForCriteria(DBCri
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_id_t accountId, DBCriteria & criteria) {
+DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_id_t & accountId, DBCriteria & criteria) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::findTransactionsForAccountID()");
 
@@ -137,7 +137,7 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_id_t accountId, DBCriteria::sql_order dateSortDirection, StrDate & firstDate, StrDate & secondDate) {
+DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, StrDate & firstDate, StrDate & secondDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveByAccountIDForPeriod()");
 
@@ -158,7 +158,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveReconciledByAccountIDForPeriod()");
 
@@ -179,7 +179,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForP
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDForPeriod(pfm_id_t accountId, StrDate & firstDate, StrDate & secondDate) {
+DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveNonRecurringByAccountIDForPeriod()");
 
