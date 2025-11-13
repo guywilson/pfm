@@ -21,10 +21,17 @@ class DBCurrency : public DBEntity {
         const char * sqlUpdate = 
                         "UPDATE currency SET code = '%s', name = '%s', symbol = '%s', updated = '%s' WHERE id = %s;";
 
+    protected:
+        struct Columns {
+            static constexpr const char * code = "code";
+            static constexpr const char * name = "name";
+            static constexpr const char * symbol = "symbol";
+        };
+
     public:
-        string                  code;
-        string                  name;
-        string                  symbol;
+        string code;
+        string name;
+        string symbol;
 
         DBCurrency() : DBEntity() {
             clear();
@@ -57,13 +64,13 @@ class DBCurrency : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "code") {
+            if (column.getName() == Columns::code) {
                 code = column.getValue();
             }
-            else if (column.getName() == "name") {
+            else if (column.getName() == Columns::name) {
                 name = column.getValue();
             }
-            else if (column.getName() == "symbol") {
+            else if (column.getName() == Columns::symbol) {
                 symbol = column.getValue();
             }
         }

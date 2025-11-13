@@ -20,8 +20,8 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t accountId) {
     log.entry("DBCarriedOver::retrieveLatestByAccountId()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.addOrderBy("date", DBCriteria::descending);
+    criteria.add(Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.addOrderBy(Columns::date, DBCriteria::descending);
     criteria.setRowLimit(1);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
@@ -44,8 +44,8 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t accountId) {
     log.entry("DBCarriedOver::retrieveByAccountId()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.addOrderBy("date", DBCriteria::descending);
+    criteria.add(Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.addOrderBy(Columns::date, DBCriteria::descending);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
 
@@ -63,8 +63,8 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t acc
     log.entry("DBCarriedOver::retrieveByAccountIdAfterDate()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("date", DBCriteria::greater_than_or_equal, after);
+    criteria.add(Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(Columns::date, DBCriteria::greater_than_or_equal, after);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
 

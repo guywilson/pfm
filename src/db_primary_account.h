@@ -30,8 +30,13 @@ class DBPrimaryAccount : public DBEntity {
                         "updated = '%s' " \
                         "WHERE id = %s;";
 
+    protected:
+        struct Columns {
+            static constexpr const char * code = "account_code";
+        };
+
     public:
-        string                  code;
+        string code;
 
         DBPrimaryAccount() : DBEntity() {
             clear();
@@ -64,7 +69,7 @@ class DBPrimaryAccount : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "account_code") {
+            if (column.getName() == Columns::code) {
                 code = column.getValue();
             }
         }

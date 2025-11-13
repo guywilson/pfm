@@ -21,6 +21,12 @@ using namespace std;
 #define __INCL_RECURRING_CHARGE_VIEW
 
 class DBRecurringChargeView : public DBRecurringCharge {
+    protected:
+        struct Columns {
+            static constexpr const char * payeeCode = "payee_code";
+            static constexpr const char * categoryCode = "category_code";
+        };
+
     public:
         string payeeCode;
         string categoryCode;
@@ -57,10 +63,10 @@ class DBRecurringChargeView : public DBRecurringCharge {
         void assignColumn(DBColumn & column) override {
             DBRecurringCharge::assignColumn(column);
             
-            if (column.getName() == "payee_code") {
+            if (column.getName() == Columns::payeeCode) {
                 payeeCode = column.getValue();
             }
-            else if (column.getName() == "category_code") {
+            else if (column.getName() == Columns::categoryCode) {
                 categoryCode = column.getValue();
             }
         }

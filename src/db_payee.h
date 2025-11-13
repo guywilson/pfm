@@ -22,9 +22,15 @@ class DBPayee : public DBEntity {
         const char * sqlUpdate = 
                         "UPDATE payee SET code = '%s', name = '%s', updated = '%s' WHERE id = %s;";
 
+    protected:
+        struct Columns {
+            static constexpr const char * name = "name";
+            static constexpr const char * code = "code";
+        };
+
     public:
-        string                  name;
-        string                  code;
+        string name;
+        string code;
 
         DBPayee() : DBEntity() {
             clear();
@@ -68,10 +74,10 @@ class DBPayee : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "code") {
+            if (column.getName() == Columns::code) {
                 code = column.getValue();
             }
-            else if (column.getName() == "name") {
+            else if (column.getName() == Columns::name) {
                 name = column.getValue();
             }
         }

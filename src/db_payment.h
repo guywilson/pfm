@@ -23,6 +23,15 @@ using namespace std;
 
 class DBPayment : public DBEntity {
     protected:
+        struct Columns {
+            static constexpr const char * accountId = "account_id";
+            static constexpr const char * categoryId = "category_id";
+            static constexpr const char * payeeId = "payee_id";
+            static constexpr const char * date = "date";
+            static constexpr const char * description = "description";
+            static constexpr const char * amount = "amount";
+        };
+
         string getAccountCode() {
             DBAccount account;
             account.retrieve(this->accountId);
@@ -138,22 +147,22 @@ class DBPayment : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "account_id") {
+            if (column.getName() == Columns::accountId) {
                 accountId = column.getIDValue();
             }
-            else if (column.getName() == "category_id") {
+            else if (column.getName() == Columns::categoryId) {
                 categoryId = column.getIDValue();
             }
-            else if (column.getName() == "payee_id") {
+            else if (column.getName() == Columns::payeeId) {
                 payeeId = column.getIDValue();
             }
-            else if (column.getName() == "date") {
+            else if (column.getName() == Columns::date) {
                 date = column.getValue();
             }
-            else if (column.getName() == "description") {
+            else if (column.getName() == Columns::description) {
                 description = column.getValue();
             }
-            else if (column.getName() == "amount") {
+            else if (column.getName() == Columns::amount) {
                 amount = column.doubleValue();
             }
         }

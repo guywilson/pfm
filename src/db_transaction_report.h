@@ -33,9 +33,15 @@ class DBTransactionReport : public DBEntity {
                         "updated = '%s' " \
                         "WHERE id = %s;";
 
+    protected:
+        struct Columns {
+            static constexpr const char * description = "description";
+            static constexpr const char * sqlWhereClause = "sql_where_clause";
+        };
+
     public:
-        string                  description;
-        string                  sqlWhereClause;
+        string description;
+        string sqlWhereClause;
 
         DBTransactionReport() : DBEntity() {
             clear();
@@ -121,10 +127,10 @@ class DBTransactionReport : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "description") {
+            if (column.getName() == Columns::description) {
                 description = column.getValue();
             }
-            else if (column.getName() == "sql_where_clause") {
+            else if (column.getName() == Columns::sqlWhereClause) {
                 sqlWhereClause = column.getValue();
             }
         }

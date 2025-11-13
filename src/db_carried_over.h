@@ -38,11 +38,19 @@ class DBCarriedOver : public DBEntity {
                         "updated = '%s' " \
                         "WHERE id = %s;";
 
+    protected:
+        struct Columns {
+            static constexpr const char * accountId = "account_id";
+            static constexpr const char * date = "date";
+            static constexpr const char * description = "description";
+            static constexpr const char * balance = "balance";
+        };
+
     public:
-        pfm_id_t                accountId;
-        StrDate                 date;
-        string                  description;
-        Money                   balance;
+        pfm_id_t accountId;
+        StrDate date;
+        string description;
+        Money balance;
 
         DBCarriedOver() : DBEntity() {
             clear();
@@ -134,16 +142,16 @@ class DBCarriedOver : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "account_id") {
+            if (column.getName() == Columns::accountId) {
                 accountId = column.getIDValue();
             }
-            else if (column.getName() == "date") {
+            else if (column.getName() == Columns::date) {
                 date = column.getValue();
             }
-            else if (column.getName() == "description") {
+            else if (column.getName() == Columns::description) {
                 description = column.getValue();
             }
-            else if (column.getName() == "balance") {
+            else if (column.getName() == Columns::balance) {
                 balance = column.doubleValue();
             }
         }

@@ -18,8 +18,8 @@ void DBConfig::retrieveByKey(const string & key) {
     log.entry("DBConfig::retrieveByKey()");
 
     DBCriteria criteria;
-    criteria.add("key", DBCriteria::equal_to, key);
-    criteria.add("is_visible", true);
+    criteria.add(Columns::key, DBCriteria::equal_to, key);
+    criteria.add(Columns::isVisible, true);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBConfig> result;
@@ -43,7 +43,7 @@ DBResult<DBConfig> DBConfig::retrieveAllVisible() {
     log.entry("DBConfig>::retrieveAllVisible()");
 
     DBCriteria criteria;
-    criteria.add("is_visible", true);
+    criteria.add(Columns::isVisible, true);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBConfig> result;

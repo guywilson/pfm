@@ -16,53 +16,40 @@ using namespace std;
 #ifndef __INCL_CARRIED_OVER_VIEW
 #define __INCL_CARRIED_OVER_VIEW
 
-class DBCarriedOverView : public DBEntity {
-    public:
-        string                  accountCode;
-        StrDate                 date;
-        string                  description;
-        Money                   balance;
+class DBCarriedOverView : public DBCarriedOver {
+    protected:
+        struct Columns {
+            static constexpr const char * accountCode = "account_code";
+        };
 
-        DBCarriedOverView() : DBEntity() {
+    public:
+        string accountCode;
+
+        DBCarriedOverView() : DBCarriedOver() {
             clear();
         }
 
-        DBCarriedOverView(const DBCarriedOverView & src) : DBEntity(src) {
+        DBCarriedOverView(const DBCarriedOverView & src) : DBCarriedOver(src) {
             set(src);
         }
 
         void clear() {
-            DBEntity::clear();
+            DBCarriedOver::clear();
 
             this->accountCode = "";
-            this->date.clear();
-            this->description = "";
-            this->balance = 0.0;
         }
 
         void set(const DBCarriedOverView & src) {
-            DBEntity::set(src);
+            DBCarriedOver::set(src);
 
             this->accountCode = src.accountCode;
-            this->date = src.date;
-            this->description = src.description;
-            this->balance = src.balance;
         }
 
         void assignColumn(DBColumn & column) override {
-            DBEntity::assignColumn(column);
+            DBCarriedOver::assignColumn(column);
             
             if (column.getName() == "account_code") {
                 accountCode = column.getValue();
-            }
-            else if (column.getName() == "date") {
-                date = column.getValue();
-            }
-            else if (column.getName() == "description") {
-                description = column.getValue();
-            }
-            else if (column.getName() == "balance") {
-                balance = column.doubleValue();
             }
         }
 

@@ -18,7 +18,7 @@ void DBCategory::retrieveByCode(string & code) {
     log.entry("DBCategory::retrieveByCode()");
 
     DBCriteria criteria;
-    criteria.add("code", DBCriteria::equal_to, code);
+    criteria.add(Columns::code, DBCriteria::equal_to, code);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBCategory> result;

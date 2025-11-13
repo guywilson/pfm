@@ -441,6 +441,12 @@ class DBEntity {
 
         string delimitSingleQuotes(string & s);
 
+        struct Columns {
+            static constexpr const char * id = "id";
+            static constexpr const char * createdDate = "created";
+            static constexpr const char * updatedDate = "updated";
+        };
+        
     public:
         pfm_id_t id;
 
@@ -476,9 +482,9 @@ class DBEntity {
             return statement;
         }
 
-        virtual const string getSelectByIDStatement(pfm_id_t key) {
+        virtual const string getSelectByIDStatement(pfm_id_t & key) {
             DBCriteria criteria;
-            criteria.add("id", DBCriteria::equal_to, key);
+            criteria.add(Columns::id, DBCriteria::equal_to, key);
 
             string statement = getSelectStatement() + criteria.getStatementCriteria();
 
@@ -490,9 +496,9 @@ class DBEntity {
             return statement;
         }
 
-        virtual const string getDeleteByIDStatement(pfm_id_t key) {
+        virtual const string getDeleteByIDStatement(pfm_id_t & key) {
             DBCriteria criteria;
-            criteria.add("id", DBCriteria::equal_to, key);
+            criteria.add(Columns::id, DBCriteria::equal_to, key);
 
             string statement = "DELETE " + getFromClause() + criteria.getStatementCriteria();
 
@@ -540,13 +546,13 @@ class DBEntity {
         }
 
         virtual void assignColumn(DBColumn & column) {
-            if (column.getName() == "id") {
+            if (column.getName() == Columns::id) {
                 id = column.getIDValue();
             }
-            else if (column.getName() == "created") {
+            else if (column.getName() == Columns::createdDate) {
                 createdDate = column.getValue();
             }
-            else if (column.getName() == "updated") {
+            else if (column.getName() == Columns::updatedDate) {
                 updatedDate = column.getValue();
             }
         }

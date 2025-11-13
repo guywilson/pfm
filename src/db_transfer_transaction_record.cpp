@@ -21,7 +21,7 @@ int DBTransferTransactionRecord::retrieveByTransactionToId(pfm_id_t transactionT
     log.entry("DBTransferTransactionRecord::retrieveByTransactionToId()");
 
     DBCriteria criteria;
-    criteria.add("transaction_to_id", DBCriteria::equal_to, transactionToId);
+    criteria.add(Columns::transactionToId, DBCriteria::equal_to, transactionToId);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransferTransactionRecord> result;
@@ -42,7 +42,7 @@ int DBTransferTransactionRecord::retrieveByTransactionFromId(pfm_id_t transactio
     log.entry("DBTransferTransactionRecord::retrieveByTransactionFromId()");
 
     DBCriteria criteria;
-    criteria.add("transaction_from_id", DBCriteria::equal_to, transactionFromId);
+    criteria.add(Columns::transactionFromId, DBCriteria::equal_to, transactionFromId);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransferTransactionRecord> result;

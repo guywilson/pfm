@@ -22,9 +22,15 @@ class DBCategory : public DBEntity {
         const char * sqlUpdate = 
                         "UPDATE category SET code = '%s', description = '%s', updated = '%s' WHERE id = %s;";
 
+    protected:
+        struct Columns {
+            static constexpr const char * description = "description";
+            static constexpr const char * code = "code";
+        };
+
     public:
-        string                  description;
-        string                  code;
+        string description;
+        string code;
 
         DBCategory() : DBEntity() {
             clear();
@@ -68,10 +74,10 @@ class DBCategory : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "code") {
+            if (column.getName() == Columns::code) {
                 code = column.getValue();
             }
-            else if (column.getName() == "description") {
+            else if (column.getName() == Columns::description) {
                 description = column.getValue();
             }
         }

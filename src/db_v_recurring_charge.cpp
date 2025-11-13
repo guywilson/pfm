@@ -18,7 +18,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_i
     log.entry("DBRecurringChargeView::retrieveByAccountID()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringChargeView> result;
@@ -35,9 +35,9 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetwee
     log.entry("DBRecurringChargeView::retrieveByAccountIDBetweenDates()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("date", DBCriteria::greater_than_or_equal, dateAfter);
-    criteria.add("date", DBCriteria::less_than, dateBefore);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, dateAfter);
+    criteria.add(DBPayment::Columns::date, DBCriteria::less_than, dateBefore);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringChargeView> result;

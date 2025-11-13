@@ -21,12 +21,21 @@ class DBConfig : public DBEntity {
         const char * sqlUpdate = 
                         "UPDATE config SET key = '%s', value = '%s', description = '%s', updated = '%s' WHERE id = %s;";
 
+    protected:
+        struct Columns {
+            static constexpr const char * key = "key";
+            static constexpr const char * value = "value";
+            static constexpr const char * description = "description";
+            static constexpr const char * isReadOnly = "is_read_only";
+            static constexpr const char * isVisible = "is_visible";
+        };
+
     public:
-        string                  key;
-        string                  value;
-        string                  description;
-        bool                    isReadOnly;
-        bool                    isVisible;
+        string key;
+        string value;
+        string description;
+        bool isReadOnly;
+        bool isVisible;
 
         DBConfig() : DBEntity() {
             clear();
@@ -63,19 +72,19 @@ class DBConfig : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "key") {
+            if (column.getName() == Columns::key) {
                 key = column.getValue();
             }
-            else if (column.getName() == "value") {
+            else if (column.getName() == Columns::value) {
                 value = column.getValue();
             }
-            else if (column.getName() == "description") {
+            else if (column.getName() == Columns::description) {
                 description = column.getValue();
             }
-            else if (column.getName() == "is_read_only") {
+            else if (column.getName() == Columns::isReadOnly) {
                 isReadOnly = column.getBoolValue();
             }
-            else if (column.getName() == "is_visible") {
+            else if (column.getName() == Columns::isVisible) {
                 isVisible = column.getBoolValue();
             }
         }

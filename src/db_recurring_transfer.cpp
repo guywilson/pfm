@@ -19,7 +19,7 @@ int DBRecurringTransfer::retrieveByRecurringChargeId(pfm_id_t recurringChargeId)
     log.entry("DBRecurringTransfer::retrieveByRecurringChargeId");
 
     DBCriteria criteria;
-    criteria.add("recurring_charge_id", DBCriteria::equal_to, recurringChargeId);
+    criteria.add(Columns::recurringChargeId, DBCriteria::equal_to, recurringChargeId);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringTransfer> result;

@@ -33,6 +33,12 @@ class DBRecurringTransfer : public DBEntity {
                         "updated = '%s' " \
                         "WHERE id = %s;";
 
+    protected:
+        struct Columns {
+            static constexpr const char * recurringChargeId = "recurring_charge_id";
+            static constexpr const char * accountToId = "account_to_id";
+        };
+
     public:
         DBAccount accountTo;
         
@@ -117,10 +123,10 @@ class DBRecurringTransfer : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "recurring_charge_id") {
+            if (column.getName() == Columns::recurringChargeId) {
                 recurringChargeId = column.getIDValue();
             }
-            else if (column.getName() == "account_to_id") {
+            else if (column.getName() == Columns::accountToId) {
                 accountToId = column.getIDValue();
             }
         }

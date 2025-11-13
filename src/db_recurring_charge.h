@@ -195,6 +195,13 @@ class DBRecurringCharge : public DBPayment {
         // Next *scheduled* (nominal) date, without weekend adjustment.
         StrDate getNextScheduledDate();
 
+    protected:
+        struct Columns {
+            static constexpr const char * lastPaymentDate = "last_payment_date";
+            static constexpr const char * frequency = "frequency";
+            static constexpr const char * endDate = "end_date";
+        };
+
     public:
         DBRecurringTransfer transfer;
 
@@ -280,13 +287,13 @@ class DBRecurringCharge : public DBPayment {
         void assignColumn(DBColumn & column) override {
             DBPayment::assignColumn(column);
             
-            if (column.getName() == "end_date") {
+            if (column.getName() == Columns::endDate) {
                 endDate = column.getValue();
             }
-            else if (column.getName() == "frequency") {
+            else if (column.getName() == Columns::frequency) {
                 frequency = Frequency::parse(column.getValue());
             }
-            else if (column.getName() == "last_payment_date") {
+            else if (column.getName() == Columns::lastPaymentDate) {
                 lastPaymentDate = column.getValue();
             }
         }

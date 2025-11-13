@@ -34,6 +34,17 @@ class DBTransactionView : public DBTransaction {
                         "AND type = 'DB' " \
                         "GROUP BY payee;";
 
+    protected:
+        struct Columns {
+            static constexpr const char * account = "account";
+            static constexpr const char * category = "category";
+            static constexpr const char * payee = "payee";
+            static constexpr const char * type = "type";
+            static constexpr const char * recurring = "recurring";
+            static constexpr const char * isReconciled = "reconciled";
+            static constexpr const char * total = "total";
+        };
+
     public:
         string account;
         string payee;
@@ -76,25 +87,25 @@ class DBTransactionView : public DBTransaction {
         void assignColumn(DBColumn & column) override {
             DBTransaction::assignColumn(column);
             
-            if (column.getName() == "payee") {
+            if (column.getName() == Columns::payee) {
                 payee = column.getValue();
             }
-            else if (column.getName() == "category") {
+            else if (column.getName() == Columns::category) {
                 category = column.getValue();
             }
-            else if (column.getName() == "account") {
+            else if (column.getName() == Columns::account) {
                 account = column.getValue();
             }
-            else if (column.getName() == "type") {
-                isCredit = getIsCredit(column.getValue());
-            }
-            else if (column.getName() == "reconciled") {
-                isReconciled = column.getBoolValue();
-            }
-            else if (column.getName() == "recurring") {
+            else if (column.getName() == Columns::recurring) {
                 isRecurring = column.getBoolValue();
             }
-            else if (column.getName() == "total") {
+            else if (column.getName() == Columns::type) {
+                type = column.getValue();
+            }
+            else if (column.getName() == Columns::isReconciled) {
+                isReconciled = column.getBoolValue();
+            }
+            else if (column.getName() == Columns::total) {
                 total = column.doubleValue();
             }
         }

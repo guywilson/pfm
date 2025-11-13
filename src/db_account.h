@@ -41,6 +41,14 @@ class DBAccount : public DBEntity {
         void createRecurringTransactions();
         void createCarriedOverLogs();
 
+    protected:
+        struct Columns {
+            static constexpr const char * name = "name";
+            static constexpr const char * code = "code";
+            static constexpr const char * openingDate = "opening_date";
+            static constexpr const char * openingBalance = "opening_balance";
+        };
+
     public:
         string                  name;
         string                  code;
@@ -90,16 +98,16 @@ class DBAccount : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "name") {
+            if (column.getName() == Columns::name) {
                 name = column.getValue();
             }
-            else if (column.getName() == "code") {
+            else if (column.getName() == Columns::code) {
                 code = column.getValue();
             }
-            else if (column.getName() == "opening_date") {
+            else if (column.getName() == Columns::openingDate) {
                 openingDate = column.getValue();
             }
-            else if (column.getName() == "opening_balance") {
+            else if (column.getName() == Columns::openingBalance) {
                 openingBalance = column.doubleValue();
             }
         }

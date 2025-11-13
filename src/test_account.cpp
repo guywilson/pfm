@@ -205,7 +205,7 @@ void testAccount() {
     trTest.categoryId = getCategoryId("LUNCH");
     trTest.date = "2024-03-24";
     trTest.description = "Lunch";
-    trTest.isCredit = false;
+    trTest.type = TYPE_DEBIT;
     trTest.isReconciled = false;
     trTest.payeeId = getPayeeId("WASAB");
     trTest.recurringChargeId.clear();
@@ -262,7 +262,7 @@ void testAccount() {
     /*
     ** Update the transaction from debit to credit...
     */
-    trTest.isCredit = true;
+    trTest.type = TYPE_CREDIT;
     trTest.save();
 
     DBResult<DBCarriedOver> coResultAfterUpdate2 = co.retrieveByAccountId(accountId);

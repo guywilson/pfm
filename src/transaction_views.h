@@ -43,7 +43,7 @@ class AddTransactionView : public CLIView {
 
         AddTransactionView(const char * title) : CLIView(title) {
             creditDebitField.setLengthLimit(2);
-            creditDebitField.setDefaultValue("DB");
+            creditDebitField.setDefaultValue(TYPE_DEBIT);
 
             isReconciledField.setLengthLimit(1);
             isReconciledField.setDefaultValue("N");
@@ -78,8 +78,7 @@ class AddTransactionView : public CLIView {
             transaction.description = descriptionField.getValue();
             transaction.reference = referenceField.getValue();
 
-            string creditDebit = creditDebitField.getValue();
-            transaction.isCredit = transaction.getIsCredit(creditDebit);
+            transaction.type = creditDebitField.getValue();
             transaction.amount = amountField.getDoubleValue();
             transaction.isReconciled = strtobool(isReconciledField.getValue().c_str());
 
@@ -194,7 +193,7 @@ class TransactionListView : public CLIListView {
                 row.addCellValue(transaction.reference);
                 row.addCellValue(transaction.category);
                 row.addCellValue(transaction.payee);
-                row.addCellValue(transaction.getCreditDebitValue());
+                row.addCellValue(transaction.type);
                 row.addCellValue(transaction.amount);
                 row.addCellValue(transaction.getIsReconciledValue());
 
@@ -405,10 +404,10 @@ class UpdateTransactionView : public CLIView {
         CLICurrencyField amountField;
 
         bool decodeCreditDebit(const char * credit_debit) {
-            if (strncmp(credit_debit, "CR", 2) == 0) {
+            if (strncmp(credit_debit, TYPE_CREDIT, 2) == 0) {
                 return true;
             }
-            else if (strncmp(credit_debit, "DB", 2) == 0) {
+            else if (strncmp(credit_debit, TYPE_DEBIT, 2) == 0) {
                 return false;
             }
             else {
@@ -450,10 +449,9 @@ class UpdateTransactionView : public CLIView {
             referenceField.setLabel(szPrompt);
             referenceField.setDefaultValue(transaction.reference);
 
-            string creditDebit = transaction.getCreditDebitValue();
-            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Credit/debit ['%s']: ", creditDebit.c_str());
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Credit/debit ['%s']: ", transaction.type.c_str());
             creditDebitField.setLabel(szPrompt);
-            creditDebitField.setDefaultValue(creditDebit);
+            creditDebitField.setDefaultValue(transaction.type);
             creditDebitField.setLengthLimit(2);
 
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Amount [%s]: ", transaction.amount.rawStringValue().c_str());
@@ -489,8 +487,7 @@ class UpdateTransactionView : public CLIView {
             transaction.date = dateField.getValue();
             transaction.description = descriptionField.getValue();
 
-            string creditDebit = creditDebitField.getValue();
-            transaction.isCredit = decodeCreditDebit(creditDebit.c_str());
+            transaction.type = creditDebitField.getValue();
             transaction.amount = amountField.getValue();
 
             return transaction;

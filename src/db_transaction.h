@@ -21,6 +21,9 @@ using namespace std;
 #ifndef __INCL_TRANSACTION
 #define __INCL_TRANSACTION
 
+#define TYPE_CREDIT         "CR"
+#define TYPE_DEBIT          "DB"
+
 class DBTransaction : public DBPayment {
     private:
         const char * sqlInsert = 
@@ -62,10 +65,18 @@ class DBTransaction : public DBPayment {
                         "AND date <= '%s'" \
                         "AND is_reconciled = 'N';";
 
+    protected:
+        struct Columns {
+            static constexpr const char * recurringChargeId = "recurring_charge_id";
+            static constexpr const char * reference = "reference";
+            static constexpr const char * type = "credit_debit";
+            static constexpr const char * isReconciled = "is_reconciled";
+        };
+
     public:
         pfm_id_t recurringChargeId;
         string reference;
-        bool isCredit;
+        string type;
         bool isReconciled;
 
         DBTransaction() : DBPayment() {
@@ -84,7 +95,7 @@ class DBTransaction : public DBPayment {
                     "\"" + date.shortDate() + "\"," +
                     "\"" + description + "\"," +
                     "\"" + reference + "\"," +
-                    "\"" + getCreditDebitValue() + "\"," +
+                    "\"" + type + "\"," +
                     "\"" + (isReconciled ? "Y" : "N") + "\"," +
                     "" + amount.rawStringValue() + "\n";
 
@@ -96,7 +107,7 @@ class DBTransaction : public DBPayment {
 
             this->recurringChargeId.clear();
             this->reference = "";
-            this->isCredit = false;
+            this->type = TYPE_DEBIT;
             this->isReconciled = false;
         }
 
@@ -105,7 +116,7 @@ class DBTransaction : public DBPayment {
 
             this->recurringChargeId = src.recurringChargeId;
             this->reference = src.reference;
-            this->isCredit = src.isCredit;
+            this->type = src.type;
             this->isReconciled = src.isReconciled;
         }
 
@@ -113,16 +124,16 @@ class DBTransaction : public DBPayment {
             DBPayment::set(record);
 
             this->reference = record.get("reference");
-            this->isCredit = getIsCredit(record.get("creditDebit"));
+            this->type = record.get("type");
             this->isReconciled = (record.get("isReconciled").compare("Y") == 0 ? true : false);
         }
 
         JRecord getRecord() override  {
             JRecord r = DBPayment::getRecord();
 
-            r.add("reference", this->reference);
-            r.add("creditDebit", this->getCreditDebitValue());
-            r.add("isReconciled", this->getIsReconciledValue());
+            r.add("reference", reference);
+            r.add("type", type);
+            r.add("isReconciled", getIsReconciledValue());
 
             return r;
         }
@@ -139,23 +150,23 @@ class DBTransaction : public DBPayment {
 
             cout << "RecurringChargeId: " << recurringChargeId.getValue() << endl;
             cout << "Reference: '" << reference << "'" << endl;
-            cout << "Debit/Credit: '" << (isCredit ? "CR" : "DB") << "'" << endl;
+            cout << "Type: '" << type << "'" << endl;
             cout << "isReconciled: " << isReconciled << endl;
         }
 
         void assignColumn(DBColumn & column) override {
             DBPayment::assignColumn(column);
             
-            if (column.getName() == "recurring_charge_id") {
+            if (column.getName() == Columns::recurringChargeId) {
                 recurringChargeId = column.getIDValue();
             }
-            else if (column.getName() == "reference") {
+            else if (column.getName() == Columns::reference) {
                 reference = column.getValue();
             }
-            else if (column.getName() == "credit_debit") {
-                isCredit = getIsCredit(column.getValue());
+            else if (column.getName() == Columns::type) {
+                type = column.getValue();
             }
-            else if (column.getName() == "is_reconciled") {
+            else if (column.getName() == Columns::isReconciled) {
                 isReconciled = column.getBoolValue();
             }
         }
@@ -171,15 +182,11 @@ class DBTransaction : public DBPayment {
             this->sequence = sequence;
         }
 
-        string getCreditDebitValue() {
-            return (isCredit ? "CR" : "DB");
-        }
-
-        bool getIsCredit(const string & value) {
-            if (value == "CR") {
+        bool isCredit() const {
+            if (type == TYPE_CREDIT) {
                 return true;
             }
-            else if (value == "DB") {
+            else if (type == TYPE_DEBIT) {
                 return false;
             }
             else {
@@ -188,7 +195,7 @@ class DBTransaction : public DBPayment {
         }
 
         Money getSignedAmount() {
-            return (isCredit ? amount : (amount * -1));
+            return (isCredit() ? amount : (amount * -1));
         }
 
         const char * getIsReconciledValue() {
@@ -222,7 +229,7 @@ class DBTransaction : public DBPayment {
                 date.shortDate().c_str(),
                 dReference.c_str(),
                 dDescription.c_str(),
-                getCreditDebitValue().c_str(),
+                type.c_str(),
                 amount.rawStringValue().c_str(),
                 getIsReconciledValue(),
                 now.c_str(),
@@ -249,7 +256,7 @@ class DBTransaction : public DBPayment {
                 date.shortDate().c_str(),
                 dReference.c_str(),
                 dDescription.c_str(),
-                getCreditDebitValue().c_str(),
+                type.c_str(),
                 amount.rawStringValue().c_str(),
                 getIsReconciledValue(),
                 now.c_str(),

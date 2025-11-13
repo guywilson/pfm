@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "db_base.h"
+#include "db_transaction.h"
 #include "strdate.h"
 #include "money.h"
 
@@ -69,7 +70,7 @@ class AddTransactionCriteriaBuilder {
         string payeeCode;
         string description;
         string reference;
-        bool isCredit = false;
+        string type = TYPE_DEBIT;
         Money amount = 0.0;
 
         AddTransactionCriteriaBuilder(vector<string> & parms);

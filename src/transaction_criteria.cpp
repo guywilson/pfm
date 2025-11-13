@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "db_base.h"
+#include "db_transaction.h"
 #include "strdate.h"
 #include "money.h"
 #include "transaction_criteria.h"
@@ -92,11 +93,11 @@ void FindTransactionCriteriaBuilder::parse() {
             i += 2;
         }
         else if (parameter.compare("db") == 0) {
-            debitOrCredit = "DB";
+            debitOrCredit = TYPE_DEBIT;
             i++;
         }
         else if (parameter.compare("cr") == 0) {
-            debitOrCredit = "CR";
+            debitOrCredit = TYPE_CREDIT;
             i++;
         }
         else if (parameter.compare("a") == 0) {
@@ -272,11 +273,11 @@ void AddTransactionCriteriaBuilder::parse() {
             i += 2;
         }
         else if (parameter.compare("db") == 0) {
-            this->isCredit = false;
+            this->type = TYPE_DEBIT;
             i++;
         }
         else if (parameter.compare("cr") == 0) {
-            this->isCredit = true;
+            this->type = TYPE_CREDIT;
             i++;
         }
         else if (parameter.compare("a") == 0) {

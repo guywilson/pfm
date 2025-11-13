@@ -19,7 +19,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t acco
     log.entry("DBTransactionView::retrieveByAccountID()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransactionView> result;
@@ -36,8 +36,8 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t acco
     log.entry("DBTransactionView::retrieveByAccountID()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.addOrderBy("date", dateSortDirection);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.addOrderBy(DBPayment::Columns::date, dateSortDirection);
 
     if (rowLimit > 0) {
         criteria.setRowLimit(rowLimit);
@@ -59,8 +59,8 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm
     log.entry("DBTransactionView::retrieveReconciledByAccountID()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("reconciled", true);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(Columns::isReconciled, true);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransactionView> result;
@@ -77,9 +77,9 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(p
     log.entry("DBTransactionView::retrieveNonRecurringByAccountID()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("recurring", false);
-    criteria.addOrderBy("date", dateSortDirection);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(Columns::recurring, false);
+    criteria.addOrderBy(DBPayment::Columns::date, dateSortDirection);
 
     if (rowLimit > 0) {
         criteria.setRowLimit(rowLimit);
@@ -109,7 +109,7 @@ DBResult<DBTransactionView> DBTransactionView::findTransactions(const string & s
 DBResult<DBTransactionView> DBTransactionView::findTransactionsForCriteria(DBCriteria & criteria) {
     DBResult<DBTransactionView> result;
 
-    criteria.addOrderBy("date", DBCriteria::descending);
+    criteria.addOrderBy(DBPayment::Columns::date, DBCriteria::descending);
     criteria.setRowLimit(SQL_ROW_LIMIT);
 
     string statement = getSelectStatement() + criteria.getStatementCriteria();
@@ -123,8 +123,8 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::findTransactionsForAccountID()");
 
-    criteria.addFirst("account_id", DBCriteria::equal_to, accountId);
-    criteria.addOrderBy("date", DBCriteria::descending);
+    criteria.addFirst(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.addOrderBy(DBPayment::Columns::date, DBCriteria::descending);
     criteria.setRowLimit(SQL_ROW_LIMIT);
 
     string statement = getSelectStatement() + criteria.getStatementCriteria();
@@ -142,10 +142,10 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_
     log.entry("DBTransactionView::retrieveByAccountIDForPeriod()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
-    criteria.addOrderBy("date", dateSortDirection);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, secondDate);
+    criteria.addOrderBy(DBPayment::Columns::date, dateSortDirection);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
@@ -163,10 +163,10 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForP
     log.entry("DBTransactionView::retrieveReconciledByAccountIDForPeriod()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("reconciled", true);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(Columns::isReconciled, true);
+    criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, secondDate);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
@@ -184,10 +184,10 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDFo
     log.entry("DBTransactionView::retrieveNonRecurringByAccountIDForPeriod()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("recurring", false);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(Columns::recurring, false);
+    criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, secondDate);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     

@@ -37,6 +37,13 @@ class DBTransferTransactionRecord : public DBEntity {
                         "updated = '%s' " \
                         "WHERE id = %s;";
 
+    protected:
+        struct Columns {
+            static constexpr const char * transactionToId = "transaction_to_id";
+            static constexpr const char * transactionFromId = "transaction_from_id";
+            static constexpr const char * transactionDate = "transaction_date";
+        };
+
     public:
         pfm_id_t transactionToId;
         pfm_id_t transactionFromId;
@@ -121,13 +128,13 @@ class DBTransferTransactionRecord : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == "transaction_to_id") {
+            if (column.getName() == Columns::transactionToId) {
                 transactionToId = column.getIDValue();
             }
-            else if (column.getName() == "transaction_from_id") {
+            else if (column.getName() == Columns::transactionFromId) {
                 transactionFromId = column.getIDValue();
             }
-            else if (column.getName() == "transaction_date") {
+            else if (column.getName() == Columns::transactionDate) {
                 transactionDate = column.getValue();
             }
         }

@@ -614,7 +614,7 @@ void Command::addTransaction(AddTransactionCriteriaBuilder & builder) {
     transaction.description = builder.description;
     transaction.reference = builder.reference;
     transaction.amount = builder.amount;
-    transaction.isCredit = builder.isCredit;
+    transaction.type = builder.type;
 
     transaction.save();
 }

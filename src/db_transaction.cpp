@@ -9,6 +9,7 @@
 #include "logger.h"
 #include "pfm_error.h"
 #include "db_base.h"
+#include "db_payment.h"
 #include "db_category.h"
 #include "db_payee.h"
 #include "db_transaction.h"
@@ -25,7 +26,7 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId) {
     log.entry("DBTransaction::retrieveByAccountID()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransaction> result;
@@ -42,8 +43,8 @@ DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountID(pfm_id_t ac
     log.entry("DBTransaction::retrieveReconciledByAccountID()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("is_reconciled", true);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(Columns::isReconciled, true);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransaction> result;
@@ -60,8 +61,8 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t accountId, D
     log.entry("DBTransaction::retrieveByAccountID()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.addOrderBy("date", dateSortDirection);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.addOrderBy(DBPayment::Columns::date, dateSortDirection);
 
     if (rowLimit > 0) {
         criteria.setRowLimit(rowLimit);
@@ -83,7 +84,7 @@ DBResult<DBTransaction> DBTransaction::retrieveByRecurringChargeID(pfm_id_t recu
     log.entry("DBTransaction::retrieveByRecurringChargeID()");
 
     DBCriteria criteria;
-    criteria.add("recurring_charge_id", DBCriteria::equal_to, recurringChargeId);
+    criteria.add(Columns::recurringChargeId, DBCriteria::equal_to, recurringChargeId);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransaction> result;
@@ -100,8 +101,8 @@ int DBTransaction::findLatestByRecurringChargeID(pfm_id_t chargeId) {
     log.entry("DBTransaction::findLatestByRecurringChargeID()");
 
     DBCriteria criteria;
-    criteria.add("recurring_charge_id", DBCriteria::equal_to, chargeId);
-    criteria.addOrderBy("date", DBCriteria::descending);
+    criteria.add(Columns::recurringChargeId, DBCriteria::equal_to, chargeId);
+    criteria.addOrderBy(DBPayment::Columns::date, DBCriteria::descending);
     criteria.setRowLimit(1);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
@@ -132,8 +133,8 @@ DBResult<DBTransaction> DBTransaction::findTransactionsForAccountID(pfm_id_t acc
     log.entry("DBTransaction::findTransactionsForAccountID()");
 
     DBCriteria c;
-    c.add("account_id", DBCriteria::equal_to, accountId);
-    c.addOrderBy("date", DBCriteria::descending);
+    c.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    c.addOrderBy(DBPayment::Columns::date, DBCriteria::descending);
     c.setRowLimit(SQL_ROW_LIMIT);
 
     string statement = getSelectStatement() + c.getWhereClause();
@@ -158,9 +159,9 @@ DBResult<DBTransaction> DBTransaction::retrieveByAccountIDForPeriod(pfm_id_t acc
     log.entry("DBTransaction::retrieveByAccountIDForPeriod()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, secondDate);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
@@ -178,10 +179,10 @@ DBResult<DBTransaction> DBTransaction::retrieveReconciledByAccountIDForPeriod(pf
     log.entry("DBTransaction::retrieveReconciledByAccountIDForPeriod()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("is_reconciled", true);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(Columns::isReconciled, true);
+    criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, secondDate);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
@@ -199,10 +200,10 @@ DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(
     log.entry("DBTransaction::retrieveNonRecurringByAccountIDForPeriod()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("recurring_charge_id", DBCriteria::is_null, recurringChargeId);
-    criteria.add("date", DBCriteria::greater_than_or_equal, firstDate);
-    criteria.add("date", DBCriteria::less_than_or_equal, secondDate);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(Columns::recurringChargeId, DBCriteria::is_null, recurringChargeId);
+    criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, firstDate);
+    criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, secondDate);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
@@ -272,7 +273,7 @@ void DBTransaction::createFromRecurringChargeAndDate(DBRecurringCharge & src, St
         tr.setFromRecurringCharge(src);
 
         tr.date = transactionDate;
-        tr.isCredit = false;
+        tr.type = TYPE_DEBIT;
         tr.isReconciled = true;
 
         tr.save();
@@ -312,7 +313,7 @@ void DBTransaction::createTransferPairFromSource(DBTransaction & source, DBAccou
         target.set(source);
 
         target.id.clear();
-        target.isCredit = true;
+        target.type = TYPE_CREDIT;
         target.accountId = accountTo.id;
 
         DBAccount accountFrom;
@@ -449,7 +450,7 @@ void DBTransaction::deleteByRecurringChargeId(pfm_id_t recurringChargeId) {
     log.entry("DBTransaction::deleteByRecurringChargeId()");
 
     DBCriteria criteria;
-    criteria.add("recurring_charge_id", DBCriteria::equal_to, recurringChargeId);
+    criteria.add(Columns::recurringChargeId, DBCriteria::equal_to, recurringChargeId);
 
     string statement = getDeleteStatement() + ' ' + criteria.getStatementCriteria();
 
@@ -463,8 +464,8 @@ void DBTransaction::deleteAllRecurringTransactionsForAccount(pfm_id_t accountId)
     log.entry("DBTransaction::deleteAllRecurringTransactionsForAccount()");
 
     DBCriteria criteria;
-    criteria.add("account_id", DBCriteria::equal_to, accountId);
-    criteria.add("recurring_charge_id", DBCriteria::is_not_null, recurringChargeId);
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(Columns::recurringChargeId, DBCriteria::is_not_null, recurringChargeId);
 
     string statement = getDeleteStatement() + ' ' + criteria.getStatementCriteria();
 
