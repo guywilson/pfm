@@ -219,43 +219,46 @@ DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(
 void DBTransaction::reconcileAllForAccountIDBeforeDate(pfm_id_t & accountId, StrDate & referenceDate) {
     Logger & log = Logger::getInstance();
 
-    log.entry("reconcileAllForAccountIDBeforeDate()");
-
-    char szStatement[SQL_STATEMENT_BUFFER_LEN];
+    log.entry("DBTransaction::reconcileAllForAccountIDBeforeDate()");
 
     string now = StrDate::getTimestamp();
+
+    string tableName = getTableName();
+    string updateStatement = 
+            "UPDATE " + tableName + " SET " +
+            Columns::isReconciled + " = 'Y', " +
+            DBEntity::Columns::updatedDate + " = '" + now + "'";
+
+    DBCriteria criteria;
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, referenceDate);
+    criteria.add(Columns::isReconciled, false);
+
+    string statement = updateStatement + criteria.getStatementCriteria();
 
     log.debug(
         "Reconciling all transactions before '%s' for account ID %s", 
         referenceDate.shortDate().c_str(), 
         accountId.c_str());
 
-    snprintf(
-        szStatement, 
-        SQL_STATEMENT_BUFFER_LEN, 
-        sqlReconcileByAccountIDBeforeDate, 
-        now.c_str(),
-        accountId.c_str(),
-        referenceDate.shortDate().c_str());
-
     PFM_DB & db = PFM_DB::getInstance();
 
     db.begin();
 
     try {
-        db.executeUpdate(szStatement);
+        db.executeUpdate(statement);
     }
     catch (pfm_error & e) {
         db.rollback();
 
-        log.error("reconcileAllForAccountIDBeforeDate() - Failed to execute update '%s'", e.what());
+        log.error("DBTransaction::reconcileAllForAccountIDBeforeDate() - Failed to execute update '%s'", e.what());
 
         throw e;
     }
 
     db.commit();
 
-    log.exit("reconcileAllForAccountIDBeforeDate");
+    log.exit("DBTransaction::reconcileAllForAccountIDBeforeDate()");
 }
 
 void DBTransaction::createFromRecurringChargeAndDate(DBRecurringCharge & src, StrDate & transactionDate) {

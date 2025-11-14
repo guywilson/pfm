@@ -17,22 +17,6 @@ using namespace std;
 #define __INCL_TRANSACTION_REPORT
 
 class DBTransactionReport : public DBEntity {
-    private:
-        const char * sqlInsert = 
-                        "INSERT INTO transaction_report (" \
-                        "description," \
-                        "sql_where_clause," \
-                        "created," \
-                        "updated) " \
-                        "VALUES ('%s', '%s', '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE transaction_report SET " \
-                        "description = '%s'," \
-                        "sql_where_clause = '%s'," \
-                        "updated = '%s' " \
-                        "WHERE id = %s;";
-
     protected:
         struct Columns {
             static constexpr const char * description = "description";
@@ -85,43 +69,21 @@ class DBTransactionReport : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::description, delimitSingleQuotes(description)},
+                {Columns::sqlWhereClause, delimitSingleQuotes(sqlWhereClause)}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-            string dSQL = delimitSingleQuotes(sqlWhereClause);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                dDescription.c_str(),
-                dSQL.c_str(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::description, delimitSingleQuotes(description)},
+                {Columns::sqlWhereClause, delimitSingleQuotes(sqlWhereClause)}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-            string dSQL = delimitSingleQuotes(sqlWhereClause);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                dDescription.c_str(),
-                dSQL.c_str(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         void assignColumn(DBColumn & column) override {

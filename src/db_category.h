@@ -15,13 +15,6 @@ using namespace std;
 #define __INCL_CATEGORY
 
 class DBCategory : public DBEntity {
-    private:
-        const char * sqlInsert = 
-                        "INSERT INTO category (description, code, created, updated) VALUES ('%s', '%s', '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE category SET code = '%s', description = '%s', updated = '%s' WHERE id = %s;";
-
     protected:
         struct Columns {
             static constexpr const char * description = "description";
@@ -91,41 +84,21 @@ class DBCategory : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::description, delimitSingleQuotes(description)},
+                {Columns::code, code},
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                dDescription.c_str(),
-                code.c_str(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::description, delimitSingleQuotes(description)},
+                {Columns::code, code},
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                code.c_str(),
-                dDescription.c_str(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         void retrieveByCode(string & code);

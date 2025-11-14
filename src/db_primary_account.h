@@ -16,20 +16,6 @@ using namespace std;
 #define __INCL_PRIMARY_ACCOUNT
 
 class DBPrimaryAccount : public DBEntity {
-    private:
-        const char * sqlInsert = 
-                        "INSERT INTO primary_account (" \
-                        "account_code," \
-                        "created," \
-                        "updated) " \
-                        "VALUES ('%s', '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE primary_account SET " \
-                        "account_code = '%s'," \
-                        "updated = '%s' " \
-                        "WHERE id = %s;";
-
     protected:
         struct Columns {
             static constexpr const char * code = "account_code";
@@ -89,35 +75,19 @@ class DBPrimaryAccount : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::code, code}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                code.c_str(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::code, code}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                code.c_str(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         static string getPrimaryAccountCode();

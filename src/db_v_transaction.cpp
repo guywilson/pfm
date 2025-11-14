@@ -204,9 +204,25 @@ DBResult<DBTransactionView> DBTransactionView::reportByCategory() {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::reportByCategory()");
 
-    DBResult<DBTransactionView> result;
+    string statement = "SELECT ";
 
-    result.retrieve(sqlReportByCategoryNonRecurring);
+    statement.append(Columns::category);
+    statement.append(", ");
+    statement.append("SUM(");
+    statement.append(DBPayment::Columns::amount);
+    statement.append(") AS total ");
+    statement.append("FROM ");
+    statement.append(getTableName());
+
+    DBCriteria criteria;
+    criteria.add(Columns::recurring, false);
+    criteria.add(Columns::type, DBCriteria::equal_to, string(TYPE_DEBIT));
+    criteria.addGroupBy(Columns::category);
+
+    statement += criteria.getStatementCriteria();
+
+    DBResult<DBTransactionView> result;
+    result.retrieve(statement);
 
     log.exit("DBTransactionView::reportByCategory()");
 
@@ -217,9 +233,25 @@ DBResult<DBTransactionView> DBTransactionView::reportByPayee() {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::reportByPayee()");
 
-    DBResult<DBTransactionView> result;
+    string statement = "SELECT ";
 
-    result.retrieve(sqlReportByPayeeNonRecurring);
+    statement.append(Columns::payee);
+    statement.append(", ");
+    statement.append("SUM(");
+    statement.append(DBPayment::Columns::amount);
+    statement.append(") AS total ");
+    statement.append("FROM ");
+    statement.append(getTableName());
+
+    DBCriteria criteria;
+    criteria.add(Columns::recurring, false);
+    criteria.add(Columns::type, DBCriteria::equal_to, string(TYPE_DEBIT));
+    criteria.addGroupBy(Columns::payee);
+
+    statement += criteria.getStatementCriteria();
+
+    DBResult<DBTransactionView> result;
+    result.retrieve(statement);
 
     log.exit("DBTransactionView::reportByPayee()");
 

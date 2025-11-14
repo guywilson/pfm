@@ -46,7 +46,7 @@ void DBEntity::update() {
     log.exit("DBEntity::update()");
 }
 
-uint64_t DBEntity::findSingleQuotePos(string & s, int startingPos = 0) {
+uint64_t DBEntity::findSingleQuotePos(string & s, int startingPos = 0) const {
     uint64_t pos = s.find(SINGLE_QUOTE_CHAR, startingPos);
 
     if (pos != string::npos) {
@@ -69,7 +69,7 @@ uint64_t DBEntity::findSingleQuotePos(string & s, int startingPos = 0) {
     return string::npos;
 }
 
-string DBEntity::delimitSingleQuotes(string & s) {
+const string DBEntity::delimitSingleQuotes(string & s) const {
     string delimited = s;
 
     uint64_t searchPos = findSingleQuotePos(delimited);

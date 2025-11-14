@@ -83,35 +83,6 @@ struct Frequency {
 
 class DBRecurringCharge : public DBPayment {
     private:
-        const char * sqlInsert = 
-                        "INSERT INTO recurring_charge (" \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "date," \
-                        "end_date," \
-                        "description," \
-                        "amount," \
-                        "last_payment_date," \
-                        "frequency," \
-                        "created," \
-                        "updated) " \
-                        "VALUES (%s, %s, %s, '%s', '%s'," \
-                        "'%s', '%s', '%s', '%s', '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE recurring_charge " \
-                        "SET category_id = %s," \
-                        "payee_id = %s," \
-                        "date = '%s'," \
-                        "end_date = '%s'," \
-                        "description = '%s'," \
-                        "amount = '%s'," \
-                        "last_payment_date = '%s'," \
-                        "frequency = '%s'," \
-                        "updated = '%s' " \
-                        "WHERE id = %s;";
-
         bool inline isNumeric(string & cfgDate) {
             bool isNumeric = true;
             for (int i = 0;i < (int)cfgDate.length();i++) {
@@ -349,54 +320,34 @@ class DBRecurringCharge : public DBPayment {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {DBPayment::Columns::accountId, accountId.getValue()},
+                {DBPayment::Columns::categoryId, categoryId.getValue()},
+                {DBPayment::Columns::payeeId, payeeId.getValue()},
+                {DBPayment::Columns::date, date.shortDate()},
+                {Columns::endDate, endDate.shortDate()},
+                {DBPayment::Columns::description, delimitSingleQuotes(description)},
+                {DBPayment::Columns::amount, amount.rawStringValue()},
+                {Columns::lastPaymentDate, lastPaymentDate.shortDate()},
+                {Columns::frequency, frequency.toString()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                accountId.c_str(),
-                categoryId.c_str(),
-                payeeId.c_str(),
-                date.shortDate().c_str(),
-                endDate.shortDate().c_str(),
-                dDescription.c_str(),
-                amount.rawStringValue().c_str(),
-                lastPaymentDate.shortDate().c_str(),
-                frequency.c_str(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {DBPayment::Columns::categoryId, categoryId.getValue()},
+                {DBPayment::Columns::payeeId, payeeId.getValue()},
+                {DBPayment::Columns::date, date.shortDate()},
+                {Columns::endDate, endDate.shortDate()},
+                {DBPayment::Columns::description, delimitSingleQuotes(description)},
+                {DBPayment::Columns::amount, amount.rawStringValue()},
+                {Columns::lastPaymentDate, lastPaymentDate.shortDate()},
+                {Columns::frequency, frequency.toString()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                categoryId.c_str(),
-                payeeId.c_str(),
-                date.shortDate().c_str(),
-                endDate.shortDate().c_str(),
-                dDescription.c_str(),
-                amount.rawStringValue().c_str(),
-                lastPaymentDate.shortDate().c_str(),
-                frequency.c_str(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         DBResult<DBRecurringCharge> retrieveByAccountID(pfm_id_t & accountId);

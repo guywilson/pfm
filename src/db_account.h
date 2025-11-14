@@ -19,25 +19,6 @@ using namespace std;
 
 class DBAccount : public DBEntity {
     private:
-        const char * sqlInsert = 
-                        "INSERT INTO account (" \
-                        "name," \
-                        "code," \
-                        "opening_date," \
-                        "opening_balance," \
-                        "created," \
-                        "updated) " \
-                        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE account SET " \
-                        "name = '%s'," \
-                        "code = '%s'," \
-                        "opening_date = '%s'," \
-                        "opening_balance = '%s'," \
-                        "updated = '%s' " \
-                        "WHERE id = %s;";
-        
         void createRecurringTransactions();
         void createCarriedOverLogs();
 
@@ -132,45 +113,25 @@ class DBAccount : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::code, code},
+                {Columns::name, name},
+                {Columns::openingBalance, openingBalance.rawStringValue()},
+                {Columns::openingDate, openingDate.shortDate()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dName = delimitSingleQuotes(name);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                dName.c_str(),
-                code.c_str(),
-                openingDate.shortDate().c_str(),
-                openingBalance.rawStringValue().c_str(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::code, code},
+                {Columns::name, name},
+                {Columns::openingBalance, openingBalance.rawStringValue()},
+                {Columns::openingDate, openingDate.shortDate()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dName = delimitSingleQuotes(name);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                dName.c_str(),
-                code.c_str(),
-                openingDate.shortDate().c_str(),
-                openingBalance.rawStringValue().c_str(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         void doBalancePrerequisites();

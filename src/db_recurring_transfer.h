@@ -17,22 +17,6 @@ using namespace std;
 #define __INCL_RECURRING_TRANSFER
 
 class DBRecurringTransfer : public DBEntity {
-    private:
-        const char * sqlInsert = 
-                        "INSERT INTO recurring_transfer (" \
-                        "recurring_charge_id," \
-                        "account_to_id," \
-                        "created," \
-                        "updated) " \
-                        "VALUES (%s, %s, '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE recurring_transfer SET " \
-                        "recurring_charge_id = %s," \
-                        "account_to_id = %s," \
-                        "updated = '%s' " \
-                        "WHERE id = %s;";
-
     protected:
         struct Columns {
             static constexpr const char * recurringChargeId = "recurring_charge_id";
@@ -87,37 +71,21 @@ class DBRecurringTransfer : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::recurringChargeId, recurringChargeId.getValue()},
+                {Columns::accountToId, accountToId.getValue()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                recurringChargeId.c_str(),
-                accountToId.c_str(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::recurringChargeId, recurringChargeId.getValue()},
+                {Columns::accountToId, accountToId.getValue()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                recurringChargeId.c_str(),
-                accountToId.c_str(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         void assignColumn(DBColumn & column) override {

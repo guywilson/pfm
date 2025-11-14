@@ -25,46 +25,6 @@ using namespace std;
 #define TYPE_DEBIT          "DB"
 
 class DBTransaction : public DBPayment {
-    private:
-        const char * sqlInsert = 
-                        "INSERT INTO account_transaction (" \
-                        "account_id," \
-                        "category_id," \
-                        "payee_id," \
-                        "recurring_charge_id," \
-                        "date," \
-                        "reference," \
-                        "description," \
-                        "credit_debit," \
-                        "amount," \
-                        "is_reconciled," \
-                        "created," \
-                        "updated) " \
-                        "VALUES (%s, %s, %s, %s, '%s', '%s', " \
-                        "'%s', '%s', '%s', '%s', '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE account_transaction " \
-                        "SET category_id = %s," \
-                        "payee_id = %s," \
-                        "recurring_charge_id = %s,"
-                        "date = '%s'," \
-                        "reference = '%s'," \
-                        "description = '%s'," \
-                        "credit_debit = '%s'," \
-                        "amount = '%s'," \
-                        "is_reconciled = '%s'," \
-                        "updated = '%s' " \
-                        "WHERE id = %s;";
-
-        const char * sqlReconcileByAccountIDBeforeDate = 
-                        "UPDATE account_transaction " \
-                        "SET is_reconciled = 'Y'," \
-                        "updated = '%s' " \
-                        "WHERE account_id = %s " \
-                        "AND date <= '%s'" \
-                        "AND is_reconciled = 'N';";
-
     protected:
         struct Columns {
             static constexpr const char * recurringChargeId = "recurring_charge_id";
@@ -211,58 +171,37 @@ class DBTransaction : public DBPayment {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {DBPayment::Columns::accountId, accountId.getValue()},
+                {DBPayment::Columns::categoryId, categoryId.getValue()},
+                {DBPayment::Columns::payeeId, payeeId.getValue()},
+                {DBPayment::Columns::date, date.shortDate()},
+                {Columns::recurringChargeId, recurringChargeId.getValue()},
+                {Columns::reference, delimitSingleQuotes(reference)},
+                {DBPayment::Columns::description, delimitSingleQuotes(description)},
+                {Columns::type, type},
+                {DBPayment::Columns::amount, amount.rawStringValue()},
+                {Columns::isReconciled, getIsReconciledValue()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-            string dReference = delimitSingleQuotes(reference);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                accountId.c_str(),
-                categoryId.c_str(),
-                payeeId.c_str(),
-                recurringChargeId.c_str(),
-                date.shortDate().c_str(),
-                dReference.c_str(),
-                dDescription.c_str(),
-                type.c_str(),
-                amount.rawStringValue().c_str(),
-                getIsReconciledValue(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {DBPayment::Columns::accountId, accountId.getValue()},
+                {DBPayment::Columns::categoryId, categoryId.getValue()},
+                {DBPayment::Columns::payeeId, payeeId.getValue()},
+                {DBPayment::Columns::date, date.shortDate()},
+                {Columns::recurringChargeId, recurringChargeId.getValue()},
+                {Columns::reference, delimitSingleQuotes(reference)},
+                {DBPayment::Columns::description, delimitSingleQuotes(description)},
+                {Columns::type, type},
+                {DBPayment::Columns::amount, amount.rawStringValue()},
+                {Columns::isReconciled, getIsReconciledValue()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-            string dReference = delimitSingleQuotes(reference);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                categoryId.c_str(),
-                payeeId.c_str(),
-                recurringChargeId.c_str(),
-                date.shortDate().c_str(),
-                dReference.c_str(),
-                dDescription.c_str(),
-                type.c_str(),
-                amount.rawStringValue().c_str(),
-                getIsReconciledValue(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         void afterInsert() override;

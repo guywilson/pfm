@@ -14,13 +14,6 @@ using namespace std;
 #define __INCL_CONFIG
 
 class DBConfig : public DBEntity {
-    private:
-        const char * sqlInsert = 
-                        "INSERT INTO config (key, value, description, is_read_only, is_visible, created, updated) VALUES ('%s', '%s', '%s', 'N', 'Y', '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE config SET key = '%s', value = '%s', description = '%s', updated = '%s' WHERE id = %s;";
-
     protected:
         struct Columns {
             static constexpr const char * key = "key";
@@ -98,45 +91,27 @@ class DBConfig : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::key, key},
+                {Columns::value, delimitSingleQuotes(value)},
+                {Columns::description, delimitSingleQuotes(description)},
+                {Columns::isReadOnly, "N"},
+                {Columns::isVisible, "Y"}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-            string dValue = delimitSingleQuotes(value);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                key.c_str(),
-                dValue.c_str(),
-                dDescription.c_str(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::key, key},
+                {Columns::value, delimitSingleQuotes(value)},
+                {Columns::description, delimitSingleQuotes(description)},
+                {Columns::isReadOnly, "N"},
+                {Columns::isVisible, "Y"}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-            string dValue = delimitSingleQuotes(value);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                key.c_str(),
-                dValue.c_str(),
-                dDescription.c_str(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         void retrieveByKey(const string & key);

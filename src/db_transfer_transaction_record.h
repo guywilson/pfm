@@ -19,24 +19,6 @@ using namespace std;
 #define __INCL_TRANSFER_TRANSACTION_RECORD
 
 class DBTransferTransactionRecord : public DBEntity {
-    private:
-        const char * sqlInsert = 
-                        "INSERT INTO transfer_transaction_record (" \
-                        "transaction_to_id," \
-                        "transaction_from_id," \
-                        "transaction_date," \
-                        "created," \
-                        "updated) " \
-                        "VALUES (%s, %s, '%s', '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE transfer_transaction_record SET " \
-                        "transaction_to_id = %s," \
-                        "transaction_from_id = %s," \
-                        "transaction_date = '%s'" \
-                        "updated = '%s' " \
-                        "WHERE id = %s;";
-
     protected:
         struct Columns {
             static constexpr const char * transactionToId = "transaction_to_id";
@@ -90,39 +72,23 @@ class DBTransferTransactionRecord : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::transactionToId, transactionToId.getValue()},
+                {Columns::transactionFromId, transactionFromId.getValue()},
+                {Columns::transactionDate, transactionDate.shortDate()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                transactionToId.c_str(),
-                transactionFromId.c_str(),
-                transactionDate.shortDate().c_str(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::transactionToId, transactionToId.getValue()},
+                {Columns::transactionFromId, transactionFromId.getValue()},
+                {Columns::transactionDate, transactionDate.shortDate()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                transactionToId.c_str(),
-                transactionFromId.c_str(),
-                transactionDate.shortDate().c_str(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         void assignColumn(DBColumn & column) override {

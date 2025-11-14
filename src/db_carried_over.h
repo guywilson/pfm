@@ -18,26 +18,6 @@ using namespace std;
 #define __INCL_CARRIED_OVER
 
 class DBCarriedOver : public DBEntity {
-    private:
-        const char * sqlInsert = 
-                        "INSERT INTO carried_over_log (" \
-                        "account_id," \
-                        "date," \
-                        "description," \
-                        "balance," \
-                        "created," \
-                        "updated) " \
-                        "VALUES (%s, '%s', '%s', '%s', '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE carried_over_log SET " \
-                        "account_id = %s," \
-                        "date = '%s'," \
-                        "description = '%s'," \
-                        "balance = '%s'," \
-                        "updated = '%s' " \
-                        "WHERE id = %s;";
-
     protected:
         struct Columns {
             static constexpr const char * accountId = "account_id";
@@ -98,45 +78,25 @@ class DBCarriedOver : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::accountId, accountId.getValue()},
+                {Columns::date, date.shortDate()},
+                {Columns::description, delimitSingleQuotes(description)},
+                {Columns::balance, balance.rawStringValue()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                accountId.c_str(),
-                date.shortDate().c_str(),
-                dDescription.c_str(),
-                balance.rawStringValue().c_str(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::accountId, accountId.getValue()},
+                {Columns::date, date.shortDate()},
+                {Columns::description, delimitSingleQuotes(description)},
+                {Columns::balance, balance.rawStringValue()}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dDescription = delimitSingleQuotes(description);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                accountId.c_str(),
-                date.shortDate().c_str(),
-                dDescription.c_str(),
-                balance.rawStringValue().c_str(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         void assignColumn(DBColumn & column) override {

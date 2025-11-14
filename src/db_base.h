@@ -34,6 +34,7 @@ class DBCriteria {
     private:
         deque<string> whereClauses;
         deque<string> orderClauses;
+        deque<string> groupClauses;
         multimap<string, string> inClauses;
         int rowLimit;
 
@@ -328,6 +329,10 @@ class DBCriteria {
             orderClauses.push_back(clause);
         }
 
+        void addGroupBy(const string & columnName) {
+            groupClauses.push_back(columnName);
+        }
+
         void setRowLimit(int numRows) {
             rowLimit = numRows;
         }
@@ -370,6 +375,25 @@ class DBCriteria {
             return orderBy;
         }
 
+        const string getGroupBy() {
+            if (groupClauses.empty()) {
+                return "";
+            }
+
+            string groupBy = " GROUP BY ";
+
+            while (!groupClauses.empty()) {
+                groupBy += groupClauses.front();
+                groupClauses.pop_front();
+
+                if (!groupClauses.empty()) {
+                    groupBy += ", ";
+                }
+            }
+
+            return groupBy;
+        }
+
         const string getLimitClause() {
             if (rowLimit == NULL_ROW_LIMIT) {
                 return "";
@@ -385,6 +409,7 @@ class DBCriteria {
             string criteria =
                 getWhereClause() + 
                 getOrderBy() + 
+                getGroupBy() +
                 getLimitClause() + 
                 ';';
 
@@ -397,7 +422,7 @@ class DBEntity {
         pfm_id_t insert();
         void update();
 
-        uint64_t findSingleQuotePos(string & s, int startingPos);
+        uint64_t findSingleQuotePos(string & s, int startingPos) const;
 
     protected:
         virtual void beforeSave() {
@@ -439,7 +464,72 @@ class DBEntity {
             return from;
         }
 
-        string delimitSingleQuotes(string & s);
+        const string delimitSingleQuotes(string & s) const;
+        
+        virtual string buildInsertStatement(const string & tableName, vector<pair<string, string>> & columnValuePairs) const {
+            string now = StrDate::getTimestamp();
+
+            columnValuePairs.push_back({Columns::createdDate, now});
+            columnValuePairs.push_back({Columns::updatedDate, now});
+
+            string cols = "(";
+            string vals = "(";
+
+            for (int i = 0;i < columnValuePairs.size();i++) {
+                string columnName = columnValuePairs[i].first;
+                string value = columnValuePairs[i].second;
+
+                cols.append(columnName);
+
+                if (value == "NULL") {
+                    vals.append(value);
+                }
+                else {
+                    vals.append("'");
+                    vals.append(value);
+                    vals.append("'");
+                }
+
+                if (i < columnValuePairs.size() - 1) {
+                    cols.append(", ");
+                    vals.append(", ");
+                }
+            }
+
+            cols.append(")");
+            vals.append(")");
+
+            string statement = "INSERT INTO " + tableName + " " + cols + " VALUES " + vals + ";";
+
+            return statement;
+        }
+        
+        virtual string buildUpdateStatement(const string & tableName, vector<pair<string, string>> & columnValuePairs) const {
+            string now = StrDate::getTimestamp();
+
+            columnValuePairs.push_back({Columns::updatedDate, now});
+ 
+            string statement = "UPDATE " + tableName + " SET ";
+
+            for (int i = 0;i < columnValuePairs.size();i++) {
+                statement.append(columnValuePairs[i].first);
+                statement.append(" = '");
+                statement.append(columnValuePairs[i].second);
+                statement.append("'");
+
+                if (i < columnValuePairs.size() - 1) {
+                    statement.append(", ");
+                }
+            }
+
+            statement.append(" WHERE ");
+            statement.append(Columns::id);
+            statement.append(" = ");
+            statement.append(id.getValue());
+            statement.append(";");
+
+            return statement;
+        }
 
         struct Columns {
             static constexpr const char * id = "id";
@@ -508,7 +598,7 @@ class DBEntity {
         virtual const string getDeleteAllStatement() {
             return getDeleteStatement();
         }
-        
+
         virtual const string getInsertStatement() {
             return "";
         }

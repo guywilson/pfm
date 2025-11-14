@@ -17,23 +17,6 @@ using namespace std;
 #define __INCL_TRANSACTION_VIEW
 
 class DBTransactionView : public DBTransaction {
-    private:
-        const char * sqlReportByCategoryNonRecurring =
-                        "SELECT category," \
-                        "SUM(amount) AS total " \
-                        "FROM v_transaction_list " \
-                        "WHERE recurring = 'N' " \
-                        "AND type = 'DB' " \
-                        "GROUP BY category;";
-
-        const char * sqlReportByPayeeNonRecurring =
-                        "SELECT payee," \
-                        "SUM(amount) as total " \
-                        "FROM v_transaction_list " \
-                        "WHERE recurring = 'N' " \
-                        "AND type = 'DB' " \
-                        "GROUP BY payee;";
-
     protected:
         struct Columns {
             static constexpr const char * account = "account";

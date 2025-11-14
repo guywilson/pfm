@@ -14,13 +14,6 @@ using namespace std;
 #define __INCL_CURRENCY
 
 class DBCurrency : public DBEntity {
-    private:
-        const char * sqlInsert = 
-                        "INSERT INTO currency (code, name, symbol, created, updated) VALUES ('%s', '%s', '%s', '%s', '%s');";
-
-        const char * sqlUpdate = 
-                        "UPDATE currency SET code = '%s', name = '%s', symbol = '%s', updated = '%s' WHERE id = %s;";
-
     protected:
         struct Columns {
             static constexpr const char * code = "code";
@@ -84,43 +77,23 @@ class DBCurrency : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::code, code},
+                {Columns::name, delimitSingleQuotes(name)},
+                {Columns::symbol, symbol}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dName = delimitSingleQuotes(name);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlInsert,
-                code.c_str(),
-                dName.c_str(),
-                symbol.c_str(),
-                now.c_str(),
-                now.c_str());
-
-            return string(szStatement);
+            return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            static char szStatement[SQL_STATEMENT_BUFFER_LEN];
+            vector<pair<string, string>> columnValuePairs = {
+                {Columns::code, code},
+                {Columns::name, delimitSingleQuotes(name)},
+                {Columns::symbol, symbol}
+            };
 
-            string now = StrDate::getTimestamp();
-
-            string dName = delimitSingleQuotes(name);
-
-            snprintf(
-                szStatement, 
-                SQL_STATEMENT_BUFFER_LEN,
-                sqlUpdate,
-                code.c_str(),
-                dName.c_str(),
-                symbol.c_str(),
-                now.c_str(),
-                id.c_str());
-
-            return string(szStatement);
+            return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
         void retrieveByCode(string & code);
