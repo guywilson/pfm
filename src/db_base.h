@@ -475,7 +475,7 @@ class DBEntity {
             string cols = "(";
             string vals = "(";
 
-            for (int i = 0;i < columnValuePairs.size();i++) {
+            for (size_t i = 0;i < columnValuePairs.size();i++) {
                 string columnName = columnValuePairs[i].first;
                 string value = columnValuePairs[i].second;
 
@@ -511,7 +511,7 @@ class DBEntity {
  
             string statement = "UPDATE " + tableName + " SET ";
 
-            for (int i = 0;i < columnValuePairs.size();i++) {
+            for (size_t i = 0;i < columnValuePairs.size();i++) {
                 statement.append(columnValuePairs[i].first);
                 statement.append(" = '");
                 statement.append(columnValuePairs[i].second);
