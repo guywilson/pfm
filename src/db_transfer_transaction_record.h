@@ -63,11 +63,11 @@ class DBTransferTransactionRecord : public DBEntity {
             cout << "TransactionDate: " << transactionDate.shortDate() << endl;
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "transfer_transaction_record";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBTransferTransactionRecord";
         }
 

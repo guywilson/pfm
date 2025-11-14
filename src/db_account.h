@@ -104,11 +104,11 @@ class DBAccount : public DBEntity {
             cout << "Opening balance: " << openingBalance.localeFormattedStringValue() << endl;
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "account";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBAccount";
         }
 

@@ -75,11 +75,11 @@ class DBCategory : public DBEntity {
             }
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "category";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBCategory";
         }
 

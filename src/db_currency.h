@@ -68,11 +68,11 @@ class DBCurrency : public DBEntity {
             }
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "currency";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBCurrency";
         }
 

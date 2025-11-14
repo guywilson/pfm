@@ -98,11 +98,11 @@ class DBTransactionView : public DBTransaction {
             this->sequence = sequence;
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "v_transaction_list";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBTransactionView";
         }
 

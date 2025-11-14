@@ -56,11 +56,11 @@ class DBTransactionReport : public DBEntity {
             cout << "SQL: '" << sqlWhereClause << "'" << endl;
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "transaction_report";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBTransactionReport";
         }
 

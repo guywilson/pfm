@@ -69,11 +69,11 @@ class DBCarriedOver : public DBEntity {
             cout << "Balance: " << balance.localeFormattedStringValue() << endl;
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "carried_over_log";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBCarriedOver";
         }
 

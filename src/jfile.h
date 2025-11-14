@@ -36,13 +36,13 @@ class JRecord {
 
 class JFileReader {
     private:
-        const char * className;
+        string className;
         json j;
 
         void validate();
 
     public:
-        JFileReader(string & filename, const char * className);
+        JFileReader(string & filename, const string & className);
 
         vector<JRecord> read(const char * name);
 };
@@ -50,15 +50,15 @@ class JFileReader {
 class JFileWriter {
     private:
         ofstream fstream;
-        const char * className;
+        string className;
 
     public:
-        JFileWriter(string & filename, const char * className);
-        JFileWriter(const string & filename, const char * className);
+        JFileWriter(string & filename, const string & className);
+        JFileWriter(const string & filename, const string & className);
         ~JFileWriter();
 
         void write(vector<JRecord> & records, const char * name);
-        void write(vector<JRecord> & records, string & name);
+        void write(vector<JRecord> & records, const string & name);
 };
 
 #endif

@@ -82,11 +82,11 @@ class DBConfig : public DBEntity {
             }
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "config";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBConfig";
         }
 

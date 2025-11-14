@@ -62,11 +62,11 @@ class DBRecurringTransfer : public DBEntity {
             return (id.isNull() && accountToId.isNull() && recurringChargeId.isNull());
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "recurring_transfer";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBRecurringTransfer";
         }
 

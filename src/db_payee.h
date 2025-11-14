@@ -75,11 +75,11 @@ class DBPayee : public DBEntity {
             }
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "payee";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBPayee";
         }
 

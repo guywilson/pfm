@@ -162,11 +162,11 @@ class DBTransaction : public DBPayment {
             return (isReconciled ? "Y" : "N");
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "account_transaction";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBTransaction";
         }
 

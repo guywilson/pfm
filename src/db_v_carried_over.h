@@ -53,11 +53,11 @@ class DBCarriedOverView : public DBCarriedOver {
             }
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "v_carried_over_log";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBCarriedOverView";
         }
 };

@@ -56,7 +56,7 @@ void JFileReader::validate() {
                             pfm_error::buildMsg(
                                 "Error importing categories, invalid className '%s', expected '%s'", 
                                 fileClassName.c_str(),
-                                className));
+                                className.c_str()));
             }
 
             break;
@@ -64,7 +64,7 @@ void JFileReader::validate() {
     }
 }
 
-JFileReader::JFileReader(string & filename, const char * className) {
+JFileReader::JFileReader(string & filename, const string & className) {
     this->className = className;
 
     ifstream fstream(filename.c_str());
@@ -87,12 +87,12 @@ vector<JRecord> JFileReader::read(const char * name) {
     return records;
 }
 
-JFileWriter::JFileWriter(string & filename, const char * className) {
+JFileWriter::JFileWriter(string & filename, const string & className) {
     this->className = className;
     this->fstream.open(filename);
 }
 
-JFileWriter::JFileWriter(const string & filename, const char * className) {
+JFileWriter::JFileWriter(const string & filename, const string & className) {
     this->className = className;
     this->fstream.open(filename);
 }
@@ -122,6 +122,6 @@ void JFileWriter::write(vector<JRecord> & records, const char * name) {
     this->fstream << entity.dump(4) << endl;
 }
 
-void JFileWriter::write(vector<JRecord> & records, string & name) {
+void JFileWriter::write(vector<JRecord> & records, const string & name) {
     write(records, name.c_str());
 }

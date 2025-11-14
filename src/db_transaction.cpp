@@ -223,9 +223,8 @@ void DBTransaction::reconcileAllForAccountIDBeforeDate(pfm_id_t & accountId, Str
 
     string now = StrDate::getTimestamp();
 
-    string tableName = getTableName();
     string updateStatement = 
-            "UPDATE " + tableName + " SET " +
+            "UPDATE " + getTableName() + " SET " +
             Columns::isReconciled + " = 'Y', " +
             DBEntity::Columns::updatedDate + " = '" + now + "'";
 

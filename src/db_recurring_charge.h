@@ -311,11 +311,11 @@ class DBRecurringCharge : public DBPayment {
 
         void migrateToTransferCharge(pfm_id_t & accountToId);
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "recurring_charge";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBRecurringCharge";
         }
 

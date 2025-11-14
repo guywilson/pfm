@@ -66,11 +66,11 @@ class DBPrimaryAccount : public DBEntity {
             cout << "Code: '" << code << "'" << endl;
         }
 
-        const char * getTableName() override {
+        const string getTableName() const override {
             return "primary_account";
         }
 
-        const char * getClassName() override {
+        const string getClassName() const override {
             return "DBPrimaryAccount";
         }
 

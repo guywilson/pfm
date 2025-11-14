@@ -559,11 +559,11 @@ class DBEntity {
             return r;
         }
         
-        virtual const char * getTableName() {
+        virtual const string getTableName() const {
             return "";
         }
 
-        virtual const char * getClassName() {
+        virtual const string getClassName() const {
             return "DBEntity";
         }
 
