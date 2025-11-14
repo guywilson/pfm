@@ -4,6 +4,7 @@
 
 #include "db_base.h"
 #include "db_transaction.h"
+#include "db_v_transaction.h"
 #include "strdate.h"
 #include "money.h"
 #include "transaction_criteria.h"
@@ -141,87 +142,22 @@ bool FindTransactionCriteriaBuilder::hasRawSQL() {
 DBCriteria FindTransactionCriteriaBuilder::getCriteria() {
     DBCriteria criteria;
 
-    if (betweenTheseDatesList.size() == 1) {
-        criteria.add("date", DBCriteria::greater_than, betweenTheseDatesList[0]);
-    }
-    else if (betweenTheseDatesList.size() >= 2) {
-        criteria.add("date", DBCriteria::greater_than_or_equal, betweenTheseDatesList[0]);
-        criteria.add("date", DBCriteria::less_than_or_equal, betweenTheseDatesList[1]);
-    }
+    criteria = DBTransactionView::FindCriteriaHelper::handleBetweenTheseDates(criteria, betweenTheseDatesList);
+    criteria = DBTransactionView::FindCriteriaHelper::handleOnTheseDates(criteria, onTheseDatesList);
 
-    if (betweenTheseAmountList.size() == 1) {
-        criteria.add("amount", DBCriteria::greater_than, betweenTheseAmountList[0]);
-    }
-    else if (betweenTheseAmountList.size() >= 2) {
-        criteria.add("amount", DBCriteria::greater_than_or_equal, betweenTheseAmountList[0]);
-        criteria.add("amount", DBCriteria::less_than_or_equal, betweenTheseAmountList[1]);
-    }
+    criteria = DBTransactionView::FindCriteriaHelper::handleBetweenTheseAmounts(criteria, betweenTheseAmountList);
+    criteria = DBTransactionView::FindCriteriaHelper::handleLessThanThisAmount(criteria, lessThanThisAmount);
 
-    if (onTheseDatesList.size() > 0) {
-        for (StrDate & date : onTheseDatesList) {
-            criteria.addToInClause("date", date);
-        }
+    criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseAccounts(criteria, withTheseAccountsList);
+    criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseCategories(criteria, withTheseCategoriesList);
+    criteria = DBTransactionView::FindCriteriaHelper::handleWithThesePayees(criteria, withThesePayeesList);
 
-        criteria.endInClause_StrDate("date");
-    }
-
-    if (withTheseAccountsList.size() > 0) {
-        for (string & account : withTheseAccountsList) {
-            criteria.addToInClause("account", account);
-        }
-
-        criteria.endInClause_string("account");
-    }
-
-    if (withTheseCategoriesList.size() > 0) {
-        for (string & category : withTheseCategoriesList) {
-            criteria.addToInClause("category", category);
-        }
-
-        criteria.endInClause_string("category");
-    }
-
-    if (withThesePayeesList.size() > 0) {
-        for (string & payee : withThesePayeesList) {
-            criteria.addToInClause("payee", payee);
-        }
-
-        criteria.endInClause_string("payee");
-    }
-
-    if (description.length() > 0) {
-        if (description.find_first_of('%') != string::npos || description.find_first_of('_') != string::npos) {
-            criteria.add("description", DBCriteria::like, description);
-        }
-        else {
-            criteria.add("description", DBCriteria::equal_to, description);
-        }
-    }
-
-    if (reference.length() > 0) {
-        if (reference.find_first_of('%') != string::npos || reference.find_first_of('_') != string::npos) {
-            criteria.add("reference", DBCriteria::like, reference);
-        }
-        else {
-            criteria.add("reference", DBCriteria::equal_to, reference);
-        }
-    }
-
-    if (debitOrCredit.length() > 0) {
-        criteria.add("type", DBCriteria::equal_to, debitOrCredit);
-    }
-
-    if (lessThanThisAmount > 0.0) {
-        criteria.add("amount", DBCriteria::less_than, lessThanThisAmount);
-    }
+    criteria = DBTransactionView::FindCriteriaHelper::handleWithThisDescription(criteria, description);
+    criteria = DBTransactionView::FindCriteriaHelper::handleWithThisReference(criteria, reference);
+    criteria = DBTransactionView::FindCriteriaHelper::handleWithThisType(criteria, debitOrCredit);
 
     if (recurringOrNonRecurring.length() > 0) {
-        if (recurringOrNonRecurring.compare("r") == 0) {
-            criteria.add("recurring", true);
-        }
-        else if (recurringOrNonRecurring.compare("n") == 0) {
-            criteria.add("recurring", false);
-        }
+        criteria = DBTransactionView::FindCriteriaHelper::handleIsRecurring(criteria, recurringOrNonRecurring.compare("r") == 0 ? true : false);
     }
 
     return criteria;

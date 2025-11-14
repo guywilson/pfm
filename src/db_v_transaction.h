@@ -10,6 +10,7 @@
 #include "db_base.h"
 #include "db_transaction.h"
 #include "strdate.h"
+#include "pfm_error.h"
 
 using namespace std;
 
@@ -117,6 +118,140 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t & accountId, DBCriteria & criteria);
         DBResult<DBTransactionView> reportByCategory();
         DBResult<DBTransactionView> reportByPayee();
+
+        class FindCriteriaHelper {
+            public:
+                static DBCriteria handleBetweenTheseDates(DBCriteria & src, vector<StrDate> & dates) {
+                    if (dates.size() == 0) {
+                        return src;
+                    }
+                    else if (dates.size() == 1) {
+                        src.add(DBPayment::Columns::date, DBCriteria::greater_than, dates[0]);
+                    }
+                    else if (dates.size() == 2) {
+                        src.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, dates[0]);
+                        src.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, dates[1]);
+                    }
+                    else {
+                        throw pfm_error("Too many date criterion supplied.");
+                    }
+
+                    return src;
+                }
+
+                static DBCriteria handleOnTheseDates(DBCriteria & src, vector<StrDate> & dates) {
+                    if (dates.size() > 0) {
+                        for (StrDate & date : dates) {
+                            src.addToInClause(DBPayment::Columns::date, date);
+                        }
+
+                        src.endInClause_StrDate(DBPayment::Columns::date);
+                    }
+
+                    return src;
+                }
+
+                static DBCriteria handleBetweenTheseAmounts(DBCriteria & src, vector<Money> & amounts) {
+                    if (amounts.size() == 0) {
+                        return src;
+                    }
+                    else if (amounts.size() == 1) {
+                        src.add(DBPayment::Columns::amount, DBCriteria::greater_than, amounts[0]);
+                    }
+                    else if (amounts.size() == 2) {
+                        src.add(DBPayment::Columns::amount, DBCriteria::greater_than_or_equal, amounts[0]);
+                        src.add(DBPayment::Columns::amount, DBCriteria::less_than_or_equal, amounts[1]);
+                    }
+                    else {
+                        throw pfm_error("Too many amount criterion supplied.");
+                    }
+
+                    return src;
+                }
+
+                static DBCriteria handleLessThanThisAmount(DBCriteria & src, Money & amount) {
+                    if (amount > 0.0) {
+                        src.add(DBPayment::Columns::amount, DBCriteria::less_than, amount);
+                    }
+                    
+                    return src;
+                }
+
+                static DBCriteria handleWithTheseAccounts(DBCriteria & src, vector<string> & accounts) {
+                    if (accounts.size() > 0) {
+                        for (string & account : accounts) {
+                            src.addToInClause(Columns::account, account);
+                        }
+
+                        src.endInClause_string(Columns::account);
+                    }
+
+                    return src;
+                }
+
+                static DBCriteria handleWithTheseCategories(DBCriteria & src, vector<string> & categories) {
+                    if (categories.size() > 0) {
+                        for (string & category : categories) {
+                            src.addToInClause(Columns::category, category);
+                        }
+
+                        src.endInClause_string(Columns::category);
+                    }
+
+                    return src;
+                }
+
+                static DBCriteria handleWithThesePayees(DBCriteria & src, vector<string> & payees) {
+                    if (payees.size() > 0) {
+                        for (string & payee : payees) {
+                            src.addToInClause(Columns::payee, payee);
+                        }
+
+                        src.endInClause_string(Columns::payee);
+                    }
+
+                    return src;
+                }
+
+                static DBCriteria handleWithThisDescription(DBCriteria & src, const string & description) {
+                    if (description.length() > 0) {
+                        if (description.find_first_of('%') != string::npos || description.find_first_of('_') != string::npos) {
+                            src.add(DBPayment::Columns::description, DBCriteria::like, description);
+                        }
+                        else {
+                            src.add(DBPayment::Columns::description, DBCriteria::equal_to, description);
+                        }
+                    }
+
+                    return src;
+                }
+
+                static DBCriteria handleWithThisReference(DBCriteria & src, const string & reference) {
+                    if (reference.length() > 0) {
+                        if (reference.find_first_of('%') != string::npos || reference.find_first_of('_') != string::npos) {
+                            src.add(DBTransaction::Columns::reference, DBCriteria::like, reference);
+                        }
+                        else {
+                            src.add(DBTransaction::Columns::reference, DBCriteria::equal_to, reference);
+                        }
+                    }
+
+                    return src;
+                }
+
+                static DBCriteria handleWithThisType(DBCriteria & src, const string & type) {
+                    if (type.length() > 0) {
+                        src.add(Columns::type, DBCriteria::equal_to, type);
+                    }
+
+                    return src;
+                }
+
+                static DBCriteria handleIsRecurring(DBCriteria & src, const bool & isRecurring) {
+                    src.add(Columns::recurring, isRecurring);
+                    return src;
+                }
+        };
 };
 
 #endif
