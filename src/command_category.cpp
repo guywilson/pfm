@@ -47,7 +47,15 @@ DBCategory Command::getCategory(string & categoryCode) {
     return category;
 }
 
-void Command::updateCategory(DBCategory & category) {
+void Command::updateCategory() {
+    string categoryCode;
+
+    if (hasParameters()) {
+        categoryCode = getParameter(0);
+    }
+
+    DBCategory category = getCategory(categoryCode);
+
     UpdateCategoryView view;
     view.setCategory(category);
     view.show();
@@ -56,12 +64,22 @@ void Command::updateCategory(DBCategory & category) {
     updatedCategory.save();
 }
 
-void Command::deleteCategory(DBCategory & category) {
+void Command::deleteCategory() {
+    string categoryCode;
+
+    if (hasParameters()) {
+        categoryCode = getParameter(0);
+    }
+
+    DBCategory category = getCategory(categoryCode);
+
     category.remove();
     category.clear();
 }
 
-void Command::importCategories(string & jsonFileName) {
+void Command::importCategories() {
+    string jsonFileName = getParameter(0);
+
     JFileReader jfile = JFileReader(jsonFileName, "DBCategory");
 
     vector<JRecord> records = jfile.read("categories");
@@ -74,7 +92,9 @@ void Command::importCategories(string & jsonFileName) {
     }
 }
 
-void Command::exportCategories(string & jsonFileName) {
+void Command::exportCategories() {
+    string jsonFileName = getParameter(0);
+
     DBResult<DBCategory> results;
     results.retrieveAll();
 

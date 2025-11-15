@@ -52,8 +52,10 @@ void Command::listAccounts() {
     view.show();
 }
 
-void Command::chooseAccount(string & accountCode) {
+void Command::chooseAccount() {
     log.entry("Command::chooseAccount()");
+
+    string accountCode = getParameter(0);
 
     log.debug("Choose account with code '%s'", accountCode.c_str());
 
@@ -72,9 +74,11 @@ void Command::chooseAccount(string & accountCode) {
     log.exit("Command::chooseAccount()");
 }
 
-void Command::setPrimaryAccount(string & accountCode) {
+void Command::setPrimaryAccount() {
     log.entry("Command::setPrimaryAccount()");
 
+    string accountCode = getParameter(0);
+    
     log.debug("Set primary account to '%s'", accountCode.c_str());
 
     DBPrimaryAccount::setPrimaryAccount(accountCode);
@@ -101,7 +105,15 @@ void Command::updateAccount() {
     selectedAccount = updatedAccount;
 }
 
-void Command::importAccounts(const string & jsonFileName) {
+void Command::deleteAccount() {
+    checkAccountSelected();
+    selectedAccount.remove();
+    selectedAccount.clear();
+}
+
+void Command::importAccounts() {
+    string jsonFileName = getParameter(0);
+
     JFileReader jfile = JFileReader(jsonFileName, "DBAccount");
 
     vector<JRecord> records = jfile.read("accounts");
@@ -114,7 +126,9 @@ void Command::importAccounts(const string & jsonFileName) {
     }
 }
 
-void Command::exportAccounts(const string & jsonFileName) {
+void Command::exportAccounts() {
+    string jsonFileName = getParameter(0);
+    
     DBResult<DBAccount> results;
     results.retrieveAll();
 

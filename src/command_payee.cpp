@@ -47,7 +47,15 @@ DBPayee Command::getPayee(string & payeeCode) {
     return payee;
 }
 
-void Command::updatePayee(DBPayee & payee) {
+void Command::updatePayee() {
+    string payeeCode;
+
+    if (hasParameters()) {
+        payeeCode = getParameter(0);
+    }
+
+    DBPayee payee = getPayee(payeeCode);
+
     UpdatePayeeView view;
     view.setPayee(payee);
     view.show();
@@ -56,12 +64,22 @@ void Command::updatePayee(DBPayee & payee) {
     updatedPayee.save();
 }
 
-void Command::deletePayee(DBPayee & payee) {
+void Command::deletePayee() {
+    string payeeCode;
+
+    if (hasParameters()) {
+        payeeCode = getParameter(0);
+    }
+
+    DBPayee payee = getPayee(payeeCode);
+
     payee.remove();
     payee.clear();
 }
 
-void Command::importPayees(string & jsonFileName) {
+void Command::importPayees() {
+    string jsonFileName = getParameter(0);
+
     JFileReader jfile = JFileReader(jsonFileName, "DBPayee");
 
     vector<JRecord> records = jfile.read("payees");
@@ -74,7 +92,9 @@ void Command::importPayees(string & jsonFileName) {
     }
 }
 
-void Command::exportPayees(string & jsonFileName) {
+void Command::exportPayees() {
+    string jsonFileName = getParameter(0);
+
     DBResult<DBPayee> results;
     results.retrieveAll();
 

@@ -56,7 +56,15 @@ DBConfig Command::getConfig(string & key) {
     return config;
 }
 
-void Command::updateConfig(DBConfig & config) {
+void Command::updateConfig() {
+    string configKey;
+
+    if (hasParameters()) {
+        configKey = getParameter(0);
+    }
+
+    DBConfig config = getConfig(configKey);
+
     if (config.isReadOnly) {
         throw pfm_validation_error(
             pfm_error::buildMsg(
@@ -72,7 +80,15 @@ void Command::updateConfig(DBConfig & config) {
     updatedConfig.save();
 }
 
-void Command::deleteConfig(DBConfig & config) {
+void Command::deleteConfig() {
+    string configKey;
+
+    if (hasParameters()) {
+        configKey = getParameter(0);
+    }
+
+    DBConfig config = getConfig(configKey);
+
     PFM_DB & db = PFM_DB::getInstance();
 
     string accessKey = db.getKey("Access password: ");

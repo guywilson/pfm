@@ -23,7 +23,6 @@ using namespace std;
 
 class Command {
     private:
-        string command;
         vector<string> parameters;
 
         vector<string> commandHistory;
@@ -32,11 +31,7 @@ class Command {
         Logger & log = Logger::getInstance();
         cfgmgr & cfg = cfgmgr::getInstance();
 
-        void parse(const string & command);
-        
-        bool isCommand(const char * compareTo) {
-            return (command.compare(compareTo) == 0 ? true : false);
-        }
+        string parse(const string & commandLine);
 
         bool hasParameters() {
             return (this->parameters.size() > 0);
@@ -71,53 +66,54 @@ class Command {
             }
         }
 
+    public:
         void saveJsonTemplate();
         
         void addAccount();
         void listAccounts();
-        void chooseAccount(string & accountCode);
-        void setPrimaryAccount(string & accountCode);
+        void chooseAccount();
+        void setPrimaryAccount();
         void updateAccount();
-        void importAccounts(const string & jsonFileName);
-        void exportAccounts(const string & jsonFileName);
+        void deleteAccount();
+        void importAccounts();
+        void exportAccounts();
 
         void addConfig();
         void listConfigItems();
         DBConfig getConfig(string & key);
-        void updateConfig(DBConfig & config);
-        void deleteConfig(DBConfig & config);
+        void updateConfig();
+        void deleteConfig();
 
         void addCategory();
         void listCategories();
         DBCategory getCategory(string & categoryCode);
-        void updateCategory(DBCategory & category);
-        void deleteCategory(DBCategory & category);
-        void importCategories(string & jsonFileName);
-        void exportCategories(string & jsonFileName);
+        void updateCategory();
+        void deleteCategory();
+        void importCategories();
+        void exportCategories();
         void clearCategories();
 
         void addPayee();
         void listPayees();
         DBPayee getPayee(string & payeeCode);
-        void updatePayee(DBPayee & payee);
-        void deletePayee(DBPayee & payee);
-        void importPayees(string & jsonFileName);
-        void exportPayees(string & jsonFileName);
+        void updatePayee();
+        void deletePayee();
+        void importPayees();
+        void exportPayees();
 
         void addRecurringCharge();
         void listRecurringCharges();
         DBRecurringCharge getRecurringCharge(int sequence);
-        void updateRecurringCharge(DBRecurringCharge & charge);
-        void deleteRecurringCharge(DBRecurringCharge & charge);
-        void importRecurringCharges(string & jsonFileName);
-        void exportRecurringCharges(string & jsonFileName);
+        void updateRecurringCharge();
+        void deleteRecurringCharge();
+        void importRecurringCharges();
+        void exportRecurringCharges();
+        void migrateCharge();
         void clearRecurringTransactions();
 
         void addTransaction();
-        void addTransaction(AddTransactionCriteriaBuilder & builder);
         void addTransferTransaction();
-        void migrateCharge(DBRecurringCharge & charge);
-        void listTransactions(uint32_t rowLimit, DBCriteria::sql_order sortDirection, bool includeRecurring);
+        void listTransactions();
         void findTransactions();
         void findTransactions(const string & where);
         void findTransactions(DBCriteria & criteria);
@@ -125,22 +121,22 @@ class Command {
         void transactionsByPayee();
         string buildFindTransactionCriteria();
         DBTransaction getTransaction(int sequence);
-        void updateTransaction(DBTransaction & transaction);
-        void deleteTransaction(DBTransaction & transaction);
-        void reconcileTransaction(DBTransaction & transaction);
-        void importTransactions(string & jsonFileName);
-        void exportTransactions(string & jsonFileName);
-        void exportTransactionsAsCSV(string & csvFileName);
+        void updateTransaction();
+        void deleteTransaction();
+        void reconcileTransaction();
+        void importTransactions();
+        void exportTransactions();
+        void exportTransactionsAsCSV();
 
         void addReport();
-        void copyReport(DBTransactionReport & report);
+        void copyReport();
         void listReports();
         DBTransactionReport getReport(int sequence);
-        void updateReport(DBTransactionReport & report);
-        void deleteReport(DBTransactionReport & report);
-        void runReport(DBTransactionReport & report);
-        void saveReport(const string & description);
-        void showReport(DBTransactionReport & report);
+        void updateReport();
+        void deleteReport();
+        void runReport();
+        void saveReport();
+        void showReport();
 
         void listCarriedOverLogs();
 
@@ -149,14 +145,13 @@ class Command {
         void saveDBKey();
 
         int getLogLevelParameter(string & level);
-        void setLoggingLevel(string & level);
-        void clearLoggingLevel(string & level);
+        void setLoggingLevel();
+        void clearLoggingLevel();
 
-    public:
         static void help();
         static void version();
 
-        bool process(const string & command);
+        bool process(const string & commandLine);
 };
 
 #endif

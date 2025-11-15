@@ -1,6 +1,7 @@
 #include <string>
 #include <string.h>
 #include <vector>
+#include <stdlib.h>
 
 #include "command.h"
 #include "pfm_error.h"
@@ -23,7 +24,11 @@ void Command::addReport() {
     report.save();
 }
 
-void Command::copyReport(DBTransactionReport & report) {
+void Command::copyReport() {
+    string sequence = getParameter(0);
+
+    DBTransactionReport report = getReport(atoi(sequence.c_str()));
+
     report.id.clear();
     report.save();
 }
@@ -54,7 +59,11 @@ DBTransactionReport Command::getReport(int sequence) {
     return report;
 }
 
-void Command::updateReport(DBTransactionReport & report) {
+void Command::updateReport() {
+    string sequence = getParameter(0);
+
+    DBTransactionReport report = getReport(atoi(sequence.c_str()));
+
     UpdateReportView view;
     view.setReport(report);
     view.show();
@@ -63,19 +72,32 @@ void Command::updateReport(DBTransactionReport & report) {
     updatedReport.save();
 }
 
-void Command::deleteReport(DBTransactionReport & report) {
+void Command::deleteReport() {
+    string sequence = getParameter(0);
+
+    DBTransactionReport report = getReport(atoi(sequence.c_str()));
+
     report.remove();
     report.clear();
 }
 
-void Command::runReport(DBTransactionReport & report) {
+void Command::runReport() {
+    string sequence = getParameter(0);
+
+    DBTransactionReport report = getReport(atoi(sequence.c_str()));
+
     findTransactions(report.sqlWhereClause);
 }
 
-void Command::saveReport(const string & description) {
+void Command::saveReport() {
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
     DBTransactionReport report;
+    string description;
+
+    if (hasParameters()) {
+        description = getParameter(0);
+    }
 
     if (description.length() == 0) {
         SaveReportView view;
@@ -94,7 +116,11 @@ void Command::saveReport(const string & description) {
     cacheMgr.clearFindCriteria();
 }
 
-void Command::showReport(DBTransactionReport & report) {
+void Command::showReport() {
+    string sequence = getParameter(0);
+
+    DBTransactionReport report = getReport(atoi(sequence.c_str()));
+
     ShowReportView view;
     view.setReport(report);
     view.show();

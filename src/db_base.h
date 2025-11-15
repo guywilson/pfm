@@ -512,10 +512,20 @@ class DBEntity {
             string statement = "UPDATE " + tableName + " SET ";
 
             for (size_t i = 0;i < columnValuePairs.size();i++) {
-                statement.append(columnValuePairs[i].first);
-                statement.append(" = '");
-                statement.append(columnValuePairs[i].second);
-                statement.append("'");
+                string columnName = columnValuePairs[i].first;
+                string value = columnValuePairs[i].second;
+
+                statement.append(columnName);
+                statement.append(" = ");
+
+                if (value == "NULL") {
+                    statement.append(value);
+                }
+                else {
+                    statement.append("'");
+                    statement.append(value);
+                    statement.append("'");
+                }
 
                 if (i < columnValuePairs.size() - 1) {
                     statement.append(", ");

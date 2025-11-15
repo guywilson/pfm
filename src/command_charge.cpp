@@ -1,6 +1,7 @@
 #include <string>
 #include <string.h>
 #include <vector>
+#include <stdlib.h>
 
 #include "command.h"
 #include "pfm_error.h"
@@ -68,7 +69,11 @@ DBRecurringCharge Command::getRecurringCharge(int sequence) {
     return charge;
 }
 
-void Command::updateRecurringCharge(DBRecurringCharge & charge) {
+void Command::updateRecurringCharge() {
+    string sequence = getParameter(0);
+
+    DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
+
     UpdateRecurringChargeView view;
     
     view.setRecurringCharge(charge);
@@ -79,7 +84,11 @@ void Command::updateRecurringCharge(DBRecurringCharge & charge) {
     updatedCharge.save();
 }
 
-void Command::deleteRecurringCharge(DBRecurringCharge & charge) {
+void Command::deleteRecurringCharge() {
+    string sequence = getParameter(0);
+
+    DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
+
     PFM_DB & db = PFM_DB::getInstance();
 
     try {
@@ -95,7 +104,9 @@ void Command::deleteRecurringCharge(DBRecurringCharge & charge) {
     }
 }
 
-void Command::importRecurringCharges(string & jsonFileName) {
+void Command::importRecurringCharges() {
+    string jsonFileName = getParameter(0);
+
     JFileReader jfile = JFileReader(jsonFileName, "DBRecurringCharge");
 
     vector<JRecord> records = jfile.read("charges");
@@ -108,7 +119,9 @@ void Command::importRecurringCharges(string & jsonFileName) {
     }
 }
 
-void Command::exportRecurringCharges(string & jsonFileName) {
+void Command::exportRecurringCharges() {
+    string jsonFileName = getParameter(0);
+
     DBResult<DBRecurringCharge> results;
     results.retrieveAll();
 
@@ -125,7 +138,11 @@ void Command::exportRecurringCharges(string & jsonFileName) {
     jFile.write(records, "charges");
 }
 
-void Command::migrateCharge(DBRecurringCharge & charge) {
+void Command::migrateCharge() {
+    string sequence = getParameter(0);
+
+    DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
+
     MigrateChargeView view;
     view.setCharge(charge);
     view.show();

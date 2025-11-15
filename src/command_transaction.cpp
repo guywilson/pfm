@@ -1,6 +1,8 @@
 #include <string>
 #include <string.h>
 #include <vector>
+#include <stdlib.h>
+#include <ctype.h>
 
 #include "command.h"
 #include "pfm_error.h"
@@ -12,9 +14,20 @@
 
 #include "db_transaction.h"
 #include "db_v_transaction.h"
+#include "db_carried_over.h"
 #include "transaction_views.h"
+#include "debug_views.h"
 
 using namespace std;
+
+void Command::listCarriedOverLogs() {
+    DBResult<DBCarriedOverView> result;
+    result.retrieveAll();
+
+    CarriedOverListView view;
+    view.addResults(result);
+    view.show();
+}
 
 void Command::clearRecurringTransactions() {
     checkAccountSelected();
@@ -26,44 +39,45 @@ void Command::clearRecurringTransactions() {
 void Command::addTransaction() {
     checkAccountSelected();
 
+    if (hasParameters()) {
+        AddTransactionCriteriaBuilder builder(this->parameters);
+
+        DBTransaction transaction;
+
+        try {
+            DBCategory category;
+            category.retrieveByCode(builder.categoryCode);
+            transaction.categoryId = category.id;
+        }
+        catch (pfm_error & e) {
+            transaction.categoryId.clear();
+        }
+
+        try {
+            DBPayee payee;
+            payee.retrieveByCode(builder.payeeCode);
+            transaction.payeeId = payee.id;
+        }
+        catch (pfm_error & e) {
+            transaction.payeeId.clear();
+        }
+
+        transaction.accountId = selectedAccount.id;
+        transaction.date = builder.date;
+        transaction.description = builder.description;
+        transaction.reference = builder.reference;
+        transaction.amount = builder.amount;
+        transaction.type = builder.type;
+
+        transaction.save();
+        return;
+    }
+
     AddTransactionView view;
     view.show();
 
     DBTransaction transaction = view.getTransaction();
     transaction.accountId = selectedAccount.id;
-    transaction.save();
-}
-
-void Command::addTransaction(AddTransactionCriteriaBuilder & builder) {
-    checkAccountSelected();
-
-    DBTransaction transaction;
-
-    try {
-        DBCategory category;
-        category.retrieveByCode(builder.categoryCode);
-        transaction.categoryId = category.id;
-    }
-    catch (pfm_error & e) {
-        transaction.categoryId.clear();
-    }
-
-    try {
-        DBPayee payee;
-        payee.retrieveByCode(builder.payeeCode);
-        transaction.payeeId = payee.id;
-    }
-    catch (pfm_error & e) {
-        transaction.payeeId.clear();
-    }
-
-    transaction.accountId = selectedAccount.id;
-    transaction.date = builder.date;
-    transaction.description = builder.description;
-    transaction.reference = builder.reference;
-    transaction.amount = builder.amount;
-    transaction.type = builder.type;
-
     transaction.save();
 }
 
@@ -82,8 +96,34 @@ void Command::addTransferTransaction() {
     DBTransaction::createTransferPairFromSource(sourceTransaction, accountTo);
 }
 
-void Command::listTransactions(uint32_t rowLimit, DBCriteria::sql_order sortDirection, bool includeRecurring) {
+void Command::listTransactions() {
     checkAccountSelected();
+
+    bool includeRecurring = false;
+    uint32_t rowLimit = 25;
+    DBCriteria::sql_order sortDirection = DBCriteria::descending;
+
+    if (hasParameters()) {
+        for (string & parameter : parameters) {
+            if (isdigit(parameter[0])) {
+                rowLimit = strtoul(parameter.c_str(), NULL, 10);
+            }
+            else {
+                if (parameter.compare("all") == 0) {
+                    includeRecurring = true;
+                }
+                else if (parameter.compare("nr") == 0) {
+                    includeRecurring = false;
+                }
+                else if (parameter.compare("asc") == 0) {
+                    sortDirection = DBCriteria::ascending;
+                }
+                else if (parameter.compare("desc") == 0) {
+                    sortDirection = DBCriteria::descending;
+                }
+            }
+        }
+    }
 
     DBTransactionView transactionInstance;
     DBResult<DBTransactionView> result;
@@ -110,6 +150,20 @@ void Command::listTransactions(uint32_t rowLimit, DBCriteria::sql_order sortDire
 }
 
 void Command::findTransactions() {
+    if (hasParameters()) {
+        FindTransactionCriteriaBuilder builder(this->parameters);
+
+        if (builder.hasRawSQL()) {
+            findTransactions(builder.getRawSQL());
+        }
+        else {
+            DBCriteria criteria = builder.getCriteria();
+            findTransactions(criteria);
+        }
+
+        return;
+    }
+
     FindTransactionView view;
     view.show();
     
@@ -198,7 +252,11 @@ DBTransaction Command::getTransaction(int sequence) {
     return transaction;
 }
 
-void Command::updateTransaction(DBTransaction & transaction) {
+void Command::updateTransaction() {
+    string sequence = getParameter(0);
+
+    DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
+
     UpdateTransactionView view;
     view.setTransaction(transaction);
     view.show();
@@ -224,19 +282,27 @@ void Command::updateTransaction(DBTransaction & transaction) {
     updatedTransaction.save();
 }
 
-void Command::deleteTransaction(DBTransaction & transaction) {
+void Command::deleteTransaction() {
+    string sequence = getParameter(0);
+
+    DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
+
     transaction.remove();
 }
 
-void Command::reconcileTransaction(DBTransaction & transaction) {
+void Command::reconcileTransaction() {
+    string sequence = getParameter(0);
+
+    DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
+
     transaction.retrieve();
-
     transaction.isReconciled = true;
-
     transaction.save();
 }
 
-void Command::importTransactions(string & jsonFileName) {
+void Command::importTransactions() {
+    string jsonFileName = getParameter(0);
+
     JFileReader jfile = JFileReader(jsonFileName, "DBTransaction");
 
     vector<JRecord> records = jfile.read("transactions");
@@ -249,7 +315,9 @@ void Command::importTransactions(string & jsonFileName) {
     }
 }
 
-void Command::exportTransactions(string & jsonFileName) {
+void Command::exportTransactions() {
+    string jsonFileName = getParameter(0);
+
     DBResult<DBTransaction> results;
     results.retrieveAll();
 
@@ -266,7 +334,9 @@ void Command::exportTransactions(string & jsonFileName) {
     jFile.write(records, "transactions");
 }
 
-void Command::exportTransactionsAsCSV(string & csvFileName) {
+void Command::exportTransactionsAsCSV() {
+    string csvFileName = getParameter(0);
+
     DBResult<DBTransaction> results;
     results.retrieveAll();
 
