@@ -11,6 +11,7 @@
 #include "cfgmgr.h"
 #include "pfm_error.h"
 #include "rlcustom.h"
+#include "bold_modifier.h"
 
 using namespace std;
 
@@ -27,26 +28,6 @@ using namespace std;
 #define LIST_VIEW_AMOUNT_WIDTH                  14
 
 #define CLI_CANCEL_KEY                         'x'
-
-
-#if defined(__APPLE__) || defined(__unix__)
-const char ESC_CHAR = '\x1B';
-std::ostream& bold_on(std::ostream& os) {
-    return os << ESC_CHAR << "[1m";
-}
-
-std::ostream& bold_off(std::ostream& os) {
-    return os << ESC_CHAR << "[0m";
-}
-#else
-std::ostream& bold_on(std::ostream& os) {
-    return os << "";
-}
-
-std::ostream& bold_off(std::ostream& os) {
-    return os << "";
-}
-#endif
 
 static int countMultiByteChars(const string & str) {
     int i = 0;

@@ -64,7 +64,7 @@ void JFileReader::validate() {
     }
 }
 
-JFileReader::JFileReader(string & filename, const string & className) {
+JFileReader::JFileReader(const string & filename, const string & className) {
     this->className = className;
 
     ifstream fstream(filename.c_str());
@@ -85,11 +85,6 @@ vector<JRecord> JFileReader::read(const char * name) {
     }
 
     return records;
-}
-
-JFileWriter::JFileWriter(string & filename, const string & className) {
-    this->className = className;
-    this->fstream.open(filename);
 }
 
 JFileWriter::JFileWriter(const string & filename, const string & className) {

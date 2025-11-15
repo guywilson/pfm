@@ -42,7 +42,7 @@ class JFileReader {
         void validate();
 
     public:
-        JFileReader(string & filename, const string & className);
+        JFileReader(const string & filename, const string & className);
 
         vector<JRecord> read(const char * name);
 };
@@ -53,7 +53,6 @@ class JFileWriter {
         string className;
 
     public:
-        JFileWriter(string & filename, const string & className);
         JFileWriter(const string & filename, const string & className);
         ~JFileWriter();
 

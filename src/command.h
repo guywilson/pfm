@@ -78,8 +78,8 @@ class Command {
         void chooseAccount(string & accountCode);
         void setPrimaryAccount(string & accountCode);
         void updateAccount();
-        void importAccounts(string & jsonFileName);
-        void exportAccounts(string & jsonFileName);
+        void importAccounts(const string & jsonFileName);
+        void exportAccounts(const string & jsonFileName);
 
         void addConfig();
         void listConfigItems();
