@@ -189,7 +189,6 @@ class DBTransaction : public DBPayment {
 
         const string getUpdateStatement() override {
             vector<pair<string, string>> columnValuePairs = {
-                {DBPayment::Columns::accountId, accountId.getValue()},
                 {DBPayment::Columns::categoryId, categoryId.getValue()},
                 {DBPayment::Columns::payeeId, payeeId.getValue()},
                 {DBPayment::Columns::date, date.shortDate()},
