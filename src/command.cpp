@@ -26,82 +26,51 @@
 #include "db_transaction.h"
 #include "jfile.h"
 #include "command.h"
+#include "command_table.h"
+#include "bold_modifier.h"
 
 using namespace std;
 
-struct CommandEntry {
-    string                      name;
-    vector<string>              aliases;
-
-    function<void(Command&)>    handler;
-};
-
-static const vector<CommandEntry> commandTable = {
-    {"save-json-template",         {"sjt"},                         [](Command& c){ c.saveJsonTemplate(); }},
-    {"add-account",                {"aa"},                          [](Command& c){ c.addAccount(); }},
-    {"list-accounts",              {"la"},                          [](Command& c){ c.listAccounts(); }},
-    {"use",                        {"select"},                      [](Command& c){ c.chooseAccount(); }},
-    {"set-primary-account",        {"spa"},                         [](Command& c){ c.setPrimaryAccount(); }},
-    {"update-account",             {"ua"},                          [](Command& c){ c.updateAccount(); }},
-    {"delete-account",             {"da"},                          [](Command& c){ c.deleteAccount(); }},
-    {"import-accounts",            {"ia"},                          [](Command& c){ c.importAccounts(); }},
-    {"export-accounts",            {"xa"},                          [](Command& c){ c.exportAccounts(); }},
-    {"add-config-item",            {"acfg"},                        [](Command& c){ c.addConfig(); }},
-    {"list-config-items",          {"lcfg"},                        [](Command& c){ c.listConfigItems(); }},
-    {"update-config-item",         {"ucfg"},                        [](Command& c){ c.updateConfig(); }},
-    {"delete-config-item",         {"dcfg"},                        [](Command& c){ c.deleteConfig(); }},
-    {"add-category",               {"ac"},                          [](Command& c){ c.addCategory(); }},
-    {"list-categories",            {"lc"},                          [](Command& c){ c.listCategories(); }},
-    {"update-category",            {"uc"},                          [](Command& c){ c.updateCategory(); }},
-    {"delete-category",            {"dc"},                          [](Command& c){ c.deleteCategory(); }},
-    {"import-categories",          {"ic"},                          [](Command& c){ c.importCategories(); }},
-    {"export-categories",          {"xc"},                          [](Command& c){ c.exportCategories(); }},
-    {"clear-categories",           {"cc"},                          [](Command& c){ c.clearCategories(); }},
-    {"add-payee",                  {"ap"},                          [](Command& c){ c.addPayee(); }},
-    {"list-payees",                {"lp"},                          [](Command& c){ c.listPayees(); }},
-    {"update-payee",               {"up"},                          [](Command& c){ c.updatePayee(); }},
-    {"delete-payee",               {"dp"},                          [](Command& c){ c.deletePayee(); }},
-    {"import-payees",              {"ip"},                          [](Command& c){ c.importPayees(); }},
-    {"export-payees",              {"xp"},                          [](Command& c){ c.exportPayees(); }},
-    {"add-recurring-charge",       {"arc"},                         [](Command& c){ c.addRecurringCharge(); }},
-    {"list-recurring-charges",     {"lrc"},                         [](Command& c){ c.listRecurringCharges(); }},
-    {"update-recurring-charge",    {"urc"},                         [](Command& c){ c.updateRecurringCharge(); }},
-    {"delete-recurring-charge",    {"drc"},                         [](Command& c){ c.deleteRecurringCharge(); }},
-    {"import-recurring-charges",   {"irc"},                         [](Command& c){ c.importRecurringCharges(); }},
-    {"export-recurring-charges",   {"xrc"},                         [](Command& c){ c.exportRecurringCharges(); }},
-    {"migrate-recurring-charge",   {"mrc"},                         [](Command& c){ c.migrateCharge(); }},
-    {"add-transaction",            {"at", "add"},                   [](Command& c){ c.addTransaction(); }},
-    {"transfer-transaction",       {"tr", "transfer"},              [](Command& c){ c.addTransferTransaction(); }},
-    {"list-transactions",          {"lt", "list"},                  [](Command& c){ c.listTransactions(); }},
-    {"find-transactions",          {"find"},                        [](Command& c){ c.findTransactions(); }},
-    {"category-report",            {"cr"},                          [](Command& c){ c.transactionsByCategory(); }},
-    {"payee-report",               {"pr"},                          [](Command& c){ c.transactionsByPayee(); }},
-    {"update-transaction",         {"ut"},                          [](Command& c){ c.updateTransaction(); }},
-    {"delete-transaction",         {"dt"},                          [](Command& c){ c.deleteTransaction(); }},
-    {"reconcile-transaction",      {"reconcile", "rt"},             [](Command& c){ c.reconcileTransaction(); }},
-    {"import-transactions",        {"it"},                          [](Command& c){ c.importTransactions(); }},
-    {"export-transactions",        {"xt"},                          [](Command& c){ c.exportTransactions(); }},
-    {"export-transactions-csv",    {"xtc"},                         [](Command& c){ c.exportTransactionsAsCSV(); }},
-    {"add-report",                 {"arp"},                         [](Command& c){ c.addReport(); }},
-    {"copy-report",                {"crp"},                         [](Command& c){ c.copyReport(); }},
-    {"list-reports",               {"show-reports", "lrp"},         [](Command& c){ c.listReports(); }},
-    {"update-report",              {"urp"},                         [](Command& c){ c.updateReport(); }},
-    {"delete-report",              {"drp"},                         [](Command& c){ c.deleteReport(); }},
-    {"run-report",                 {"run"},                         [](Command& c){ c.runReport(); }},
-    {"save-report",                {"save"},                        [](Command& c){ c.saveReport(); }},
-    {"show-report",                {"srp"},                         [](Command& c){ c.showReport(); }},
-    {"list-carried-over-logs",     {"lco"},                         [](Command& c){ c.listCarriedOverLogs(); }},
-    {"change-password",            {},                              [](Command& c){ c.changePassword(); }},
-    {"clear-recurring-transactions", {},                            [](Command& c){ c.clearRecurringTransactions(); }},
-    {"set-logging-level",          {},                              [](Command& c){ c.setLoggingLevel(); }},
-    {"clear-logging-level",        {},                              [](Command& c){ c.clearLoggingLevel(); }},
-    {"get-db-key",                 {},                              [](Command& c){ c.getDBKey(); }},
-    {"save-db-key",                {},                              [](Command& c){ c.saveDBKey(); }}
-};
-
 void Command::help() {
-    cout << "For help, please see the manual" << endl;
-    cout << "\tman pfm" << endl << endl;
+    cout << "For more detailed help, please see the manual" << endl;
+    cout << "e.g. man pfm" << endl << endl;
+
+    cout << "Commands supported:" << endl << endl;
+
+    for (const auto &entry : commandTable) {
+        if (entry.helpText.length() == 0) {
+            continue;
+        }
+        
+        cout << bold_on << entry.name << bold_off;
+
+        if (entry.aliases.empty()) {
+            cout << endl;
+        }
+        else {
+            cout << " [ ";
+
+            size_t i = 0;
+            for (const auto & alias : entry.aliases) {
+                cout << alias;
+
+                if (i < entry.aliases.size() - 1) {
+                    cout << ", ";
+                }
+
+                i++;
+            }
+
+            cout << " ]" << endl;
+        }
+
+        if (entry.helpText.length() > 0) {
+            cout << entry.helpText << endl;
+        }
+        cout << endl;
+    }
+
+    cout << endl;
 }
 
 void Command::version() {
