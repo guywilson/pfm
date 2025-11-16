@@ -25,9 +25,16 @@ class DBAccount : public DBEntity {
     protected:
         struct Columns {
             static constexpr const char * name = "name";
+            static constexpr ColumnType name_type = ColumnType::TEXT;
+
             static constexpr const char * code = "code";
+            static constexpr ColumnType code_type = ColumnType::TEXT;
+            
             static constexpr const char * openingDate = "opening_date";
+            static constexpr ColumnType openingDate_type = ColumnType::DATE;
+            
             static constexpr const char * openingBalance = "opening_balance";
+            static constexpr ColumnType openingBalance_type = ColumnType::MONEY;
         };
 
     public:
@@ -113,22 +120,22 @@ class DBAccount : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::code, code},
-                {Columns::name, name},
-                {Columns::openingBalance, openingBalance.rawStringValue()},
-                {Columns::openingDate, openingDate.shortDate()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::code, Columns::code_type}, code},
+                {{Columns::name, Columns::name_type}, name},
+                {{Columns::openingBalance, Columns::openingBalance_type}, openingBalance.rawStringValue()},
+                {{Columns::openingDate, Columns::openingDate_type}, openingDate.shortDate()}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::code, code},
-                {Columns::name, name},
-                {Columns::openingBalance, openingBalance.rawStringValue()},
-                {Columns::openingDate, openingDate.shortDate()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::code, Columns::code_type}, code},
+                {{Columns::name, Columns::name_type}, name},
+                {{Columns::openingBalance, Columns::openingBalance_type}, openingBalance.rawStringValue()},
+                {{Columns::openingDate, Columns::openingDate_type}, openingDate.shortDate()}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);

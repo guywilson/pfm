@@ -28,9 +28,16 @@ class DBTransaction : public DBPayment {
     protected:
         struct Columns {
             static constexpr const char * recurringChargeId = "recurring_charge_id";
+            static constexpr ColumnType recurringChargeId_type = ColumnType::ID;
+
             static constexpr const char * reference = "reference";
+            static constexpr ColumnType reference_type = ColumnType::TEXT;
+
             static constexpr const char * type = "credit_debit";
+            static constexpr ColumnType type_type = ColumnType::TEXT;
+
             static constexpr const char * isReconciled = "is_reconciled";
+            static constexpr ColumnType isReconciled_type = ColumnType::BOOL;
         };
 
     public:
@@ -171,33 +178,33 @@ class DBTransaction : public DBPayment {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {DBPayment::Columns::accountId, accountId.getValue()},
-                {DBPayment::Columns::categoryId, categoryId.getValue()},
-                {DBPayment::Columns::payeeId, payeeId.getValue()},
-                {DBPayment::Columns::date, date.shortDate()},
-                {Columns::recurringChargeId, recurringChargeId.getValue()},
-                {Columns::reference, delimitSingleQuotes(reference)},
-                {DBPayment::Columns::description, delimitSingleQuotes(description)},
-                {Columns::type, type},
-                {DBPayment::Columns::amount, amount.rawStringValue()},
-                {Columns::isReconciled, getIsReconciledValue()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{DBPayment::Columns::accountId, DBPayment::Columns::accountId_type}, accountId.getValue()},
+                {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categoryId.getValue()},
+                {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeId.getValue()},
+                {{DBPayment::Columns::date, DBPayment::Columns::date_type}, date.shortDate()},
+                {{Columns::recurringChargeId, Columns::recurringChargeId_type}, recurringChargeId.getValue()},
+                {{Columns::reference, Columns::reference_type}, delimitSingleQuotes(reference)},
+                {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::type, Columns::type_type}, type},
+                {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
+                {{Columns::isReconciled, Columns::isReconciled_type}, getIsReconciledValue()}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {DBPayment::Columns::categoryId, categoryId.getValue()},
-                {DBPayment::Columns::payeeId, payeeId.getValue()},
-                {DBPayment::Columns::date, date.shortDate()},
-                {Columns::recurringChargeId, recurringChargeId.getValue()},
-                {Columns::reference, delimitSingleQuotes(reference)},
-                {DBPayment::Columns::description, delimitSingleQuotes(description)},
-                {Columns::type, type},
-                {DBPayment::Columns::amount, amount.rawStringValue()},
-                {Columns::isReconciled, getIsReconciledValue()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categoryId.getValue()},
+                {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeId.getValue()},
+                {{DBPayment::Columns::date, DBPayment::Columns::date_type}, date.shortDate()},
+                {{Columns::recurringChargeId, Columns::recurringChargeId_type}, recurringChargeId.getValue()},
+                {{Columns::reference, Columns::reference_type}, delimitSingleQuotes(reference)},
+                {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::type, Columns::type_type}, type},
+                {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
+                {{Columns::isReconciled, Columns::isReconciled_type}, getIsReconciledValue()}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);

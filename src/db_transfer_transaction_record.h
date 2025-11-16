@@ -22,8 +22,13 @@ class DBTransferTransactionRecord : public DBEntity {
     protected:
         struct Columns {
             static constexpr const char * transactionToId = "transaction_to_id";
+            static constexpr ColumnType transactionToId_type = ColumnType::ID;
+
             static constexpr const char * transactionFromId = "transaction_from_id";
+            static constexpr ColumnType transactionFromId_type = ColumnType::ID;
+
             static constexpr const char * transactionDate = "transaction_date";
+            static constexpr ColumnType transactionDate_type = ColumnType::DATE;
         };
 
     public:
@@ -72,20 +77,20 @@ class DBTransferTransactionRecord : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::transactionToId, transactionToId.getValue()},
-                {Columns::transactionFromId, transactionFromId.getValue()},
-                {Columns::transactionDate, transactionDate.shortDate()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::transactionToId, Columns::transactionToId_type}, transactionToId.getValue()},
+                {{Columns::transactionFromId, Columns::transactionFromId_type}, transactionFromId.getValue()},
+                {{Columns::transactionDate, Columns::transactionDate_type}, transactionDate.shortDate()}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::transactionToId, transactionToId.getValue()},
-                {Columns::transactionFromId, transactionFromId.getValue()},
-                {Columns::transactionDate, transactionDate.shortDate()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::transactionToId, Columns::transactionToId_type}, transactionToId.getValue()},
+                {{Columns::transactionFromId, Columns::transactionFromId_type}, transactionFromId.getValue()},
+                {{Columns::transactionDate, Columns::transactionDate_type}, transactionDate.shortDate()}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);

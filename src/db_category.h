@@ -18,7 +18,10 @@ class DBCategory : public DBEntity {
     protected:
         struct Columns {
             static constexpr const char * description = "description";
+            static constexpr ColumnType description_type = ColumnType::TEXT;
+
             static constexpr const char * code = "code";
+            static constexpr ColumnType code_type = ColumnType::TEXT;
         };
 
     public:
@@ -84,18 +87,18 @@ class DBCategory : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::description, delimitSingleQuotes(description)},
-                {Columns::code, code},
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::code, Columns::code_type}, code},
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::description, delimitSingleQuotes(description)},
-                {Columns::code, code},
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::code, Columns::code_type}, code},
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);

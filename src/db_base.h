@@ -466,22 +466,22 @@ class DBEntity {
 
         const string delimitSingleQuotes(string & s) const;
         
-        virtual string buildInsertStatement(const string & tableName, vector<pair<string, string>> & columnValuePairs) const {
+        virtual string buildInsertStatement(const string & tableName, vector<pair<ColumnDef, string>> & columnValuePairs) const {
             string now = StrDate::getTimestamp();
 
-            columnValuePairs.push_back({Columns::createdDate, now});
-            columnValuePairs.push_back({Columns::updatedDate, now});
+            columnValuePairs.push_back({{Columns::createdDate, Columns::createdDate_type}, now});
+            columnValuePairs.push_back({{Columns::updatedDate, Columns::updatedDate_type}, now});
 
             string cols = "(";
             string vals = "(";
 
             for (size_t i = 0;i < columnValuePairs.size();i++) {
-                string columnName = columnValuePairs[i].first;
+                ColumnDef column = columnValuePairs[i].first;
                 string value = columnValuePairs[i].second;
 
-                cols.append(columnName);
+                cols.append(column.name);
 
-                if (value == "NULL") {
+                if (column.type == ID || column.type == MONEY) {
                     vals.append(value);
                 }
                 else {
@@ -504,21 +504,21 @@ class DBEntity {
             return statement;
         }
         
-        virtual string buildUpdateStatement(const string & tableName, vector<pair<string, string>> & columnValuePairs) const {
+        virtual string buildUpdateStatement(const string & tableName, vector<pair<ColumnDef, string>> & columnValuePairs) const {
             string now = StrDate::getTimestamp();
 
-            columnValuePairs.push_back({Columns::updatedDate, now});
+            columnValuePairs.push_back({{Columns::updatedDate, Columns::updatedDate_type}, now});
  
             string statement = "UPDATE " + tableName + " SET ";
 
             for (size_t i = 0;i < columnValuePairs.size();i++) {
-                string columnName = columnValuePairs[i].first;
+                ColumnDef column = columnValuePairs[i].first;
                 string value = columnValuePairs[i].second;
 
-                statement.append(columnName);
+                statement.append(column.name);
                 statement.append(" = ");
 
-                if (value == "NULL") {
+                if (column.type == ID || column.type == MONEY) {
                     statement.append(value);
                 }
                 else {
@@ -543,8 +543,13 @@ class DBEntity {
 
         struct Columns {
             static constexpr const char * id = "id";
+            static constexpr ColumnType id_type = ID;
+
             static constexpr const char * createdDate = "created";
+            static constexpr ColumnType createdDate_type = TEXT;
+
             static constexpr const char * updatedDate = "updated";
+            static constexpr ColumnType updatedDate_type = TEXT;
         };
         
     public:

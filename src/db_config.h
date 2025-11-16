@@ -17,10 +17,19 @@ class DBConfig : public DBEntity {
     protected:
         struct Columns {
             static constexpr const char * key = "key";
+            static constexpr ColumnType key_type = ColumnType::TEXT;
+
             static constexpr const char * value = "value";
+            static constexpr ColumnType value_type = ColumnType::TEXT;
+
             static constexpr const char * description = "description";
+            static constexpr ColumnType description_type = ColumnType::TEXT;
+
             static constexpr const char * isReadOnly = "is_read_only";
+            static constexpr ColumnType isReadOnly_type = ColumnType::TEXT;
+
             static constexpr const char * isVisible = "is_visible";
+            static constexpr ColumnType isVisible_type = ColumnType::TEXT;
         };
 
     public:
@@ -91,24 +100,24 @@ class DBConfig : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::key, key},
-                {Columns::value, delimitSingleQuotes(value)},
-                {Columns::description, delimitSingleQuotes(description)},
-                {Columns::isReadOnly, "N"},
-                {Columns::isVisible, "Y"}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::key, Columns::key_type}, key},
+                {{Columns::value, Columns::value_type}, delimitSingleQuotes(value)},
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::isReadOnly, Columns::isReadOnly_type}, "N"},
+                {{Columns::isVisible, Columns::isVisible_type}, "Y"}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::key, key},
-                {Columns::value, delimitSingleQuotes(value)},
-                {Columns::description, delimitSingleQuotes(description)},
-                {Columns::isReadOnly, "N"},
-                {Columns::isVisible, "Y"}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::key, Columns::key_type}, key},
+                {{Columns::value, Columns::value_type}, delimitSingleQuotes(value)},
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::isReadOnly, Columns::isReadOnly_type}, "N"},
+                {{Columns::isVisible, Columns::isVisible_type}, "Y"}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);

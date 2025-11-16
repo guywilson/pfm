@@ -20,7 +20,10 @@ class DBRecurringTransfer : public DBEntity {
     protected:
         struct Columns {
             static constexpr const char * recurringChargeId = "recurring_charge_id";
+            static constexpr ColumnType recurringChargeId_type = ColumnType::ID;
+
             static constexpr const char * accountToId = "account_to_id";
+            static constexpr ColumnType accountToId_type = ColumnType::ID;
         };
 
     public:
@@ -71,18 +74,18 @@ class DBRecurringTransfer : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::recurringChargeId, recurringChargeId.getValue()},
-                {Columns::accountToId, accountToId.getValue()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::recurringChargeId, Columns::recurringChargeId_type}, recurringChargeId.getValue()},
+                {{Columns::accountToId, Columns::accountToId_type}, accountToId.getValue()}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::recurringChargeId, recurringChargeId.getValue()},
-                {Columns::accountToId, accountToId.getValue()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::recurringChargeId, Columns::recurringChargeId_type}, recurringChargeId.getValue()},
+                {{Columns::accountToId, Columns::accountToId_type}, accountToId.getValue()}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);

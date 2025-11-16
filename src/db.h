@@ -23,6 +23,19 @@ using namespace std;
 
 #define SQL_ROW_LIMIT                                80
 
+enum ColumnType {
+    ID,
+    TEXT,
+    MONEY,
+    DATE,
+    BOOL
+};
+
+struct ColumnDef {
+    string      name;
+    ColumnType  type;
+};
+
 class DBColumn {
     private:
         string name;

@@ -18,7 +18,10 @@ class DBPayee : public DBEntity {
     protected:
         struct Columns {
             static constexpr const char * name = "name";
+            static constexpr ColumnType name_type = ColumnType::TEXT;
+
             static constexpr const char * code = "code";
+            static constexpr ColumnType code_type = ColumnType::TEXT;
         };
 
     public:
@@ -84,18 +87,18 @@ class DBPayee : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::code, code},
-                {Columns::name, delimitSingleQuotes(name)}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::code, Columns::code_type}, code},
+                {{Columns::name, Columns::name_type}, delimitSingleQuotes(name)}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::code, code},
-                {Columns::name, delimitSingleQuotes(name)}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::code, Columns::code_type}, code},
+                {{Columns::name, Columns::name_type}, delimitSingleQuotes(name)}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);

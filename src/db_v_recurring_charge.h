@@ -24,7 +24,10 @@ class DBRecurringChargeView : public DBRecurringCharge {
     protected:
         struct Columns {
             static constexpr const char * payeeCode = "payee_code";
+            static constexpr ColumnType payeeCode_type = ColumnType::TEXT;
+
             static constexpr const char * categoryCode = "category_code";
+            static constexpr ColumnType categoryCode_type = ColumnType::TEXT;
         };
 
     public:

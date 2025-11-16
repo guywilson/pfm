@@ -25,11 +25,22 @@ class DBPayment : public DBEntity {
     protected:
         struct Columns {
             static constexpr const char * accountId = "account_id";
+            static constexpr ColumnType accountId_type = ColumnType::ID;
+
             static constexpr const char * categoryId = "category_id";
+            static constexpr ColumnType categoryId_type = ColumnType::ID;
+
             static constexpr const char * payeeId = "payee_id";
+            static constexpr ColumnType payeeId_type = ColumnType::ID;
+
             static constexpr const char * date = "date";
+            static constexpr ColumnType date_type = ColumnType::DATE;
+
             static constexpr const char * description = "description";
+            static constexpr ColumnType description_type = ColumnType::TEXT;
+
             static constexpr const char * amount = "amount";
+            static constexpr ColumnType amount_type = ColumnType::MONEY;
         };
 
         string getAccountCode() {

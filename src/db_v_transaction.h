@@ -21,12 +21,25 @@ class DBTransactionView : public DBTransaction {
     protected:
         struct Columns {
             static constexpr const char * account = "account";
+            static constexpr ColumnType account_type = ColumnType::TEXT;
+
             static constexpr const char * category = "category";
+            static constexpr ColumnType category_type = ColumnType::TEXT;
+
             static constexpr const char * payee = "payee";
+            static constexpr ColumnType payee_type = ColumnType::TEXT;
+
             static constexpr const char * type = "type";
+            static constexpr ColumnType type_type = ColumnType::TEXT;
+
             static constexpr const char * recurring = "recurring";
+            static constexpr ColumnType recurring_type = ColumnType::BOOL;
+
             static constexpr const char * isReconciled = "reconciled";
+            static constexpr ColumnType isReconciled_type = ColumnType::BOOL;
+
             static constexpr const char * total = "total";
+            static constexpr ColumnType total_type = ColumnType::MONEY;
         };
 
     public:

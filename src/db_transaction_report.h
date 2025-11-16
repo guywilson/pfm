@@ -20,7 +20,10 @@ class DBTransactionReport : public DBEntity {
     protected:
         struct Columns {
             static constexpr const char * description = "description";
+            static constexpr ColumnType description_type = ColumnType::TEXT;
+
             static constexpr const char * sqlWhereClause = "sql_where_clause";
+            static constexpr ColumnType sqlWhereClause_type = ColumnType::TEXT;
         };
 
     public:
@@ -69,18 +72,18 @@ class DBTransactionReport : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::description, delimitSingleQuotes(description)},
-                {Columns::sqlWhereClause, delimitSingleQuotes(sqlWhereClause)}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::sqlWhereClause, Columns::sqlWhereClause_type}, delimitSingleQuotes(sqlWhereClause)}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::description, delimitSingleQuotes(description)},
-                {Columns::sqlWhereClause, delimitSingleQuotes(sqlWhereClause)}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::sqlWhereClause, Columns::sqlWhereClause_type}, delimitSingleQuotes(sqlWhereClause)}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);

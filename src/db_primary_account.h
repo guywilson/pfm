@@ -19,6 +19,7 @@ class DBPrimaryAccount : public DBEntity {
     protected:
         struct Columns {
             static constexpr const char * code = "account_code";
+            static constexpr ColumnType code_type = ColumnType::TEXT;
         };
 
     public:
@@ -75,16 +76,16 @@ class DBPrimaryAccount : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::code, code}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::code, Columns::code_type}, code}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::code, code}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::code, Columns::code_type}, code}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);

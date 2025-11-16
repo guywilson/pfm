@@ -20,6 +20,7 @@ class DBCarriedOverView : public DBCarriedOver {
     protected:
         struct Columns {
             static constexpr const char * accountCode = "account_code";
+            static constexpr ColumnType accountCode_type = ColumnType::TEXT;
         };
 
     public:
@@ -48,7 +49,7 @@ class DBCarriedOverView : public DBCarriedOver {
         void assignColumn(DBColumn & column) override {
             DBCarriedOver::assignColumn(column);
             
-            if (column.getName() == "account_code") {
+            if (column.getName() == Columns::accountCode) {
                 accountCode = column.getValue();
             }
         }

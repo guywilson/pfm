@@ -169,8 +169,13 @@ class DBRecurringCharge : public DBPayment {
     protected:
         struct Columns {
             static constexpr const char * lastPaymentDate = "last_payment_date";
+            static constexpr ColumnType lastPaymentDate_type = ColumnType::DATE;
+
             static constexpr const char * frequency = "frequency";
+            static constexpr ColumnType frequency_type = ColumnType::TEXT;
+
             static constexpr const char * endDate = "end_date";
+            static constexpr ColumnType endDate_type = ColumnType::DATE;
         };
 
     public:
@@ -320,31 +325,31 @@ class DBRecurringCharge : public DBPayment {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {DBPayment::Columns::accountId, accountId.getValue()},
-                {DBPayment::Columns::categoryId, categoryId.getValue()},
-                {DBPayment::Columns::payeeId, payeeId.getValue()},
-                {DBPayment::Columns::date, date.shortDate()},
-                {Columns::endDate, endDate.shortDate()},
-                {DBPayment::Columns::description, delimitSingleQuotes(description)},
-                {DBPayment::Columns::amount, amount.rawStringValue()},
-                {Columns::lastPaymentDate, lastPaymentDate.shortDate()},
-                {Columns::frequency, frequency.toString()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{DBPayment::Columns::accountId, DBPayment::Columns::accountId_type}, accountId.getValue()},
+                {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categoryId.getValue()},
+                {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeId.getValue()},
+                {{DBPayment::Columns::date, DBPayment::Columns::date_type}, date.shortDate()},
+                {{Columns::endDate, Columns::endDate_type}, endDate.shortDate()},
+                {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
+                {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
+                {{Columns::lastPaymentDate, Columns::lastPaymentDate_type}, lastPaymentDate.shortDate()},
+                {{Columns::frequency, Columns::frequency_type}, frequency.toString()}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {DBPayment::Columns::categoryId, categoryId.getValue()},
-                {DBPayment::Columns::payeeId, payeeId.getValue()},
-                {DBPayment::Columns::date, date.shortDate()},
-                {Columns::endDate, endDate.shortDate()},
-                {DBPayment::Columns::description, delimitSingleQuotes(description)},
-                {DBPayment::Columns::amount, amount.rawStringValue()},
-                {Columns::lastPaymentDate, lastPaymentDate.shortDate()},
-                {Columns::frequency, frequency.toString()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categoryId.getValue()},
+                {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeId.getValue()},
+                {{DBPayment::Columns::date, DBPayment::Columns::date_type}, date.shortDate()},
+                {{Columns::endDate, Columns::endDate_type}, endDate.shortDate()},
+                {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
+                {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
+                {{Columns::lastPaymentDate, Columns::lastPaymentDate_type}, lastPaymentDate.shortDate()},
+                {{Columns::frequency, Columns::frequency_type}, frequency.toString()}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);

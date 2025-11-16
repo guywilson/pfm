@@ -21,9 +21,16 @@ class DBCarriedOver : public DBEntity {
     protected:
         struct Columns {
             static constexpr const char * accountId = "account_id";
+            static constexpr ColumnType accountId_type = ColumnType::ID;
+
             static constexpr const char * date = "date";
+            static constexpr ColumnType date_type = ColumnType::DATE;
+
             static constexpr const char * description = "description";
+            static constexpr ColumnType description_type = ColumnType::TEXT;
+
             static constexpr const char * balance = "balance";
+            static constexpr ColumnType balance_type = ColumnType::MONEY;
         };
 
     public:
@@ -78,22 +85,22 @@ class DBCarriedOver : public DBEntity {
         }
 
         const string getInsertStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::accountId, accountId.getValue()},
-                {Columns::date, date.shortDate()},
-                {Columns::description, delimitSingleQuotes(description)},
-                {Columns::balance, balance.rawStringValue()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::accountId, Columns::accountId_type}, accountId.getValue()},
+                {{Columns::date, Columns::date_type}, date.shortDate()},
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::balance, Columns::balance_type}, balance.rawStringValue()}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
         const string getUpdateStatement() override {
-            vector<pair<string, string>> columnValuePairs = {
-                {Columns::accountId, accountId.getValue()},
-                {Columns::date, date.shortDate()},
-                {Columns::description, delimitSingleQuotes(description)},
-                {Columns::balance, balance.rawStringValue()}
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::accountId, Columns::accountId_type}, accountId.getValue()},
+                {{Columns::date, Columns::date_type}, date.shortDate()},
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::balance, Columns::balance_type}, balance.rawStringValue()}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);
