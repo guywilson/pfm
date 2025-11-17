@@ -7,8 +7,8 @@
 ###############################################################################
 
 # Version number for pfm
-MAJOR_VERSION = 1
-MINOR_VERSION = 9
+MAJOR_VERSION = 2
+MINOR_VERSION = 0
 
 # Directories
 SOURCE = src
@@ -34,12 +34,12 @@ PRECOMPILE = @ mkdir -p $(BUILD) $(DEP)
 # postcompile step
 POSTCOMPILE = @ mv -f $(DEP)/$*.Td $(DEP)/$*.d
 
-#GLOBAL_DEF=-DPFM_TEST_SUITE_ENABLED
+TEST_DEFINE_FLAGS=-DPFM_TEST_SUITE_ENABLED
 DEBUG_PASSWD=
 
 COMMON_FLAGS=-c -Wall -pedantic
 DEP_FLAGS=-MT $@ -MMD -MP -MF $(DEP)/$*.Td
-BASE_DEFINE_FLAGS=-DSQLITE_HAS_CODEC $(GLOBAL_DEF)
+BASE_DEFINE_FLAGS=-DSQLITE_HAS_CODEC
 DEBUG_DEFINE_FLAGS=-DRUN_IN_DEBUGGER -DDEBUG_PASSWORD=\"$(DEBUG_PASSWD)\"
 
 CFLAGS_BASE=$(COMMON_FLAGS)
@@ -58,17 +58,17 @@ CPPFLAGS=$(CPPFLAGS_DBG)
 CFLAGS=$(CFLAGS_DBG)
 endif
 
-DEPFLAGS = -MT $@ -MMD -MP -MF $(DEP)/$*.Td
+DEPFLAGS=-MT $@ -MMD -MP -MF $(DEP)/$*.Td
 
 PANDOCFLAGS = -s -t man
 
 # Libraries
-STDLIBS =
-EXTLIBS = -lreadline -lhistory -lcurses -lsqlite3 -lgcrypt
+STDLIBS=
+EXTLIBS=-lreadline -lhistory -lcurses -lsqlcipher -lgcrypt
 
-COMPILE.cpp = $(CPP) $(CPPFLAGS) -o $@
-COMPILE.c = $(C) $(CFLAGS) -o $@
-LINK.o = $(LINKER) $(STDLIBS) -o $@
+COMPILE.cpp=$(CPP) $(CPPFLAGS) -o $@
+COMPILE.c=$(C) $(CFLAGS) -o $@
+LINK.o=$(LINKER) -o $@
 
 PANDOC.md = $(PANDOC) $(PANDOCFLAGS) -o $@
 

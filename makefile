@@ -34,12 +34,12 @@ PRECOMPILE = @ mkdir -p $(BUILD) $(DEP)
 # postcompile step
 POSTCOMPILE = @ mv -f $(DEP)/$*.Td $(DEP)/$*.d
 
-#GLOBAL_DEF=-DPFM_TEST_SUITE_ENABLED
+TEST_DEFINE_FLAGS=-DPFM_TEST_SUITE_ENABLED
 DEBUG_PASSWD=
 
 COMMON_FLAGS=-c -Wall -pedantic
-DEP_FLAGS = -MT $@ -MMD -MP -MF $(DEP)/$*.Td
-BASE_DEFINE_FLAGS=-DSQLITE_HAS_CODEC $(GLOBAL_DEF)
+DEP_FLAGS=-MT $@ -MMD -MP -MF $(DEP)/$*.Td
+BASE_DEFINE_FLAGS=-DSQLITE_HAS_CODEC
 DEBUG_DEFINE_FLAGS=-DRUN_IN_DEBUGGER -DDEBUG_PASSWORD=\"$(DEBUG_PASSWD)\"
 
 CFLAGS_BASE=$(COMMON_FLAGS)
@@ -61,12 +61,12 @@ endif
 PANDOCFLAGS = -s -t man
 
 # Libraries
-STDLIBS =
-EXTLIBS = -lreadline -lhistory -lcurses -lsqlcipher -lgcrypt
+STDLIBS=
+EXTLIBS=-lreadline -lhistory -lcurses -lsqlcipher -lgcrypt
 
-COMPILE.cpp = $(CPP) $(CPPFLAGS) -o $@
-COMPILE.c = $(C) $(CFLAGS) -o $@
-LINK.o = $(LINKER) $(STDLIBS) -o $@
+COMPILE.cpp=$(CPP) $(CPPFLAGS) -o $@
+COMPILE.c=$(C) $(CFLAGS) -o $@
+LINK.o=$(LINKER) -o $@
 
 PANDOC.md = $(PANDOC) $(PANDOCFLAGS) -o $@
 
