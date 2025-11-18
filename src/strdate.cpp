@@ -53,6 +53,21 @@ void clearOverrideDate(const char * date) {
     _isDateOverride = false;
 }
 
+void checkForInvalidChars(const string & date) {
+    for (size_t i = 0;i < date.length();i++) {
+        char c = date[i];
+
+        if (!isdigit(c) && c != '-' && c != '/') {
+            throw pfm_validation_error(
+                        pfm_error::buildMsg(
+                            "\nInvalid date string '%s': Date must be in the format 'dd-mm-yyyy' or 'yyyy-mm-dd'",
+                            date.c_str()),
+                        __FILE__,
+                        __LINE__);
+        }
+    }
+}
+
 StrDate::StrDate() {
     this->_date = StrDate::today();
 }
@@ -244,6 +259,8 @@ void StrDate::validateDateString(const string & date) {
     if (date == "N/A") {
         return;
     }
+
+    checkForInvalidChars(date);
 
     StrDate::YMD dateComponents = splitDate(date);
 
