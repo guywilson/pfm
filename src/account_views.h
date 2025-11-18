@@ -19,6 +19,7 @@ class AddAccountView : public CLIView {
         CLITextField codeField = CLITextField("Code (max. 5 chars): ");
         DateField openingDateField = DateField("Opening date: ");
         CLITextField openingBalanceField = CLITextField("Opening balance [0.00]: ");
+        CLITextField balanceLimitField = CLITextField("Balance limit [0.00]: ");
 
     public:
         AddAccountView() : AddAccountView("Add account") {}
@@ -26,11 +27,15 @@ class AddAccountView : public CLIView {
         AddAccountView(const char * title) : CLIView(title) {
             nameField.setLengthLimit(FIELD_STRING_LEN);
             codeField.setLengthLimit(CODE_FIELD_MAX_LENGTH);
-            openingDateField.setLengthLimit(DATE_FIELD_LENGTH);
 
+            openingDateField.setLengthLimit(DATE_FIELD_LENGTH);
             openingDateField.setDefaultValue(StrDate::today());
+
             openingBalanceField.setDefaultValue("0.00");
             openingBalanceField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
+            
+            balanceLimitField.setDefaultValue("0.00");
+            balanceLimitField.setLengthLimit(AMOUNT_FIELD_STRING_LEN);
         }
 
         void show() override {
@@ -40,6 +45,7 @@ class AddAccountView : public CLIView {
             codeField.show();
             openingDateField.show();
             openingBalanceField.show();
+            balanceLimitField.show();
         }
 
         DBAccount getAccount() {
@@ -49,6 +55,7 @@ class AddAccountView : public CLIView {
             account.code = codeField.getValue();
             account.openingDate = openingDateField.getValue();
             account.openingBalance = openingBalanceField.getValue();
+            account.balanceLimit = balanceLimitField.getValue();
 
             return account;
         }
@@ -91,7 +98,7 @@ class AccountListView : public CLIListView {
             CLIListColumn column1 = CLIListColumn("Code", 5, CLIListColumn::leftAligned);
             headerRow.addColumn(column1);
 
-            CLIListColumn column2 = CLIListColumn("Name", 25, CLIListColumn::leftAligned);
+            CLIListColumn column2 = CLIListColumn("Name", 20, CLIListColumn::leftAligned);
             headerRow.addColumn(column2);
 
             CLIListColumn column3 = CLIListColumn("Balance", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
@@ -103,8 +110,11 @@ class AccountListView : public CLIListView {
             CLIListColumn column5 = CLIListColumn("After Bills", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
             headerRow.addColumn(column5);
 
-            CLIListColumn column6 = CLIListColumn("Primary", 7, CLIListColumn::leftAligned);
+            CLIListColumn column6 = CLIListColumn("Remaining", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
             headerRow.addColumn(column6);
+
+            CLIListColumn column7 = CLIListColumn("P", 1, CLIListColumn::leftAligned);
+            headerRow.addColumn(column7);
 
             addHeaderRow(headerRow);
 
@@ -118,13 +128,15 @@ class AccountListView : public CLIListView {
                 Money currentBalance = account.calculateCurrentBalance();
                 Money reconciledBalance = account.calculateReconciledBalance();
                 Money balanceAfterBills = account.calculateBalanceAfterBills();
+                Money remainingBalance = account.calculateRemainingBalance(balanceAfterBills);
 
                 row.addCellValue(account.code);
                 row.addCellValue(account.name);
                 row.addCellValue(currentBalance);
                 row.addCellValue(reconciledBalance);
                 row.addCellValue(balanceAfterBills);
-                row.addCellValue(account.isPrimary() ? "   *" : "");
+                row.addCellValue(remainingBalance);
+                row.addCellValue(account.isPrimary() ? "*" : "");
 
                 addRow(row);
             }
@@ -139,6 +151,7 @@ class UpdateAccountView : public CLIView {
         CLITextField codeField;
         DateField openingDateField;
         CLICurrencyField openingBalanceField;
+        CLICurrencyField balanceLimitField;
 
     public:
         UpdateAccountView() : UpdateAccountView("Update account") {}
@@ -168,6 +181,10 @@ class UpdateAccountView : public CLIView {
             snprintf(szPrompt, MAX_PROMPT_LENGTH, "Opening balance [%s]: ", account.openingBalance.rawStringValue().c_str());
             openingBalanceField.setLabel(szPrompt);
             openingBalanceField.setDefaultValue(account.openingBalance.rawStringValue());
+
+            snprintf(szPrompt, MAX_PROMPT_LENGTH, "Balance limit [%s]: ", account.balanceLimit.rawStringValue().c_str());
+            balanceLimitField.setLabel(szPrompt);
+            balanceLimitField.setDefaultValue(account.balanceLimit.rawStringValue());
         }
 
         void show() override {
@@ -177,6 +194,7 @@ class UpdateAccountView : public CLIView {
             codeField.show();
             openingDateField.show();
             openingBalanceField.show();
+            balanceLimitField.show();
         }
 
         DBAccount getAccount() {
@@ -188,6 +206,7 @@ class UpdateAccountView : public CLIView {
             account.code = codeField.getValue();
             account.openingDate = openingDateField.getValue();
             account.openingBalance = openingBalanceField.getValue();
+            account.balanceLimit = balanceLimitField.getValue();
 
             if (account.code.length() == 0) {
                 throw pfm_error("Account code must have a value");

@@ -439,6 +439,30 @@ Money DBAccount::calculateBalanceAfterBills() {
     return balance;
 }
 
+Money DBAccount::calculateRemainingBalance() {
+    Money balanceAfterBills = calculateBalanceAfterBills();
+    return calculateRemainingBalance(balanceAfterBills);
+}
+
+Money DBAccount::calculateRemainingBalance(Money & balanceAfterBills) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBAccount::calculateRemainingBalance()");
+
+    Money balance = 0.0;
+
+    try {
+        balance = balanceAfterBills - balanceLimit;
+        log.exit("DBAccount::calculateRemainingBalance()");
+    }
+    catch (pfm_error & e) {
+        log.error("DBAccount.calculateRemainingBalance() - caught exception: %s", e.what());
+
+        throw e;
+    }
+
+    return balance;
+}
+
 bool DBAccount::isPrimary() {
     Logger & log = Logger::getInstance();
     log.entry("DBAccount::isPrimary()");

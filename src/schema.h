@@ -257,6 +257,7 @@ const char * pszCreateAccountTable =
     "code TEXT NOT NULL," \
     "opening_date TEXT NOT NULL," \
     "opening_balance NUMERIC NOT NULL," \
+    "balance_limit NUMERIC NOT NULL DEFAULT 0.0," \
     "currency_id INTEGER,"
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \

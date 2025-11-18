@@ -35,13 +35,19 @@ class DBAccount : public DBEntity {
             
             static constexpr const char * openingBalance = "opening_balance";
             static constexpr ColumnType openingBalance_type = ColumnType::MONEY;
+            
+            static constexpr const char * balanceLimit = "balance_limit";
+            static constexpr ColumnType balanceLimit_type = ColumnType::MONEY;
         };
 
     public:
-        string                  name;
-        string                  code;
-        StrDate                 openingDate;
-        Money                   openingBalance;
+        string name;
+        string code;
+
+        StrDate openingDate;
+
+        Money openingBalance;
+        Money balanceLimit;
 
         DBAccount() : DBEntity() {
             clear();
@@ -54,6 +60,7 @@ class DBAccount : public DBEntity {
             this->code = "";
             this->openingDate.clear();
             this->openingBalance = 0.0;
+            this->balanceLimit = 0.0;
         }
 
         void set(const DBAccount & src) {
@@ -63,6 +70,7 @@ class DBAccount : public DBEntity {
             this->code =            src.code;
             this->openingDate =     src.openingDate;
             this->openingBalance =  src.openingBalance;
+            this->balanceLimit =    src.balanceLimit;
         }
 
         void set(JRecord & record) {
@@ -70,6 +78,7 @@ class DBAccount : public DBEntity {
             this->name = record.get("name");
             this->openingDate = record.get("openingDate");
             this->openingBalance = record.get("openingBalance");
+            this->balanceLimit = record.get("balanceLimit");
         }
 
         JRecord getRecord() override  {
@@ -79,6 +88,7 @@ class DBAccount : public DBEntity {
             r.add("code", code);
             r.add("openingDate", openingDate.shortDate());
             r.add("openingBalance", openingBalance.rawStringValue());
+            r.add("balanceLimit", balanceLimit.rawStringValue());
 
             return r;
         }
@@ -98,6 +108,9 @@ class DBAccount : public DBEntity {
             else if (column.getName() == Columns::openingBalance) {
                 openingBalance = column.doubleValue();
             }
+            else if (column.getName() == Columns::balanceLimit) {
+                balanceLimit = column.doubleValue();
+            }
         }
 
         void print() {
@@ -109,6 +122,7 @@ class DBAccount : public DBEntity {
 
             cout << fixed << setprecision(2);
             cout << "Opening balance: " << openingBalance.localeFormattedStringValue() << endl;
+            cout << "Balance limit: " << balanceLimit.localeFormattedStringValue() << endl;
         }
 
         const string getTableName() const override {
@@ -123,8 +137,9 @@ class DBAccount : public DBEntity {
             vector<pair<ColumnDef, string>> columnValuePairs = {
                 {{Columns::code, Columns::code_type}, code},
                 {{Columns::name, Columns::name_type}, name},
+                {{Columns::openingDate, Columns::openingDate_type}, openingDate.shortDate()},
                 {{Columns::openingBalance, Columns::openingBalance_type}, openingBalance.rawStringValue()},
-                {{Columns::openingDate, Columns::openingDate_type}, openingDate.shortDate()}
+                {{Columns::balanceLimit, Columns::balanceLimit_type}, balanceLimit.rawStringValue()}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
@@ -134,8 +149,9 @@ class DBAccount : public DBEntity {
             vector<pair<ColumnDef, string>> columnValuePairs = {
                 {{Columns::code, Columns::code_type}, code},
                 {{Columns::name, Columns::name_type}, name},
+                {{Columns::openingDate, Columns::openingDate_type}, openingDate.shortDate()},
                 {{Columns::openingBalance, Columns::openingBalance_type}, openingBalance.rawStringValue()},
-                {{Columns::openingDate, Columns::openingDate_type}, openingDate.shortDate()}
+                {{Columns::balanceLimit, Columns::balanceLimit_type}, balanceLimit.rawStringValue()}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);
@@ -144,9 +160,13 @@ class DBAccount : public DBEntity {
         void doBalancePrerequisites();
 
         void beforeUpdate() override;
+        
         Money calculateCurrentBalance();
         Money calculateBalanceAfterBills();
         Money calculateReconciledBalance();
+        Money calculateRemainingBalance();
+        Money calculateRemainingBalance(Money & balanceAfterBills);
+
         void retrieveByCode(string & code);
 
         bool isPrimary();
