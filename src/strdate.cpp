@@ -21,36 +21,28 @@ using namespace std;
 
 #define CURRENT_DATE_BUFFER_LENGTH    11
 
-static char _currentDate[CURRENT_DATE_BUFFER_LENGTH];
+static string _currentDate;
 static bool _isDateOverride = false;
 
-static char * getCurrentDate() {
-    if (!_isDateOverride) {
-        struct timeval tv;
-
-        gettimeofday(&tv, NULL);
-        time_t t = tv.tv_sec;
-        struct tm * localTime = localtime(&t);
-
-        snprintf(
-            _currentDate, 
-            CURRENT_DATE_BUFFER_LENGTH, 
-            "%4d-%02d-%02d", 
-            localTime->tm_year + 1900, 
-            localTime->tm_mon + 1, 
-            localTime->tm_mday);
-    }
-
-    return _currentDate;
-}
-
-void setOverrideDate(const char * date) {
-    strncpy(_currentDate, date, CURRENT_DATE_BUFFER_LENGTH - 1);
+void setOverrideDate(const string & date) {
+    _currentDate = date;
     _isDateOverride = true;
 }
 
-void clearOverrideDate(const char * date) {
+void clearOverrideDate() {
     _isDateOverride = false;
+}
+
+static void fillTv(struct timeval * tv) {
+    gettimeofday(tv, nullptr);
+}
+
+static void fillTimeStruct(struct tm * time) {
+    struct timeval tv;
+    fillTv(&tv);
+
+    time_t t = tv.tv_sec;
+    localtime_r(&t, time);
 }
 
 void checkForInvalidChars(const string & date) {
@@ -189,8 +181,37 @@ StrDate::YMD StrDate::splitDate(const string & date) {
 }
 
 string StrDate::today() {
-    char * t = getCurrentDate();
-    return string(t);
+    if (!_isDateOverride) {
+        auto twoDigits = [](int v) {
+            string s = to_string(v);
+
+            if (s.size() < 2) {
+                s.insert(s.begin(), '0');
+            }
+
+            return s;
+        };
+
+        auto fourDigits = [](int v) {
+            string s = to_string(v);
+
+            while (s.size() < 4) {
+                s.insert(s.begin(), '0');
+            }
+
+            return s;
+        };
+
+        struct tm timeResult;
+        fillTimeStruct(&timeResult);
+
+        _currentDate = 
+                fourDigits(timeResult.tm_year + 1900) + "-" +
+                twoDigits(timeResult.tm_mon + 1) + "-" +
+                twoDigits(timeResult.tm_mday);
+    }
+
+    return _currentDate;
 }
 
 string StrDate::getTimestamp() {
@@ -202,41 +223,46 @@ string StrDate::getTimestampToMicrosecond() {
 }
 
 string StrDate::getTimestamp(bool includeus) {
-    char now[TIME_STAMP_BUFFER_LEN];
-
     struct timeval tv;
+    fillTv(&tv);
 
-    gettimeofday(&tv, NULL);
-    time_t t = tv.tv_sec;
-    struct tm * localTime = localtime(&t);
+    struct tm timeResult;
+    fillTimeStruct(&timeResult);
+
+    auto twoDigits = [](int v) {
+        string s = to_string(v);
+
+        if (s.size() < 2) {
+            s.insert(s.begin(), '0');
+        }
+
+        return s;
+    };
+
+    auto fourDigits = [](int v) {
+        string s = to_string(v);
+
+        while (s.size() < 4) {
+            s.insert(s.begin(), '0');
+        }
+
+        return s;
+    };
+
+    string ts =
+        fourDigits(timeResult.tm_year + 1900) + "-" +
+        twoDigits(timeResult.tm_mon + 1) + "-" +
+        twoDigits(timeResult.tm_mday) + " " +
+        twoDigits(timeResult.tm_hour) + ":" +
+        twoDigits(timeResult.tm_min) + ":" +
+        twoDigits(timeResult.tm_sec);
 
     if (includeus) {
-        snprintf(
-            now, 
-            TIME_STAMP_BUFFER_LEN, 
-            "%04d-%02d-%02d %02d:%02d:%02d.%d", 
-            localTime->tm_year + 1900, 
-            localTime->tm_mon + 1, 
-            localTime->tm_mday,
-            localTime->tm_hour,
-            localTime->tm_min,
-            localTime->tm_sec,
-            (int)tv.tv_usec);
-    }
-    else {
-        snprintf(
-            now, 
-            TIME_STAMP_BUFFER_LEN, 
-            "%04d-%02d-%02d %02d:%02d:%02d", 
-            localTime->tm_year + 1900, 
-            localTime->tm_mon + 1, 
-            localTime->tm_mday,
-            localTime->tm_hour,
-            localTime->tm_min,
-            localTime->tm_sec);
+        ts += ".";
+        ts += to_string(static_cast<int>(tv.tv_usec));
     }
 
-    return string(now);
+    return ts;
 }
 
 int StrDate::getDaysInMonth(int year, int month) {
