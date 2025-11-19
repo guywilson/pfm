@@ -33,16 +33,24 @@ void clearOverrideDate() {
     _isDateOverride = false;
 }
 
-static void fillTv(struct timeval * tv) {
-    gettimeofday(tv, nullptr);
-}
-
-static void fillTimeStruct(struct tm * time) {
+static void fillTimeStruct(TimeDetails * time) {
     struct timeval tv;
-    fillTv(&tv);
+    gettimeofday(&tv, nullptr);
 
+    struct tm ltime;
     time_t t = tv.tv_sec;
-    localtime_r(&t, time);
+
+    localtime_r(&t, &ltime);
+
+    time->year = (uint16_t)(ltime.tm_year + 1900);
+    time->month = (uint8_t)(ltime.tm_mon + 1);
+    time->day = (uint8_t)ltime.tm_mday;
+
+    time->hour = (uint8_t)ltime.tm_hour;
+    time->minute = (uint8_t)ltime.tm_min;
+    time->second = (uint8_t)ltime.tm_sec;
+
+    time->microsecond = (uint32_t)tv.tv_usec;
 }
 
 void checkForInvalidChars(const string & date) {
@@ -202,13 +210,13 @@ string StrDate::today() {
             return s;
         };
 
-        struct tm timeResult;
-        fillTimeStruct(&timeResult);
+        TimeDetails td;
+        fillTimeStruct(&td);
 
         _currentDate = 
-                fourDigits(timeResult.tm_year + 1900) + "-" +
-                twoDigits(timeResult.tm_mon + 1) + "-" +
-                twoDigits(timeResult.tm_mday);
+                fourDigits(td.year) + "-" +
+                twoDigits(td.month) + "-" +
+                twoDigits(td.day);
     }
 
     return _currentDate;
@@ -223,11 +231,8 @@ string StrDate::getTimestampToMicrosecond() {
 }
 
 string StrDate::getTimestamp(bool includeus) {
-    struct timeval tv;
-    fillTv(&tv);
-
-    struct tm timeResult;
-    fillTimeStruct(&timeResult);
+    TimeDetails td;
+    fillTimeStruct(&td);
 
     auto twoDigits = [](int v) {
         string s = to_string(v);
@@ -250,16 +255,16 @@ string StrDate::getTimestamp(bool includeus) {
     };
 
     string ts =
-        fourDigits(timeResult.tm_year + 1900) + "-" +
-        twoDigits(timeResult.tm_mon + 1) + "-" +
-        twoDigits(timeResult.tm_mday) + " " +
-        twoDigits(timeResult.tm_hour) + ":" +
-        twoDigits(timeResult.tm_min) + ":" +
-        twoDigits(timeResult.tm_sec);
+        fourDigits(td.year) + "-" +
+        twoDigits(td.month) + "-" +
+        twoDigits(td.day) + " " +
+        twoDigits(td.hour) + ":" +
+        twoDigits(td.minute) + ":" +
+        twoDigits(td.second);
 
     if (includeus) {
         ts += ".";
-        ts += to_string(static_cast<int>(tv.tv_usec));
+        ts += to_string(static_cast<int>(td.microsecond));
     }
 
     return ts;
