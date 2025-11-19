@@ -2,6 +2,7 @@
 #include <string>
 #include <time.h>
 #include <sys/time.h>
+#include <cstdint>
 
 #include "logger.h"
 #include "pfm_error.h"

@@ -8,6 +8,7 @@
 #include <sys/time.h>
 #include <locale>
 #include <ctype.h>
+#include <cstdint>
 
 #include "logger.h"
 #include "pfm_error.h"
