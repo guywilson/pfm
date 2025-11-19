@@ -35,7 +35,7 @@ static char * getCurrentDate() {
         snprintf(
             _currentDate, 
             CURRENT_DATE_BUFFER_LENGTH, 
-            "%d-%02d-%02d", 
+            "%4d-%02d-%02d", 
             localTime->tm_year + 1900, 
             localTime->tm_mon + 1, 
             localTime->tm_mday);
