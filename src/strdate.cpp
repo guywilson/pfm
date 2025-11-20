@@ -34,7 +34,27 @@ void clearOverrideDate() {
     _isDateOverride = false;
 }
 
-static void fillTimeStruct(TimeDetails * time) {
+static void fillTimeStruct(TimeComponents * time) {
+    auto twoDigits = [](int v) {
+        string s = to_string(v);
+
+        if (s.size() < 2) {
+            s.insert(s.begin(), '0');
+        }
+
+        return s;
+    };
+
+    auto fourDigits = [](int v) {
+        string s = to_string(v);
+
+        while (s.size() < 4) {
+            s.insert(s.begin(), '0');
+        }
+
+        return s;
+    };
+
     struct timeval tv;
     gettimeofday(&tv, nullptr);
 
@@ -43,15 +63,15 @@ static void fillTimeStruct(TimeDetails * time) {
 
     localtime_r(&t, &ltime);
 
-    time->year = (uint16_t)(ltime.tm_year + 1900);
-    time->month = (uint8_t)(ltime.tm_mon + 1);
-    time->day = (uint8_t)ltime.tm_mday;
+    time->year = fourDigits((int)(ltime.tm_year + 1900));
+    time->month = twoDigits((int)(ltime.tm_mon + 1));
+    time->day = twoDigits(ltime.tm_mday);
 
-    time->hour = (uint8_t)ltime.tm_hour;
-    time->minute = (uint8_t)ltime.tm_min;
-    time->second = (uint8_t)ltime.tm_sec;
+    time->hour = twoDigits((int)ltime.tm_hour);
+    time->minute = twoDigits((int)ltime.tm_min);
+    time->second = twoDigits((int)ltime.tm_sec);
 
-    time->microsecond = (uint32_t)tv.tv_usec;
+    time->microsecond = to_string(static_cast<int>(tv.tv_usec));
 }
 
 void checkForInvalidChars(const string & date) {
@@ -191,33 +211,10 @@ StrDate::YMD StrDate::splitDate(const string & date) {
 
 string StrDate::today() {
     if (!_isDateOverride) {
-        auto twoDigits = [](int v) {
-            string s = to_string(v);
+        TimeComponents tc;
+        fillTimeStruct(&tc);
 
-            if (s.size() < 2) {
-                s.insert(s.begin(), '0');
-            }
-
-            return s;
-        };
-
-        auto fourDigits = [](int v) {
-            string s = to_string(v);
-
-            while (s.size() < 4) {
-                s.insert(s.begin(), '0');
-            }
-
-            return s;
-        };
-
-        TimeDetails td;
-        fillTimeStruct(&td);
-
-        _currentDate = 
-                fourDigits(td.year) + "-" +
-                twoDigits(td.month) + "-" +
-                twoDigits(td.day);
+        _currentDate = tc.year + "-" + tc.month + "-" + tc.day;
     }
 
     return _currentDate;
@@ -232,40 +229,20 @@ string StrDate::getTimestampToMicrosecond() {
 }
 
 string StrDate::getTimestamp(bool includeus) {
-    TimeDetails td;
-    fillTimeStruct(&td);
-
-    auto twoDigits = [](int v) {
-        string s = to_string(v);
-
-        if (s.size() < 2) {
-            s.insert(s.begin(), '0');
-        }
-
-        return s;
-    };
-
-    auto fourDigits = [](int v) {
-        string s = to_string(v);
-
-        while (s.size() < 4) {
-            s.insert(s.begin(), '0');
-        }
-
-        return s;
-    };
+    TimeComponents tc;
+    fillTimeStruct(&tc);
 
     string ts =
-        fourDigits(td.year) + "-" +
-        twoDigits(td.month) + "-" +
-        twoDigits(td.day) + " " +
-        twoDigits(td.hour) + ":" +
-        twoDigits(td.minute) + ":" +
-        twoDigits(td.second);
+        tc.year + "-" +
+        tc.month + "-" +
+        tc.day + " " +
+        tc.hour + ":" +
+        tc.minute + ":" +
+        tc.second;
 
     if (includeus) {
         ts += ".";
-        ts += to_string(static_cast<int>(td.microsecond));
+        ts += tc.microsecond;
     }
 
     return ts;

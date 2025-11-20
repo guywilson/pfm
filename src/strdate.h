@@ -16,16 +16,16 @@ using namespace std;
 #define DATE_STAMP_BUFFER_LEN               32
 #define DATE_STRING_LENGTH                  10
 
-struct TimeDetails {
-    uint16_t year;
-    uint8_t month;
-    uint8_t day;
+struct TimeComponents {
+    string year;
+    string month;
+    string day;
 
-    uint8_t hour;
-    uint8_t minute;
-    uint8_t second;
+    string hour;
+    string minute;
+    string second;
 
-    uint32_t microsecond;
+    string microsecond;
 };
 
 void setOverrideDate(const string & date);
