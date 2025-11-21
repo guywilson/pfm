@@ -144,7 +144,7 @@ void Command::listTransactions() {
     cacheMgr.clearTransactions();
 
     for (int i = 0;i < result.size();i++) {
-        DBTransactionView transaction = result.at(i);
+        DBTransactionView transaction = result[i];
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }
 }

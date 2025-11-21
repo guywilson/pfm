@@ -10,9 +10,12 @@
 #include "cache.h"
 #include "jfile.h"
 
+#include "db_base.h"
 #include "db_account.h"
 #include "db_primary_account.h"
+#include "db_v_transaction.h"
 #include "account_views.h"
+#include "transaction_views.h"
 
 using namespace std;
 
@@ -70,6 +73,26 @@ void Command::chooseAccount() {
     account.retrieveByCode(accountCode);
     
     selectedAccount = account;
+
+    AccountDetailsView view;
+    view.setAccount(account);
+    view.show();
+
+    DBTransactionView transaction;
+    DBResult<DBTransactionView> result = transaction.retrieveByAccountID(account.id, DBCriteria::descending, 16);
+
+    TransactionListView trView;
+    trView.addResults(result, account.code);
+    trView.show();
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    cacheMgr.clearTransactions();
+
+    for (int i = 0;i < result.size();i++) {
+        DBTransactionView transaction = result[i];
+        cacheMgr.addTransaction(transaction.sequence, transaction);
+    }
 
     log.exit("Command::chooseAccount()");
 }

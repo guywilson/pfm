@@ -7,6 +7,7 @@
 #include "cli_widget.h"
 #include "custom_widgets.h"
 #include "db_account.h"
+#include "bold_modifier.h"
 
 using namespace std;
 
@@ -80,6 +81,53 @@ class ChooseAccountView : public CLIView {
 
         string getCode() {
             return codeField.getValue();
+        }
+};
+
+class AccountDetailsView : public CLIView {
+    private:
+        DBAccount account;
+
+        void printRow(const string & label, const Money & amount) {
+            cout 
+                << right 
+                << setw(42) 
+                << label 
+                << right 
+                << bold_on 
+                << setw(LIST_VIEW_AMOUNT_WIDTH) 
+                << amount.localeFormattedStringValue() 
+                << bold_off 
+                << endl;
+        }
+
+    public:
+        void setAccount(DBAccount & account) {
+            this->account = account;
+        }
+
+        void show() override {
+            cout 
+                << endl << endl 
+                << bold_on 
+                << account.name 
+                << bold_off 
+                << " [" << account.code << "]" 
+                << (account.isPrimary() ? " - primary" : "") 
+                << endl;
+
+            Money currentBalance = account.calculateCurrentBalance();
+            Money reconciledBalance = account.calculateReconciledBalance();
+            Money balanceAfterBills = account.calculateBalanceAfterBills();
+            Money remainingBalance = account.calculateRemainingBalance(balanceAfterBills);
+
+            printRow("limit: ", account.balanceLimit);
+            printRow("current balance: ", currentBalance);
+            printRow("reconciled balance: ", reconciledBalance);
+            printRow("balance after bills: ", balanceAfterBills);
+            printRow("remaining balance: ", remainingBalance);
+
+            cout << endl;
         }
 };
 

@@ -212,17 +212,13 @@ int main(int argc, char ** argv) {
 
     Command command;
     
-    if (numAccounts > 0) {
-        command.process("list-accounts");
-    }
-    else {
+    if (numAccounts == 0) {
         cout << endl << "*** Welcome to PFM ***" << endl << endl << "Create your first account..." << endl << endl;
         command.process("add-account");
     }
 
     string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
     command.process("use " + primaryAccountCode);
-    command.process("list 12:all:desc");
 
     bool loop = true;
 
