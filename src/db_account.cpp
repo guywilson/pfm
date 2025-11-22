@@ -197,6 +197,13 @@ void DBAccount::createCarriedOverLogs() {
             StrDate firstDate = openingDate;
             StrDate secondDate = openingDate.lastDayInMonth();
 
+            if (secondDate > dateToday) {
+                log.debug("Period end is in the future, ignoring...");
+                log.exit("DBAccount::createCarriedOverLogs()");
+
+                return;
+            }
+
             co = DBCarriedOver::createForPeriod(this->id, openingBalance, firstDate, secondDate);
         }
 

@@ -247,15 +247,17 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
 }
 
 void DBRecurringCharge::migrateToTransferCharge(pfm_id_t & accountToId) {
+    DBAccount accountTo;
+    accountTo.retrieve(accountToId);
+
     DBTransaction tr;
-    DBResult<DBTransaction> recurringTransactions = tr.retrieveByRecurringChargeID(id);
+    DBResult<DBTransaction> recurringTransactions = tr.retrieveByRecurringChargeIDAfterDate(id, accountTo.openingDate);
 
     for (int i = 0;i < recurringTransactions.size();i++) {
         DBTransaction sourceTransaction = recurringTransactions[i];
 
         DBAccount accountTo;
-        accountTo.id = accountToId;
-        accountTo.retrieve();
+        accountTo.retrieve(accountToId);
 
         DBTransaction::createTransferPairFromSource(sourceTransaction, accountTo);
     }

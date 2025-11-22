@@ -96,6 +96,24 @@ DBResult<DBTransaction> DBTransaction::retrieveByRecurringChargeID(pfm_id_t & re
     return result;
 }
 
+DBResult<DBTransaction> DBTransaction::retrieveByRecurringChargeIDAfterDate(pfm_id_t & recurringChargeId, StrDate & after) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::retrieveByRecurringChargeIDAfterDate()");
+
+    DBCriteria criteria;
+    criteria.add(Columns::recurringChargeId, DBCriteria::equal_to, recurringChargeId);
+    criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, after);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    DBResult<DBTransaction> result;
+
+    result.retrieve(statement);
+
+    log.exit("DBTransaction::retrieveByRecurringChargeIDAfterDate()");
+
+    return result;
+}
+
 int DBTransaction::findLatestByRecurringChargeID(pfm_id_t & chargeId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::findLatestByRecurringChargeID()");
