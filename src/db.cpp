@@ -57,6 +57,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <pwd.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,6 +116,17 @@ static int __getch(void) {
 #endif
 
     return ch;
+}
+
+static string getUserString() {
+    struct passwd * pw = getpwuid(geteuid());
+
+    if (pw) {
+        string userString = string(pw->pw_name) + '_' + to_string(pw->pw_uid) + '_' + string(pw->pw_gecos);
+        return userString;
+    }
+
+    return "";
 }
 
 static string getPassword(const string & prompt) {
@@ -266,7 +278,12 @@ void PFM_DB::createDB(const string & dbName) {
 }
 
 void PFM_DB::encryptKey(const string & key, uint8_t * buffer, int bufferLength) {
+#if defined (__linux__) || defined(__APPLE__)
+    string userName = getUserString();
+    string encryptionKey = getKeyFromPassword(userName);
+#else
     string encryptionKey = KEY_KEY;
+#endif
 
     if (bufferLength < (int)key.length()) {
         throw pfm_error(
@@ -281,7 +298,12 @@ void PFM_DB::encryptKey(const string & key, uint8_t * buffer, int bufferLength) 
 }
 
 string PFM_DB::decryptKey(uint8_t * buffer, int bufferLength) {
+#if defined (__linux__) || defined(__APPLE__)
+    string userName = getUserString();
+    string encryptionKey = getKeyFromPassword(userName);
+#else
     string encryptionKey = KEY_KEY;
+#endif
 
     string key;
     for (int i = 0;i < (int)encryptionKey.length();i++) {
