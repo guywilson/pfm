@@ -89,6 +89,70 @@ void checkForInvalidChars(const string & date) {
     }
 }
 
+static string dayString(int day) {
+    string comp;
+
+    if (day == 1 || day == 21 || day == 31) {
+        comp = to_string(day) + "st";
+    }
+    else if (day == 2 || day == 22) {
+        comp = to_string(day) + "nd";
+    }
+    else if (day == 3 || day == 23) {
+        comp = to_string(day) + "rd";
+    }
+    else {
+        comp = to_string(day) + "th";
+    }
+
+    return comp;
+}
+
+static const string monthString(int month) {
+    string comp;
+
+    switch (month) {
+        case 1:
+            return "January";
+
+        case 2:
+            return "February";
+
+        case 3:
+            return "March";
+
+        case 4:
+            return "April";
+
+        case 5:
+            return "May";
+
+        case 6:
+            return "June";
+
+        case 7:
+            return "July";
+
+        case 8:
+            return "August";
+
+        case 9:
+            return "September";
+
+        case 10:
+            return "October";
+
+        case 11:
+            return "November";
+
+        case 12:
+            return "December";
+        
+        default:
+            return "Unknown";
+    }
+}
+
 StrDate::StrDate() {
     this->_date = StrDate::today();
 }
@@ -335,6 +399,12 @@ void StrDate::validateDateString(const string & date) {
 
 string StrDate::shortDate() const {
     return _date;
+}
+
+string StrDate::longDate() const {
+    string ldate = dayString(day()) + " " + monthString(month()) + " " + to_string(year());
+
+    return ldate;
 }
 
 string StrDate::getDisplayDate() const {

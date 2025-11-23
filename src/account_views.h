@@ -88,16 +88,26 @@ class AccountDetailsView : public CLIView {
     private:
         DBAccount account;
 
+        void printHorizontalLine() {
+            cout << "+--------------------------------------------+---------------+" << endl;
+        }
+
         void printRow(const string & label, const Money & amount) {
             cout 
+                << left
+                << "| "
                 << right 
                 << setw(42) 
                 << label 
+                << left
+                << " | "
                 << right 
                 << bold_on 
                 << setw(LIST_VIEW_AMOUNT_WIDTH) 
                 << amount.localeFormattedStringValue() 
                 << bold_off 
+                << left
+                << " |"
                 << endl;
         }
 
@@ -114,6 +124,13 @@ class AccountDetailsView : public CLIView {
                 << bold_off 
                 << " [" << account.code << "]" 
                 << (account.isPrimary() ? " - primary" : "") 
+                << endl
+                << endl
+                << "Opened on " 
+                << account.openingDate.longDate()
+                << " with balance: " 
+                << account.openingBalance.localeFormattedStringValue() 
+                << endl
                 << endl;
 
             Money currentBalance = account.calculateCurrentBalance();
@@ -121,11 +138,15 @@ class AccountDetailsView : public CLIView {
             Money balanceAfterBills = account.calculateBalanceAfterBills();
             Money remainingBalance = account.calculateRemainingBalance(balanceAfterBills);
 
-            printRow("limit: ", account.balanceLimit);
-            printRow("current balance: ", currentBalance);
-            printRow("reconciled balance: ", reconciledBalance);
-            printRow("balance after bills: ", balanceAfterBills);
-            printRow("remaining balance: ", remainingBalance);
+            printHorizontalLine();
+
+            printRow("limit:", account.balanceLimit);
+            printRow("current balance:", currentBalance);
+            printRow("reconciled balance:", reconciledBalance);
+            printRow("balance after bills:", balanceAfterBills);
+            printRow("remaining balance:", remainingBalance);
+
+            printHorizontalLine();
 
             cout << endl;
         }

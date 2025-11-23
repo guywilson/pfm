@@ -104,6 +104,7 @@ class StrDate {
         static bool isDateValid(const string & date);
         
         string shortDate() const;
+        string longDate() const;
         string getDisplayDate() const;
     
         int year() const;
