@@ -119,14 +119,26 @@ static int __getch(void) {
 }
 
 static string getUserString() {
-    struct passwd * pw = getpwuid(geteuid());
+    struct passwd pw;
+	struct passwd * pwp;
+	char buf[1024];
+	
+	int status = getpwuid_r(geteuid(), &pw, buf, sizeof(buf), &pwp);
 
-    if (pw) {
-        string userString = string(pw->pw_name) + '_' + to_string(pw->pw_uid) + '_' + string(pw->pw_gecos);
+    if (status == 0) {
+        string userString = string(pw.pw_name) + '_' + to_string(pw.pw_uid) + '_' + string(pw.pw_gecos);
+
+        memset(&pw, 0, sizeof(pw));
+        memset(buf, 0, sizeof(buf));
+
         return userString;
     }
+    else {
+        memset(&pw, 0, sizeof(pw));
+        memset(buf, 0, sizeof(buf));
 
-    return "";
+        throw pfm_error("Failed to get current user details", __FILE__, __LINE__);
+    }
 }
 
 static string getPassword(const string & prompt) {
@@ -279,8 +291,15 @@ void PFM_DB::createDB(const string & dbName) {
 
 void PFM_DB::encryptKey(const string & key, uint8_t * buffer, int bufferLength) {
 #if defined (__linux__) || defined(__APPLE__)
-    string userName = getUserString();
-    string encryptionKey = getKeyFromPassword(userName);
+    string encryptionKey;
+    try {
+        string userString = getUserString();
+        encryptionKey = getKeyFromPassword(userString);
+    }
+    catch (pfm_error & e) {
+        log.error("Failed to generate encryption key from user details, using default key instead");
+        encryptionKey = KEY_KEY;
+    }
 #else
     string encryptionKey = KEY_KEY;
 #endif
@@ -299,8 +318,15 @@ void PFM_DB::encryptKey(const string & key, uint8_t * buffer, int bufferLength) 
 
 string PFM_DB::decryptKey(uint8_t * buffer, int bufferLength) {
 #if defined (__linux__) || defined(__APPLE__)
-    string userName = getUserString();
-    string encryptionKey = getKeyFromPassword(userName);
+    string encryptionKey;
+    try {
+        string userString = getUserString();
+        encryptionKey = getKeyFromPassword(userString);
+    }
+    catch (pfm_error & e) {
+        log.error("Failed to generate encryption key from user details, using default key instead");
+        encryptionKey = KEY_KEY;
+    }
 #else
     string encryptionKey = KEY_KEY;
 #endif
