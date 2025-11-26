@@ -51,7 +51,7 @@ void Command::updateCategory() {
     string categoryCode;
 
     if (hasParameters()) {
-        categoryCode = getParameter(0);
+        categoryCode = getParameter(SIMPLE_PARAM_NAME);
     }
 
     DBCategory category = getCategory(categoryCode);
@@ -68,7 +68,7 @@ void Command::deleteCategory() {
     string categoryCode;
 
     if (hasParameters()) {
-        categoryCode = getParameter(0);
+        categoryCode = getParameter(SIMPLE_PARAM_NAME);
     }
 
     DBCategory category = getCategory(categoryCode);
@@ -78,7 +78,7 @@ void Command::deleteCategory() {
 }
 
 void Command::importCategories() {
-    string jsonFileName = getParameter(0);
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName, "DBCategory");
 
@@ -93,7 +93,7 @@ void Command::importCategories() {
 }
 
 void Command::exportCategories() {
-    string jsonFileName = getParameter(0);
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBCategory> results;
     results.retrieveAll();

@@ -51,7 +51,7 @@ void Command::updatePayee() {
     string payeeCode;
 
     if (hasParameters()) {
-        payeeCode = getParameter(0);
+        payeeCode = getParameter(SIMPLE_PARAM_NAME);
     }
 
     DBPayee payee = getPayee(payeeCode);
@@ -68,7 +68,7 @@ void Command::deletePayee() {
     string payeeCode;
 
     if (hasParameters()) {
-        payeeCode = getParameter(0);
+        payeeCode = getParameter(SIMPLE_PARAM_NAME);
     }
 
     DBPayee payee = getPayee(payeeCode);
@@ -78,7 +78,7 @@ void Command::deletePayee() {
 }
 
 void Command::importPayees() {
-    string jsonFileName = getParameter(0);
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName, "DBPayee");
 
@@ -93,7 +93,7 @@ void Command::importPayees() {
 }
 
 void Command::exportPayees() {
-    string jsonFileName = getParameter(0);
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBPayee> results;
     results.retrieveAll();

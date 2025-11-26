@@ -25,7 +25,7 @@ void Command::addReport() {
 }
 
 void Command::copyReport() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransactionReport report = getReport(atoi(sequence.c_str()));
 
@@ -60,7 +60,7 @@ DBTransactionReport Command::getReport(int sequence) {
 }
 
 void Command::updateReport() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransactionReport report = getReport(atoi(sequence.c_str()));
 
@@ -73,7 +73,7 @@ void Command::updateReport() {
 }
 
 void Command::deleteReport() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransactionReport report = getReport(atoi(sequence.c_str()));
 
@@ -82,7 +82,7 @@ void Command::deleteReport() {
 }
 
 void Command::runReport() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransactionReport report = getReport(atoi(sequence.c_str()));
 
@@ -96,7 +96,7 @@ void Command::saveReport() {
     string description;
 
     if (hasParameters()) {
-        description = getParameter(0);
+        description = getParameter(SIMPLE_PARAM_NAME);
     }
 
     if (description.length() == 0) {
@@ -117,7 +117,7 @@ void Command::saveReport() {
 }
 
 void Command::showReport() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransactionReport report = getReport(atoi(sequence.c_str()));
 

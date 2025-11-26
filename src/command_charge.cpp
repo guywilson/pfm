@@ -70,7 +70,7 @@ DBRecurringCharge Command::getRecurringCharge(int sequence) {
 }
 
 void Command::updateRecurringCharge() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
 
@@ -85,7 +85,7 @@ void Command::updateRecurringCharge() {
 }
 
 void Command::deleteRecurringCharge() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
 
@@ -105,7 +105,7 @@ void Command::deleteRecurringCharge() {
 }
 
 void Command::importRecurringCharges() {
-    string jsonFileName = getParameter(0);
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName, "DBRecurringCharge");
 
@@ -120,7 +120,7 @@ void Command::importRecurringCharges() {
 }
 
 void Command::exportRecurringCharges() {
-    string jsonFileName = getParameter(0);
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBRecurringCharge> results;
     results.retrieveAll();
@@ -139,7 +139,7 @@ void Command::exportRecurringCharges() {
 }
 
 void Command::migrateCharge() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
 

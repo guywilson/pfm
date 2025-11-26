@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <vector>
 #include <unordered_map>
+#include <sstream>
 #include <functional>
 
 #include <sqlcipher/sqlite3.h>
@@ -30,6 +31,19 @@
 #include "bold_modifier.h"
 
 using namespace std;
+
+bool Command::isStringNumeric(const string & s) {
+    bool isNumeric = true;
+
+    for (char c : s) {
+        if (!isdigit(c)) {
+            isNumeric = false;
+            break;
+        }
+    }
+
+    return isNumeric;
+}
 
 void Command::help() {
     cout << "For more detailed help, please see the manual" << endl;
@@ -77,27 +91,74 @@ void Command::version() {
     cout << "PFM version '" << getVersion() << "' - built [" << getBuildDate() << "]" << endl << endl;
 }
 
-string Command::parse(const string & commandLine) {
-    const char * parameterDelimiters = ";:|";
+void Command::handleExceptions(const string & command, const string & token) {
+    string value = trim(token);
 
-    char * cmdString = strdup(commandLine.c_str());;
-    char * part = strtok(cmdString, " ");
-
-    this->parameters.clear();
-
-    string command;
-
-    int i = 0;
-    while (part != NULL) {
-        if (i == 0) {
-            command = part;
+    if (isStringNumeric(token)) {
+        if (command == "list") {
+            string name = "rows";
+            parameters[name].push_back(value);
         }
         else {
-            this->parameters.push_back(part);
+            string name = SEQUENCE_PARAM_NAME;
+            parameters[name].push_back(value);
+        }
+    }
+    else {
+        if (value == "all" || value == "nr") {
+            string name = "recurring";
+            parameters[name].push_back(value);
+        }
+        else if (value == "asc" || value == "desc") {
+            string name = "sort";
+            parameters[name].push_back(value);
+        }
+        else {
+            string name = SIMPLE_PARAM_NAME;
+            parameters[name].push_back(value);
+        }
+    }
+}
+
+string Command::parse(const string & commandLine) {
+    parameters.clear();
+
+    // Find command name (before first space)
+    auto firstSpace = commandLine.find(' ');
+
+    if (firstSpace == string::npos) {
+        // No parameters; the whole line is just the command
+        return trim(commandLine);
+    }
+
+    string command = trim(commandLine.substr(0, firstSpace));
+    string paramPart = commandLine.substr(firstSpace + 1);
+
+    // Split parameter part on '|'
+    stringstream ss(paramPart);
+    string token;
+
+    while (getline(ss, token, '|')) {
+        token = trim(token);
+
+        if (token.empty()) {
+            continue;
         }
 
-        part = strtok(NULL, parameterDelimiters);
-        i++;
+        // Split "name:value" on the first ':'
+        auto colonPos = token.find(':');
+
+        if (colonPos == string::npos) {
+            handleExceptions(command, token);
+            continue;
+        }
+
+        string name  = trim(token.substr(0, colonPos));
+        string value = trim(token.substr(colonPos + 1));
+
+        if (!name.empty()) {
+            parameters[name].push_back(value);
+        }
     }
 
     return command;

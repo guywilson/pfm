@@ -58,7 +58,7 @@ void Command::listAccounts() {
 void Command::chooseAccount() {
     log.entry("Command::chooseAccount()");
 
-    string accountCode = getParameter(0);
+    string accountCode = getParameter(SIMPLE_PARAM_NAME);
 
     log.debug("Choose account with code '%s'", accountCode.c_str());
 
@@ -100,7 +100,7 @@ void Command::chooseAccount() {
 void Command::setPrimaryAccount() {
     log.entry("Command::setPrimaryAccount()");
 
-    string accountCode = getParameter(0);
+    string accountCode = getParameter(SIMPLE_PARAM_NAME);
     
     log.debug("Set primary account to '%s'", accountCode.c_str());
 
@@ -135,7 +135,7 @@ void Command::deleteAccount() {
 }
 
 void Command::importAccounts() {
-    string jsonFileName = getParameter(0);
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName, "DBAccount");
 
@@ -150,7 +150,7 @@ void Command::importAccounts() {
 }
 
 void Command::exportAccounts() {
-    string jsonFileName = getParameter(0);
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
     
     DBResult<DBAccount> results;
     results.retrieveAll();

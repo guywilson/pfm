@@ -88,11 +88,11 @@ int Command::getLogLevelParameter(string & level) {
 }
 
 void Command::setLoggingLevel() {
-    string level = getParameter(0);
+    string level = getParameter(SIMPLE_PARAM_NAME);
     log.addLogLevel(getLogLevelParameter(level));
 }
 
 void Command::clearLoggingLevel() {
-    string level = getParameter(0);
+    string level = getParameter(SIMPLE_PARAM_NAME);
     log.clearLogLevel(getLogLevelParameter(level));
 }

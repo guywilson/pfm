@@ -60,7 +60,7 @@ void Command::updateConfig() {
     string configKey;
 
     if (hasParameters()) {
-        configKey = getParameter(0);
+        configKey = getParameter(SIMPLE_PARAM_NAME);
     }
 
     DBConfig config = getConfig(configKey);
@@ -84,7 +84,7 @@ void Command::deleteConfig() {
     string configKey;
 
     if (hasParameters()) {
-        configKey = getParameter(0);
+        configKey = getParameter(SIMPLE_PARAM_NAME);
     }
 
     DBConfig config = getConfig(configKey);

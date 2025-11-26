@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <string.h>
+#include <exception>
 
 #include "logger.h"
 #include "cfgmgr.h"
@@ -14,16 +16,18 @@
 #include "db_transaction.h"
 #include "db_carried_over.h"
 #include "db_transaction_report.h"
-#include "transaction_criteria.h"
 
 using namespace std;
 
 #ifndef __INCL_COMMAND
 #define __INCL_COMMAND
 
+#define SIMPLE_PARAM_NAME                   "param"
+#define SEQUENCE_PARAM_NAME                 "sequence"
+
 class Command {
     private:
-        vector<string> parameters;
+        unordered_map<std::string, std::vector<std::string>> parameters;
 
         vector<string> commandHistory;
         DBAccount selectedAccount;
@@ -31,8 +35,11 @@ class Command {
         Logger & log = Logger::getInstance();
         cfgmgr & cfg = cfgmgr::getInstance();
 
-        string parse(const string & commandLine);
+        bool isStringNumeric(const string & s);
 
+        string parse(const string & commandLine);
+        void handleExceptions(const string & command, const string & token);
+ 
         bool hasParameters() {
             return (this->parameters.size() > 0);
         }
@@ -41,19 +48,41 @@ class Command {
             return this->parameters.size();
         }
 
-        string getParameter(int index) const {
+        vector<string> getParameters(const string & key) const {
             if (parameters.size() == 0) {
                 throw pfm_error("Expected parameters but none were supplied");
             }
-            else if (index >= (int)parameters.size()) {
-                throw pfm_error(
-                        pfm_error::buildMsg(
-                            "Expecting at least %d parameters but only %d have been supplied", 
-                            index + 1, 
-                            parameters.size()));
+
+            try {
+                vector<string> values = parameters.at(key);
+                return values;
+            }
+            catch (out_of_range & e) {
+                return {};
+            }
+        }
+
+        string getParameter(const string & key) const {
+            if (parameters.size() == 0) {
+                throw pfm_error("Expected parameters but none were supplied");
             }
 
-            return parameters[index];
+            vector<string> values = getParameters(key);
+            return values.empty() ? "" : values[0];
+        }
+
+        static string trim(const string & s) {
+            const char * whitespace = " \t\n\r\f\v";
+
+            const auto start = s.find_first_not_of(whitespace);
+
+            if (start == string::npos) {
+                return "";
+            }
+
+            const auto end = s.find_last_not_of(whitespace);
+
+            return s.substr(start, end - start + 1);
         }
 
         const char * getNoAccountSelectedMsg() {

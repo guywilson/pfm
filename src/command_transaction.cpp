@@ -40,13 +40,12 @@ void Command::addTransaction() {
     checkAccountSelected();
 
     if (hasParameters()) {
-        AddTransactionCriteriaBuilder builder(this->parameters);
-
         DBTransaction transaction;
 
         try {
             DBCategory category;
-            category.retrieveByCode(builder.categoryCode);
+            string code = getParameter("c");
+            category.retrieveByCode(code);
             transaction.categoryId = category.id;
         }
         catch (pfm_error & e) {
@@ -55,19 +54,24 @@ void Command::addTransaction() {
 
         try {
             DBPayee payee;
-            payee.retrieveByCode(builder.payeeCode);
+            string code = getParameter("p");
+            payee.retrieveByCode(code);
             transaction.payeeId = payee.id;
         }
         catch (pfm_error & e) {
             transaction.payeeId.clear();
         }
 
+        string date = getParameter("date");
+        transaction.date = date.empty() ? StrDate::today() : date;
+
+        string type = getParameter("type");
+        transaction.type = type.empty() ? TYPE_DEBIT : TYPE_CREDIT;
+
         transaction.accountId = selectedAccount.id;
-        transaction.date = builder.date;
-        transaction.description = builder.description;
-        transaction.reference = builder.reference;
-        transaction.amount = builder.amount;
-        transaction.type = builder.type;
+        transaction.description = getParameter("desc");
+        transaction.reference = getParameter("ref");
+        transaction.amount = getParameter("amnt");
 
         transaction.save();
         return;
@@ -104,23 +108,28 @@ void Command::listTransactions() {
     DBCriteria::sql_order sortDirection = DBCriteria::descending;
 
     if (hasParameters()) {
-        for (string & parameter : parameters) {
-            if (isdigit(parameter[0])) {
-                rowLimit = strtoul(parameter.c_str(), NULL, 10);
+        string rows = getParameter("rows");
+        if (!rows.empty()) {
+            rowLimit = strtoul(rows.c_str(), NULL, 10);
+        }
+        
+        string recurring = getParameter("recurring");
+        if (!recurring.empty()) {
+            if (recurring.compare("all") == 0) {
+                includeRecurring = true;
             }
-            else {
-                if (parameter.compare("all") == 0) {
-                    includeRecurring = true;
-                }
-                else if (parameter.compare("nr") == 0) {
-                    includeRecurring = false;
-                }
-                else if (parameter.compare("asc") == 0) {
-                    sortDirection = DBCriteria::ascending;
-                }
-                else if (parameter.compare("desc") == 0) {
-                    sortDirection = DBCriteria::descending;
-                }
+            else if (recurring.compare("nr") == 0) {
+                includeRecurring = false;
+            }
+        }
+
+        string sort = getParameter("sort");
+        if (!sort.empty()) {
+            if (sort.compare("asc") == 0) {
+                sortDirection = DBCriteria::ascending;
+            }
+            else if (sort.compare("desc") == 0) {
+                sortDirection = DBCriteria::descending;
             }
         }
     }
@@ -151,13 +160,93 @@ void Command::listTransactions() {
 
 void Command::findTransactions() {
     if (hasParameters()) {
-        FindTransactionCriteriaBuilder builder(this->parameters);
+        string sql = getParameter("sql");
 
-        if (builder.hasRawSQL()) {
-            findTransactions(builder.getRawSQL());
+        if (!sql.empty()) {
+            findTransactions(sql);
         }
         else {
-            DBCriteria criteria = builder.getCriteria();
+            vector<StrDate> betweenTheseDatesList;
+            vector<StrDate> onTheseDatesList;
+            vector<string> withTheseAccountsList;
+            vector<string> withTheseCategoriesList;
+            vector<string> withThesePayeesList;
+            vector<Money> betweenTheseAmountList;
+            
+            string dateAfter = getParameter("date>");
+            if (!dateAfter.empty()) {
+                betweenTheseDatesList.push_back(dateAfter);
+            }
+
+            string dateBefore = getParameter("date<");
+            if (!dateBefore.empty()) {
+                betweenTheseDatesList.push_back(dateBefore);
+            }
+
+            vector<string> dates = getParameters("date");
+            for (string & s : dates) {
+                onTheseDatesList.push_back(s);
+            }
+
+            withTheseAccountsList = getParameters("acc");
+            withTheseCategoriesList = getParameters("c");
+            withThesePayeesList = getParameters("p");
+            
+            string amountGreater = getParameter("amnt>");
+            if (!amountGreater.empty()) {
+                betweenTheseAmountList.push_back(amountGreater);
+            }
+            
+            string amountLess = getParameter("amnt<");
+            if (!amountLess.empty()) {
+                betweenTheseAmountList.push_back(amountLess);
+            }
+
+            string type = getParameter("type");
+            string recurring = getParameter("type");
+
+            auto replaceWildcards = [](string & s) {
+                for (size_t i = 0;i < s.length();i++) {
+                    if (s[i] == '*') {
+                        s[i] = '%';
+                    }
+                    else if (s[i] == '?') {
+                        s[i] = '_';
+                    }
+                }
+
+                return s;
+            };
+
+            string description = getParameter("desc");
+            if (!description.empty()) {
+                description = replaceWildcards(description);
+            }
+
+            string reference = getParameter("ref");
+            if (!reference.empty()) {
+                reference = replaceWildcards(reference);
+            }
+
+            DBCriteria criteria;
+
+            criteria = DBTransactionView::FindCriteriaHelper::handleBetweenTheseDates(criteria, betweenTheseDatesList);
+            criteria = DBTransactionView::FindCriteriaHelper::handleOnTheseDates(criteria, onTheseDatesList);
+
+            criteria = DBTransactionView::FindCriteriaHelper::handleBetweenTheseAmounts(criteria, betweenTheseAmountList);
+
+            criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseAccounts(criteria, withTheseAccountsList);
+            criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseCategories(criteria, withTheseCategoriesList);
+            criteria = DBTransactionView::FindCriteriaHelper::handleWithThesePayees(criteria, withThesePayeesList);
+
+            criteria = DBTransactionView::FindCriteriaHelper::handleWithThisDescription(criteria, description);
+            criteria = DBTransactionView::FindCriteriaHelper::handleWithThisReference(criteria, reference);
+            criteria = DBTransactionView::FindCriteriaHelper::handleWithThisType(criteria, type);
+
+            if (!recurring.empty()) {
+                criteria = DBTransactionView::FindCriteriaHelper::handleIsRecurring(criteria, recurring.compare("r") == 0 ? true : false);
+            }
+
             findTransactions(criteria);
         }
 
@@ -253,7 +342,7 @@ DBTransaction Command::getTransaction(int sequence) {
 }
 
 void Command::updateTransaction() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
 
@@ -283,7 +372,7 @@ void Command::updateTransaction() {
 }
 
 void Command::deleteTransaction() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
 
@@ -291,7 +380,7 @@ void Command::deleteTransaction() {
 }
 
 void Command::reconcileTransaction() {
-    string sequence = getParameter(0);
+    string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
 
@@ -301,7 +390,7 @@ void Command::reconcileTransaction() {
 }
 
 void Command::importTransactions() {
-    string jsonFileName = getParameter(0);
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName, "DBTransaction");
 
@@ -316,7 +405,7 @@ void Command::importTransactions() {
 }
 
 void Command::exportTransactions() {
-    string jsonFileName = getParameter(0);
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBTransaction> results;
     results.retrieveAll();
@@ -335,7 +424,7 @@ void Command::exportTransactions() {
 }
 
 void Command::exportTransactionsAsCSV() {
-    string csvFileName = getParameter(0);
+    string csvFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBTransaction> results;
     results.retrieveAll();
