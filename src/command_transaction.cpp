@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <ctype.h>
+#include <algorithm>
 
 #include "command.h"
 #include "pfm_error.h"
@@ -203,7 +204,9 @@ void Command::findTransactions() {
             }
 
             string type = getParameter("type");
-            string recurring = getParameter("type");
+            transform(type.begin(), type.end(), type.begin(), ::toupper);
+            
+            string recurring = getParameter("rec");
 
             auto replaceWildcards = [](string & s) {
                 for (size_t i = 0;i < s.length();i++) {
