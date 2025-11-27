@@ -67,8 +67,12 @@ void Command::addTransaction() {
         transaction.date = date.empty() ? StrDate::today() : date;
 
         string type = getParameter("type");
-        transaction.type = type.empty() ? TYPE_DEBIT : TYPE_CREDIT;
+        transform(type.begin(), type.end(), type.begin(), ::toupper);
+        transaction.type = type.empty() ? TYPE_DEBIT : type;
 
+        string reconciled = getParameter("rec");
+        transaction.isReconciled = reconciled == "Y" ? true : false;
+        
         transaction.accountId = selectedAccount.id;
         transaction.description = getParameter("desc");
         transaction.reference = getParameter("ref");
@@ -205,7 +209,7 @@ void Command::findTransactions() {
 
             string type = getParameter("type");
             transform(type.begin(), type.end(), type.begin(), ::toupper);
-            
+
             string recurring = getParameter("rec");
 
             auto replaceWildcards = [](string & s) {

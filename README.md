@@ -57,7 +57,7 @@ The full list of ‘standard’ CRUD commands are as follows, commands outside o
 **update-recurring-charge, urc**
 **delete-recurring-charge, drc**
 
-**add-transaction, at**
+**add-transaction, at** (*See extended form below*)
 **list-transactions, list, lt** (*See extended forms below*)
 **update-transaction, ut**
 **delete-transaction, dt**
@@ -101,7 +101,19 @@ The PFM command **save-json-template** will save an example json file for the en
 
 > [!TIP] Google Sheets has extensions available to allow export of spreadsheet data into JSON format
 
-**list [options]**
+**add-transaction, at, add [parameters]**
+
+- acc:[account code] - The account code of the account the transaction is against
+- c:[category code] - The category code of the transaction
+- p:[payee code] - The payee code of the transaction
+- date:[date] - The date for the transaction (defaults to today)
+- desc:[description] - The description
+- ref:[reference] - The reference
+- type:[DB/CR] - Whether this is a debit or credit transaction
+- amnt:[amount] - The amount
+- rec:[Y/N] - Is the transaction reconciled or not
+
+**list-transactions, lt, list [parameters]**
 
 - num - number of results to be returned
 - all - return non-recurring and recurring transactions
@@ -111,26 +123,25 @@ The PFM command **save-json-template** will save an example json file for the en
 
 An example list command could be:
 ```
-list 50:all:desc
+list 50|all|desc
 ```
 
-**find-transactions, find [options]**
+**find-transactions, find [parameters]**
 
-Parameters are listed below, any parameters that accept wildcards recognise * as any string, _ as any character, e.g. ds:travel*. Parameters are separated by the ‘|’ character:
+Parameters are listed below, any parameters that accept wildcards recognise * as any string, ? as any character, e.g. desc:travel*. Parameters are separated by the ‘|’ character:
 
-- d:[date] - transactions on the specified date
-- D:[date]|D:[date] - transactions between these dates
-- ds:[description] - transactions with this description
+- date:[date] - transactions on the specified date(s)
+- date>:[date] - transactions after this date
+- date<:[date] - transactions before this date
+- desc:[description] - transactions with this description, wildcards are accepted
 - acc:[account code] - transactions with this account code
 - c:[category code] - transactions with this category code
 - p:[payee code] - transactions with this payee code
-- ds:[description] - transactions like this description, wildcards are accepted
-- r:[reference] - transactions with this reference, wildcards are accepted
-- rc:[r/n] - transactions that are [r]ecurring or [n]on-recurring
-- db - transactions that are a debit
-- cr - transactions that are a credit
-- a:[amount] - transactions where the amount is less than this
-- A:[amount]|A:[amount] - transactions where the amount is between these 
+- ref:[reference] - transactions with this reference, wildcards are accepted
+- rec:[r/n] - transactions that are [r]ecurring or [n]on-recurring
+- type:[DB/CR] - transactions with type either debit or credit
+- amnt>:[amount] - transactions where the amount is greater than this
+- amnt<:[amount] - transactions where the amount is less than this
 
 - sql:[where clause parameters] - find transactions specified by the criteria
 
@@ -171,35 +182,9 @@ Sets the primary account, like the immortals in *Highlander*, there can be only 
 
 Deletes **all** stored categories, used for example if you don’t want any of the default categories created with a new file.
 
-**add-transaction, at, add [parameters]**
-
-For a quicker user experience when entering transactions, the following parameters can be supplied. Parameters are separated by the ‘|’ character:
-
-- d:[date] - The transaction date in the format dd-mm-yyyy or yyyy-mm-dd
-- c:[category code] - The category for the transaction, it must exist if specified. Skip if not required
-- p:[payee code] - The payee for the transaction, it must exist if specified. Skip if not required
-- ds:[description] - The transaction description
-- r:[reference] - The transaction reference, e.g. cheque number (does anyone still use those?)
-- db - Create a debit transaction
-- cr - Create a credit transaction
-- a:[amount] - The transaction amount
-
 **transfer-transaction, tr, transfer**
 
 Add a transfer transaction to another account, this will create a debit transaction from the currently selected account, and a debit transaction in the ‘transfer to’ account.
-
-**list-transactions, lt, list [parameters]**
-
-List the transactions of the currently selected account. Allows filtering of the transaction results with the following parameters, parameters are separated with the ‘|’ character:
-
-- num - The number of results to return
-- all - Return both recurring and non-recurring transactions
-- nr - Return only non-recurring transactions (the default)
-- asc - Sort the results in ascending date order
-- desc - Sort the results in descending date order (the default)
-
-An example command is:
-	**list 50:all:asc** - returns the oldest 50 transactions, including recurring transactions.
 
 **reconcile-transaction, reconcile, rt [sequence number]**
 
