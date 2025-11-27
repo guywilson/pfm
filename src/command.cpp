@@ -149,6 +149,11 @@ string Command::parse(const string & commandLine) {
         auto colonPos = token.find(':');
 
         if (colonPos == string::npos) {
+            /*
+            ** Here we have detected that there is no ':' present, so it is
+            ** likely just a 'simple' command with one parameter. Handle that
+            ** in handleExceptions()...
+            */
             handleExceptions(command, token);
             continue;
         }
