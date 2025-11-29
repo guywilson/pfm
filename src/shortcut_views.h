@@ -1,0 +1,147 @@
+#include <iostream>
+#include <string>
+#include <string.h>
+#include <vector>
+
+#include <readline/readline.h>
+#include <readline/history.h>
+
+#include "pfm_error.h"
+#include "cli_widget.h"
+#include "custom_widgets.h"
+#include "db_shortcut.h"
+#include "cfgmgr.h"
+
+using namespace std;
+
+#ifndef __REPORT_VIEW
+#define __REPORT_VIEW
+
+#define CRITERIA_BUFFER_LENGTH                      64
+#define SHORTCUT_PROMPT_LENGTH                      80
+
+class AddShortcutView : public CLIView {
+    private:
+        CLITextField shortcutField = CLITextField("Shortcut: ");
+        CLITextField replacementTextField = CLITextField("Replacement text: ");
+
+    public:
+        AddShortcutView() : AddShortcutView("Add shortcut") {}
+
+        AddShortcutView(const char * title) : CLIView(title) {
+        }
+
+        void show() override {
+            CLIView::show();
+
+            shortcutField.show();
+            replacementTextField.show();
+        }
+
+        DBShortcut getShortcut() {
+            DBShortcut shortcut;
+
+            shortcut.shortcut = shortcutField.getValue();
+            shortcut.replacementText = replacementTextField.getValue();
+
+            return shortcut;
+        }
+};
+
+class ShortcutListView : public CLIListView {
+    private:
+        void showResultsTable(DBResult<DBShortcut> & result) {
+            CLIListRow headerRow;
+
+            CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
+            headerRow.addColumn(column1);
+
+            CLIListColumn column2 = CLIListColumn("Shortcut", 10, CLIListColumn::leftAligned);
+            headerRow.addColumn(column2);
+
+            CLIListColumn column3 = CLIListColumn("Replacement", 80, CLIListColumn::leftAligned);
+            headerRow.addColumn(column3);
+
+            addHeaderRow(headerRow);
+
+            for (int i = 0;i < result.size();i++) {
+                DBShortcut shortcut = result[i];
+
+                CLIListRow row(headerRow);
+
+                row.addCellValue(shortcut.sequence);
+                row.addCellValue(shortcut.shortcut);
+                row.addCellValue(shortcut.replacementText);
+
+                addRow(row);
+            }
+        }
+
+    public:
+        ShortcutListView() : CLIListView() {
+        }
+
+        void addResults(DBResult<DBShortcut> & result) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Shortcut list (%d)", result.size());
+            setTitle(szTitle);
+
+            showResultsTable(result);
+        }
+
+        void show() override {
+            CLIListView::show();
+        }
+};
+
+class UpdateShortcutView : public CLIView {
+    private:
+        pfm_id_t shortcutId;
+
+        CLITextField shortcutField;
+        CLITextField replacementTextField;
+
+    public:
+        UpdateShortcutView() : UpdateShortcutView("Update shortcut") {}
+
+        UpdateShortcutView(const char * title) : CLIView(title) {
+            replacementTextField.setLengthLimit(SHORTCUT_PROMPT_LENGTH);
+        }
+
+        void setShortcut(DBShortcut & shortcut) {
+            char szPrompt[SHORTCUT_PROMPT_LENGTH];
+
+            shortcut.retrieve();
+
+            shortcutId = shortcut.id;
+
+            snprintf(szPrompt, SHORTCUT_PROMPT_LENGTH, "Shortcut ['%s']: ", shortcut.shortcut.c_str());
+            shortcutField.setLabel(szPrompt);
+            shortcutField.setDefaultValue(shortcut.shortcut);
+
+            snprintf(szPrompt, SHORTCUT_PROMPT_LENGTH, "Replacement ['%s']: ", shortcut.replacementText.c_str());
+            replacementTextField.setLabel(szPrompt);
+            replacementTextField.setDefaultValue(shortcut.replacementText);
+        }
+
+        void show() override {
+            CLIView::show();
+
+            shortcutField.show();
+            replacementTextField.show();
+        }
+
+        DBShortcut getShortcut() {
+            DBShortcut shortcut;
+
+            shortcut.id = shortcutId;
+
+            shortcut.shortcut = shortcutField.getValue();
+            shortcut.replacementText = replacementTextField.getValue();
+
+            return shortcut;
+        }
+};
+
+#endif

@@ -230,6 +230,22 @@ const vector<CommandEntry> commandTable = {
         "Show the criteria of the report specified with the supplied sequence", 
         [](Command& c){ c.showReport(); }},
 
+    {"add-shortcut", {"ash"}, 
+        "Add a new shortcut", 
+        [](Command& c){ c.addShortcut(); }},
+
+    {"list-shortcuts", {"lsh"}, 
+        "List all shortcuts", 
+        [](Command& c){ c.listShortcuts(); }},
+
+    {"update-shortcut", {"ush"}, 
+        "Update the shortcut specified by the supplied sequence", 
+        [](Command& c){ c.updateShortcut(); }},
+
+    {"delete-shortcut", {"dsh"}, 
+        "Delete the shortcut specified by the supplied sequence", 
+        [](Command& c){ c.deleteShortcut(); }},
+
     {"list-carried-over-logs", {"lco"}, 
         "", 
         [](Command& c){ c.listCarriedOverLogs(); }},

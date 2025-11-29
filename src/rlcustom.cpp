@@ -1,17 +1,56 @@
+#include <string>
+#include <unordered_map>
 #include <stdio.h>
 #include <stdint.h>
 
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include "db_base.h"
+#include "db_shortcut.h"
 #include "pfm_error.h"
 #include "rlcustom.h"
 
-uint16_t _lineLength = DEFAULT_LINE_LENGTH;
+using namespace std;
 
+uint16_t _lineLength = DEFAULT_LINE_LENGTH;
+unordered_map<string, string> shortcuts;
 
 static int handle_cancel_key(int count, int key) {
     throw pfm_field_cancel_error();
+}
+
+static int expand_shortcut(int count, int key) {
+    int cursor = rl_point;
+
+    int start = cursor - 1;
+    while (start >= 0 && !isspace(static_cast<unsigned char>(rl_line_buffer[start]))) {
+        --start;
+    }
+    start++; // move to first char of the word
+
+    int end = cursor;
+
+    if (start < end) {
+        string word(rl_line_buffer + start, rl_line_buffer + end);
+
+        auto it = shortcuts.find(word);
+        if (it != shortcuts.end()) {
+            const string & replacement = it->second;
+
+            // Remove the original word
+            rl_delete_text(start, end);
+            rl_point = start; // move cursor to start of word
+
+            // Insert the replacement text
+            rl_insert_text(replacement.c_str());
+            rl_point = start + replacement.size();
+        }
+    }
+
+    rl_redisplay();
+
+    return 0;
 }
 
 static int limited_insert(int count, int key) {
@@ -28,13 +67,19 @@ static int limited_insert(int count, int key) {
     return 0;
 }
 
+void rl_utils::loadShortcuts() {
+    shortcuts = DBShortcut::populate();
+}
+
 void rl_utils::setup() {
-    // Bind printable characters to limited_insert
+    loadShortcuts();
+    
     for (int c = 32; c <= 126; c++) {
         rl_bind_key(c, limited_insert);
     }
 
     rl_bind_key('\t', rl_complete);
+    rl_bind_key('\\', expand_shortcut);
     rl_bind_keyseq(CANCEL_READLINE_KEYSEQ, handle_cancel_key);
     using_history();
 }

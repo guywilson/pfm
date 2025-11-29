@@ -12,6 +12,7 @@
 #include "db_v_transaction.h"
 #include "db_transaction.h"
 #include "db_transaction_report.h"
+#include "db_shortcut.h"
 
 using namespace std;
 
@@ -31,6 +32,7 @@ class CacheMgr {
         unordered_map<int, DBRecurringCharge> recurringChargeBySequence;
         unordered_map<int, DBTransaction> transactionBySequence;
         unordered_map<int, DBTransactionReport> reportBySequence;
+        unordered_map<int, DBShortcut> shortcutBySequence;
 
         string findCriteria;
 
@@ -49,6 +51,10 @@ class CacheMgr {
             reportBySequence.clear();
         }
 
+        void clearShortcuts() {
+            shortcutBySequence.clear();
+        }
+
         void clearFindCriteria() {
             findCriteria.clear();
         }
@@ -63,6 +69,10 @@ class CacheMgr {
 
         void addReport(int sequence, DBTransactionReport & report) {
             reportBySequence.insert({sequence, report});
+        }
+
+        void addShortcut(int sequence, DBShortcut & shortcut) {
+            shortcutBySequence.insert({sequence, shortcut});
         }
 
         DBRecurringCharge getRecurringCharge(int sequence) {
@@ -93,6 +103,16 @@ class CacheMgr {
             }
 
             throw pfm_error("DBTransactionReport not found in cache.");
+        }
+
+        DBShortcut getShortcut(int sequence) {
+            unordered_map<int, DBShortcut>::const_iterator item = shortcutBySequence.find(sequence);
+
+            if (item != shortcutBySequence.end()) {
+                return item->second;
+            }
+
+            throw pfm_error("DBShortcut not found in cache.");
         }
 
         void addFindCriteria(const string & criteria) {

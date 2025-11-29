@@ -368,6 +368,14 @@ static const char * pszCreateReportTable =
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL);";
 
+static const char * pszCreateShortcutTable = 
+    "CREATE TABLE shortcut (" \
+    "id INTEGER PRIMARY KEY," \
+    "shortcut_text TEXT NOT NULL," \
+    "replacement_text TEXT NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL);";
+
 /*
 ** Create views, do this last...
 */

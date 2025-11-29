@@ -16,6 +16,7 @@
 #include "db_transaction.h"
 #include "db_carried_over.h"
 #include "db_transaction_report.h"
+#include "db_shortcut.h"
 
 using namespace std;
 
@@ -166,6 +167,12 @@ class Command {
         void runReport();
         void saveReport();
         void showReport();
+
+        void addShortcut();
+        void listShortcuts();
+        DBShortcut getShortcut(int sequence);
+        void updateShortcut();
+        void deleteShortcut();
 
         void listCarriedOverLogs();
 

@@ -131,8 +131,6 @@ int main(int argc, char ** argv) {
     defaultLogLevel = LOG_LEVEL_ALL;
 #endif
 
-    rl_utils::setup();
-
     CmdArg cmdarg(argc, argv);
 
     while (cmdarg.hasMoreArgs()) {
@@ -201,6 +199,8 @@ int main(int argc, char ** argv) {
 #ifdef PFM_TEST_SUITE_ENABLED
     test();
 #endif
+
+    rl_utils::setup();
 
     cfgmgr & cfg = cfgmgr::getInstance();
     cfg.initialise();
