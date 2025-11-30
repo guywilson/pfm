@@ -93,8 +93,43 @@ void Command::addTransaction() {
 void Command::addTransferTransaction() {
     checkAccountSelected();
 
+    if (hasParameters()) {
+        DBTransaction transaction;
+        DBAccount accountTo;
+
+        string accountToCode = getParameter("to");
+
+        if (accountToCode.empty()) {
+            throw pfm_error("addTransferTransaction: The account to transfer to must be supplied");
+        }
+
+        accountTo.retrieveByCode(accountToCode);
+
+        try {
+            DBCategory category;
+            string code = getParameter("c");
+            category.retrieveByCode(code);
+            transaction.categoryId = category.id;
+        }
+        catch (pfm_error & e) {
+            transaction.categoryId.clear();
+        }
+
+        string date = getParameter("date");
+        transaction.date = date.empty() ? StrDate::today() : date;
+        
+        transaction.description = getParameter("desc");
+        transaction.amount = getParameter("amnt");
+        transaction.accountId = selectedAccount.id;
+
+        string reconciled = getParameter("rec");
+        transaction.isReconciled = (reconciled == "Y" ? true : false);
+
+        DBTransaction::createTransferPairFromSource(transaction, accountTo);
+        return;
+    }
+
     TransferToAccountView view;
-    view.setSourceAccountCode(selectedAccount.code);
     view.show();
 
     DBTransaction sourceTransaction = view.getSourceTransaction();

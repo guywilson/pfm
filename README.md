@@ -62,6 +62,8 @@ The full list of ‘standard’ CRUD commands are as follows, commands outside o
 **update-transaction, ut**
 **delete-transaction, dt**
 
+**transfer-transaction, transfer, tr** (*See extended form below*)
+
 **add-report, arp**
 **list-reports, show-reports, lrp**
 **update-report, urp**
@@ -103,13 +105,21 @@ The PFM command **save-json-template** will save an example json file for the en
 
 **add-transaction, at, add [parameters]**
 
-- acc:[account code] - The account code of the account the transaction is against
 - c:[category code] - The category code of the transaction
 - p:[payee code] - The payee code of the transaction
 - date:[date] - The date for the transaction (defaults to today)
 - desc:[description] - The description
 - ref:[reference] - The reference
 - type:[DB/CR] - Whether this is a debit or credit transaction
+- amnt:[amount] - The amount
+- rec:[Y/N] - Is the transaction reconciled or not
+
+**transfer-transaction, transfer, tr [parameters]**
+
+- to:[account code] - The code of the account to transfer to
+- c:[category code] - The category code of the transaction
+- date:[date] - The date for the transaction (defaults to today)
+- desc:[description] - The description
 - amnt:[amount] - The amount
 - rec:[Y/N] - Is the transaction reconciled or not
 
