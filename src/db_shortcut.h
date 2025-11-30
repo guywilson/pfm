@@ -101,8 +101,8 @@ class DBShortcut : public DBEntity {
             }
         }
 
-        static unordered_map<string, string> populate() {
-            unordered_map<string, string> shortcuts;
+        static vector<pair<string, string>> populate() {
+            vector<pair<string, string>> shortcutPairs;
 
             DBResult<DBShortcut> results;
             results.retrieveAll();
@@ -110,10 +110,10 @@ class DBShortcut : public DBEntity {
             for (int i = 0;i < results.size();i++) {
                 DBShortcut shortcut = results[i];
 
-                shortcuts[shortcut.shortcut] = shortcut.replacementText;
+                shortcutPairs.push_back({shortcut.shortcut, shortcut.replacementText});
             }
 
-            return shortcuts;
+            return shortcutPairs;
         }
 };
 

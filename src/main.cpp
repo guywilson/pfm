@@ -43,6 +43,7 @@
 #include "db_payee.h"
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
+#include "db_shortcut.h"
 #include "command.h"
 #include "cfgmgr.h"
 #include "cmdarg.h"
@@ -200,7 +201,10 @@ int main(int argc, char ** argv) {
     test();
 #endif
 
+    vector<pair<string, string>> shortcutPairs = DBShortcut::populate();
+    
     rl_utils::setup();
+    rl_utils::loadShortcuts(shortcutPairs);
 
     cfgmgr & cfg = cfgmgr::getInstance();
     cfg.initialise();

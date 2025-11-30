@@ -1,5 +1,5 @@
 #include <string>
-#include <unordered_map>
+#include <vector>
 #include <stdio.h>
 #include <stdint.h>
 
@@ -13,7 +13,7 @@ using namespace std;
 
 class rl_utils {
     public:
-        static void loadShortcuts();
+        static void loadShortcuts(vector<pair<string, string>> & shortcutPairs);
         static void setup();
         static uint16_t getLineLength();
         static void setLineLength(uint16_t length);

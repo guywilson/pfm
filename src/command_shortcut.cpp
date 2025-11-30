@@ -24,7 +24,8 @@ void Command::addShortcut() {
     DBShortcut shortcut = view.getShortcut();
     shortcut.save();
 
-    rl_utils::loadShortcuts();
+    vector<pair<string, string>> pairs = DBShortcut::populate();
+    rl_utils::loadShortcuts(pairs);
 }
 
 void Command::listShortcuts() {
@@ -64,6 +65,9 @@ void Command::updateShortcut() {
 
     DBShortcut updatedShortcut = view.getShortcut();
     updatedShortcut.save();
+
+    vector<pair<string, string>> pairs = DBShortcut::populate();
+    rl_utils::loadShortcuts(pairs);
 }
 
 void Command::deleteShortcut() {
@@ -73,4 +77,7 @@ void Command::deleteShortcut() {
 
     shortcut.remove();
     shortcut.clear();
+
+    vector<pair<string, string>> pairs = DBShortcut::populate();
+    rl_utils::loadShortcuts(pairs);
 }

@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include <unordered_map>
 #include <stdio.h>
 #include <stdint.h>
@@ -6,8 +7,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#include "db_base.h"
-#include "db_shortcut.h"
 #include "pfm_error.h"
 #include "rlcustom.h"
 
@@ -67,13 +66,15 @@ static int limited_insert(int count, int key) {
     return 0;
 }
 
-void rl_utils::loadShortcuts() {
-    shortcuts = DBShortcut::populate();
+void rl_utils::loadShortcuts(vector<pair<string, string>> & shortcutPairs) {
+    shortcuts.clear();
+    
+    for (pair<string, string> & p : shortcutPairs) {
+        shortcuts.insert({p.first, p.second});
+    }
 }
 
 void rl_utils::setup() {
-    loadShortcuts();
-    
     for (int c = 32; c <= 126; c++) {
         rl_bind_key(c, limited_insert);
     }
