@@ -42,8 +42,8 @@ void Command::addRecurringCharge() {
             charge.payeeId.clear();
         }
 
-        string date = getParameter("date");
-        charge.date = date.empty() ? StrDate::today() : date;
+        string start = getParameter("start");
+        charge.date = start.empty() ? StrDate::today() : start;
 
         string end = getParameter("end");
         StrDate nullDate;

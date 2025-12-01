@@ -56,7 +56,7 @@ The full list of ‘standard’ CRUD commands are as follows, commands outside o
 **update-payee, up**
 **delete-payee, dp**
 
-**add-recurring-charge, arc**
+**add-recurring-charge, arc** (*See extended form below*)
 **list-recurring-charges, lrc**
 **update-recurring-charge, urc**
 **delete-recurring-charge, drc**
@@ -106,6 +106,17 @@ JSON import files must be in the format:
 The PFM command **save-json-template** will save an example json file for the entity you choose, making it easy to edit this in your favourite text editor. 
 
 > [!TIP] Google Sheets has extensions available to allow export of spreadsheet data into JSON format
+
+**add-recurring-charge, arc [parameters]**
+
+- c:[category code] - The category code of the charge
+- p:[payee code] - The payee code of the charge
+- start:[date] - The start date for the charge (defaults to today)
+- end:[date] - The end date for the charge (defaults to N/A)
+- desc:[description] - The description
+- freq:[frequency code] - The frequency of the charge - n[y|m|w|d], e.g. '1m' for monthly
+- amnt:[amount] - The amount
+- to:[account code] - The account code to transfer to, e.g. recurring transfer
 
 **add-transaction, at, add [parameters]**
 
