@@ -122,14 +122,14 @@ class DBRecurringCharge : public DBPayment {
         }
  
         // Move forward to Monday if the given day is a weekend.
-        StrDate inline adjustForwardToBusinessDay(StrDate& d) {
+        StrDate inline adjustForwardToBusinessDay(StrDate & d) {
             StrDate x = d;
 
             if (x.isSaturday()) {
                 return x.addDays(2);
             }
             else if (x.isSunday()) {
-            return x.addDays(1);
+                return x.addDays(1);
             }
 
             return x;
@@ -164,7 +164,7 @@ class DBRecurringCharge : public DBPayment {
         int getPeriodEndDay(StrDate & referenceDate);
 
         // Next *scheduled* (nominal) date, without weekend adjustment.
-        StrDate getNextScheduledDate();
+        StrDate getNextNominalScheduledDate();
 
     protected:
         struct Columns {

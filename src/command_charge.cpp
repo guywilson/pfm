@@ -19,6 +19,46 @@ using namespace std;
 void Command::addRecurringCharge() {
     checkAccountSelected();
 
+    if (hasParameters()) {
+        DBRecurringCharge charge;
+
+        try {
+            DBCategory category;
+            string code = getParameter("c");
+            category.retrieveByCode(code);
+            charge.categoryId = category.id;
+        }
+        catch (pfm_error & e) {
+            charge.categoryId.clear();
+        }
+
+        try {
+            DBPayee payee;
+            string code = getParameter("p");
+            payee.retrieveByCode(code);
+            charge.payeeId = payee.id;
+        }
+        catch (pfm_error & e) {
+            charge.payeeId.clear();
+        }
+
+        string date = getParameter("date");
+        charge.date = date.empty() ? StrDate::today() : date;
+
+        string end = getParameter("end");
+        StrDate nullDate;
+        nullDate.clear();
+        charge.endDate = end.empty() ? nullDate : end;
+        
+        charge.accountId = selectedAccount.id;
+        charge.description = getParameter("desc");
+        charge.frequency = Frequency::parse(getParameter("freq"));
+        charge.amount = getParameter("amnt");
+
+        charge.save();
+        return;
+    }
+
     AddRecurringChargeView view;
     view.show();
 

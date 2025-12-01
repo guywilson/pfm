@@ -151,9 +151,9 @@ bool DBRecurringCharge::isWithinCurrentPeriod(StrDate & referenceDate) {
     return inThisPeriod;
 }
 
-StrDate DBRecurringCharge::getNextScheduledDate() {
+StrDate DBRecurringCharge::getNextNominalScheduledDate() {
     Logger & log = Logger::getInstance();
-    log.entry("DBRecurringCharge::getNextScheduledDate()");
+    log.entry("DBRecurringCharge::getNextNominalScheduledDate()");
 
     StrDate periodStart = getPeriodStartDate();
     StrDate d = this->date;
@@ -180,9 +180,18 @@ StrDate DBRecurringCharge::getNextScheduledDate() {
         }
     }
 
+    /*
+    ** If the nominal next payment day has drifted from the start day,
+    ** then push it back to the start day. Remember this is the nominal
+    ** date, accounting for weekends will be taken care in the caller...
+    */
+    if (d.day() > this->date.day()) {
+        d.set(d.year(), d.month(), this->date.day());
+    }
+
     log.debug("Next scheduled date for charge '%s' is '%s'", this->description.c_str(), d.shortDate().c_str());
 
-    log.exit("DBRecurringCharge::getNextScheduledDate()");
+    log.exit("DBRecurringCharge::getNextNominalScheduledDate()");
 
     // IMPORTANT: do not adjust weekends here; this is the *nominal* schedule.
     return d;
@@ -199,7 +208,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod() {
         StrDate periodEnd = getPeriodEndDate();
 
         // Find the next *nominal* (no weekend adjustment) scheduled date
-        StrDate nominalNext = getNextScheduledDate();
+        StrDate nominalNext = getNextNominalScheduledDate();
 
         // If there is no next occurrence, it's not due.
         if (!nominalNext.isNull()) {
@@ -232,7 +241,7 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
     StrDate txnDate;
 
     if (isActive()) {
-        StrDate nominal = getNextScheduledDate();
+        StrDate nominal = getNextNominalScheduledDate();
         txnDate = adjustForwardToBusinessDay(nominal);
 
         log.debug("Next transaction date for charge '%s' is '%s' (nominal: %s)",
