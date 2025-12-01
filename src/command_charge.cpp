@@ -55,6 +55,15 @@ void Command::addRecurringCharge() {
         charge.frequency = Frequency::parse(getParameter("freq"));
         charge.amount = getParameter("amnt");
 
+        string accountToCode = getParameter("to:");
+        if (!accountToCode.empty()) {
+            DBAccount accountTo;
+            accountTo.retrieveByCode(accountToCode);
+
+            charge.transfer.accountTo = accountTo;
+            charge.transfer.accountToId = charge.transfer.accountTo.id;
+        }
+
         charge.save();
         return;
     }
