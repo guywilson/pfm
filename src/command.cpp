@@ -131,16 +131,43 @@ string Command::parse(const string & commandLine) {
         return trim(commandLine);
     }
 
-    string command = trim(commandLine.substr(0, firstSpace));
+    string command   = trim(commandLine.substr(0, firstSpace));
     string paramPart = commandLine.substr(firstSpace + 1);
 
-    // Split parameter part on '|'
-    stringstream ss(paramPart);
-    string token;
+    // Tokenize parameter part:
+    // - split on whitespace when we are NOT inside quotes
+    // - keep everything (including spaces) between quotes as part of one token
+    vector<string> tokens;
+    bool inQuotes = false;
+    string current;
 
-    while (getline(ss, token, '|')) {
-        token = trim(token);
+    for (char ch : paramPart) {
+        if (ch == '"') {
+            // Toggle quoted state, but don't include the quote itself
+            inQuotes = !inQuotes;
+            continue;
+        }
 
+        if (!inQuotes && (isspace(static_cast<unsigned char>(ch)))) {
+            // Separator outside quotes
+            if (!current.empty()) {
+                tokens.push_back(trim(current));
+                current.clear();
+            }
+        }
+        else {
+            current.push_back(ch);
+        }
+    }
+
+    // Flush last token
+    if (!current.empty()) {
+        tokens.push_back(trim(current));
+    }
+
+    // Process tokens as name:value or delegated to handleExceptions
+    for (const auto & rawToken : tokens) {
+        string token = trim(rawToken);
         if (token.empty()) {
             continue;
         }
@@ -150,9 +177,8 @@ string Command::parse(const string & commandLine) {
 
         if (colonPos == string::npos) {
             /*
-            ** Here we have detected that there is no ':' present, so it is
-            ** likely just a 'simple' command with one parameter. Handle that
-            ** in handleExceptions()...
+            ** No ':' present: treat as a 'simple' parameter and let
+            ** handleExceptions() interpret it according to the command.
             */
             handleExceptions(command, token);
             continue;
