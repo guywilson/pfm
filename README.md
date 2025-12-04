@@ -30,7 +30,15 @@ Prints the supported command line options and exits.
 
 For commands that support optional arguments, if no arguments are supplied, the user is presented with interactive prompts to enter the required data. Each entity supports the standard CRUD commands to add, list, update and delete records. For entities that have a unique code, that is account, category and payee, update and delete commands take a code to reference the required record. For transaction and recurring charge entities that do not have a code, update and delete commands take a sequence number as displayed by the list command.
 
-The full list of ‘standard’ CRUD commands are as follows, commands outside of this model are listed separately. Command parameters are delimited with the ‘|’, ‘:’ or ‘;’ character. Date fields accept the format yyyy-mm-dd or dd-mm-yyyy, they do not accept the the frankly weird US date format of mm-dd-yyyy.
+The full list of ‘standard’ CRUD commands are as follows, commands outside of this model are listed separately. Command parameters take the form of
+```
+parameter_name:parameter_value
+```
+
+Date fields accept the formats yyyy-mm-dd or dd-mm-yyyy only. Text fields should be delimited with "" if they contain spaces, e.g.
+```
+desc:"The quick brown fox jumped over the lazy dog"
+```
 
 **add-account, aa**
 **list-accounts, la**
@@ -152,12 +160,12 @@ The PFM command **save-json-template** will save an example json file for the en
 
 An example list command could be:
 ```
-list 50|all|desc
+list 50 all desc
 ```
 
 **find-transactions, find [parameters]**
 
-Parameters are listed below, any parameters that accept wildcards recognise * as any string, ? as any character, e.g. desc:travel*. Parameters are separated by the ‘|’ character:
+Parameters are listed below, any parameters that accept wildcards recognise * as any string, ? as any character, e.g. desc:travel*.
 
 - date:[date] - transactions on the specified date(s)
 - date>:[date] - transactions after this date
