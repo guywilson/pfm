@@ -218,15 +218,6 @@ int main(int argc, char ** argv) {
 
     free(pszDatabase);
 
-    if (runScratch) {
-        unitTestCodeFragment();
-
-        db.close();
-        log.close();
-
-        return 0;
-    }
-
 #ifdef PFM_TEST_SUITE_ENABLED
     test();
 #endif
@@ -238,6 +229,15 @@ int main(int argc, char ** argv) {
 
     cfgmgr & cfg = cfgmgr::getInstance();
     cfg.initialise();
+
+    if (runScratch) {
+        unitTestCodeFragment();
+
+        db.close();
+        log.close();
+
+        return 0;
+    }
 
     DBResult<DBAccount> accounts;
     accounts.retrieveAll();
