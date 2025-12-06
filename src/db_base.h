@@ -772,6 +772,9 @@ class DBResult : public Result {
         }
 
         void addRow(T & entity) {
+            entity.onRowComplete(getSequence());
+            incrementSequence();
+
             results.push_back(entity);
             incrementNumRows();
         }
@@ -785,9 +788,6 @@ class DBResult : public Result {
                 entity.assignColumn(column);
             }
             
-            entity.onRowComplete(getSequence());
-            incrementSequence();
-
             addRow(entity);
         }
 };

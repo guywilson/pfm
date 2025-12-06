@@ -62,7 +62,6 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::getOutstandingChargesDueT
 
     DBResult<DBRecurringChargeView> results;
 
-    int count = 0;
     for (int i = 0;i < charges.size();i++) {
         DBRecurringChargeView charge = charges[i];
 
@@ -78,12 +77,9 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::getOutstandingChargesDueT
         if (isChargeUnpaid && charge.isChargeDueThisPeriod()) {
             log.debug("Charge '%s' is outstanding...", charge.description.c_str());
             results.addRow(charge);
-            count++;
         }
     }
 
-    log.debug("Found %d oustanding charges (counter = %d)", results.size(), count);
-    
     log.exit("DBRecurringChargeView::getOutstandingChargesDueThisPeriod()");
 
     return results;
