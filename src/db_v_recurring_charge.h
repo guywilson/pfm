@@ -86,6 +86,8 @@ class DBRecurringChargeView : public DBRecurringCharge {
             return "DBRecurringChrageView";
         }
 
+        DBResult<DBRecurringChargeView> getOutstandingChargesDueThisPeriod(pfm_id_t & accountId);
+
         DBResult<DBRecurringChargeView> retrieveByAccountID(pfm_id_t & accountId);
         DBResult<DBRecurringChargeView> retrieveByAccountIDBetweenDates(pfm_id_t & accountId, StrDate & dateAfter, StrDate & dateBefore);
 };

@@ -773,6 +773,7 @@ class DBResult : public Result {
 
         void addRow(T & entity) {
             results.push_back(entity);
+            incrementNumRows();
         }
 
         void processRow(DBRow & row) {
@@ -788,7 +789,6 @@ class DBResult : public Result {
             incrementSequence();
 
             addRow(entity);
-            incrementNumRows();
         }
 };
 

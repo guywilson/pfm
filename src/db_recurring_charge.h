@@ -135,6 +135,21 @@ class DBRecurringCharge : public DBPayment {
             return x;
         }
 
+        // Next *scheduled* (nominal) date, without weekend adjustment.
+        StrDate getNextNominalScheduledDate();
+
+    protected:
+        struct Columns {
+            static constexpr const char * lastPaymentDate = "last_payment_date";
+            static constexpr ColumnType lastPaymentDate_type = ColumnType::DATE;
+
+            static constexpr const char * frequency = "frequency";
+            static constexpr ColumnType frequency_type = ColumnType::TEXT;
+
+            static constexpr const char * endDate = "end_date";
+            static constexpr ColumnType endDate_type = ColumnType::DATE;
+        };
+
         StrDate inline getPeriodStartDate() {
             StrDate today;
             return getPeriodStartDate(today);
@@ -162,21 +177,6 @@ class DBRecurringCharge : public DBPayment {
         int getPeriodStartDay();
         int getPeriodEndDay();
         int getPeriodEndDay(StrDate & referenceDate);
-
-        // Next *scheduled* (nominal) date, without weekend adjustment.
-        StrDate getNextNominalScheduledDate();
-
-    protected:
-        struct Columns {
-            static constexpr const char * lastPaymentDate = "last_payment_date";
-            static constexpr ColumnType lastPaymentDate_type = ColumnType::DATE;
-
-            static constexpr const char * frequency = "frequency";
-            static constexpr ColumnType frequency_type = ColumnType::TEXT;
-
-            static constexpr const char * endDate = "end_date";
-            static constexpr ColumnType endDate_type = ColumnType::DATE;
-        };
 
     public:
         DBRecurringTransfer transfer;

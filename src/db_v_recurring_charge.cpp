@@ -48,3 +48,43 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetwee
 
     return result;
 }
+
+DBResult<DBRecurringChargeView> DBRecurringChargeView::getOutstandingChargesDueThisPeriod(pfm_id_t & accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringChargeView::getOutstandingChargesDueThisPeriod()");
+
+    StrDate today;
+    StrDate periodStart = getPeriodStartDate(today);
+    StrDate periodEnd = getPeriodEndDate(today);
+
+    DBRecurringChargeView c;
+    DBResult<DBRecurringChargeView> charges = c.retrieveByAccountID(accountId);
+
+    DBResult<DBRecurringChargeView> results;
+
+    int count = 0;
+    for (int i = 0;i < charges.size();i++) {
+        DBRecurringChargeView charge = charges[i];
+
+        bool isChargeUnpaid = (!charge.lastPaymentDate.isNull() ? (charge.lastPaymentDate < periodStart) : true);
+
+        log.debug(
+            "Charge '%s' is %sunpaid in this period '%s' -> '%s'", 
+            charge.description.c_str(),
+            (isChargeUnpaid ? "" : "not "), 
+            periodStart.shortDate().c_str(), 
+            periodEnd.shortDate().c_str());
+
+        if (isChargeUnpaid && charge.isChargeDueThisPeriod()) {
+            log.debug("Charge '%s' is outstanding...", charge.description.c_str());
+            results.addRow(charge);
+            count++;
+        }
+    }
+
+    log.debug("Found %d oustanding charges (counter = %d)", results.size(), count);
+    
+    log.exit("DBRecurringChargeView::getOutstandingChargesDueThisPeriod()");
+
+    return results;
+}

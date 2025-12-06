@@ -97,6 +97,26 @@ void Command::listRecurringCharges() {
     view.show();
 }
 
+void Command::listOutstandingCharges() {
+    checkAccountSelected();
+
+    DBRecurringChargeView chargeInstance;
+    DBResult<DBRecurringChargeView> result = chargeInstance.getOutstandingChargesDueThisPeriod(selectedAccount.id);
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    cacheMgr.clearRecurringCharges();
+
+    for (int i = 0;i < result.size();i++) {
+        DBRecurringChargeView charge = result[i];
+        cacheMgr.addRecurringCharge(charge.sequence, charge);
+    }
+
+    RecurringChargeListView view;
+    view.addResults(result, selectedAccount.code);
+    view.show();
+}
+
 DBRecurringCharge Command::getRecurringCharge(int sequence) {
     int selectedSequence;
 
