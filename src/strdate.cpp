@@ -416,6 +416,10 @@ string StrDate::getDisplayDate() const {
     }
 }
 
+void StrDate::set(const StrDate & date) {
+    set(date.year(), date.month(), date.day());
+}
+
 void StrDate::set(const string & date) {
     set(date.c_str());
 }
@@ -755,4 +759,34 @@ bool StrDate::operator>=(StrDate & rhs) {
 bool StrDate::operator>=(string & rhs) {
     StrDate d1(rhs);
     return (this->epoch() >= d1.epoch());
+}
+
+// prefix increment
+StrDate & StrDate::operator++() {
+    StrDate d = this->addDays(1);
+    this->set(d);
+
+    return *this;
+}
+
+// postfix increment
+StrDate StrDate::operator++(int) {
+    StrDate old = *this;
+    operator++();
+    return old;
+}
+
+// prefix decrement
+StrDate & StrDate::operator--() {
+    StrDate d = this->addDays(-1);
+    this->set(d);
+
+    return *this;
+}
+
+// postfix decrement
+StrDate StrDate::operator--(int) {
+    StrDate old = *this;
+    operator--();
+    return old;
 }

@@ -89,6 +89,7 @@ class StrDate {
         StrDate(const char * pszDate);
         StrDate(int year, int month, int day);
 
+        void set(const StrDate & date);
         void set(const string & date);
         void set(const char * date);
         void set(int year, int month, int day);
@@ -146,6 +147,16 @@ class StrDate {
 
         bool operator>=(StrDate & rh);
         bool operator>=(string & rh);
+
+        // prefix increment
+        StrDate & operator++();
+        // postfix increment
+        StrDate operator++(int);
+
+        // prefix decrement
+        StrDate & operator--();
+        // postfix decrement
+        StrDate operator--(int);
 };
 
 #ifdef PFM_TEST_SUITE_ENABLED

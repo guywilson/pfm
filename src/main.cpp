@@ -124,9 +124,27 @@ static void checkTerminalSize(void) {
     }
 }
 
+void unitTestCodeFragment() {
+    Logger & log = Logger::getInstance();
+    log.setLogLevel(LOG_LEVEL_ALL);
+
+    setOverrideDate("2025-11-29");
+
+    pfm_id_t chargeId;
+    chargeId.set(31);
+
+    DBRecurringCharge charge;
+    charge.retrieve(chargeId);
+    
+    StrDate transactionDate = charge.getNextRecurringTransactionDate(charge.lastPaymentDate);
+
+    cout << "Processing test date '" << charge.lastPaymentDate.shortDate() << "' to transaction date '" << transactionDate.shortDate() << "'" << endl;
+}
+
 int main(int argc, char ** argv) {
     char * pszDatabase = NULL;
     int defaultLogLevel = LOG_LEVEL_ERROR | LOG_LEVEL_FATAL;
+    bool runScratch = false;
 
 #ifdef RUN_IN_DEBUGGER
     defaultLogLevel = LOG_LEVEL_ALL;
@@ -164,6 +182,9 @@ int main(int argc, char ** argv) {
         else if (arg.compare("--debug-logging") == 0) {
             defaultLogLevel |= LOG_LEVEL_DEBUG | LOG_LEVEL_INFO;
         }
+        else if (arg.compare("--run-scratch") == 0) {
+            runScratch = true;
+        }
         else {
             cout << "Unknown argument '" << arg << "'" << endl;
             printUsage();
@@ -196,6 +217,15 @@ int main(int argc, char ** argv) {
     }
 
     free(pszDatabase);
+
+    if (runScratch) {
+        unitTestCodeFragment();
+
+        db.close();
+        log.close();
+
+        return 0;
+    }
 
 #ifdef PFM_TEST_SUITE_ENABLED
     test();

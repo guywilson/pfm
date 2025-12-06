@@ -244,6 +244,28 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
         StrDate nominal = getNextNominalScheduledDate();
         txnDate = adjustForwardToBusinessDay(nominal);
 
+        /*
+        ** If our date has rolled over to the next month because the nominal date
+        ** fell on a weekend and the next working day is the 1st of the next month,
+        ** then our charge will be missed with the algorithm. So in this scenario,
+        ** wind back the payment date to the previous business day.
+        **
+        ** An example:
+        **
+        ** nominal next payment date is calculated as Saturday 29th November 2025,
+        ** therefore txnDate is calculated as Monday 1st December 2025 as the next 
+        ** business day. Here we wind it back to Friday 28th November, although
+        ** incorrect compared with reality (the payment will likely be taken on
+        ** Monday 1st December), it prevents the payment being missed entirely.
+        */
+        if (txnDate.month() > nominal.month()) {
+            log.debug("Winding back next transaction date for charge '%s'", txnDate.shortDate().c_str());
+
+            while (txnDate >= nominal || txnDate.isWeekend()) {
+                --txnDate;
+            }
+        }
+
         log.debug("Next transaction date for charge '%s' is '%s' (nominal: %s)",
                 this->description.c_str(),
                 txnDate.shortDate().c_str(),
