@@ -230,6 +230,9 @@ int main(int argc, char ** argv) {
     cfgmgr & cfg = cfgmgr::getInstance();
     cfg.initialise();
 
+    /*
+    ** Run scratch code, suitable for unit testing...
+    */
     if (runScratch) {
         unitTestCodeFragment();
 
