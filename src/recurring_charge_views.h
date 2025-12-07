@@ -6,6 +6,7 @@
 #include "pfm_error.h"
 #include "cli_widget.h"
 #include "custom_widgets.h"
+#include "db_account.h"
 #include "db_recurring_charge.h"
 #include "db_recurring_transfer.h"
 #include "db_v_recurring_charge.h"
@@ -95,17 +96,21 @@ class ChooseRecurringChargeView : public CLIView {
 class RecurringChargeListView : public CLIListView {
     private:
         Money total;
+        string title;
 
     public:
-        RecurringChargeListView() : CLIListView() {
-            total = 0.0;
+        RecurringChargeListView(DBAccount & account) : CLIListView() {
+            title = "Recurring charges for account: " + account.code;
         }
 
-        void addResults(DBResult<DBRecurringChargeView> & result, string & accountCode) {
-            char szTitle[TITLE_BUFFER_LEN];
+        RecurringChargeListView(const string & title) : CLIListView() {
+            this->title = title;
+        }
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Recurring charges for account: %s (%d)", accountCode.c_str(), result.size());
-            setTitle(szTitle);
+        void addResults(DBResult<DBRecurringChargeView> & result) {
+            title += " (" + to_string(result.size()) + ')';
+
+            setTitle(title);
 
             CLIListRow headerRow;
 
@@ -134,6 +139,8 @@ class RecurringChargeListView : public CLIListView {
             headerRow.addColumn(column8);
 
             addHeaderRow(headerRow);
+
+            total = 0.0;
 
             for (int i = 0;i < result.size();i++) {
                 DBRecurringChargeView charge = result.at(i);

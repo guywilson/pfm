@@ -92,8 +92,8 @@ void Command::listRecurringCharges() {
         cacheMgr.addRecurringCharge(charge.sequence, charge);
     }
 
-    RecurringChargeListView view;
-    view.addResults(result, selectedAccount.code);
+    RecurringChargeListView view = RecurringChargeListView(selectedAccount);
+    view.addResults(result);
     view.show();
 }
 
@@ -112,8 +112,8 @@ void Command::listOutstandingCharges() {
         cacheMgr.addRecurringCharge(charge.sequence, charge);
     }
 
-    RecurringChargeListView view;
-    view.addResults(result, selectedAccount.code);
+    RecurringChargeListView view = RecurringChargeListView("Outstanding charges for account: " + selectedAccount.code);
+    view.addResults(result);
     view.show();
 }
 
