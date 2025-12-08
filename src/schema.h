@@ -300,7 +300,7 @@ const char * pszCreateRCTable =
     "end_date TEXT," \
     "description TEXT NOT NULL," \
     "amount NUMERIC NOT NULL," \
-    "last_payment_date TEXT" \
+    "last_payment_date TEXT," \
     "frequency TEXT NOT NULL," \
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
