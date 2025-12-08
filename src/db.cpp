@@ -705,6 +705,29 @@ void PFM_DB::createView(const char * sql) {
     log.exit("PFM_DB::createView()");
 }
 
+void PFM_DB::createIndex(const char * sql) {
+    log.entry("PFM_DB::createIndex()");
+    
+    log.sql("Creating index with sql %s", sql);
+
+    try {
+        _executeSQLNoCallback(sql);
+    }
+    catch (pfm_error & e) {
+        log.error("Failed to create index with error '%s'", e.what());
+
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to create index with statement '%s' with error %s",
+                sql,
+                e.what()), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    log.exit("PFM_DB::createIndex()");
+}
+
 void PFM_DB::createSchema() {
     log.entry("PFM_DB::createSchema()");
 
@@ -728,6 +751,14 @@ void PFM_DB::createSchema() {
         createView(pszCreateListTransationView);
         createView(pszCreateRecurringTransactionsView);
         createView(pszCreateTransferRecordView);
+
+        createIndex(pszPayeeCodeIndex);
+        createIndex(pszChargeDateIndex);
+        createIndex(pszCategoryCodeIndex);
+        createIndex(pszTransactionDateIndex);
+        createIndex(pszTransactionChargeIndex);
+        createIndex(pszCarriedOverLogDateIndex);
+        createIndex(pszChargeLastPaymentDateIndex);
 
         createCurrencies();
         createDefaultCategories();

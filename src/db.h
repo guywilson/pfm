@@ -169,6 +169,7 @@ class PFM_DB {
 
         void createTable(const char * sql);
         void createView(const char * sql);
+        void createIndex(const char * sql);
 
         int executeSelect(const string & statement, vector<DBRow> * rows);
         

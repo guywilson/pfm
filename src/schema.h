@@ -492,4 +492,25 @@ static const char * pszCreateTransferRecordView =
     "LEFT JOIN account at ON at.id = trt.account_id " \
     "ORDER BY trf.date ASC;";
 
+static const char * pszTransactionDateIndex = 
+    "CREATE INDEX idx_transaction_date ON account_transaction(date);";
+
+static const char * pszTransactionChargeIndex = 
+    "CREATE INDEX idx_transaction_charge_id ON account_transaction(recurring_charge_id);";
+
+static const char * pszChargeDateIndex = 
+    "CREATE INDEX idx_charge_date ON recurring_charge(date);";
+
+static const char * pszChargeLastPaymentDateIndex = 
+    "CREATE INDEX idx_charge_last_payment_date ON recurring_charge(last_payment_date);";
+
+static const char * pszCarriedOverLogDateIndex = 
+    "CREATE INDEX idx_carried_over_log_date ON carried_over_log(date);";
+
+static const char * pszCategoryCodeIndex = 
+    "CREATE UNIQUE INDEX idx_category_code ON category(code);";
+
+static const char * pszPayeeCodeIndex = 
+    "CREATE UNIQUE INDEX idx_payee_code ON payee(code);";
+
 #endif
