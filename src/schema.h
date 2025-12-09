@@ -331,6 +331,7 @@ static const char * pszCreateTransactionTable =
     "credit_debit TEXT NOT NULL," \
     "amount NUMERIC NOT NULL," \
     "is_reconciled TEXT NOT NULL," \
+    "is_transfer TEXT NOT NULL DEFAULT 'N'," \
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
     "FOREIGN KEY(account_id) REFERENCES account(id)," \
@@ -434,6 +435,7 @@ static const char * pszCreateListTransationView =
     "tr.credit_debit AS type," \
     "tr.amount," \
     "tr.is_reconciled AS reconciled," \
+    "tr.is_transfer," \
     "tr.created," \
     "tr.updated " \
     "FROM account_transaction tr " \

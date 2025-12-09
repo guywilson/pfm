@@ -38,6 +38,9 @@ class DBTransactionView : public DBTransaction {
             static constexpr const char * isReconciled = "reconciled";
             static constexpr ColumnType isReconciled_type = ColumnType::BOOL;
 
+            static constexpr const char * isTransfer = "is_transfer";
+            static constexpr ColumnType isTransfer_type = ColumnType::BOOL;
+
             static constexpr const char * total = "total";
             static constexpr ColumnType total_type = ColumnType::MONEY;
         };
@@ -47,6 +50,7 @@ class DBTransactionView : public DBTransaction {
         string payee;
         string category;
         bool isRecurring;
+        bool isTransfer;
 
         Money total; // For category, payee reports
 
@@ -61,6 +65,7 @@ class DBTransactionView : public DBTransaction {
             this->payee = "";
             this->category = "";
             this->isRecurring = false;
+            this->isTransfer = false;
         }
 
         void set(const DBTransactionView & src) {
@@ -70,6 +75,7 @@ class DBTransactionView : public DBTransaction {
             this->payee = src.payee;
             this->category = src.category;
             this->isRecurring = src.isRecurring;
+            this->isTransfer = src.isTransfer;
         }
 
         void print() {
@@ -77,6 +83,7 @@ class DBTransactionView : public DBTransaction {
 
             cout << "Account: '" << account << "'" << endl;
             cout << "IsRecurring: '" << isRecurring << "'" << endl;
+            cout << "IsTransfer: '" << isTransfer << "'" << endl;
             cout << "Payee: '" << payee << "'" << endl;
             cout << "Category: '" << category << "'" << endl;
         }
@@ -101,6 +108,9 @@ class DBTransactionView : public DBTransaction {
             }
             else if (column.getName() == Columns::isReconciled) {
                 isReconciled = column.getBoolValue();
+            }
+            else if (column.getName() == Columns::isTransfer) {
+                isTransfer = column.getBoolValue();
             }
             else if (column.getName() == Columns::total) {
                 total = column.doubleValue();

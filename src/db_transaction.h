@@ -38,6 +38,9 @@ class DBTransaction : public DBPayment {
 
             static constexpr const char * isReconciled = "is_reconciled";
             static constexpr ColumnType isReconciled_type = ColumnType::BOOL;
+
+            static constexpr const char * isTransfer = "is_transfer";
+            static constexpr ColumnType isTransfer_type = ColumnType::BOOL;
         };
 
     public:
@@ -45,13 +48,14 @@ class DBTransaction : public DBPayment {
         string reference;
         string type;
         bool isReconciled;
+        bool isTransfer;
 
         DBTransaction() : DBPayment() {
             clear();
         }
 
         static const string getCSVHeader() {
-            return "accountCode,categoryCode,payeeCode,date,description,reference,creditDebit,isReconciled,amount\n";
+            return "accountCode,categoryCode,payeeCode,date,description,reference,creditDebit,isReconciled,isTransfer,amount\n";
         }
 
         string getCSVRecord() {
@@ -64,6 +68,7 @@ class DBTransaction : public DBPayment {
                     "\"" + reference + "\"," +
                     "\"" + type + "\"," +
                     "\"" + (isReconciled ? "Y" : "N") + "\"," +
+                    "\"" + (isTransfer ? "Y" : "N") + "\"," +
                     "" + amount.rawStringValue() + "\n";
 
             return record;
@@ -76,6 +81,7 @@ class DBTransaction : public DBPayment {
             this->reference = "";
             this->type = TYPE_DEBIT;
             this->isReconciled = false;
+            this->isTransfer = false;
         }
 
         void set(const DBTransaction & src) {
@@ -85,6 +91,7 @@ class DBTransaction : public DBPayment {
             this->reference = src.reference;
             this->type = src.type;
             this->isReconciled = src.isReconciled;
+            this->isTransfer = src.isTransfer;
         }
 
         void set(JRecord & record) {
@@ -93,6 +100,7 @@ class DBTransaction : public DBPayment {
             this->reference = record.get("reference");
             this->type = record.get("type");
             this->isReconciled = (record.get("isReconciled").compare("Y") == 0 ? true : false);
+            this->isTransfer = (record.get("isTransfer").compare("Y") == 0 ? true : false);
         }
 
         JRecord getRecord() override  {
@@ -101,6 +109,7 @@ class DBTransaction : public DBPayment {
             r.add("reference", reference);
             r.add("type", type);
             r.add("isReconciled", getIsReconciledValue());
+            r.add("isTransfer", getIsTransferValue());
 
             return r;
         }
@@ -119,6 +128,7 @@ class DBTransaction : public DBPayment {
             cout << "Reference: '" << reference << "'" << endl;
             cout << "Type: '" << type << "'" << endl;
             cout << "isReconciled: " << isReconciled << endl;
+            cout << "isTransfer: " << isTransfer << endl;
         }
 
         void assignColumn(DBColumn & column) override {
@@ -135,6 +145,9 @@ class DBTransaction : public DBPayment {
             }
             else if (column.getName() == Columns::isReconciled) {
                 isReconciled = column.getBoolValue();
+            }
+            else if (column.getName() == Columns::isTransfer) {
+                isTransfer = column.getBoolValue();
             }
         }
 
@@ -169,6 +182,10 @@ class DBTransaction : public DBPayment {
             return (isReconciled ? "Y" : "N");
         }
 
+        const char * getIsTransferValue() {
+            return (isTransfer ? "Y" : "N");
+        }
+
         const string getTableName() const override {
             return "account_transaction";
         }
@@ -188,7 +205,8 @@ class DBTransaction : public DBPayment {
                 {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
                 {{Columns::type, Columns::type_type}, type},
                 {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
-                {{Columns::isReconciled, Columns::isReconciled_type}, getIsReconciledValue()}
+                {{Columns::isReconciled, Columns::isReconciled_type}, getIsReconciledValue()},
+                {{Columns::isTransfer, Columns::isTransfer_type}, getIsTransferValue()}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
@@ -204,7 +222,8 @@ class DBTransaction : public DBPayment {
                 {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
                 {{Columns::type, Columns::type_type}, type},
                 {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
-                {{Columns::isReconciled, Columns::isReconciled_type}, getIsReconciledValue()}
+                {{Columns::isReconciled, Columns::isReconciled_type}, getIsReconciledValue()},
+                {{Columns::isTransfer, Columns::isTransfer_type}, getIsTransferValue()}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);
@@ -223,8 +242,8 @@ class DBTransaction : public DBPayment {
         void reconcileAllForAccountIDBeforeDate(pfm_id_t & accountId, StrDate & referenceDate);
 
         static void createFromRecurringChargeAndDate(DBRecurringCharge & src, StrDate & transactionDate);
-
         static void createTransferPairFromSource(DBTransaction & source, DBAccount & accountTo);
+        static void linkTransferTransactions();
 
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t & accountId);
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);

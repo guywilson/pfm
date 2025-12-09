@@ -341,7 +341,9 @@ void DBTransaction::createTransferPairFromSource(DBTransaction & source, DBAccou
         accountFrom.retrieve();
 
         source.reference = "TR > " + accountTo.code;
+        source.isTransfer = true;
         target.reference = "TR < " + accountFrom.code;
+        target.isTransfer = true;
 
         target.save();
         source.save();
@@ -356,6 +358,29 @@ void DBTransaction::createTransferPairFromSource(DBTransaction & source, DBAccou
     }
 
     log.exit("DBTransaction::createTransferPairFromSource()");
+}
+
+void DBTransaction::linkTransferTransactions() {
+    DBCriteria criteria;
+    criteria.add(Columns::isTransfer, true);
+    criteria.add(Columns::reference, DBCriteria::like, string("TR >%"));
+    criteria.addOrderBy(DBPayment::Columns::accountId, DBCriteria::ascending);
+
+    DBTransaction t;
+    string statement = t.getSelectStatement() +  criteria.getStatementCriteria();
+    
+    DBResult<DBTransaction> sourceTransactions;
+    sourceTransactions.retrieve(statement);
+
+    criteria.clear();
+    criteria.add(Columns::isTransfer, true);
+    criteria.add(Columns::reference, DBCriteria::like, string("TR <%"));
+    criteria.addOrderBy(DBPayment::Columns::accountId, DBCriteria::ascending);
+
+    statement = t.getSelectStatement() +  criteria.getStatementCriteria();
+    
+    DBResult<DBTransaction> targetTransactions;
+    targetTransactions.retrieve(statement);
 }
 
 int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate) {

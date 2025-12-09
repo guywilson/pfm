@@ -438,12 +438,27 @@ void Command::importTransactions() {
 
     vector<JRecord> records = jfile.read("transactions");
 
-    for (JRecord & record : records) {
-        DBTransaction transaction;
+    PFM_DB & db = PFM_DB::getInstance();
 
-        transaction.set(record);
-        transaction.save();
+    try {
+        db.begin();
+
+        for (JRecord & record : records) {
+            DBTransaction transaction;
+
+            transaction.set(record);
+            transaction.save();
+        }
+
+        DBTransaction::linkTransferTransactions();
+
+        db.commit();
     }
+    catch(pfm_error & e) {
+        db.rollback();
+        throw e;
+    }
+    
 }
 
 void Command::exportTransactions() {
