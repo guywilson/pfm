@@ -128,17 +128,7 @@ void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ALL);
 
-    setOverrideDate("2025-11-29");
-
-    pfm_id_t chargeId;
-    chargeId.set(31);
-
-    DBRecurringCharge charge;
-    charge.retrieve(chargeId);
-    
-    StrDate transactionDate = charge.getNextRecurringTransactionDate(charge.lastPaymentDate);
-
-    cout << "Processing test date '" << charge.lastPaymentDate.shortDate() << "' to transaction date '" << transactionDate.shortDate() << "'" << endl;
+    DBTransaction::linkTransferTransactions();
 }
 
 int main(int argc, char ** argv) {

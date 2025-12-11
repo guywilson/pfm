@@ -50,7 +50,7 @@ int DBTransferTransactionRecord::retrieveByTransactionFromId(pfm_id_t & transact
     int rowsRetrievedCount = result.retrieve(statement);
 
     if (rowsRetrievedCount == 1) {
-        set(result.at(0));
+        set(result[0]);
     }
 
     log.exit("DBTransferTransactionRecord::retrieveByTransactionFromId()");
@@ -88,4 +88,27 @@ DBTransferTransactionRecord DBTransferTransactionRecord::createFromTransactions(
     log.exit("DBTransferTransactionRecord::createFromTransactions()");
 
     return record;
+}
+
+int DBTransferTransactionRecord::retrieveByTransactionIds(pfm_id_t & sourceTransactionId, pfm_id_t & targetTransactionId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransferTransactionRecord::retrieveByTransactionIds()");
+
+    DBCriteria criteria;
+    criteria.add(Columns::transactionFromId, DBCriteria::equal_to, sourceTransactionId);
+    criteria.add(Columns::transactionToId, DBCriteria::equal_to, targetTransactionId);
+
+    string statement = getSelectStatement() + criteria.getStatementCriteria();
+
+    DBResult<DBTransferTransactionRecord> result;
+
+    int rowsRetrievedCount = result.retrieve(statement);
+
+    if (rowsRetrievedCount == 1) {
+        set(result[0]);
+    }
+
+    log.exit("DBTransferTransactionRecord::retrieveByTransactionIds()");
+
+    return rowsRetrievedCount;
 }

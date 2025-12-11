@@ -361,6 +361,11 @@ void DBTransaction::createTransferPairFromSource(DBTransaction & source, DBAccou
 }
 
 void DBTransaction::linkTransferTransactions() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransaction::linkTransferTransactions()");
+
+    log.debug("Attempting to link source & target transfer transactions");
+
     DBCriteria criteria;
     criteria.add(Columns::isTransfer, true);
     criteria.add(Columns::reference, DBCriteria::like, string("TR >%"));
@@ -381,6 +386,64 @@ void DBTransaction::linkTransferTransactions() {
     
     DBResult<DBTransaction> targetTransactions;
     targetTransactions.retrieve(statement);
+
+    if (sourceTransactions.size() != targetTransactions.size()) {
+        throw pfm_validation_error("Failed to link transfer transactions, there should be an equal number of source and target transactions");
+    }
+
+    int matchCount = 0;
+
+    for (int i = 0;i < sourceTransactions.size();i++) {
+        DBTransaction source = sourceTransactions[i];
+
+        for (int j = 0;j < targetTransactions.size();j++) {
+            DBTransaction target = targetTransactions[j];
+
+            if (target.categoryId.getValue() == source.categoryId.getValue() &&
+                target.payeeId.getValue() == source.payeeId.getValue() &&
+                target.date == source.date &&
+                target.amount == source.amount)
+            {
+                log.debug(
+                    "Found match on categoryId, payeeId, date '%s' and amount %s for transaction '%s'", 
+                    source.date.shortDate().c_str(), 
+                    source.amount.rawStringValue().c_str(), 
+                    source.description.c_str());
+
+                DBAccount targetAccount;
+                targetAccount.retrieve(target.accountId);
+
+                DBAccount sourceAccount;
+                sourceAccount.retrieve(source.accountId);
+
+                if (targetAccount.code == source.reference.substr(5) &&
+                    sourceAccount.code == target.reference.substr(5))
+                {
+                    matchCount++;
+
+                    log.debug(
+                        "Found match on source account '%s' to target account '%s'", 
+                        sourceAccount.code.c_str(), 
+                        targetAccount.code.c_str());
+
+                    DBTransferTransactionRecord transfer;
+                    int isExistingTransferPresent = transfer.retrieveByTransactionIds(source.id, target.id);
+
+                    if (!isExistingTransferPresent) {
+                        DBTransferTransactionRecord::createFromTransactions(target, source);
+                    }
+                }
+            }
+        }
+    }
+
+    log.debug("Found a total of %d matches for %d transfer transactions", matchCount, sourceTransactions.size());
+
+    if (matchCount != sourceTransactions.size()) {
+        throw pfm_validation_error("Failed to link transfer transactions, failed to match all source and target transactions");
+    }
+
+    log.exit("DBTransaction::linkTransferTransactions()");
 }
 
 int DBTransaction::createNextTransactionForCharge(DBRecurringCharge & charge, StrDate & latestDate) {
