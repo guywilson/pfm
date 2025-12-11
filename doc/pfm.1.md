@@ -125,6 +125,8 @@ The PFM command **save-json-template** will save an example json file for the en
 
 **add-recurring-charge, arc [parameters]**
 
+Add a new recurring charge to the currently selected account
+
 - c:[category code] - The category code of the charge
 - p:[payee code] - The payee code of the charge
 - start:[date] - The start date for the charge (defaults to today)
@@ -134,7 +136,13 @@ The PFM command **save-json-template** will save an example json file for the en
 - amnt:[amount] - The amount
 - to:[account code] - The account code to transfer to, e.g. recurring transfer
 
+**list-outstanding-charges, loc**
+
+Lists the oustanding charges for the currently selected account.
+
 **add-transaction, at, add [parameters]**
+
+Add a new transaction to the currently selected account
 
 - c:[category code] - The category code of the transaction
 - p:[payee code] - The payee code of the transaction
@@ -147,6 +155,8 @@ The PFM command **save-json-template** will save an example json file for the en
 
 **transfer-transaction, transfer, tr [parameters]**
 
+Add a new transfer transaction to the currently selected account
+
 - to:[account code] - The code of the account to transfer to
 - c:[category code] - The category code of the transaction
 - date:[date] - The date for the transaction (defaults to today)
@@ -155,6 +165,8 @@ The PFM command **save-json-template** will save an example json file for the en
 - rec:[Y/N] - Is the transaction reconciled or not
 
 **list-transactions, lt, list [parameters]**
+
+List transactions for the currently selected account
 
 - num - number of results to be returned
 - all - return non-recurring and recurring transactions
@@ -168,6 +180,8 @@ list 50 all desc
 ```
 
 **find-transactions, find [parameters]**
+
+Find transactions for the currently selected account
 
 Parameters are listed below, any parameters that accept wildcards recognise * as any string, ? as any character, e.g. desc:travel*.
 
