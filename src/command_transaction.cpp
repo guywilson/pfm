@@ -458,7 +458,6 @@ void Command::importTransactions() {
         db.rollback();
         throw e;
     }
-    
 }
 
 void Command::exportTransactions() {
