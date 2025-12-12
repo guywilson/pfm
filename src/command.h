@@ -181,6 +181,8 @@ class Command {
         void getDBKey();
         void saveDBKey();
 
+        void enterSQLMode();
+
         int getLogLevelParameter(string & level);
         void setLoggingLevel();
         void clearLoggingLevel();

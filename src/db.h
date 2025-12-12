@@ -174,9 +174,11 @@ class PFM_DB {
         int executeSelect(const string & statement, vector<DBRow> * rows);
         
         pfm_id_t executeInsert(const string & statement);
-
         void executeUpdate(const string & statement);
         void executeDelete(const string & statement);
+
+        void executeRead(const string & statement, vector<DBRow> * rows);
+        void executeWrite(const string & statement);
 
         void begin();
         void commit();

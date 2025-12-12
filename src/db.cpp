@@ -892,11 +892,8 @@ void PFM_DB::createCurrencies() {
 
 int PFM_DB::executeSelect(const string & statement, vector<DBRow> * rows) {
     log.entry("PFM_DB::executeSelect()");
-
-    _executeSQLCallback(statement, rows);
-
+    executeRead(statement, rows);
     log.debug("Execute SELECT returned %d rows", rows->size());
-
     log.exit("PFM_DB::executeSelect()");
 
     return rows->size();
@@ -904,30 +901,35 @@ int PFM_DB::executeSelect(const string & statement, vector<DBRow> * rows) {
 
 pfm_id_t PFM_DB::executeInsert(const string & statement) {
     log.entry("PFM_DB::executeInsert()");
-
-    _executeSQLNoCallback(statement);
-
-    log.exit("PFM_DB::executeInsert()");
-
+    executeWrite(statement);
     pfm_id_t id = sqlite3_last_insert_rowid(dbHandle);
+    log.exit("PFM_DB::executeInsert()");
 
     return id;
 }
 
 void PFM_DB::executeUpdate(const string & statement) {
     log.entry("PFM_DB::executeUpdate()");
-
-    _executeSQLNoCallback(statement);
-
+    executeWrite(statement);
     log.exit("PFM_DB::executeUpdate()");
 }
 
 void PFM_DB::executeDelete(const string & statement) {
     log.entry("PFM_DB::executeDelete()");
-
-    _executeSQLNoCallback(statement);
-
+    executeWrite(statement);
     log.exit("PFM_DB::executeDelete()");
+}
+
+void PFM_DB::executeRead(const string & statement, vector<DBRow> * rows) {
+    log.entry("PFM_DB::executeRead()");
+    _executeSQLCallback(statement, rows);
+    log.exit("PFM_DB::executeRead()");
+}
+
+void PFM_DB::executeWrite(const string & statement) {
+    log.entry("PFM_DB::executeWrite()");
+    _executeSQLNoCallback(statement);
+    log.exit("PFM_DB::executeWrite()");
 }
 
 void PFM_DB::begin() {

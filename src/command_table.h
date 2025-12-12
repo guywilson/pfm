@@ -258,6 +258,10 @@ const vector<CommandEntry> commandTable = {
         "Change the database password and re-encrypt the db", 
         [](Command& c){ c.changePassword(); }},
 
+    {"sql-mode", {}, 
+        "", 
+        [](Command& c){ c.enterSQLMode(); }},
+
     {"clear-recurring-transactions", {}, 
         "", 
         [](Command& c){ c.clearRecurringTransactions(); }},
