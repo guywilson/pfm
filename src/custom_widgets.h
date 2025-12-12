@@ -12,6 +12,7 @@ using namespace std;
 #define __INCL_CUSTOM_WIDGETS
 
 #define DATE_FIELD_LENGTH                       10
+#define TIMESTAMP_FIELD_LENGTH                  19
 
 class CategorySpinField : public CLISpinTextField {
     private:

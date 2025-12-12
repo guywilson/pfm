@@ -15,6 +15,7 @@
 #include "cfgmgr.h"
 #include "cache.h"
 #include "jfile.h"
+#include "debug_views.h"
 
 using namespace std;
 
@@ -127,7 +128,7 @@ void Command::enterSQLMode() {
         }
 
         add_history(statement.c_str());
-        
+
         string command = statement.substr(0, 6);
 
         int i = 0;
@@ -141,27 +142,10 @@ void Command::enterSQLMode() {
 
             db.executeRead(statement, &rows);
 
-            for (int i = 0;i < rows.size();i++) {
-                DBRow row = rows[i];
+            GenericListView view;
+            view.addRows(rows);
 
-                if (i == 0) {
-                    cout << "| ";
-                    for (size_t columnNum = 0;columnNum < row.getNumColumns();columnNum++) {
-                        DBColumn c = row.getColumnAt(columnNum);
-
-                        cout << c.getName() << " | ";
-                    }
-                    cout << endl;
-                }
-
-                cout << "| ";
-                for (size_t columnNum = 0;columnNum < row.getNumColumns();columnNum++) {
-                    DBColumn c = row.getColumnAt(columnNum);
-
-                    cout << c.getValue() << " | ";
-                }
-                cout << endl;
-            }
+            view.show();
         }
         else {
             db.executeWrite(statement);
