@@ -41,6 +41,9 @@ class DBPayment : public DBEntity {
 
             static constexpr const char * amount = "amount";
             static constexpr ColumnType amount_type = ColumnType::MONEY;
+
+            static constexpr const char * isTransfer = "is_transfer";
+            static constexpr ColumnType isTransfer_type = ColumnType::BOOL;
         };
 
         string getAccountCode() {
@@ -58,6 +61,8 @@ class DBPayment : public DBEntity {
         StrDate date;
         string description;
         Money amount;
+
+        bool isTransfer;
 
         DBAccount account;
         DBCategory category;
@@ -86,6 +91,8 @@ class DBPayment : public DBEntity {
 
             this->description = "";
             this->amount = 0.0;
+
+            this->isTransfer = false;
         }
 
         void set(const DBPayment & src) {
@@ -98,6 +105,8 @@ class DBPayment : public DBEntity {
             this->date = src.date;
             this->description = src.description;
             this->amount = src.amount;
+
+            this->isTransfer = src.isTransfer;
 
             this->account.set(src.account);
             this->category.set(src.category);
@@ -120,6 +129,7 @@ class DBPayment : public DBEntity {
             this->amount = record.get("amount");
             this->date = record.get("date");
             this->description = record.get("description");
+            this->isTransfer = (record.get("isTransfer").compare("Y") == 0 ? true : false);
         }
 
         JRecord getRecord() override {
@@ -131,6 +141,7 @@ class DBPayment : public DBEntity {
             r.add("date", this->date.shortDate());
             r.add("description", this->description);
             r.add("amount", this->amount.rawStringValue());
+            r.add("isTransfer", getIsTransferValue());
 
             return r;
         }
@@ -147,6 +158,8 @@ class DBPayment : public DBEntity {
 
             cout << fixed << setprecision(2);
             cout << "Amount: " << amount.localeFormattedStringValue() << endl;
+
+            cout << "isTransfer: " << isTransfer << endl;
 
             cout << "DBCategory (encapsulated object):" << endl;
             category.print();
@@ -176,6 +189,13 @@ class DBPayment : public DBEntity {
             else if (column.getName() == Columns::amount) {
                 amount = column.doubleValue();
             }
+            else if (column.getName() == Columns::isTransfer) {
+                isTransfer = column.getBoolValue();
+            }
+        }
+
+        const char * getIsTransferValue() {
+            return (isTransfer ? "Y" : "N");
         }
 };
 

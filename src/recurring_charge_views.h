@@ -66,11 +66,23 @@ class AddRecurringChargeView : public CLIView {
             charge.amount = amountField.getDoubleValue();
 
             if (transferToAccountField.getValue().length() > 0) {
-                charge.transfer.accountTo = transferToAccountField.getAccount();
-                charge.transfer.accountToId = charge.transfer.accountTo.id;
+                charge.isTransfer = true;
             }
 
             return charge;
+        }
+
+        DBRecurringTransfer getRecurringTransfer() {
+            DBRecurringTransfer transfer;
+
+            if (transferToAccountField.getValue().length() > 0) {
+                DBAccount accountTo = transferToAccountField.getAccount();
+                
+                transfer.accountTo = accountTo;
+                transfer.accountToId = accountTo.id;
+            }
+
+            return transfer;
         }
 };
 
@@ -138,6 +150,9 @@ class RecurringChargeListView : public CLIListView {
             CLIListColumn column8 = CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
             headerRow.addColumn(column8);
 
+            CLIListColumn column9 = CLIListColumn("Tr", 2, CLIListColumn::leftAligned);
+            headerRow.addColumn(column9);
+
             addHeaderRow(headerRow);
 
             total = 0.0;
@@ -155,6 +170,7 @@ class RecurringChargeListView : public CLIListView {
                 row.addCellValue(charge.payeeCode);
                 row.addCellValue(charge.frequency.toString());
                 row.addCellValue(charge.amount);
+                row.addCellValue(charge.getIsTransferValue());
 
                 total += charge.amount;
                 addRow(row);
@@ -192,12 +208,17 @@ class MigrateChargeView : public CLIView {
         }
 
         DBRecurringCharge getCharge() {
+            return charge;
+        }
+
+        DBRecurringTransfer getTransfer() {
             DBAccount accountTo = accountField.getAccount();
 
-            charge.transfer.accountToId = accountTo.id;
-            charge.transfer.recurringChargeId = charge.id;
+            DBRecurringTransfer transfer;
+            transfer.accountToId = accountTo.id;
+            transfer.recurringChargeId = charge.id;
 
-            return charge;
+            return transfer;
         }
 };
 

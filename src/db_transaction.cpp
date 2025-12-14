@@ -12,6 +12,7 @@
 #include "db_payment.h"
 #include "db_category.h"
 #include "db_payee.h"
+#include "db_recurring_transfer.h"
 #include "db_transaction.h"
 #include "db_account.h"
 #include "db_carried_over.h"
@@ -298,12 +299,22 @@ void DBTransaction::createFromRecurringChargeAndDate(DBRecurringCharge & src, St
 
         tr.save();
 
-        if (src.isTransfer()) {
+        if (src.isTransfer) {
             log.debug("Creating transfer records for charge '%s'", src.description.c_str());
 
+            DBRecurringTransfer transfer;
+            int transferExists = transfer.retrieveByRecurringChargeId(src.id);
+
+            if (!transferExists) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Recurring charge ID(%s) is marked as a transfer but does not have a recurring transfer record!", src.id.c_str()), 
+                        __FILE__, 
+                        __LINE__);
+            }
+            
             DBAccount accountTo;
-            accountTo.id = src.transfer.accountToId;
-            accountTo.retrieve();
+            accountTo.retrieve(transfer.accountToId);
 
             DBTransaction::createTransferPairFromSource(tr, accountTo);
         }
@@ -367,7 +378,7 @@ void DBTransaction::linkTransferTransactions() {
     log.debug("Attempting to link source & target transfer transactions");
 
     DBCriteria criteria;
-    criteria.add(Columns::isTransfer, true);
+    criteria.add(DBPayment::Columns::isTransfer, true);
     criteria.add(Columns::reference, DBCriteria::like, string("TR >%"));
     criteria.addOrderBy(DBPayment::Columns::accountId, DBCriteria::ascending);
 
@@ -378,7 +389,7 @@ void DBTransaction::linkTransferTransactions() {
     sourceTransactions.retrieve(statement);
 
     criteria.clear();
-    criteria.add(Columns::isTransfer, true);
+    criteria.add(DBPayment::Columns::isTransfer, true);
     criteria.add(Columns::reference, DBCriteria::like, string("TR <%"));
     criteria.addOrderBy(DBPayment::Columns::accountId, DBCriteria::ascending);
 

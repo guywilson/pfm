@@ -278,26 +278,48 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
 }
 
 void DBRecurringCharge::migrateToTransferCharge(pfm_id_t & accountToId) {
-    DBAccount accountTo;
-    accountTo.retrieve(accountToId);
+    PFM_DB & db = PFM_DB::getInstance();
+    Logger & log = Logger::getInstance();
 
-    DBTransaction tr;
-    DBResult<DBTransaction> recurringTransactions = tr.retrieveByRecurringChargeIDAfterDate(id, accountTo.openingDate);
+    log.entry("DBRecurringCharge::migrateToTransferCharge()");
 
-    for (int i = 0;i < recurringTransactions.size();i++) {
-        DBTransaction sourceTransaction = recurringTransactions[i];
+    try {
+        db.begin();
 
         DBAccount accountTo;
         accountTo.retrieve(accountToId);
 
-        DBTransaction::createTransferPairFromSource(sourceTransaction, accountTo);
+        DBTransaction tr;
+        DBResult<DBTransaction> recurringTransactions = tr.retrieveByRecurringChargeIDAfterDate(id, accountTo.openingDate);
+
+        for (int i = 0;i < recurringTransactions.size();i++) {
+            DBTransaction sourceTransaction = recurringTransactions[i];
+            DBTransaction::createTransferPairFromSource(sourceTransaction, accountTo);
+        }
+
+        this->isTransfer = true;
+        save();
+
+        DBRecurringTransfer transfer;
+        int transferExists = transfer.retrieveByRecurringChargeId(id);
+
+        if (!transferExists) {
+            transfer.accountToId = accountToId;
+            transfer.recurringChargeId = id;
+
+            transfer.save();
+        }
+
+        db.commit();
+    }
+    catch (exception & e) {
+        db.rollback();
+        log.error("Failed to migrate charge '%s'", this->description.c_str());
+
+        throw e;
     }
 
-    DBRecurringTransfer transfer;
-    transfer.accountToId = accountToId;
-    transfer.recurringChargeId = this->id;
-
-    transfer.save();
+    log.exit("DBRecurringCharge::migrateToTransferCharge()");
 }
 
 void DBRecurringCharge::beforeRemove() {
@@ -345,37 +367,5 @@ void DBRecurringCharge::beforeUpdate() {
         }
     }
 
-    if (isTransfer()) {
-        if (this->transfer.accountToId != currentCharge.transfer.accountToId) {
-            this->transfer.save();
-        }
-    }
-
     log.exit("DBRecurringCharge::beforeUpdate()");
-}
-
-void DBRecurringCharge::afterInsert() {
-    Logger & log = Logger::getInstance();
-    log.entry("DBRecurringCharge::afterInsert()");
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    if (isTransfer()) {
-        try {
-            db.begin();
-
-            transfer.accountToId = transfer.accountTo.id;
-            transfer.recurringChargeId = id;
-
-            transfer.save();
-
-            db.commit();
-        }
-        catch (exception & e) {
-            log.error("Failed to create transfer record for charge '%s'", this->description.c_str());
-            db.rollback();
-        }
-    }
-
-    log.exit("DBRecurringCharge::afterInsert()");
 }

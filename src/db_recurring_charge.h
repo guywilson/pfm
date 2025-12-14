@@ -179,8 +179,6 @@ class DBRecurringCharge : public DBPayment {
         int getPeriodEndDay(StrDate & referenceDate);
 
     public:
-        DBRecurringTransfer transfer;
-
         StrDate lastPaymentDate;
         Frequency frequency;
         StrDate endDate;
@@ -219,7 +217,6 @@ class DBRecurringCharge : public DBPayment {
         void clear() {
             DBPayment::clear();
 
-            this->transfer.clear();
             this->lastPaymentDate.clear();
             this->frequency.set("");
             this->endDate.clear();
@@ -228,7 +225,6 @@ class DBRecurringCharge : public DBPayment {
         void set(const DBRecurringCharge & src) {
             DBPayment::set(src);
 
-            this->transfer = src.transfer;
             this->lastPaymentDate = src.lastPaymentDate;
             this->frequency = src.frequency;
             this->endDate = src.endDate;
@@ -282,13 +278,7 @@ class DBRecurringCharge : public DBPayment {
                 payee.retrieve(payeeId);
             }
 
-            transfer.retrieveByRecurringChargeId(id);
-
             this->sequence = sequence;
-        }
-
-        bool isTransfer() {
-            return (!transfer.isNull() ? true : false);
         }
 
         bool inline isActive() {
@@ -307,7 +297,6 @@ class DBRecurringCharge : public DBPayment {
 
         void beforeRemove() override;
         void beforeUpdate() override;
-        void afterInsert() override;
 
         bool isWithinCurrentPeriod(StrDate & referenceDate);
         bool isChargeDueThisPeriod();
@@ -333,6 +322,7 @@ class DBRecurringCharge : public DBPayment {
                 {{Columns::endDate, Columns::endDate_type}, endDate.shortDate()},
                 {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
                 {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
+                {{DBPayment::Columns::isTransfer, DBPayment::Columns::isTransfer_type}, getIsTransferValue()},
                 {{Columns::lastPaymentDate, Columns::lastPaymentDate_type}, lastPaymentDate.shortDate()},
                 {{Columns::frequency, Columns::frequency_type}, frequency.toString()}
             };
@@ -348,6 +338,7 @@ class DBRecurringCharge : public DBPayment {
                 {{Columns::endDate, Columns::endDate_type}, endDate.shortDate()},
                 {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
                 {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
+                {{DBPayment::Columns::isTransfer, DBPayment::Columns::isTransfer_type}, getIsTransferValue()},
                 {{Columns::lastPaymentDate, Columns::lastPaymentDate_type}, lastPaymentDate.shortDate()},
                 {{Columns::frequency, Columns::frequency_type}, frequency.toString()}
             };

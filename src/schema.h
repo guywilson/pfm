@@ -300,6 +300,7 @@ const char * pszCreateRCTable =
     "end_date TEXT," \
     "description TEXT NOT NULL," \
     "amount NUMERIC NOT NULL," \
+    "is_transfer TEXT NOT NULL DEFAULT 'N'," \
     "last_payment_date TEXT," \
     "frequency TEXT NOT NULL," \
     "created TEXT NOT NULL," \
@@ -316,7 +317,8 @@ const char * pszCreateRecurringTransferTable =
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
     "FOREIGN KEY(account_to_id) REFERENCES account(id)," \
-    "FOREIGN KEY(recurring_charge_id) REFERENCES category(id));";
+    "FOREIGN KEY(recurring_charge_id) REFERENCES category(id)," \
+    "UNIQUE(recurring_charge_id) ON CONFLICT ROLLBACK);";
 
 static const char * pszCreateTransactionTable = 
     "CREATE TABLE account_transaction (" \
@@ -406,6 +408,7 @@ const char * pszCreateListRCView =
     "rc.category_id," \
     "c.code AS category_code," \
     "rc.amount," \
+    "rc.is_transfer," \
     "rc.last_payment_date," \
     "rc.frequency," \
     "rc.created," \
