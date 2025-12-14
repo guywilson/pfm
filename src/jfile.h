@@ -38,15 +38,14 @@ class JRecord {
 
 class JFileReader {
     private:
-        string className;
         json j;
 
-        void validate();
-
     public:
-        JFileReader(const string & filename, const string & className);
+        JFileReader(const string & filename);
 
-        vector<JRecord> read(const char * name);
+        vector<JRecord> read(const string & name);
+
+        void validate(const string & className);
 };
 
 class JFileWriter {
@@ -55,10 +54,11 @@ class JFileWriter {
         string className;
 
     public:
+        JFileWriter(const string & filename);
         JFileWriter(const string & filename, const string & className);
         ~JFileWriter();
 
-        void write(vector<JRecord> & records, const char * name);
+        void write(vector<JRecord> & records, const string & name, const string & className);
         void write(vector<JRecord> & records, const string & name);
 };
 

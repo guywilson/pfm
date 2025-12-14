@@ -271,6 +271,34 @@ class DBRecurringCharge : public DBPayment {
             cout << "EndDate: '" << endDate.shortDate() << "'" << endl;
         }
 
+        void backup(JFileWriter & jFile) override {
+            DBResult<DBRecurringCharge> results;
+            results.retrieveAll();
+
+            vector<JRecord> records;
+
+            for (int i = 0;i < results.size();i++) {
+                DBRecurringCharge entity = results[i];
+                records.push_back(entity.getRecord());
+            }
+            
+            jFile.write(records, getJSONArrayName(), getClassName());
+        }
+
+        void restore(JFileReader & jFile) override {
+            DBEntity::restore(jFile);
+
+            vector<JRecord> records = jFile.read(getJSONArrayName());
+
+            DBRecurringCharge entity;
+
+            for (JRecord & record : records) {
+                entity.clear();
+                entity.set(record);
+                entity.save();
+            }
+        }
+
         void assignColumn(DBColumn & column) override {
             DBPayment::assignColumn(column);
             
@@ -324,6 +352,10 @@ class DBRecurringCharge : public DBPayment {
 
         const string getClassName() const override {
             return "DBRecurringCharge";
+        }
+
+        const string getJSONArrayName() const override {
+            return "charges";
         }
 
         const string getInsertStatement() override {

@@ -54,37 +54,39 @@ void JRecord::add(const char * name, const bool value) {
     record[name] = (value ? "Y" : "N");
 }
 
-void JFileReader::validate() {
+void JFileReader::validate(const string & className) {
     unordered_map<string, json> elements = j.template get<unordered_map<string, json>>();
+
+    bool foundClassName = false;
+    string fileClassName;
 
     for (auto& i : elements) {
         if (i.first.compare("className") == 0) {
-            string fileClassName = i.second;
+            fileClassName = i.second;
 
-            if (fileClassName.compare(className) != 0) {
-                throw pfm_validation_error(
-                            pfm_error::buildMsg(
-                                "Error importing categories, invalid className '%s', expected '%s'", 
-                                fileClassName.c_str(),
-                                className.c_str()));
+            if (fileClassName == className) {
+                foundClassName = true;
             }
-
             break;
         }
     }
+
+    if (!foundClassName) {
+        throw pfm_validation_error(
+                    pfm_error::buildMsg(
+                        "Error importing categories, invalid className '%s', expected '%s'", 
+                        fileClassName.c_str(),
+                        className.c_str()));
+    }
 }
 
-JFileReader::JFileReader(const string & filename, const string & className) {
-    this->className = className;
-
-    ifstream fstream(filename.c_str());
+JFileReader::JFileReader(const string & filename) {
+    ifstream fstream(filename);
     this->j = json::parse(fstream);
     fstream.close();
-
-    validate();
 }
 
-vector<JRecord> JFileReader::read(const char * name) {
+vector<JRecord> JFileReader::read(const string & name) {
     vector<JRecord> records;
 
     objects_t rows = j.at(name).get<objects_t>();
@@ -97,6 +99,10 @@ vector<JRecord> JFileReader::read(const char * name) {
     return records;
 }
 
+JFileWriter::JFileWriter(const string & filename) {
+    this->fstream.open(filename);
+}
+
 JFileWriter::JFileWriter(const string & filename, const string & className) {
     this->className = className;
     this->fstream.open(filename);
@@ -106,7 +112,7 @@ JFileWriter::~JFileWriter() {
     this->fstream.close();
 }
 
-void JFileWriter::write(vector<JRecord> & records, const char * name) {
+void JFileWriter::write(vector<JRecord> & records, const string & name) {
     auto jsonEntities = json::array();
 
     for (JRecord record : records) {
@@ -127,6 +133,23 @@ void JFileWriter::write(vector<JRecord> & records, const char * name) {
     this->fstream << entity.dump(4) << endl;
 }
 
-void JFileWriter::write(vector<JRecord> & records, const string & name) {
-    write(records, name.c_str());
+void JFileWriter::write(vector<JRecord> & records, const string & name, const string & className) {
+    auto jsonEntities = json::array();
+
+    for (JRecord record : records) {
+        json j = json::object();
+        object_t o = record.getObject();
+
+        for (const auto& [key, value] : o) {
+            j[key] = value;
+        }
+
+        jsonEntities.push_back(j);
+    }
+
+    json entity;
+    entity["className"] = className;
+    entity[name] = {jsonEntities};
+
+    this->fstream << entity.dump(4) << endl;
 }

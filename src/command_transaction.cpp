@@ -434,49 +434,19 @@ void Command::reconcileTransaction() {
 void Command::importTransactions() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    JFileReader jfile = JFileReader(jsonFileName, "DBTransaction");
+    JFileReader jFile = JFileReader(jsonFileName);
 
-    vector<JRecord> records = jfile.read("transactions");
-
-    PFM_DB & db = PFM_DB::getInstance();
-
-    try {
-        db.begin();
-
-        for (JRecord & record : records) {
-            DBTransaction transaction;
-
-            transaction.set(record);
-            transaction.save();
-        }
-
-        DBTransaction::linkTransferTransactions();
-
-        db.commit();
-    }
-    catch(pfm_error & e) {
-        db.rollback();
-        throw e;
-    }
+    DBTransaction entity;
+    entity.restore(jFile);
 }
 
 void Command::exportTransactions() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    DBResult<DBTransaction> results;
-    results.retrieveAll();
+    JFileWriter jFile = JFileWriter(jsonFileName);
 
-    vector<JRecord> records;
-
-    for (int i = 0;i < results.size();i++) {
-        DBTransaction transaction = results.at(i);
-
-        JRecord r = transaction.getRecord();
-        records.push_back(r);
-    }
-    
-    JFileWriter jFile = JFileWriter(jsonFileName, "DBTransaction");
-    jFile.write(records, "transactions");
+    DBTransaction entity;
+    entity.backup(jFile);
 }
 
 void Command::exportTransactionsAsCSV() {

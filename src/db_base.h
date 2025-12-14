@@ -573,6 +573,14 @@ class DBEntity {
             JRecord r;
             return r;
         }
+
+        virtual void backup(JFileWriter & jFile) {
+            return;
+        }
+        
+        virtual void restore(JFileReader & jFile) {
+            jFile.validate(getClassName());
+        }
         
         virtual const string getTableName() const {
             return "";
@@ -580,6 +588,10 @@ class DBEntity {
 
         virtual const string getClassName() const {
             return "DBEntity";
+        }
+
+        virtual const string getJSONArrayName() const {
+            return "";
         }
 
         virtual const string getSelectStatement() {

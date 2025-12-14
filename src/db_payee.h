@@ -67,6 +67,34 @@ class DBPayee : public DBEntity {
             cout << "Code: '" << code << "'" << endl;
         }
 
+        void backup(JFileWriter & jFile) override {
+            DBResult<DBPayee> results;
+            results.retrieveAll();
+
+            vector<JRecord> records;
+
+            for (int i = 0;i < results.size();i++) {
+                DBPayee entity = results[i];
+                records.push_back(entity.getRecord());
+            }
+            
+            jFile.write(records, getJSONArrayName(), getClassName());
+        }
+
+        void restore(JFileReader & jFile) override {
+            DBEntity::restore(jFile);
+
+            vector<JRecord> records = jFile.read(getJSONArrayName());
+
+            DBPayee entity;
+
+            for (JRecord & record : records) {
+                entity.clear();
+                entity.set(record);
+                entity.save();
+            }
+        }
+
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
@@ -84,6 +112,10 @@ class DBPayee : public DBEntity {
 
         const string getClassName() const override {
             return "DBPayee";
+        }
+
+        const string getJSONArrayName() const override {
+            return "payees";
         }
 
         const string getInsertStatement() override {

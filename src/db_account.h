@@ -93,6 +93,34 @@ class DBAccount : public DBEntity {
             return r;
         }
 
+        void backup(JFileWriter & jFile) override {
+            DBResult<DBAccount> results;
+            results.retrieveAll();
+
+            vector<JRecord> records;
+
+            for (int i = 0;i < results.size();i++) {
+                DBAccount entity = results[i];
+                records.push_back(entity.getRecord());
+            }
+            
+            jFile.write(records, getJSONArrayName(), getClassName());
+        }
+
+        void restore(JFileReader & jFile) override {
+            DBEntity::restore(jFile);
+
+            vector<JRecord> records = jFile.read(getJSONArrayName());
+
+            DBAccount entity;
+
+            for (JRecord & record : records) {
+                entity.clear();
+                entity.set(record);
+                entity.save();
+            }
+        }
+
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
@@ -131,6 +159,10 @@ class DBAccount : public DBEntity {
 
         const string getClassName() const override {
             return "DBAccount";
+        }
+
+        const string getJSONArrayName() const override {
+            return "accounts";
         }
 
         const string getInsertStatement() override {

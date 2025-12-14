@@ -122,6 +122,39 @@ class DBTransaction : public DBPayment {
             cout << "isReconciled: " << isReconciled << endl;
         }
 
+        void backup(JFileWriter & jFile) override {
+            DBResult<DBTransaction> results;
+            results.retrieveAll();
+
+            vector<JRecord> records;
+
+            for (int i = 0;i < results.size();i++) {
+                DBTransaction entity = results[i];
+
+                if (entity.recurringChargeId.isNull()) {
+                    records.push_back(entity.getRecord());
+                }
+            }
+            
+            jFile.write(records, getJSONArrayName(), getClassName());
+        }
+
+        void restore(JFileReader & jFile) override {
+            DBEntity::restore(jFile);
+
+            vector<JRecord> records = jFile.read(getJSONArrayName());
+
+            DBTransaction entity;
+
+            for (JRecord & record : records) {
+                entity.clear();
+                entity.set(record);
+                entity.save();
+            }
+
+            DBTransaction::linkTransferTransactions();
+        }
+
         void assignColumn(DBColumn & column) override {
             DBPayment::assignColumn(column);
             
@@ -165,6 +198,10 @@ class DBTransaction : public DBPayment {
 
         const string getClassName() const override {
             return "DBTransaction";
+        }
+
+        const string getJSONArrayName() const override {
+            return "transactions";
         }
 
         const string getInsertStatement() override {

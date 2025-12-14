@@ -250,6 +250,14 @@ const vector<CommandEntry> commandTable = {
         "Delete the shortcut specified by the supplied sequence", 
         [](Command& c){ c.deleteShortcut(); }},
 
+    {"backup", {}, 
+        "Backup the database to the specified JSON file", 
+        [](Command& c){ c.backup(); }},
+
+    {"restore", {}, 
+        "Restore the database from the specified JSON file", 
+        [](Command& c){ c.restore(); }},
+
     {"list-carried-over-logs", {"lco"}, 
         "", 
         [](Command& c){ c.listCarriedOverLogs(); }},

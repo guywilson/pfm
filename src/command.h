@@ -175,6 +175,9 @@ class Command {
         void updateShortcut();
         void deleteShortcut();
 
+        void backup();
+        void restore();
+        
         void listCarriedOverLogs();
 
         void changePassword();

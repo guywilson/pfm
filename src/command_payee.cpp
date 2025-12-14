@@ -80,33 +80,17 @@ void Command::deletePayee() {
 void Command::importPayees() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    JFileReader jfile = JFileReader(jsonFileName, "DBPayee");
+    JFileReader jFile = JFileReader(jsonFileName);
 
-    vector<JRecord> records = jfile.read("payees");
-
-    for (JRecord & record : records) {
-        DBPayee payee;
-
-        payee.set(record);
-        payee.save();
-    }
+    DBPayee entity;
+    entity.restore(jFile);
 }
 
 void Command::exportPayees() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    DBResult<DBPayee> results;
-    results.retrieveAll();
+    JFileWriter jFile = JFileWriter(jsonFileName);
 
-    vector<JRecord> records;
-
-    for (int i = 0;i < results.size();i++) {
-        DBPayee payee = results.at(i);
-
-        JRecord r = payee.getRecord();
-        records.push_back(r);
-    }
-    
-    JFileWriter jFile = JFileWriter(jsonFileName, "DBPayee");
-    jFile.write(records, "payees");
+    DBPayee entity;
+    entity.backup(jFile);
 }

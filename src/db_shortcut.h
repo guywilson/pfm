@@ -82,6 +82,10 @@ class DBShortcut : public DBEntity {
             return "DBShortcut";
         }
 
+        const string getJSONArrayName() const override {
+            return "shortcuts";
+        }
+
         void onRowComplete(int sequence) override {
             this->sequence = sequence;
         }
@@ -102,6 +106,34 @@ class DBShortcut : public DBEntity {
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);
+        }
+
+        void backup(JFileWriter & jFile) override {
+            DBResult<DBShortcut> results;
+            results.retrieveAll();
+
+            vector<JRecord> records;
+
+            for (int i = 0;i < results.size();i++) {
+                DBShortcut entity = results[i];
+                records.push_back(entity.getRecord());
+            }
+            
+            jFile.write(records, getJSONArrayName(), getClassName());
+        }
+
+        void restore(JFileReader & jFile) override {
+            DBEntity::restore(jFile);
+
+            vector<JRecord> records = jFile.read(getJSONArrayName());
+
+            DBShortcut entity;
+
+            for (JRecord & record : records) {
+                entity.clear();
+                entity.set(record);
+                entity.save();
+            }
         }
 
         void assignColumn(DBColumn & column) override {

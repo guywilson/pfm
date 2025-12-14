@@ -152,3 +152,63 @@ void Command::enterSQLMode() {
         }
     }
 }
+
+void Command::backup() {
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    
+    JFileWriter jFile = JFileWriter(jsonFileName);
+
+    DBConfig config;
+    config.backup(jFile);
+
+    DBShortcut shortcut;
+    shortcut.backup(jFile);
+
+    DBTransactionReport report;
+    report.backup(jFile);
+
+    DBCategory category;
+    category.backup(jFile);
+
+    DBPayee payee;
+    payee.backup(jFile);
+
+    DBAccount account;
+    account.backup(jFile);
+
+    DBRecurringCharge charge;
+    charge.backup(jFile);
+
+    DBTransaction transaction;
+    transaction.backup(jFile);
+}
+
+void Command::restore() {
+    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    
+    JFileReader jFile = JFileReader(jsonFileName);
+
+    DBConfig config;
+    config.restore(jFile);
+
+    DBShortcut shortcut;
+    shortcut.restore(jFile);
+
+    DBTransactionReport report;
+    report.restore(jFile);
+
+    DBCategory category;
+    category.restore(jFile);
+
+    DBPayee payee;
+    payee.restore(jFile);
+
+    DBAccount account;
+    account.restore(jFile);
+
+    DBRecurringCharge charge;
+    charge.restore(jFile);
+
+    DBTransaction transaction;
+    transaction.restore(jFile);
+}
