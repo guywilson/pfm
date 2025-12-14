@@ -117,10 +117,6 @@ class DBTransactionView : public DBTransaction {
             }
         }
 
-        void onRowComplete(int sequence) override {
-            this->sequence = sequence;
-        }
-
         const string getTableName() const override {
             return "v_transaction_list";
         }

@@ -74,10 +74,6 @@ class DBRecurringChargeView : public DBRecurringCharge {
             }
         }
 
-        void onRowComplete(int sequence) override {
-            DBRecurringCharge::onRowComplete(sequence);
-        }
-
         const string getTableName() const override {
             return "v_recurring_charge_list";
         }
