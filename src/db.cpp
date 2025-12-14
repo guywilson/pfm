@@ -751,6 +751,7 @@ void PFM_DB::createSchema() {
         createView(pszCreateListTransationView);
         createView(pszCreateRecurringTransactionsView);
         createView(pszCreateTransferRecordView);
+        createView(pszCreateRecurringTransferListView);
 
         createIndex(pszPayeeCodeIndex);
         createIndex(pszChargeDateIndex);

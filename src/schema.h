@@ -497,7 +497,7 @@ static const char * pszCreateTransferRecordView =
     "LEFT JOIN account at ON at.id = trt.account_id " \
     "ORDER BY trf.date ASC;";
 
-static const char * pszCreateREcurringTransferListView = 
+static const char * pszCreateRecurringTransferListView = 
     "CREATE VIEW v_recurring_transfer_list AS" \
     "SELECT rt.id, " \
     "rc.id AS charge_id, " \
