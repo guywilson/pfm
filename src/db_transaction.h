@@ -93,7 +93,7 @@ class DBTransaction : public DBPayment {
 
             this->reference = record.get("reference");
             this->type = record.get("type");
-            this->isReconciled = (record.get("isReconciled").compare("Y") == 0 ? true : false);
+            this->isReconciled = record.getBoolValue("isReconciled");
         }
 
         JRecord getRecord() override  {
@@ -101,7 +101,7 @@ class DBTransaction : public DBPayment {
 
             r.add("reference", reference);
             r.add("type", type);
-            r.add("isReconciled", getIsReconciledValue());
+            r.add("isReconciled", isReconciled);
 
             return r;
         }

@@ -56,11 +56,31 @@ class DBConfig : public DBEntity {
         void set(const DBConfig & src) {
             DBEntity::set(src);
 
-            this->key.assign(src.key);
-            this->value.assign(src.value);
-            this->description.assign(src.description);
+            this->key = src.key;
+            this->value = src.value;
+            this->description = src.description;
             this->isReadOnly = src.isReadOnly;
             this->isVisible = src.isVisible;
+        }
+
+        void set(JRecord & record) {
+            this->key = record.get("key");
+            this->value = record.get("value");
+            this->description = record.get("description");
+            this->isReadOnly = record.getBoolValue("isReadOnly");
+            this->isVisible = record.getBoolValue("isVisible");
+        }
+
+        JRecord getRecord() override  {
+            JRecord r;
+
+            r.add("key", key);
+            r.add("value", value);
+            r.add("description", description);
+            r.add("isReadOnly", isReadOnly);
+            r.add("isVisible", isVisible);
+
+            return r;
         }
 
         void print() {

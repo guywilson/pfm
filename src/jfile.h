@@ -29,9 +29,11 @@ class JRecord {
         JRecord(object_t & o);
 
         string get(const char * name);
+        bool getBoolValue(const char * name);
 
         object_t getObject();
         void add(const char * name, const string & value);
+        void add(const char * name, const bool value);
 };
 
 class JFileReader {

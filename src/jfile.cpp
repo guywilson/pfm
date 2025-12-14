@@ -36,12 +36,22 @@ string JRecord::get(const char * name) {
     return record[name];
 }
 
+bool JRecord::getBoolValue(const char * name) {
+    string value = get(name);
+
+    return (value == "Y" ? true : false);
+}
+
 object_t JRecord::getObject() {
     return this->record;
 }
 
 void JRecord::add(const char * name, const string & value) {
     record[name] = value;
+}
+
+void JRecord::add(const char * name, const bool value) {
+    record[name] = (value ? "Y" : "N");
 }
 
 void JFileReader::validate() {

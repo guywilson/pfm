@@ -53,6 +53,20 @@ class DBShortcut : public DBEntity {
             this->replacementText =  src.replacementText;
         }
 
+        void set(JRecord & record) {
+            this->shortcut = record.get("shortcut");
+            this->replacementText = record.get("replacementText");
+        }
+
+        JRecord getRecord() override  {
+            JRecord r;
+
+            r.add("shortcut", shortcut);
+            r.add("replacementText", replacementText);
+
+            return r;
+        }
+
         void print() {
             DBEntity::print();
 

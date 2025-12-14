@@ -139,7 +139,7 @@ class DBPayment : public DBEntity {
             this->amount = record.get("amount");
             this->date = record.get("date");
             this->description = record.get("description");
-            this->isTransfer = (record.get("isTransfer").compare("Y") == 0 ? true : false);
+            this->isTransfer = record.getBoolValue("isTransfer");
         }
 
         JRecord getRecord() override {
@@ -164,7 +164,7 @@ class DBPayment : public DBEntity {
             r.add("date", this->date.shortDate());
             r.add("description", this->description);
             r.add("amount", this->amount.rawStringValue());
-            r.add("isTransfer", getIsTransferValue());
+            r.add("isTransfer", isTransfer);
 
             return r;
         }

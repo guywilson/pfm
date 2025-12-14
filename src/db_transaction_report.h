@@ -52,6 +52,20 @@ class DBTransactionReport : public DBEntity {
             this->sqlWhereClause =  src.sqlWhereClause;
         }
 
+        void set(JRecord & record) {
+            this->description = record.get("description");
+            this->sqlWhereClause = record.get("sql");
+        }
+
+        JRecord getRecord() override  {
+            JRecord r;
+
+            r.add("description", description);
+            r.add("sql", sqlWhereClause);
+
+            return r;
+        }
+
         void print() {
             DBEntity::print();
 
