@@ -150,6 +150,8 @@ class DBRecurringCharge : public DBPayment {
             static constexpr ColumnType endDate_type = ColumnType::DATE;
         };
 
+        string transferTo;
+
         StrDate inline getPeriodStartDate() {
             StrDate today;
             return getPeriodStartDate(today);
@@ -228,6 +230,8 @@ class DBRecurringCharge : public DBPayment {
             this->lastPaymentDate = src.lastPaymentDate;
             this->frequency = src.frequency;
             this->endDate = src.endDate;
+
+            this->transferTo = src.transferTo;
         }
 
         void set(JRecord & record) {
@@ -236,6 +240,10 @@ class DBRecurringCharge : public DBPayment {
             this->lastPaymentDate = record.get("lastPaymentDate");
             this->frequency = Frequency::parse(record.get("frequency"));
             this->endDate = record.get("endDate");
+
+            if (isTransfer) {
+                this->transferTo = record.get("transferTo");
+            }
         }
 
         JRecord getRecord() override  {
@@ -244,6 +252,13 @@ class DBRecurringCharge : public DBPayment {
             r.add("lastPaymentDate", this->lastPaymentDate.shortDate());
             r.add("endDate", this->endDate.shortDate());
             r.add("frequency", this->frequency.toString());
+
+            if (isTransfer) {
+                DBRecurringTransfer transfer;
+                transfer.retrieveByRecurringChargeId(id);
+
+                r.add("transferTo", transfer.accountTo.code);
+            }
 
             return r;
         }
@@ -270,17 +285,6 @@ class DBRecurringCharge : public DBPayment {
             }
         }
 
-        void onRowComplete(int sequence) override {
-            if (!categoryId.isNull()) {
-                category.retrieve(categoryId);
-            }
-            if (!payeeId.isNull()) {
-                payee.retrieve(payeeId);
-            }
-
-            this->sequence = sequence;
-        }
-
         bool inline isActive() {
             StrDate today;
             return (endDate.isNull() || (!endDate.isNull() && endDate >= today));
@@ -295,8 +299,17 @@ class DBRecurringCharge : public DBPayment {
             rc.save();
         }
 
+        void inline setTransferToAccount(string & accountCode) {
+            transferTo = accountCode;
+        }
+
+        void inline setTransferToAccount(DBAccount & account) {
+            setTransferToAccount(account.code);
+        }
+
         void beforeRemove() override;
         void beforeUpdate() override;
+        void afterInsert() override;
 
         bool isWithinCurrentPeriod(StrDate & referenceDate);
         bool isChargeDueThisPeriod();

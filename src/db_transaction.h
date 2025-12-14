@@ -139,17 +139,6 @@ class DBTransaction : public DBPayment {
             }
         }
 
-        void onRowComplete(int sequence) override {
-            if (!categoryId.isNull()) {
-                category.retrieve(categoryId);
-            }
-            if (!payeeId.isNull()) {
-                payee.retrieve(payeeId);
-            }
-
-            this->sequence = sequence;
-        }
-
         bool isCredit() const {
             if (type == TYPE_CREDIT) {
                 return true;

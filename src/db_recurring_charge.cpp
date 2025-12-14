@@ -369,3 +369,23 @@ void DBRecurringCharge::beforeUpdate() {
 
     log.exit("DBRecurringCharge::beforeUpdate()");
 }
+
+void DBRecurringCharge::afterInsert() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::afterInsert()");
+
+    if (isTransfer) {
+        log.debug("Creating recurring transfer record for charge '%s'", description.c_str());
+
+        DBAccount accountTo;
+        accountTo.retrieveByCode(transferTo);
+
+        DBRecurringTransfer transfer;
+        transfer.recurringChargeId = id;
+        transfer.accountToId = accountTo.id;
+
+        transfer.save();
+    }
+
+    log.exit("DBRecurringCharge::afterInsert()");
+}

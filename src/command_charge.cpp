@@ -55,19 +55,13 @@ void Command::addRecurringCharge() {
         charge.frequency = Frequency::parse(getParameter("freq"));
         charge.amount = getParameter("amnt");
 
-        charge.save();
-
         string accountToCode = getParameter("to:");
         if (!accountToCode.empty()) {
-            DBAccount accountTo;
-            accountTo.retrieveByCode(accountToCode);
-
-            DBRecurringTransfer transfer;
-            transfer.accountToId = accountTo.id;
-            transfer.recurringChargeId = charge.id;
-
-            transfer.save();
+            charge.isTransfer = true;
+            charge.setTransferToAccount(accountToCode);
         }
+
+        charge.save();
 
         return;
     }
@@ -78,12 +72,10 @@ void Command::addRecurringCharge() {
     DBRecurringCharge charge = view.getRecurringCharge();
     charge.accountId = selectedAccount.id;
 
+    DBAccount transferTo = view.getTransferTo();
+    charge.setTransferToAccount(transferTo);
+
     charge.save();
-
-    DBRecurringTransfer transfer = view.getRecurringTransfer();
-    transfer.recurringChargeId = charge.id;
-
-    transfer.save();
 }
 
 void Command::listRecurringCharges() {

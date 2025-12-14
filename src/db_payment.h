@@ -117,11 +117,21 @@ class DBPayment : public DBEntity {
             string accountCode = record.get("accountCode");
             account.retrieveByCode(accountCode);
 
-            string categoryCode = record.get("categoryCode");
-            category.retrieveByCode(categoryCode);
+            try {
+                string categoryCode = record.get("categoryCode");
+                category.retrieveByCode(categoryCode);
+            }
+            catch (pfm_error & e) {
+                // Do nothing
+            }
 
-            string payeeCode = record.get("payeeCode");
-            payee.retrieveByCode(payeeCode);
+            try {
+                string payeeCode = record.get("payeeCode");
+                payee.retrieveByCode(payeeCode);
+            }
+            catch (pfm_error & e) {
+                // Do nothing
+            }
 
             this->accountId = account.id;
             this->categoryId = category.id;
@@ -135,9 +145,22 @@ class DBPayment : public DBEntity {
         JRecord getRecord() override {
             JRecord r;
 
-            r.add("accountCode", this->account.code);
-            r.add("categoryCode", this->category.code);
-            r.add("payeeCode", this->payee.code);
+            DBAccount account;
+            account.retrieve(this->accountId);
+            r.add("accountCode", account.code);
+
+            if (!this->categoryId.isNull()) {
+                DBCategory category;
+                category.retrieve(this->categoryId);
+                r.add("categoryCode", category.code);
+            }
+
+            if (!this->payeeId.isNull()) {
+                DBPayee payee;
+                payee.retrieve(this->payeeId);
+                r.add("payeeCode", payee.code);
+            }
+
             r.add("date", this->date.shortDate());
             r.add("description", this->description);
             r.add("amount", this->amount.rawStringValue());
@@ -166,6 +189,10 @@ class DBPayment : public DBEntity {
 
             cout << "DBPayee (encapsulated object):" << endl;
             payee.print();
+        }
+
+        void onRowComplete(int sequence) override {
+            this->sequence = sequence;
         }
 
         void assignColumn(DBColumn & column) override {

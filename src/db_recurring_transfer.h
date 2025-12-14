@@ -50,6 +50,7 @@ class DBRecurringTransfer : public DBEntity {
         void set(const DBRecurringTransfer & src) {
             DBEntity::set(src);
 
+            this->accountTo = src.accountTo;
             this->recurringChargeId = src.recurringChargeId;
             this->accountToId = src.accountToId;
         }
@@ -59,6 +60,12 @@ class DBRecurringTransfer : public DBEntity {
 
             cout << "RecurringChargeId: " << recurringChargeId.getValue() << endl;
             cout << "AccountToId: " << accountToId.getValue() << endl;
+        }
+
+        void onRowComplete(int sequence) override {
+            if (!accountToId.isNull()) {
+                accountTo.retrieve(accountToId);
+            }
         }
 
         bool inline isNull() {

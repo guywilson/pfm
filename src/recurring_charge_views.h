@@ -72,17 +72,14 @@ class AddRecurringChargeView : public CLIView {
             return charge;
         }
 
-        DBRecurringTransfer getRecurringTransfer() {
-            DBRecurringTransfer transfer;
+        DBAccount getTransferTo() {
+            DBAccount transferTo;
 
             if (transferToAccountField.getValue().length() > 0) {
-                DBAccount accountTo = transferToAccountField.getAccount();
-                
-                transfer.accountTo = accountTo;
-                transfer.accountToId = accountTo.id;
+                transferTo = transferToAccountField.getAccount();
             }
 
-            return transfer;
+            return transferTo;
         }
 };
 
