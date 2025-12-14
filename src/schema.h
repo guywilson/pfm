@@ -317,7 +317,7 @@ const char * pszCreateRecurringTransferTable =
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL," \
     "FOREIGN KEY(account_to_id) REFERENCES account(id)," \
-    "FOREIGN KEY(recurring_charge_id) REFERENCES category(id)," \
+    "FOREIGN KEY(recurring_charge_id) REFERENCES recurring_charge(id)," \
     "UNIQUE(recurring_charge_id) ON CONFLICT ROLLBACK);";
 
 static const char * pszCreateTransactionTable = 
@@ -497,6 +497,23 @@ static const char * pszCreateTransferRecordView =
     "LEFT JOIN account at ON at.id = trt.account_id " \
     "ORDER BY trf.date ASC;";
 
+static const char * pszCreateREcurringTransferListView = 
+    "CREATE VIEW v_recurring_transfer_list AS" \
+    "SELECT rt.id, " \
+    "rc.id AS charge_id, " \
+    "rc.date AS start_date, " \
+    "rc.last_payment_date, " \
+    "rc.description, " \
+    "ac.code AS account_to, " \
+    "rt.created, " \
+    "rt.updated " \
+    "FROM recurring_transfer rt " \
+    "LEFT JOIN recurring_charge rc ON rc.id = rt.recurring_charge_id " \
+    "LEFT JOIN account ac ON ac.id = rt.account_to_id;";
+
+/*
+** Create indexes...
+*/
 static const char * pszTransactionDateIndex = 
     "CREATE INDEX idx_transaction_date ON account_transaction(date);";
 
