@@ -193,6 +193,13 @@ class DBPayment : public DBEntity {
 
         void onRowComplete(int sequence) override {
             this->sequence = sequence;
+
+            if (!categoryId.isNull()) {
+                category.retrieve(categoryId);
+            }
+            if (!payeeId.isNull()) {
+                payee.retrieve(payeeId);
+            }
         }
 
         void assignColumn(DBColumn & column) override {
