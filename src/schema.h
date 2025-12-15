@@ -498,7 +498,7 @@ static const char * pszCreateTransferRecordView =
     "ORDER BY trf.date ASC;";
 
 static const char * pszCreateRecurringTransferListView = 
-    "CREATE VIEW v_recurring_transfer_list AS" \
+    "CREATE VIEW v_recurring_transfer_list AS " \
     "SELECT rt.id, " \
     "rc.id AS charge_id, " \
     "rc.date AS start_date, " \
