@@ -67,6 +67,12 @@ class DBCategory : public DBEntity {
             cout << "Code: '" << code << "'" << endl;
         }
 
+        string getIDByCodeSubSelect() {
+            string idColumnName = DBEntity::Columns::id;
+            string statement = "(SELECT " + idColumnName + " FROM " + getTableName() + " WHERE " + Columns::code + " = '" + code + "')";
+            return statement;
+        }
+
         void backup(ofstream & os) override {
             DBResult<DBCategory> results;
             results.retrieveAll();

@@ -94,6 +94,12 @@ class DBAccount : public DBEntity {
             return r;
         }
 
+        string getIDByCodeSubSelect() {
+            string idColumnName = DBEntity::Columns::id;
+            string statement = "(SELECT " + idColumnName + " FROM " + getTableName() + " WHERE " + Columns::code + " = '" + code + "')";
+            return statement;
+        }
+
         void backup(ofstream & os) override {
             DBResult<DBAccount> results;
             results.retrieveAll();

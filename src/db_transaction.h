@@ -25,6 +25,31 @@ using namespace std;
 #define TYPE_DEBIT          "DB"
 
 class DBTransaction : public DBPayment {
+    private:
+        const string getInsertStatementForRestore() {
+            account.retrieve(accountId);
+
+            string accountSubSelect = account.getIDByCodeSubSelect();
+            string categorySubSelect = category.getIDByCodeSubSelect();
+            string payeeSubSelect = payee.getIDByCodeSubSelect();
+
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{DBPayment::Columns::accountId, DBPayment::Columns::accountId_type}, accountSubSelect},
+                {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categorySubSelect},
+                {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeSubSelect},
+                {{DBPayment::Columns::date, DBPayment::Columns::date_type}, date.shortDate()},
+                {{Columns::recurringChargeId, Columns::recurringChargeId_type}, recurringChargeId.getValue()},
+                {{Columns::reference, Columns::reference_type}, delimitSingleQuotes(reference)},
+                {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::type, Columns::type_type}, type},
+                {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
+                {{Columns::isReconciled, Columns::isReconciled_type}, getIsReconciledValue()},
+                {{DBPayment::Columns::isTransfer, DBPayment::Columns::isTransfer_type}, getIsTransferValue()}
+            };
+
+            return buildInsertStatement(getTableName(), columnValuePairs);
+        }
+
     protected:
         struct Columns {
             static constexpr const char * recurringChargeId = "recurring_charge_id";
@@ -127,7 +152,11 @@ class DBTransaction : public DBPayment {
             results.retrieveAll();
 
             for (int i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatement() << endl;
+                DBTransaction transaction = results[i];
+
+                if (transaction.recurringChargeId.isNull()) {
+                    os << transaction.getInsertStatementForRestore() << endl;
+                }
             }
 
             os.flush();

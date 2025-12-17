@@ -135,6 +135,28 @@ class DBRecurringCharge : public DBPayment {
             return x;
         }
 
+        const string getInsertStatementForRestore() {
+            account.retrieve(accountId);
+
+            string accountSubSelect = account.getIDByCodeSubSelect();
+            string categorySubSelect = category.getIDByCodeSubSelect();
+            string payeeSubSelect = payee.getIDByCodeSubSelect();
+
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{DBPayment::Columns::accountId, DBPayment::Columns::accountId_type}, accountSubSelect},
+                {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categorySubSelect},
+                {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeSubSelect},
+                {{DBPayment::Columns::date, DBPayment::Columns::date_type}, date.shortDate()},
+                {{Columns::endDate, Columns::endDate_type}, endDate.shortDate()},
+                {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
+                {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
+                {{DBPayment::Columns::isTransfer, DBPayment::Columns::isTransfer_type}, getIsTransferValue()},
+                {{Columns::frequency, Columns::frequency_type}, frequency.toString()}
+            };
+
+            return buildInsertStatement(getTableName(), columnValuePairs);
+        }
+
         // Next *scheduled* (nominal) date, without weekend adjustment.
         StrDate getNextNominalScheduledDate();
 
@@ -276,7 +298,9 @@ class DBRecurringCharge : public DBPayment {
             results.retrieveAll();
 
             for (int i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatement() << endl;
+                DBRecurringCharge charge = results[i];
+
+                os << charge.getInsertStatementForRestore() << endl;
             }
 
             os.flush();

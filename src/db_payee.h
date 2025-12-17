@@ -67,6 +67,12 @@ class DBPayee : public DBEntity {
             cout << "Code: '" << code << "'" << endl;
         }
 
+        string getIDByCodeSubSelect() {
+            string idColumnName = DBEntity::Columns::id;
+            string statement = "(SELECT " + idColumnName + " FROM " + getTableName() + " WHERE " + Columns::code + " = '" + code + "')";
+            return statement;
+        }
+
         void backup(ofstream & os) override {
             DBResult<DBPayee> results;
             results.retrieveAll();
