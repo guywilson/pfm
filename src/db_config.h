@@ -91,32 +91,15 @@ class DBConfig : public DBEntity {
             cout << "Description: '" << description << "'" << endl;
         }
 
-        void backup(JFileWriter & jFile) override {
+        void backup(ofstream & os) override {
             DBResult<DBConfig> results;
             results.retrieveAll();
 
-            vector<JRecord> records;
-
             for (int i = 0;i < results.size();i++) {
-                DBConfig entity = results[i];
-                records.push_back(entity.getRecord());
+                os << results[i].getInsertStatement() << endl;
             }
-            
-            jFile.write(records, getJSONArrayName(), getClassName());
-        }
 
-        void restore(JFileReader & jFile) override {
-            DBEntity::restore(jFile);
-
-            vector<JRecord> records = jFile.read(getJSONArrayName());
-
-            DBConfig entity;
-
-            for (JRecord & record : records) {
-                entity.clear();
-                entity.set(record);
-                entity.save();
-            }
+            os.flush();
         }
 
         void assignColumn(DBColumn & column) override {

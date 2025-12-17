@@ -137,17 +137,34 @@ void Command::deleteAccount() {
 void Command::importAccounts() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    JFileReader jFile = JFileReader(jsonFileName);
+    JFileReader jfile = JFileReader(jsonFileName);
+    jfile.validate("DBAccount");
 
-    DBAccount entity;
-    entity.restore(jFile);
+    vector<JRecord> records = jfile.read("accounts");
+
+    for (JRecord & record : records) {
+        DBAccount account;
+
+        account.set(record);
+        account.save();
+    }
 }
 
 void Command::exportAccounts() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    JFileWriter jFile = JFileWriter(jsonFileName);
+    DBResult<DBAccount> results;
+    results.retrieveAll();
 
-    DBAccount entity;
-    entity.backup(jFile);
+    vector<JRecord> records;
+
+    for (int i = 0;i < results.size();i++) {
+        DBAccount account = results.at(i);
+
+        JRecord r = account.getRecord();
+        records.push_back(r);
+    }
+    
+    JFileWriter jFile = JFileWriter(jsonFileName, "DBAccount");
+    jFile.write(records, "accounts");
 }

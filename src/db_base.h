@@ -574,12 +574,8 @@ class DBEntity {
             return r;
         }
 
-        virtual void backup(JFileWriter & jFile) {
+        virtual void backup(ofstream & os) {
             return;
-        }
-        
-        virtual void restore(JFileReader & jFile) {
-            jFile.validate(getClassName());
         }
         
         virtual const string getTableName() const {

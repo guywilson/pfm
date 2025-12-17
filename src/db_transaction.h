@@ -122,37 +122,15 @@ class DBTransaction : public DBPayment {
             cout << "isReconciled: " << isReconciled << endl;
         }
 
-        void backup(JFileWriter & jFile) override {
+        void backup(ofstream & os) override {
             DBResult<DBTransaction> results;
             results.retrieveAll();
 
-            vector<JRecord> records;
-
             for (int i = 0;i < results.size();i++) {
-                DBTransaction entity = results[i];
-
-                if (entity.recurringChargeId.isNull()) {
-                    records.push_back(entity.getRecord());
-                }
-            }
-            
-            jFile.write(records, getJSONArrayName(), getClassName());
-        }
-
-        void restore(JFileReader & jFile) override {
-            DBEntity::restore(jFile);
-
-            vector<JRecord> records = jFile.read(getJSONArrayName());
-
-            DBTransaction entity;
-
-            for (JRecord & record : records) {
-                entity.clear();
-                entity.set(record);
-                entity.save();
+                os << results[i].getInsertStatement() << endl;
             }
 
-            DBTransaction::linkTransferTransactions();
+            os.flush();
         }
 
         void assignColumn(DBColumn & column) override {

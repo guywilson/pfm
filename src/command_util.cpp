@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <ctype.h>
+#include <fstream>
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -154,61 +155,64 @@ void Command::enterSQLMode() {
 }
 
 void Command::backup() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
-    
-    JFileWriter jFile = JFileWriter(jsonFileName);
+    string fileName = getParameter(SIMPLE_PARAM_NAME);
+
+    ofstream os;
+    os.open(fileName);
 
     DBConfig config;
-    config.backup(jFile);
+    config.backup(os);
 
     DBShortcut shortcut;
-    shortcut.backup(jFile);
+    shortcut.backup(os);
 
     DBTransactionReport report;
-    report.backup(jFile);
+    report.backup(os);
 
     DBCategory category;
-    category.backup(jFile);
+    category.backup(os);
 
     DBPayee payee;
-    payee.backup(jFile);
+    payee.backup(os);
 
     DBAccount account;
-    account.backup(jFile);
+    account.backup(os);
 
     DBRecurringCharge charge;
-    charge.backup(jFile);
+    charge.backup(os);
 
     DBTransaction transaction;
-    transaction.backup(jFile);
+    transaction.backup(os);
+
+    os.close();
 }
 
 void Command::restore() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
     
-    JFileReader jFile = JFileReader(jsonFileName);
+    // JFileReader jFile = JFileReader(jsonFileName);
 
-    DBConfig config;
-    config.restore(jFile);
+    // DBConfig config;
+    // config.restore(jFile);
 
-    DBShortcut shortcut;
-    shortcut.restore(jFile);
+    // DBShortcut shortcut;
+    // shortcut.restore(jFile);
 
-    DBTransactionReport report;
-    report.restore(jFile);
+    // DBTransactionReport report;
+    // report.restore(jFile);
 
-    DBCategory category;
-    category.restore(jFile);
+    // DBCategory category;
+    // category.restore(jFile);
 
-    DBPayee payee;
-    payee.restore(jFile);
+    // DBPayee payee;
+    // payee.restore(jFile);
 
-    DBAccount account;
-    account.restore(jFile);
+    // DBAccount account;
+    // account.restore(jFile);
 
-    DBRecurringCharge charge;
-    charge.restore(jFile);
+    // DBRecurringCharge charge;
+    // charge.restore(jFile);
 
-    DBTransaction transaction;
-    transaction.restore(jFile);
+    // DBTransaction transaction;
+    // transaction.restore(jFile);
 }

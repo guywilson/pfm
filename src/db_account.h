@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include <sqlcipher/sqlite3.h>
 
@@ -93,32 +94,15 @@ class DBAccount : public DBEntity {
             return r;
         }
 
-        void backup(JFileWriter & jFile) override {
+        void backup(ofstream & os) override {
             DBResult<DBAccount> results;
             results.retrieveAll();
 
-            vector<JRecord> records;
-
             for (int i = 0;i < results.size();i++) {
-                DBAccount entity = results[i];
-                records.push_back(entity.getRecord());
+                os << results[i].getInsertStatement() << endl;
             }
-            
-            jFile.write(records, getJSONArrayName(), getClassName());
-        }
 
-        void restore(JFileReader & jFile) override {
-            DBEntity::restore(jFile);
-
-            vector<JRecord> records = jFile.read(getJSONArrayName());
-
-            DBAccount entity;
-
-            for (JRecord & record : records) {
-                entity.clear();
-                entity.set(record);
-                entity.save();
-            }
+            os.flush();
         }
 
         void assignColumn(DBColumn & column) override {

@@ -80,19 +80,36 @@ void Command::deleteCategory() {
 void Command::importCategories() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    JFileReader jFile = JFileReader(jsonFileName);
+    JFileReader jfile = JFileReader(jsonFileName);
+    jfile.validate("DBCategory");
 
-    DBCategory entity;
-    entity.restore(jFile);
+    vector<JRecord> records = jfile.read("categories");
+
+    for (JRecord & record : records) {
+        DBCategory category;
+
+        category.set(record);
+        category.save();
+    }
 }
 
 void Command::exportCategories() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    JFileWriter jFile = JFileWriter(jsonFileName);
+    DBResult<DBCategory> results;
+    results.retrieveAll();
 
-    DBCategory entity;
-    entity.backup(jFile);
+    vector<JRecord> records;
+
+    for (int i = 0;i < results.size();i++) {
+        DBCategory category = results.at(i);
+
+        JRecord r = category.getRecord();
+        records.push_back(r);
+    }
+    
+    JFileWriter jFile = JFileWriter(jsonFileName, "DBCategory");
+    jFile.write(records, "categories");
 }
 
 void Command::clearCategories() {

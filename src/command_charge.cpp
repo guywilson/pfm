@@ -177,19 +177,36 @@ void Command::deleteRecurringCharge() {
 void Command::importRecurringCharges() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    JFileReader jFile = JFileReader(jsonFileName);
+    JFileReader jfile = JFileReader(jsonFileName);
+    jfile.validate("DBRecurringCharge");
 
-    DBRecurringCharge entity;
-    entity.restore(jFile);
+    vector<JRecord> records = jfile.read("charges");
+
+    for (JRecord & record : records) {
+        DBAccount account;
+
+        account.set(record);
+        account.save();
+    }
 }
 
 void Command::exportRecurringCharges() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    JFileWriter jFile = JFileWriter(jsonFileName);
+    DBResult<DBAccount> results;
+    results.retrieveAll();
 
-    DBRecurringCharge entity;
-    entity.backup(jFile);
+    vector<JRecord> records;
+
+    for (int i = 0;i < results.size();i++) {
+        DBAccount account = results.at(i);
+
+        JRecord r = account.getRecord();
+        records.push_back(r);
+    }
+    
+    JFileWriter jFile = JFileWriter(jsonFileName, "DBRecurringCharge");
+    jFile.write(records, "charges");
 }
 
 void Command::migrateCharge() {
