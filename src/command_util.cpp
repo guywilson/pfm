@@ -236,6 +236,8 @@ void Command::restore() {
             line++;
         }
 
+        DBTransaction::linkTransferTransactions();
+        
         db.commit();
     }
     catch (exception & e) {
