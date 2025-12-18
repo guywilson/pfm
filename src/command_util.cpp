@@ -109,6 +109,7 @@ void Command::clearLoggingLevel() {
 void Command::enterSQLMode() {
     PFM_DB & db = PFM_DB::getInstance();
     cfgmgr & cfg = cfgmgr::getInstance();
+    Logger & log = Logger::getInstance();
 
     string key = db.getKey("Access password: ");
 
@@ -141,18 +142,24 @@ void Command::enterSQLMode() {
             command[i++] = x;
         }
 
-        if (command == "SELECT") {
-            vector<DBRow> rows;
+        try {
+            if (command == "SELECT") {
+                vector<DBRow> rows;
 
-            db.executeRead(statement, &rows);
+                db.executeRead(statement, &rows);
 
-            GenericListView view;
-            view.addRows(rows);
+                GenericListView view;
+                view.addRows(rows);
 
-            view.show();
+                view.show();
+            }
+            else {
+                db.executeWrite(statement);
+            }
         }
-        else {
-            db.executeWrite(statement);
+        catch (pfm_error & e) {
+            log.error("SQL mode: Failed to execute statement: %s", e.what());
+            cout << "Error: " << e.what() << endl << endl;
         }
     }
 }

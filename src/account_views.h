@@ -18,7 +18,7 @@ class AddAccountView : public CLIView {
     private:
         CLITextField nameField = CLITextField("Name: ");
         CLITextField codeField = CLITextField("Code (max. 5 chars): ");
-        DateField openingDateField = DateField("Opening date: ");
+        DateField openingDateField = DateField("Opening date [today]: ");
         CLITextField openingBalanceField = CLITextField("Opening balance [0.00]: ");
         CLITextField balanceLimitField = CLITextField("Balance limit [0.00]: ");
 

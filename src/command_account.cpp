@@ -41,8 +41,6 @@ void Command::addAccount() {
 
         primaryAccount.save();
     }
-
-    cout << "Created account with ID " << account.id.getValue() << endl;
 }
 
 void Command::listAccounts() {
