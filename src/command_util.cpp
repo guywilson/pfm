@@ -20,6 +20,9 @@
 
 using namespace std;
 
+#define DEFAULT_BACKUP_FILE_NAME                    "pfm_backup.sql"
+#define LINE_BUFFER_LENGTH                          4096
+
 void Command::changePassword() {
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -155,10 +158,17 @@ void Command::enterSQLMode() {
 }
 
 void Command::backup() {
-    string fileName = getParameter(SIMPLE_PARAM_NAME);
+    string filename;
+
+    if (hasParameters()) {
+        filename = getParameter(SIMPLE_PARAM_NAME);
+    }
+    else {
+        filename = DEFAULT_BACKUP_FILE_NAME;
+    }
 
     ofstream os;
-    os.open(fileName);
+    os.open(filename);
 
     DBConfig config;
     config.backup(os);
@@ -178,6 +188,12 @@ void Command::backup() {
     DBAccount account;
     account.backup(os);
 
+    DBPrimaryAccount primaryAccount;
+    primaryAccount.backup(os);
+
+    DBCarriedOver co;
+    co.backup(os);
+
     DBRecurringCharge charge;
     charge.backup(os);
 
@@ -188,31 +204,45 @@ void Command::backup() {
 }
 
 void Command::restore() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
-    
-    // JFileReader jFile = JFileReader(jsonFileName);
+    string filename;
 
-    // DBConfig config;
-    // config.restore(jFile);
+    if (hasParameters()) {
+        filename = getParameter(SIMPLE_PARAM_NAME);
+    }
+    else {
+        filename = DEFAULT_BACKUP_FILE_NAME;
+    }
 
-    // DBShortcut shortcut;
-    // shortcut.restore(jFile);
+    ifstream is;
+    is.open(filename);
 
-    // DBTransactionReport report;
-    // report.restore(jFile);
+    PFM_DB & db = PFM_DB::getInstance();
 
-    // DBCategory category;
-    // category.restore(jFile);
+    char * lineBuffer = (char *)malloc(LINE_BUFFER_LENGTH);
 
-    // DBPayee payee;
-    // payee.restore(jFile);
+    if (lineBuffer == NULL) {
+        throw pfm_fatal("Failed to allocate memory for SQL import buffer");
+    }
 
-    // DBAccount account;
-    // account.restore(jFile);
+    int line = 1;
 
-    // DBRecurringCharge charge;
-    // charge.restore(jFile);
+    try {
+        db.begin();
 
-    // DBTransaction transaction;
-    // transaction.restore(jFile);
+        while (!is.eof()) {
+            is.getline(lineBuffer, LINE_BUFFER_LENGTH);
+            db.executeWrite(lineBuffer);
+
+            line++;
+        }
+
+        db.commit();
+    }
+    catch (exception & e) {
+        db.rollback();
+        cout << "Error at line " << to_string(line) << " in file " << filename << " : " << e.what() << endl << endl;
+    }
+
+    free(lineBuffer);
+    is.close();
 }

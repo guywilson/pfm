@@ -77,6 +77,8 @@ class DBPayee : public DBEntity {
             DBResult<DBPayee> results;
             results.retrieveAll();
 
+            os << getDeleteAllStatement() << endl;
+
             for (int i = 0;i < results.size();i++) {
                 os << results[i].getInsertStatement() << endl;
             }

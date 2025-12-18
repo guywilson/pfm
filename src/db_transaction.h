@@ -33,12 +33,23 @@ class DBTransaction : public DBPayment {
             string categorySubSelect = category.getIDByCodeSubSelect();
             string payeeSubSelect = payee.getIDByCodeSubSelect();
 
+            string recurringChargeSubSelect;
+            if (recurringChargeId.isNull()) {
+                recurringChargeSubSelect = recurringChargeId.getValue();
+            }
+            else {
+                DBRecurringCharge charge;
+                charge.retrieve(recurringChargeId);
+
+                recurringChargeSubSelect = charge.getIDByCriteriaSubSelect();
+            }
+
             vector<pair<ColumnDef, string>> columnValuePairs = {
                 {{DBPayment::Columns::accountId, DBPayment::Columns::accountId_type}, accountSubSelect},
                 {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categorySubSelect},
                 {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeSubSelect},
                 {{DBPayment::Columns::date, DBPayment::Columns::date_type}, date.shortDate()},
-                {{Columns::recurringChargeId, Columns::recurringChargeId_type}, recurringChargeId.getValue()},
+                {{Columns::recurringChargeId, Columns::recurringChargeId_type}, recurringChargeSubSelect},
                 {{Columns::reference, Columns::reference_type}, delimitSingleQuotes(reference)},
                 {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
                 {{Columns::type, Columns::type_type}, type},
@@ -151,12 +162,10 @@ class DBTransaction : public DBPayment {
             DBResult<DBTransaction> results;
             results.retrieveAll();
 
-            for (int i = 0;i < results.size();i++) {
-                DBTransaction transaction = results[i];
+            os << getDeleteAllStatement() << endl;
 
-                if (transaction.recurringChargeId.isNull()) {
-                    os << transaction.getInsertStatementForRestore() << endl;
-                }
+            for (int i = 0;i < results.size();i++) {
+                os << results[i].getInsertStatementForRestore() << endl;
             }
 
             os.flush();

@@ -53,6 +53,19 @@ class DBPrimaryAccount : public DBEntity {
             return r;
         }
 
+        void backup(ofstream & os) override {
+            DBResult<DBPrimaryAccount> results;
+            results.retrieveAll();
+
+            os << getDeleteAllStatement() << endl;
+
+            for (int i = 0;i < results.size();i++) {
+                os << results[i].getInsertStatement() << endl;
+            }
+
+            os.flush();
+        }
+
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             

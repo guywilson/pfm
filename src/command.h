@@ -9,6 +9,7 @@
 #include "db.h"
 #include "db_base.h"
 #include "db_account.h"
+#include "db_primary_account.h"
 #include "db_config.h"
 #include "db_category.h"
 #include "db_payee.h"

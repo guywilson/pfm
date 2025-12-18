@@ -77,6 +77,8 @@ class DBCategory : public DBEntity {
             DBResult<DBCategory> results;
             results.retrieveAll();
 
+            os << getDeleteAllStatement() << endl;
+
             for (int i = 0;i < results.size();i++) {
                 os << results[i].getInsertStatement() << endl;
             }

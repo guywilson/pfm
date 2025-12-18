@@ -148,6 +148,7 @@ class DBRecurringCharge : public DBPayment {
                 {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeSubSelect},
                 {{DBPayment::Columns::date, DBPayment::Columns::date_type}, date.shortDate()},
                 {{Columns::endDate, Columns::endDate_type}, endDate.shortDate()},
+                {{Columns::lastPaymentDate, Columns::lastPaymentDate_type}, lastPaymentDate.shortDate()},
                 {{DBPayment::Columns::description, DBPayment::Columns::description_type}, delimitSingleQuotes(description)},
                 {{DBPayment::Columns::amount, DBPayment::Columns::amount_type}, amount.rawStringValue()},
                 {{DBPayment::Columns::isTransfer, DBPayment::Columns::isTransfer_type}, getIsTransferValue()},
@@ -293,9 +294,27 @@ class DBRecurringCharge : public DBPayment {
             cout << "EndDate: '" << endDate.shortDate() << "'" << endl;
         }
 
+        string getIDByCriteriaSubSelect() {
+            account.retrieve(accountId);
+
+            DBCriteria criteria;
+            criteria.addIgnoreSQ(DBPayment::Columns::accountId, DBCriteria::equal_to, account.getIDByCodeSubSelect());
+            criteria.addIgnoreSQ(DBPayment::Columns::categoryId, DBCriteria::equal_to, category.getIDByCodeSubSelect());
+            criteria.addIgnoreSQ(DBPayment::Columns::payeeId, DBCriteria::equal_to, payee.getIDByCodeSubSelect());
+            criteria.add(DBPayment::Columns::description, DBCriteria::equal_to, description);
+            criteria.add(DBPayment::Columns::amount, DBCriteria::equal_to, amount);
+
+            const string idName = DBEntity::Columns::id;
+            string statement = "(SELECT " + idName + " FROM " + getTableName() + criteria.getWhereClause() + ")";
+
+            return statement;
+        }
+
         void backup(ofstream & os) override {
             DBResult<DBRecurringCharge> results;
             results.retrieveAll();
+
+            os << getDeleteAllStatement() << endl;
 
             for (int i = 0;i < results.size();i++) {
                 DBRecurringCharge charge = results[i];

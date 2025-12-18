@@ -8,6 +8,7 @@
 #include "pfm_error.h"
 #include "db_base.h"
 #include "db.h"
+#include "db_account.h"
 #include "strdate.h"
 #include "money.h"
 #include "cfgmgr.h"
@@ -18,6 +19,23 @@ using namespace std;
 #define __INCL_CARRIED_OVER
 
 class DBCarriedOver : public DBEntity {
+    private:
+        const string getInsertStatementForRestore() {
+            DBAccount account;
+            account.retrieve(accountId);
+
+            string accountSubSelect = account.getIDByCodeSubSelect();
+
+            vector<pair<ColumnDef, string>> columnValuePairs = {
+                {{Columns::accountId, Columns::accountId_type}, accountSubSelect},
+                {{Columns::date, Columns::date_type}, date.shortDate()},
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
+                {{Columns::balance, Columns::balance_type}, balance.rawStringValue()}
+            };
+
+            return buildInsertStatement(getTableName(), columnValuePairs);
+        }
+
     protected:
         struct Columns {
             static constexpr const char * accountId = "account_id";
@@ -104,6 +122,19 @@ class DBCarriedOver : public DBEntity {
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);
+        }
+
+        void backup(ofstream & os) override {
+            DBResult<DBCarriedOver> results;
+            results.retrieveAll();
+
+            os << getDeleteAllStatement() << endl;
+
+            for (int i = 0;i < results.size();i++) {
+                os << results[i].getInsertStatementForRestore() << endl;
+            }
+
+            os.flush();
         }
 
         void assignColumn(DBColumn & column) override {

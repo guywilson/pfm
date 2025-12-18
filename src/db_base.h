@@ -139,6 +139,62 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
+        void addIgnoreSQ(const string & columnName, enum sql_operator op, const string & value) {
+            string clause = columnName;
+
+            switch (op) {
+                case less_than:
+                    clause.append(" < ");
+                    clause.append(value);
+                    break;
+
+                case less_than_or_equal:
+                    clause.append(" <= ");
+                    clause.append(value);
+                    break;
+
+                case greater_than:
+                    clause.append(" > ");
+                    clause.append(value);
+                    break;
+
+                case greater_than_or_equal:
+                    clause.append(" >= ");
+                    clause.append(value);
+                    break;
+
+                case equal_to:
+                    clause.append(" = ");
+                    clause.append(value);
+                    break;
+
+                case not_equal_to:
+                    clause.append(" != ");
+                    clause.append(value);
+                    break;
+
+                case like:
+                    clause.append(" LIKE ");
+                    clause.append(value);
+                    break;
+
+                case not_like:
+                    clause.append(" NOT LIKE ");
+                    clause.append(value);
+                    break;
+
+                case is_null:
+                    clause.append(" IS NULL");
+                    break;
+
+                case is_not_null:
+                    clause.append(" IS NOT NULL");
+                    break;
+            }
+
+            whereClauses.push_back(clause);
+        }
+
         void add(const string & columnName, enum sql_operator op, const StrDate & value) {
             add(columnName, op, value.shortDate());
         }

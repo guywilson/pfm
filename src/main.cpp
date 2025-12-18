@@ -240,12 +240,12 @@ int main(int argc, char ** argv) {
     Command command;
     
     if (numAccounts == 0) {
-        cout << endl << "*** Welcome to PFM ***" << endl << endl << "Create your first account..." << endl << endl;
-        command.process("add-account");
+        cout << endl << "*** Welcome to PFM ***" << endl << endl << "Create your first account using the add-account command..." << endl << endl;
     }
-
-    string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
-    command.process("use " + primaryAccountCode);
+    else {
+        string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
+        command.process("use " + primaryAccountCode);
+    }
 
     bool loop = true;
 

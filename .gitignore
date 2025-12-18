@@ -12,3 +12,4 @@ pfm.1
 .pfm-journal
 .DS_Store
 .pfm_key
+*.sql
