@@ -30,9 +30,16 @@ static const char * getDecimalValue(string & value) {
     return value.c_str();
 }
 
+void cfgmgr::clear() {
+    values.clear();
+    isConfigured = false;
+}
+
 void cfgmgr::initialise() {
     DBResult<DBConfig> results;
     results.retrieveAll();
+
+    clear();
 
     for (int i = 0;i < results.size();i++) {
         DBConfig item = results.at(i);

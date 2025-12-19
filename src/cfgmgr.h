@@ -28,6 +28,7 @@ class cfgmgr {
     public:
         ~cfgmgr() {}
 
+        void clear();
         void initialise();
 
         string getValue(const string & key);

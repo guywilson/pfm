@@ -254,4 +254,12 @@ void Command::restore() {
 
     free(lineBuffer);
     is.close();
+
+    /*
+    ** Re-initialise the config, if we started from
+    ** a new database, we will have the default config
+    ** loaded.
+    */
+    cfgmgr & cfg = cfgmgr::getInstance();
+    cfg.initialise();
 }
