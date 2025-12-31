@@ -128,7 +128,11 @@ void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ALL);
 
-    DBTransaction::linkTransferTransactions();
+    DBRecurringCharge charge;
+    StrDate startDate = charge.getPeriodStartDate();
+    StrDate endDate = charge.getPeriodEndDate();
+
+    cout << "Got period start date '" << startDate.shortDate() << "', period end date '" << endDate.shortDate() << "'" << endl << endl;
 }
 
 int main(int argc, char ** argv) {

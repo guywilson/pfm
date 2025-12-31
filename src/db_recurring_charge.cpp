@@ -93,6 +93,30 @@ int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
     return periodEnd;
 }
 
+StrDate DBRecurringCharge::getPeriodStartDate() {
+    StrDate today;
+    return getPeriodStartDate(today);
+}
+
+StrDate DBRecurringCharge::getPeriodEndDate() {
+    StrDate today;
+    return getPeriodEndDate(today);
+}
+
+StrDate DBRecurringCharge::getPeriodStartDate(StrDate & referenceDate) {
+    const int periodStartDay = getPeriodStartDay();
+    StrDate periodStart(referenceDate.year(), referenceDate.month(), periodStartDay);
+
+    return periodStart;
+}
+
+StrDate DBRecurringCharge::getPeriodEndDate(StrDate & referenceDate) {
+    const int periodEndDay = getPeriodEndDay(referenceDate);
+    StrDate periodEnd(referenceDate.year(), referenceDate.month(), periodEndDay);
+
+    return periodEnd;
+}
+
 DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::retrieveByAccountID()");

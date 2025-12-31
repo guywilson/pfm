@@ -175,30 +175,6 @@ class DBRecurringCharge : public DBPayment {
 
         string transferTo;
 
-        StrDate inline getPeriodStartDate() {
-            StrDate today;
-            return getPeriodStartDate(today);
-        }
-
-        StrDate inline getPeriodEndDate() {
-            StrDate today;
-            return getPeriodEndDate(today);
-        }
-
-        StrDate inline getPeriodStartDate(StrDate & referenceDate) {
-            const int periodStartDay = getPeriodStartDay();
-            StrDate periodStart(referenceDate.year(), referenceDate.month(), periodStartDay);
-
-            return periodStart;
-        }
-
-        StrDate inline getPeriodEndDate(StrDate & referenceDate) {
-            const int periodEndDay = getPeriodEndDay(referenceDate);
-            StrDate periodEnd(referenceDate.year(), referenceDate.month(), periodEndDay);
-
-            return periodEnd;
-        }
-
         int getPeriodStartDay();
         int getPeriodEndDay();
         int getPeriodEndDay(StrDate & referenceDate);
@@ -360,6 +336,11 @@ class DBRecurringCharge : public DBPayment {
         void inline setTransferToAccount(DBAccount & account) {
             setTransferToAccount(account.code);
         }
+
+        StrDate getPeriodStartDate();
+        StrDate getPeriodEndDate();
+        StrDate getPeriodStartDate(StrDate & referenceDate);
+        StrDate getPeriodEndDate(StrDate & referenceDate);
 
         void beforeRemove() override;
         void beforeUpdate() override;
