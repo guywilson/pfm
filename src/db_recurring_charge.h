@@ -175,7 +175,6 @@ class DBRecurringCharge : public DBPayment {
 
         string transferTo;
 
-        int getPeriodStartDay();
         int getPeriodEndDay();
         int getPeriodEndDay(StrDate & referenceDate);
 

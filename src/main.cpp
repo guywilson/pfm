@@ -128,6 +128,8 @@ void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ALL);
 
+    setOverrideDate("2026-01-01");
+
     DBRecurringCharge charge;
     StrDate startDate = charge.getPeriodStartDate();
     StrDate endDate = charge.getPeriodEndDate();

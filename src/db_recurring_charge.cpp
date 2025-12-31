@@ -20,19 +20,6 @@
 
 using namespace std;
 
-int DBRecurringCharge::getPeriodStartDay() {
-    Logger & log = Logger::getInstance();
-    log.entry("DBRecurringCharge::getPeriodStartDay()");
-
-    cfgmgr & cfg = cfgmgr::getInstance();
-
-    int periodStart = cfg.getValueAsInteger("cycle.start");
-
-    log.exit("DBRecurringCharge::getPeriodStartDay()");
-
-    return periodStart;
-}
-
 int DBRecurringCharge::getPeriodEndDay() {
     StrDate today;
     return getPeriodEndDay(today);
@@ -104,17 +91,61 @@ StrDate DBRecurringCharge::getPeriodEndDate() {
 }
 
 StrDate DBRecurringCharge::getPeriodStartDate(StrDate & referenceDate) {
-    const int periodStartDay = getPeriodStartDay();
-    StrDate periodStart(referenceDate.year(), referenceDate.month(), periodStartDay);
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::getPeriodStartDate()");
 
+    // Determine which period end applies to referenceDate
+    StrDate periodEnd = getPeriodEndDate(referenceDate);
+
+    // Previous period end is the configured end date in the month before periodEnd's month
+    StrDate endMonth(periodEnd.year(), periodEnd.month(), 1);
+    StrDate prevMonth = endMonth.addMonths(-1);
+
+    const int prevEndDay = getPeriodEndDay(prevMonth);
+    StrDate prevPeriodEnd(prevMonth.year(), prevMonth.month(), prevEndDay);
+
+    // Start is the day after previous period end
+    StrDate periodStart = prevPeriodEnd.addDays(1);
+
+    log.debug("Period start for '%s' is '%s' (prev end '%s', current end '%s')",
+              referenceDate.shortDate().c_str(),
+              periodStart.shortDate().c_str(),
+              prevPeriodEnd.shortDate().c_str(),
+              periodEnd.shortDate().c_str());
+
+    log.exit("DBRecurringCharge::getPeriodStartDate()");
     return periodStart;
 }
 
 StrDate DBRecurringCharge::getPeriodEndDate(StrDate & referenceDate) {
-    const int periodEndDay = getPeriodEndDay(referenceDate);
-    StrDate periodEnd(referenceDate.year(), referenceDate.month(), periodEndDay);
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringCharge::getPeriodEndDate()");
 
-    return periodEnd;
+    // Compute end date for referenceDate's month
+    StrDate thisMonth(referenceDate.year(), referenceDate.month(), 1);
+    const int endDayThisMonth = getPeriodEndDay(thisMonth);
+    StrDate endThisMonth(thisMonth.year(), thisMonth.month(), endDayThisMonth);
+
+    // If referenceDate is on/before this month's configured end, that's the period end
+    if (referenceDate <= endThisMonth) {
+        log.debug("Period end for '%s' is '%s' (same month)",
+                  referenceDate.shortDate().c_str(),
+                  endThisMonth.shortDate().c_str());
+        log.exit("DBRecurringCharge::getPeriodEndDate()");
+        return endThisMonth;
+    }
+
+    // Otherwise, period ends at next month's configured end
+    StrDate nextMonth = thisMonth.addMonths(1);
+    const int endDayNextMonth = getPeriodEndDay(nextMonth);
+    StrDate endNextMonth(nextMonth.year(), nextMonth.month(), endDayNextMonth);
+
+    log.debug("Period end for '%s' is '%s' (next month)",
+              referenceDate.shortDate().c_str(),
+              endNextMonth.shortDate().c_str());
+
+    log.exit("DBRecurringCharge::getPeriodEndDate()");
+    return endNextMonth;
 }
 
 DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t & accountId) {
