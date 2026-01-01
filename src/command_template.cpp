@@ -15,6 +15,7 @@
 #include "db_payee.h"
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
+#include "db_public_holiday.h"
 #include "cli_widget.h"
 
 using namespace std;
@@ -46,6 +47,15 @@ static DBCategory * createSampleCategory() {
     category->description = "Takeaway coffee";
 
     return category;
+}
+
+static DBPublicHoliday * createSampleHoliday() {
+    DBPublicHoliday * holiday = new DBPublicHoliday();
+
+    holiday->date = "01-01-2026";
+    holiday->description = "New Year's day";
+
+    return holiday;
 }
 
 static DBRecurringCharge * createSampleCharge() {
@@ -90,8 +100,9 @@ void Command::saveJsonTemplate() {
     cout << "1) Account" << endl;
     cout << "2) Payee" << endl;
     cout << "3) Category" << endl;
-    cout << "4) Recurring Charge" << endl;
-    cout << "5) Transaction" << endl;
+    cout << "4) Public Holiday" << endl;
+    cout << "5) Recurring Charge" << endl;
+    cout << "6) Transaction" << endl;
 
     CLITextField optionField = CLITextField("Enter option: ");
     optionField.show();
@@ -121,11 +132,16 @@ void Command::saveJsonTemplate() {
             break;
 
         case 4:
+            entity = createSampleHoliday();
+            name = "holidays";
+            break;
+
+        case 5:
             entity = createSampleCharge();
             name = "charges";
             break;
 
-        case 5:
+        case 6:
             entity = createSampleTransaction();
             name = "transactions";
             break;

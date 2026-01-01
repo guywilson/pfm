@@ -183,6 +183,9 @@ void Command::backup() {
     DBShortcut shortcut;
     shortcut.backup(os);
 
+    DBPublicHoliday holiday;
+    holiday.backup(os);
+
     DBTransactionReport report;
     report.backup(os);
 
