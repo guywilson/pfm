@@ -104,6 +104,7 @@ class Command {
         void addAccount();
         void listAccounts();
         void chooseAccount();
+        void showAccount();
         void setPrimaryAccount();
         void updateAccount();
         void deleteAccount();

@@ -30,6 +30,10 @@ const vector<CommandEntry> commandTable = {
         "List all accounts", 
         [](Command& c){ c.listAccounts(); }},
 
+    {"show-account", {"show", "sa"}, 
+        "Show account details", 
+        [](Command& c){ c.showAccount(); }},
+
     {"use", {"select"}, 
         "Use (select) the account with the specified code", 
         [](Command& c){ c.chooseAccount(); }},

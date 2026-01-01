@@ -95,6 +95,23 @@ void Command::chooseAccount() {
     log.exit("Command::chooseAccount()");
 }
 
+void Command::showAccount() {
+    log.entry("Command::showAccount()");
+
+    string accountCode = selectedAccount.code;
+
+    log.debug("Show account with code '%s'", accountCode.c_str());
+
+    DBAccount account;
+    account.retrieveByCode(accountCode);
+    
+    AccountDetailsView view;
+    view.setAccount(account);
+    view.show();
+
+    log.exit("Command::showAccount()");
+}
+
 void Command::setPrimaryAccount() {
     log.entry("Command::setPrimaryAccount()");
 
