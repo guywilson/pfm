@@ -44,6 +44,7 @@
 #include "db_recurring_charge.h"
 #include "db_transaction.h"
 #include "db_shortcut.h"
+#include "db_public_holiday.h"
 #include "command.h"
 #include "cfgmgr.h"
 #include "cmdarg.h"
@@ -128,13 +129,12 @@ void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ALL);
 
-    setOverrideDate("2026-01-01");
+    StrDate date = "02-12-2025";
 
-    DBRecurringCharge charge;
-    StrDate startDate = charge.getPeriodStartDate();
-    StrDate endDate = charge.getPeriodEndDate();
+    DBPublicHoliday holiday;
+    bool isHoliday = holiday.isPublicHoliday(date);
 
-    cout << "Got period start date '" << startDate.shortDate() << "', period end date '" << endDate.shortDate() << "'" << endl << endl;
+    cout << "Date: '" <<  date.shortDate() << "' is " << (isHoliday ? "a " : "not a ") << "holiday" << endl << endl;
 }
 
 int main(int argc, char ** argv) {
