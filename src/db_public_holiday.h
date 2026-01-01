@@ -11,50 +11,50 @@
 
 using namespace std;
 
-#ifndef __INCL_CATEGORY
-#define __INCL_CATEGORY
+#ifndef __INCL_PUBLIC_HOLIDAY
+#define __INCL_PUBLIC_HOLIDAY
 
-class DBCategory : public DBEntity {
+class DBPublicHoliday : public DBEntity {
     protected:
         struct Columns {
+            static constexpr const char * date = "date";
+            static constexpr ColumnType date_type = ColumnType::DATE;
+
             static constexpr const char * description = "description";
             static constexpr ColumnType description_type = ColumnType::TEXT;
-
-            static constexpr const char * code = "code";
-            static constexpr ColumnType code_type = ColumnType::TEXT;
         };
 
     public:
+        StrDate date;
         string description;
-        string code;
 
-        DBCategory() : DBEntity() {
+        DBPublicHoliday() : DBEntity() {
             clear();
         }
 
         void clear() {
             DBEntity::clear();
 
+            this->date.clear();
             this->description = "";
-            this->code = "";
         }
 
-        void set(const DBCategory & src) {
+        void set(const DBPublicHoliday & src) {
             DBEntity::set(src);
 
+            this->date = src.date;
             this->description = src.description;
-            this->code = src.code;
         }
 
         void set(JRecord & record) {
-            this->code = record.get("code");
+            this->date = record.get("date");
             this->description = record.get("description");
         }
 
         JRecord getRecord() override  {
             JRecord r;
 
-            r.add("code", this->code);
+            r.add("date", this->date.shortDate());
             r.add("description", this->description);
 
             return r;
@@ -63,18 +63,12 @@ class DBCategory : public DBEntity {
         void print() {
             DBEntity::print();
 
+            cout << "Date: '" << date.shortDate() << "'" << endl;
             cout << "Description: '" << description << "'" << endl;
-            cout << "Code: '" << code << "'" << endl;
-        }
-
-        string getIDByCodeSubSelect() {
-            string idColumnName = DBEntity::Columns::id;
-            string statement = "(SELECT " + idColumnName + " FROM " + getTableName() + " WHERE " + Columns::code + " = '" + code + "')";
-            return statement;
         }
 
         void backup(ofstream & os) override {
-            DBResult<DBCategory> results;
+            DBResult<DBPublicHoliday> results;
             results.retrieveAll();
 
             os << getDeleteAllStatement() << endl;
@@ -89,30 +83,34 @@ class DBCategory : public DBEntity {
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             
-            if (column.getName() == Columns::code) {
-                code = column.getValue();
+            if (column.getName() == Columns::date) {
+                date = column.getValue();
             }
             else if (column.getName() == Columns::description) {
                 description = column.getValue();
             }
         }
 
+        void onRowComplete(int sequence) override {
+            this->sequence = sequence;
+        }
+
         const string getTableName() const override {
-            return "category";
+            return "public_holiday";
         }
 
         const string getClassName() const override {
-            return "DBCategory";
+            return "DBPublicHoliday";
         }
 
         const string getJSONArrayName() const override {
-            return "categories";
+            return "holidays";
         }
 
         const string getInsertStatement() override {
             vector<pair<ColumnDef, string>> columnValuePairs = {
-                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
-                {{Columns::code, Columns::code_type}, code}
+                {{Columns::date, Columns::date_type}, date.shortDate()},
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
@@ -120,14 +118,26 @@ class DBCategory : public DBEntity {
 
         const string getUpdateStatement() override {
             vector<pair<ColumnDef, string>> columnValuePairs = {
-                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
-                {{Columns::code, Columns::code_type}, code}
+                {{Columns::date, Columns::date_type}, date.shortDate()},
+                {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
-        void retrieveByCode(string & code);
+        bool isPublicHoliday(const StrDate & d) {
+            DBCriteria criteria;
+            criteria.add(Columns::date, DBCriteria::equal_to, d);
+            criteria.setRowLimit(1);
+
+            string statement = getSelectStatement() + criteria.getStatementCriteria();
+
+            DBResult<DBPublicHoliday> result;
+
+            int rowsRetrievedCount = result.retrieve(statement);
+
+            return (rowsRetrievedCount == 1 ? true : false);
+        }
 };
 
 #endif

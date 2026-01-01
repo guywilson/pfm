@@ -379,6 +379,15 @@ static const char * pszCreateShortcutTable =
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL);";
 
+static const char * pszCreatePublicHolidayTable = 
+    "CREATE TABLE public_holiday (" \
+    "id INTEGER PRIMARY KEY," \
+    "date TEXT NOT NULL," \
+    "description TEXT NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL," \
+    "UNIQUE(date) ON CONFLICT ROLLBACK);";
+
 /*
 ** Create views, do this last...
 */

@@ -70,6 +70,26 @@ const vector<CommandEntry> commandTable = {
         "Delete the specified config item", 
         [](Command& c){ c.deleteConfig(); }},
 
+    {"add-public-holiday", {"aph"}, 
+        "Add a new public holiday", 
+        [](Command& c){ c.addHoliday(); }},
+
+    {"list-public-holidays", {"lph"}, 
+        "List all public holidays", 
+        [](Command& c){ c.listHolidays(); }},
+
+    {"update-public-holiday", {"uph"}, 
+        "Update the public holiday with the specified sequence", 
+        [](Command& c){ c.updateHoliday(); }},
+
+    {"delete-public-holiday", {"dph"}, 
+        "Delete the public holiday with the specified sequence", 
+        [](Command& c){ c.deleteHoliday(); }},
+
+    {"import-public-holidays", {"iph"}, 
+        "Import public holidays from the specified JSON file", 
+        [](Command& c){ c.importHolidays(); }},
+
     {"add-category", {"ac"}, 
         "Add a new category", 
         [](Command& c){ c.addCategory(); }},

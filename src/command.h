@@ -18,6 +18,7 @@
 #include "db_carried_over.h"
 #include "db_transaction_report.h"
 #include "db_shortcut.h"
+#include "db_public_holiday.h"
 
 using namespace std;
 
@@ -114,6 +115,13 @@ class Command {
         DBConfig getConfig(string & key);
         void updateConfig();
         void deleteConfig();
+
+        void addHoliday();
+        void listHolidays();
+        DBPublicHoliday getHoliday(int sequence);
+        void updateHoliday();
+        void deleteHoliday();
+        void importHolidays();
 
         void addCategory();
         void listCategories();
