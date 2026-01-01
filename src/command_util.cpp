@@ -148,10 +148,15 @@ void Command::enterSQLMode() {
 
                 db.executeRead(statement, &rows);
 
-                GenericListView view;
-                view.addRows(rows);
+                if (rows.size() > 0) {
+                    GenericListView view;
+                    view.addRows(rows);
 
-                view.show();
+                    view.show();
+                }
+                else {
+                    cout << "SELECT statement returned 0 rows" << endl << endl;
+                }
             }
             else {
                 db.executeWrite(statement);
