@@ -10,6 +10,7 @@
 #include "db_payee.h"
 #include "db_payment.h"
 #include "db_recurring_transfer.h"
+#include "db_public_holiday.h"
 #include "db.h"
 #include "db_base.h"
 #include "jfile.h"
@@ -125,11 +126,10 @@ class DBRecurringCharge : public DBPayment {
         StrDate inline adjustForwardToBusinessDay(StrDate & d) {
             StrDate x = d;
 
-            if (x.isSaturday()) {
-                return x.addDays(2);
-            }
-            else if (x.isSunday()) {
-                return x.addDays(1);
+            DBPublicHoliday h;
+
+            while (x.isWeekend() || h.isPublicHoliday(x)) {
+                ++x;
             }
 
             return x;

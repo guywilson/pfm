@@ -12,6 +12,7 @@
 #include "db_recurring_charge.h"
 #include "db_recurring_transfer.h"
 #include "db_transfer_transaction_record.h"
+#include "db_public_holiday.h"
 #include "db_config.h"
 #include "db.h"
 #include "cfgmgr.h"
@@ -37,12 +38,14 @@ int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
 
     int periodEnd;
 
+    DBPublicHoliday h;
+
     if (isNumeric(cycleEnd)) {
         periodEnd = atoi(cycleEnd.c_str());
 
         StrDate specificDate(referenceDate.year(), referenceDate.month(), periodEnd);
 
-        while (specificDate.isWeekend()) {
+        while (specificDate.isWeekend() || h.isPublicHoliday(specificDate)) {
             specificDate = specificDate.addDays(-1);
         }
 
@@ -52,7 +55,7 @@ int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
         StrDate lastWorkingDay = referenceDate;
         lastWorkingDay = lastWorkingDay.lastDayInMonth();
 
-        while (lastWorkingDay.isWeekend()) {
+        while (lastWorkingDay.isWeekend() || h.isPublicHoliday(lastWorkingDay)) {
             lastWorkingDay = lastWorkingDay.addDays(-1);
         }
 
@@ -64,6 +67,14 @@ int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
 
         while (lastFriday.dayOfTheWeek() != StrDate::sd_friday) {
             lastFriday = lastFriday.addDays(-1);
+        }
+
+        /*
+        ** If the last friday is a public holiday, then
+        ** roll back to the previous week...
+        */
+        if (h.isPublicHoliday(lastFriday)) {
+            lastFriday = lastFriday.addDays(-7);
         }
 
         periodEnd = lastFriday.day();
@@ -316,7 +327,9 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) 
         if (txnDate.month() > nominal.month()) {
             log.debug("Winding back next transaction date for charge '%s'", txnDate.shortDate().c_str());
 
-            while (txnDate >= nominal || txnDate.isWeekend()) {
+            DBPublicHoliday h;
+
+            while (txnDate >= nominal || txnDate.isWeekend() || h.isPublicHoliday(txnDate)) {
                 --txnDate;
             }
         }
