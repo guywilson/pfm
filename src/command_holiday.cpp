@@ -22,6 +22,9 @@ void Command::addHoliday() {
     DBPublicHoliday holiday = view.getHoliday();
 
     holiday.save();
+
+    clearPublicHolidays();
+    DBPublicHoliday::populatePublicHolidays();
 }
 
 void Command::listHolidays() {
@@ -74,6 +77,9 @@ void Command::updateHoliday() {
 
     DBPublicHoliday updatedHoliday = view.getHoliday();
     updatedHoliday.save();
+
+    clearPublicHolidays();
+    DBPublicHoliday::populatePublicHolidays();
 }
 
 void Command::deleteHoliday() {
@@ -83,6 +89,9 @@ void Command::deleteHoliday() {
 
     holiday.remove();
     holiday.clear();
+
+    clearPublicHolidays();
+    DBPublicHoliday::populatePublicHolidays();
 }
 
 void Command::importHolidays() {
@@ -99,4 +108,7 @@ void Command::importHolidays() {
         holiday.set(record);
         holiday.save();
     }
+
+    clearPublicHolidays();
+    DBPublicHoliday::populatePublicHolidays();
 }
