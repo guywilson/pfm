@@ -158,6 +158,10 @@ const vector<CommandEntry> commandTable = {
         "List all oustanding charges for this period for the currently selected account", 
         [](Command& c){ c.listOutstandingCharges(); }},
 
+    {"list-paid-charges", {"lpc"}, 
+        "List all paid charges for this period for the currently selected account", 
+        [](Command& c){ c.listPaidCharges(); }},
+
     {"update-recurring-charge", {"urc"}, 
         "Update the recurring charge specified with sequence supplied", 
         [](Command& c){ c.updateRecurringCharge(); }},

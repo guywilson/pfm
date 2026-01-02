@@ -348,7 +348,7 @@ class DBRecurringCharge : public DBPayment {
         bool isWithinCurrentPeriod(StrDate & referenceDate);
         bool isChargeDueThisPeriod();
 
-        StrDate getNextRecurringTransactionDate(StrDate & startDate);
+        StrDate getNextRecurringTransactionDate();
 
         void migrateToTransferCharge(pfm_id_t & accountToId);
 

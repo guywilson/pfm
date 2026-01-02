@@ -102,7 +102,7 @@ void Command::listOutstandingCharges() {
     checkAccountSelected();
 
     DBRecurringChargeView chargeInstance;
-    DBResult<DBRecurringChargeView> result = chargeInstance.getOutstandingChargesDueThisPeriod(selectedAccount.id);
+    DBResult<DBRecurringChargeView> result = chargeInstance.getChargesOutstandingThisPeriod(selectedAccount.id);
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
@@ -114,6 +114,26 @@ void Command::listOutstandingCharges() {
     }
 
     RecurringChargeListView view = RecurringChargeListView("Outstanding charges for account: " + selectedAccount.code);
+    view.addResults(result);
+    view.show();
+}
+
+void Command::listPaidCharges() {
+    checkAccountSelected();
+
+    DBRecurringChargeView chargeInstance;
+    DBResult<DBRecurringChargeView> result = chargeInstance.getChargesPaidThisPeriod(selectedAccount.id);
+
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    cacheMgr.clearRecurringCharges();
+
+    for (int i = 0;i < result.size();i++) {
+        DBRecurringChargeView charge = result[i];
+        cacheMgr.addRecurringCharge(charge.sequence, charge);
+    }
+
+    RecurringChargeListView view = RecurringChargeListView("Paid charges for account: " + selectedAccount.code);
     view.addResults(result);
     view.show();
 }

@@ -300,7 +300,7 @@ bool DBRecurringCharge::isChargeDueThisPeriod() {
     return inThisPeriod;
 }
 
-StrDate DBRecurringCharge::getNextRecurringTransactionDate(StrDate & startDate) {
+StrDate DBRecurringCharge::getNextRecurringTransactionDate() {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::getNextRecurringTransactionDate()");
 

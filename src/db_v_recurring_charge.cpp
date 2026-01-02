@@ -49,38 +49,68 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetwee
     return result;
 }
 
-DBResult<DBRecurringChargeView> DBRecurringChargeView::getOutstandingChargesDueThisPeriod(pfm_id_t & accountId) {
+DBResult<DBRecurringChargeView> DBRecurringChargeView::getChargesOutstandingThisPeriod(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
-    log.entry("DBRecurringChargeView::getOutstandingChargesDueThisPeriod()");
+    log.entry("DBRecurringChargeView::getChargesOutstandingThisPeriod()");
 
     StrDate today;
     StrDate periodStart = getPeriodStartDate(today);
     StrDate periodEnd = getPeriodEndDate(today);
 
-    DBRecurringChargeView c;
-    DBResult<DBRecurringChargeView> charges = c.retrieveByAccountID(accountId);
+    DBCriteria criteria;
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.addOrderBy(DBRecurringCharge::Columns::lastPaymentDate, DBCriteria::ascending);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    DBResult<DBRecurringChargeView> charges;
+
+    charges.retrieve(statement);
 
     DBResult<DBRecurringChargeView> results;
 
     for (int i = 0;i < charges.size();i++) {
         DBRecurringChargeView charge = charges[i];
 
-        bool isChargeUnpaid = (!charge.lastPaymentDate.isNull() ? (charge.lastPaymentDate < periodStart) : true);
+        StrDate chargeDate = charge.getNextRecurringTransactionDate();
+
+        bool isChargeOutstanding = (charge.isChargeDueThisPeriod() && chargeDate > today && chargeDate <= periodEnd);
 
         log.debug(
-            "Charge '%s' is %sunpaid in this period '%s' -> '%s'", 
+            "Charge '%s' is %outstanding in this period '%s' -> '%s'", 
             charge.description.c_str(),
-            (isChargeUnpaid ? "" : "not "), 
+            (isChargeOutstanding ? "" : "not "), 
             periodStart.shortDate().c_str(), 
             periodEnd.shortDate().c_str());
 
-        if (isChargeUnpaid && charge.isChargeDueThisPeriod()) {
-            log.debug("Charge '%s' is outstanding...", charge.description.c_str());
+        if (isChargeOutstanding) {
             results.addRow(charge);
         }
     }
 
-    log.exit("DBRecurringChargeView::getOutstandingChargesDueThisPeriod()");
+    log.exit("DBRecurringChargeView::getChargesOutstandingThisPeriod()");
+
+    return results;
+}
+
+DBResult<DBRecurringChargeView> DBRecurringChargeView::getChargesPaidThisPeriod(pfm_id_t & accountId) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBRecurringChargeView::getChargesPaidThisPeriod()");
+
+    StrDate today;
+    StrDate periodStart = getPeriodStartDate(today);
+
+    DBCriteria criteria;
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.add(DBRecurringCharge::Columns::lastPaymentDate, DBCriteria::greater_than_or_equal, periodStart);
+    criteria.add(DBRecurringCharge::Columns::lastPaymentDate, DBCriteria::less_than_or_equal, today);
+    criteria.addOrderBy(DBRecurringCharge::Columns::lastPaymentDate, DBCriteria::ascending);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    DBResult<DBRecurringChargeView> results;
+
+    results.retrieve(statement);
+
+    log.exit("DBRecurringChargeView::getChargesPaidThisPeriod()");
 
     return results;
 }

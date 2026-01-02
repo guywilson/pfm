@@ -144,6 +144,7 @@ class Command {
         void addRecurringCharge();
         void listRecurringCharges();
         void listOutstandingCharges();
+        void listPaidCharges();
         DBRecurringCharge getRecurringCharge(int sequence);
         void updateRecurringCharge();
         void deleteRecurringCharge();

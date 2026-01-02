@@ -78,7 +78,7 @@ void DBAccount::createRecurringTransactions() {
                         transactionDate = charge.date;
 
                         while (transactionDate < openingDate) {
-                            transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
+                            transactionDate = charge.getNextRecurringTransactionDate();
                         }
                     }
                     else {
@@ -88,7 +88,7 @@ void DBAccount::createRecurringTransactions() {
                 else {
                     log.debug("Found latest transactions for charge %s with date '%s'", charge.id.c_str(), transaction.date.shortDate().c_str());
                     
-                    transactionDate = charge.getNextRecurringTransactionDate(transaction.date);
+                    transactionDate = charge.getNextRecurringTransactionDate();
                 }
 
                 log.debug(
@@ -111,7 +111,7 @@ void DBAccount::createRecurringTransactions() {
                     charge.retrieve();
 
                     // Move to next occurrence
-                    transactionDate = charge.getNextRecurringTransactionDate(transactionDate);
+                    transactionDate = charge.getNextRecurringTransactionDate();
                 }
             }
         }
