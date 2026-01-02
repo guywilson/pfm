@@ -21,144 +21,6 @@
 
 using namespace std;
 
-int DBRecurringCharge::getPeriodEndDay() {
-    StrDate today;
-    return getPeriodEndDay(today);
-}
-
-int DBRecurringCharge::getPeriodEndDay(StrDate & referenceDate) {
-    Logger & log = Logger::getInstance();
-    log.entry("DBRecurringCharge::getPeriodEndDay()");
-
-    cfgmgr & cfg = cfgmgr::getInstance();
-
-    string cycleEnd = cfg.getValue("cycle.end");
-
-    log.info("Value of config item 'cycle.end' is '%s'", cycleEnd.c_str());
-
-    int periodEnd;
-
-    DBPublicHoliday h;
-
-    if (isNumeric(cycleEnd)) {
-        periodEnd = atoi(cycleEnd.c_str());
-
-        StrDate specificDate(referenceDate.year(), referenceDate.month(), periodEnd);
-
-        while (specificDate.isWeekend() || h.isPublicHoliday(specificDate)) {
-            specificDate = specificDate.addDays(-1);
-        }
-
-        periodEnd = specificDate.day();
-    }
-    else if (cycleEnd.compare("last-working-day") == 0) {
-        StrDate lastWorkingDay = referenceDate;
-        lastWorkingDay = lastWorkingDay.lastDayInMonth();
-
-        while (lastWorkingDay.isWeekend() || h.isPublicHoliday(lastWorkingDay)) {
-            lastWorkingDay = lastWorkingDay.addDays(-1);
-        }
-
-        periodEnd = lastWorkingDay.day();
-    }
-    else if (cycleEnd.compare("last-friday") == 0) {
-        StrDate lastFriday = referenceDate;
-        lastFriday = lastFriday.lastDayInMonth();
-
-        while (lastFriday.dayOfTheWeek() != StrDate::sd_friday) {
-            lastFriday = lastFriday.addDays(-1);
-        }
-
-        /*
-        ** If the last friday is a public holiday, then
-        ** roll back to the previous week...
-        */
-        if (h.isPublicHoliday(lastFriday)) {
-            lastFriday = lastFriday.addDays(-7);
-        }
-
-        periodEnd = lastFriday.day();
-    }
-    else {
-        StrDate lastDay = referenceDate.lastDayInMonth();
-        periodEnd = lastDay.day();
-    }
-
-    log.debug("Got period end day as %d for date '%s'", periodEnd, referenceDate.shortDate().c_str());
-
-    log.exit("DBRecurringCharge::getPeriodEndDay()");
-
-    return periodEnd;
-}
-
-StrDate DBRecurringCharge::getPeriodStartDate() {
-    StrDate today;
-    return getPeriodStartDate(today);
-}
-
-StrDate DBRecurringCharge::getPeriodEndDate() {
-    StrDate today;
-    return getPeriodEndDate(today);
-}
-
-StrDate DBRecurringCharge::getPeriodStartDate(StrDate & referenceDate) {
-    Logger & log = Logger::getInstance();
-    log.entry("DBRecurringCharge::getPeriodStartDate()");
-
-    // Determine which period end applies to referenceDate
-    StrDate periodEnd = getPeriodEndDate(referenceDate);
-
-    // Previous period end is the configured end date in the month before periodEnd's month
-    StrDate endMonth(periodEnd.year(), periodEnd.month(), 1);
-    StrDate prevMonth = endMonth.addMonths(-1);
-
-    const int prevEndDay = getPeriodEndDay(prevMonth);
-    StrDate prevPeriodEnd(prevMonth.year(), prevMonth.month(), prevEndDay);
-
-    // Start is the day after previous period end
-    StrDate periodStart = prevPeriodEnd.addDays(1);
-
-    log.debug("Period start for '%s' is '%s' (prev end '%s', current end '%s')",
-              referenceDate.shortDate().c_str(),
-              periodStart.shortDate().c_str(),
-              prevPeriodEnd.shortDate().c_str(),
-              periodEnd.shortDate().c_str());
-
-    log.exit("DBRecurringCharge::getPeriodStartDate()");
-    return periodStart;
-}
-
-StrDate DBRecurringCharge::getPeriodEndDate(StrDate & referenceDate) {
-    Logger & log = Logger::getInstance();
-    log.entry("DBRecurringCharge::getPeriodEndDate()");
-
-    // Compute end date for referenceDate's month
-    StrDate thisMonth(referenceDate.year(), referenceDate.month(), 1);
-    const int endDayThisMonth = getPeriodEndDay(thisMonth);
-    StrDate endThisMonth(thisMonth.year(), thisMonth.month(), endDayThisMonth);
-
-    // If referenceDate is on/before this month's configured end, that's the period end
-    if (referenceDate <= endThisMonth) {
-        log.debug("Period end for '%s' is '%s' (same month)",
-                  referenceDate.shortDate().c_str(),
-                  endThisMonth.shortDate().c_str());
-        log.exit("DBRecurringCharge::getPeriodEndDate()");
-        return endThisMonth;
-    }
-
-    // Otherwise, period ends at next month's configured end
-    StrDate nextMonth = thisMonth.addMonths(1);
-    const int endDayNextMonth = getPeriodEndDay(nextMonth);
-    StrDate endNextMonth(nextMonth.year(), nextMonth.month(), endDayNextMonth);
-
-    log.debug("Period end for '%s' is '%s' (next month)",
-              referenceDate.shortDate().c_str(),
-              endNextMonth.shortDate().c_str());
-
-    log.exit("DBRecurringCharge::getPeriodEndDate()");
-    return endNextMonth;
-}
-
 DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::retrieveByAccountID()");
@@ -199,8 +61,8 @@ bool DBRecurringCharge::isWithinCurrentPeriod(StrDate & referenceDate) {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::isWithinCurrentPeriod()");
 
-    StrDate periodStart = getPeriodStartDate();
-    StrDate periodEnd = getPeriodEndDate();
+    StrDate periodStart = StrDate::getPeriodStartDate();
+    StrDate periodEnd = StrDate::getPeriodEndDate();
 
     bool inThisPeriod =
         (referenceDate >= periodStart) &&
@@ -221,7 +83,7 @@ StrDate DBRecurringCharge::getNextNominalScheduledDate() {
     Logger & log = Logger::getInstance();
     log.entry("DBRecurringCharge::getNextNominalScheduledDate()");
 
-    StrDate periodStart = getPeriodStartDate();
+    StrDate periodStart = StrDate::getPeriodStartDate();
     StrDate d = this->date;
 
     // If a lastPaymentDate exists, we should advance from there so we don't
@@ -270,8 +132,8 @@ bool DBRecurringCharge::isChargeDueThisPeriod() {
     bool inThisPeriod = false;
 
     if (isActive()) {
-        StrDate periodStart = getPeriodStartDate();
-        StrDate periodEnd = getPeriodEndDate();
+        StrDate periodStart = StrDate::getPeriodStartDate();
+        StrDate periodEnd = StrDate::getPeriodEndDate();
 
         // Find the next *nominal* (no weekend adjustment) scheduled date
         StrDate nominalNext = getNextNominalScheduledDate();
@@ -327,9 +189,7 @@ StrDate DBRecurringCharge::getNextRecurringTransactionDate() {
         if (txnDate.month() > nominal.month()) {
             log.debug("Winding back next transaction date for charge '%s'", txnDate.shortDate().c_str());
 
-            DBPublicHoliday h;
-
-            while (txnDate >= nominal || txnDate.isWeekend() || h.isPublicHoliday(txnDate)) {
+            while (txnDate >= nominal || txnDate.isWeekend() || isPublicHoliday(txnDate)) {
                 --txnDate;
             }
         }

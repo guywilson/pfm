@@ -54,8 +54,8 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::getChargesOutstandingThis
     log.entry("DBRecurringChargeView::getChargesOutstandingThisPeriod()");
 
     StrDate today;
-    StrDate periodStart = getPeriodStartDate(today);
-    StrDate periodEnd = getPeriodEndDate(today);
+    StrDate periodStart = StrDate::getPeriodStartDate(today);
+    StrDate periodEnd = StrDate::getPeriodEndDate(today);
 
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
@@ -97,7 +97,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::getChargesPaidThisPeriod(
     log.entry("DBRecurringChargeView::getChargesPaidThisPeriod()");
 
     StrDate today;
-    StrDate periodStart = getPeriodStartDate(today);
+    StrDate periodStart = StrDate::getPeriodStartDate(today);
 
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);

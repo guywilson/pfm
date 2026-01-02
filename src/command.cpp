@@ -109,8 +109,16 @@ void Command::handleExceptions(const string & command, const string & token) {
             string name = "recurring";
             parameters[name].push_back(value);
         }
+        else if (value == "period" || value == "any") {
+            string name = "timeframe";
+            parameters[name].push_back(value);
+        }
         else if (value == "asc" || value == "desc") {
             string name = "sort";
+            parameters[name].push_back(value);
+        }
+        else if (value == "total") {
+            string name = "total";
             parameters[name].push_back(value);
         }
         else {

@@ -125,18 +125,19 @@ class DBPublicHoliday : public DBEntity {
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
-        bool isPublicHoliday(const StrDate & d) {
-            DBCriteria criteria;
-            criteria.add(Columns::date, DBCriteria::equal_to, d);
-            criteria.setRowLimit(1);
+        static void populatePublicHolidays() {
+            DBResult<DBPublicHoliday> holidays;
+            holidays.retrieveAll();
 
-            string statement = getSelectStatement() + criteria.getStatementCriteria();
+            for (int i = 0;i < holidays.size();i++) {
+                DBPublicHoliday holiday = holidays[i];
 
-            DBResult<DBPublicHoliday> result;
+                pair<StrDate, string> holidayPair;
+                holidayPair.first = holiday.date;
+                holidayPair.second = holiday.description;
 
-            int rowsRetrievedCount = result.retrieve(statement);
-
-            return (rowsRetrievedCount == 1 ? true : false);
+                addPublicHoliday(holidayPair);
+            }
         }
 };
 

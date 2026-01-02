@@ -144,6 +144,8 @@ void Command::listTransactions() {
     checkAccountSelected();
 
     bool includeRecurring = false;
+    bool thisPeriod = false;
+    bool showTotal = false;
     uint32_t rowLimit = 25;
     DBCriteria::sql_order sortDirection = DBCriteria::descending;
 
@@ -153,6 +155,16 @@ void Command::listTransactions() {
             rowLimit = strtoul(rows.c_str(), NULL, 10);
         }
         
+        string timeframe = getParameter("timeframe");
+        if (!timeframe.empty()) {
+            if (timeframe.compare("period") == 0) {
+                thisPeriod = true;
+            }
+            else if (timeframe.compare("any") == 0) {
+                thisPeriod = false;
+            }
+        }
+
         string recurring = getParameter("recurring");
         if (!recurring.empty()) {
             if (recurring.compare("all") == 0) {
@@ -172,19 +184,28 @@ void Command::listTransactions() {
                 sortDirection = DBCriteria::descending;
             }
         }
+
+        string total = getParameter("total");
+        if (!total.empty()) {
+            showTotal = true;
+        }
     }
 
     DBTransactionView transactionInstance;
-    DBResult<DBTransactionView> result;
-
-    if (includeRecurring) {
-        result = transactionInstance.retrieveByAccountID(selectedAccount.id, sortDirection, rowLimit);
-    }
-    else {
-        result = transactionInstance.retrieveNonRecurringByAccountID(selectedAccount.id, sortDirection, rowLimit);
-    }
+    DBResult<DBTransactionView> result = 
+        transactionInstance.listByAccountID(
+                                selectedAccount.id, 
+                                includeRecurring, 
+                                thisPeriod, 
+                                sortDirection, 
+                                rowLimit);
 
     TransactionListView view;
+
+    if (showTotal) {
+        view.addTotal();
+    }
+    
     view.addResults(result, selectedAccount.code);
     view.show();
 

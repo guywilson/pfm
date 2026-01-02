@@ -131,9 +131,8 @@ void unitTestCodeFragment() {
 
     setOverrideDate("2025-12-15");
 
-    DBRecurringCharge charge;
-    StrDate startDate = charge.getPeriodStartDate();
-    StrDate endDate = charge.getPeriodEndDate();
+    StrDate startDate = StrDate::getPeriodStartDate();
+    StrDate endDate = StrDate::getPeriodEndDate();
 
     cout << "Got period start date '" << startDate.shortDate() << "', period end date '" << endDate.shortDate() << "'" << endl << endl;
 }
@@ -224,6 +223,8 @@ int main(int argc, char ** argv) {
     rl_utils::setup();
     rl_utils::loadShortcuts(shortcutPairs);
 
+    DBPublicHoliday::populatePublicHolidays();
+    
     cfgmgr & cfg = cfgmgr::getInstance();
     cfg.initialise();
 

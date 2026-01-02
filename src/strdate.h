@@ -28,9 +28,6 @@ struct TimeComponents {
     string microsecond;
 };
 
-void setOverrideDate(const string & date);
-void clearOverrideDate();
-
 class StrDate {
     private:
         string _date;
@@ -71,6 +68,9 @@ class StrDate {
         static bool isLeapYear(int year);
         static string getTimestamp(bool includems);
 
+        static int getPeriodEndDay();
+        static int getPeriodEndDay(StrDate & referenceDate);
+
     public:
         typedef enum {
             sd_sunday = 0,
@@ -103,6 +103,11 @@ class StrDate {
         static string getTimestampToMicrosecond();
         static int getDaysInMonth(int year, int month);
         static bool isDateValid(const string & date);
+
+        static StrDate getPeriodStartDate();
+        static StrDate getPeriodEndDate();
+        static StrDate getPeriodStartDate(StrDate & referenceDate);
+        static StrDate getPeriodEndDate(StrDate & referenceDate);
         
         string shortDate() const;
         string longDate() const;
@@ -158,6 +163,13 @@ class StrDate {
         // postfix decrement
         StrDate operator--(int);
 };
+
+void setOverrideDate(const string & date);
+void clearOverrideDate();
+
+void addPublicHoliday(pair<StrDate, string> & holiday);
+void clearPublicHolidays();
+bool isPublicHoliday(const StrDate & date);
 
 #ifdef PFM_TEST_SUITE_ENABLED
 class StrDateTest {

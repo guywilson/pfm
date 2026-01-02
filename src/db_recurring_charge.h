@@ -84,18 +84,6 @@ struct Frequency {
 
 class DBRecurringCharge : public DBPayment {
     private:
-        bool inline isNumeric(string & cfgDate) {
-            bool isNumeric = true;
-            for (int i = 0;i < (int)cfgDate.length();i++) {
-                if (!isdigit(cfgDate.at(i))) {
-                    isNumeric = false;
-                    break;
-                }
-            }
-
-            return isNumeric;
-        }
-
         StrDate inline advanceDateByFrequency(StrDate & from) {
             StrDate d = from;
             const int n = frequency.count;
@@ -126,9 +114,7 @@ class DBRecurringCharge : public DBPayment {
         StrDate inline adjustForwardToBusinessDay(StrDate & d) {
             StrDate x = d;
 
-            DBPublicHoliday h;
-
-            while (x.isWeekend() || h.isPublicHoliday(x)) {
+            while (x.isWeekend() || isPublicHoliday(x)) {
                 ++x;
             }
 
@@ -174,9 +160,6 @@ class DBRecurringCharge : public DBPayment {
         };
 
         string transferTo;
-
-        int getPeriodEndDay();
-        int getPeriodEndDay(StrDate & referenceDate);
 
     public:
         StrDate lastPaymentDate;
@@ -335,11 +318,6 @@ class DBRecurringCharge : public DBPayment {
         void inline setTransferToAccount(DBAccount & account) {
             setTransferToAccount(account.code);
         }
-
-        StrDate getPeriodStartDate();
-        StrDate getPeriodEndDate();
-        StrDate getPeriodStartDate(StrDate & referenceDate);
-        StrDate getPeriodEndDate(StrDate & referenceDate);
 
         void beforeRemove() override;
         void beforeUpdate() override;

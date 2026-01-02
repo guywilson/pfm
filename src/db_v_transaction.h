@@ -127,8 +127,8 @@ class DBTransactionView : public DBTransaction {
 
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t & accountId);
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
+        DBResult<DBTransactionView> listByAccountID(pfm_id_t & accountId, bool includeRecurring, bool thisPeriod, DBCriteria::sql_order dateSortDirection, int rowLimit);
         DBResult<DBTransactionView> retrieveReconciledByAccountID(pfm_id_t & accountId);
-        DBResult<DBTransactionView> retrieveNonRecurringByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
         DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveReconciledByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);

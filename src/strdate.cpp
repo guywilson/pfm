@@ -2,6 +2,8 @@
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include <vector>
+#include <unordered_map>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -12,6 +14,7 @@
 
 #include "logger.h"
 #include "pfm_error.h"
+#include "cfgmgr.h"
 #include "strdate.h"
 
 using namespace std;
@@ -24,6 +27,7 @@ using namespace std;
 
 static string _currentDate;
 static bool _isDateOverride = false;
+static unordered_map<string, string> _publicHolidays;
 
 void setOverrideDate(const string & date) {
     _currentDate = date;
@@ -32,6 +36,19 @@ void setOverrideDate(const string & date) {
 
 void clearOverrideDate() {
     _isDateOverride = false;
+}
+
+void addPublicHoliday(pair<StrDate, string> & holiday) {
+
+    _publicHolidays.insert({holiday.first.shortDate(), holiday.second});
+}
+
+void clearPublicHolidays() {
+    _publicHolidays.clear();
+}
+
+bool isPublicHoliday(const StrDate & date) {
+    return _publicHolidays.contains(date.shortDate());
 }
 
 static void fillTimeStruct(TimeComponents * time) {
@@ -74,7 +91,19 @@ static void fillTimeStruct(TimeComponents * time) {
     time->microsecond = to_string(static_cast<int>(tv.tv_usec));
 }
 
-void checkForInvalidChars(const string & date) {
+static bool isNumeric(string & cfgDate) {
+    bool isNumeric = true;
+    for (int i = 0;i < (int)cfgDate.length();i++) {
+        if (!isdigit(cfgDate.at(i))) {
+            isNumeric = false;
+            break;
+        }
+    }
+
+    return isNumeric;
+}
+
+static void checkForInvalidChars(const string & date) {
     for (size_t i = 0;i < date.length();i++) {
         char c = date[i];
 
@@ -507,6 +536,142 @@ bool StrDate::isLeapYear(int year) {
 
 bool StrDate::isLeapYear() {
     return(StrDate::isLeapYear(year()));
+}
+
+int StrDate::getPeriodEndDay() {
+    StrDate today;
+    return getPeriodEndDay(today);
+}
+
+int StrDate::getPeriodEndDay(StrDate & referenceDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("StrDate::getPeriodEndDay()");
+
+    cfgmgr & cfg = cfgmgr::getInstance();
+
+    string cycleEnd = cfg.getValue("cycle.end");
+
+    log.info("Value of config item 'cycle.end' is '%s'", cycleEnd.c_str());
+
+    int periodEnd;
+
+    if (isNumeric(cycleEnd)) {
+        periodEnd = atoi(cycleEnd.c_str());
+
+        StrDate specificDate(referenceDate.year(), referenceDate.month(), periodEnd);
+
+        while (specificDate.isWeekend() || isPublicHoliday(specificDate)) {
+            specificDate = specificDate.addDays(-1);
+        }
+
+        periodEnd = specificDate.day();
+    }
+    else if (cycleEnd.compare("last-working-day") == 0) {
+        StrDate lastWorkingDay = referenceDate;
+        lastWorkingDay = lastWorkingDay.lastDayInMonth();
+
+        while (lastWorkingDay.isWeekend() || isPublicHoliday(lastWorkingDay)) {
+            lastWorkingDay = lastWorkingDay.addDays(-1);
+        }
+
+        periodEnd = lastWorkingDay.day();
+    }
+    else if (cycleEnd.compare("last-friday") == 0) {
+        StrDate lastFriday = referenceDate;
+        lastFriday = lastFriday.lastDayInMonth();
+
+        while (lastFriday.dayOfTheWeek() != StrDate::sd_friday) {
+            lastFriday = lastFriday.addDays(-1);
+        }
+
+        /*
+        ** If the last friday is a public holiday, then
+        ** roll back to the previous week...
+        */
+        if (isPublicHoliday(lastFriday)) {
+            lastFriday = lastFriday.addDays(-7);
+        }
+
+        periodEnd = lastFriday.day();
+    }
+    else {
+        StrDate lastDay = referenceDate.lastDayInMonth();
+        periodEnd = lastDay.day();
+    }
+
+    log.debug("Got period end day as %d for date '%s'", periodEnd, referenceDate.shortDate().c_str());
+
+    log.exit("StrDate::getPeriodEndDay()");
+
+    return periodEnd;
+}
+
+StrDate StrDate::getPeriodStartDate() {
+    StrDate today;
+    return getPeriodStartDate(today);
+}
+
+StrDate StrDate::getPeriodEndDate() {
+    StrDate today;
+    return getPeriodEndDate(today);
+}
+
+StrDate StrDate::getPeriodStartDate(StrDate & referenceDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("StrDate::getPeriodStartDate()");
+
+    // Determine which period end applies to referenceDate
+    StrDate periodEnd = getPeriodEndDate(referenceDate);
+
+    // Previous period end is the configured end date in the month before periodEnd's month
+    StrDate endMonth(periodEnd.year(), periodEnd.month(), 1);
+    StrDate prevMonth = endMonth.addMonths(-1);
+
+    const int prevEndDay = getPeriodEndDay(prevMonth);
+    StrDate prevPeriodEnd(prevMonth.year(), prevMonth.month(), prevEndDay);
+
+    // Start is the day after previous period end
+    StrDate periodStart = prevPeriodEnd.addDays(1);
+
+    log.debug("Period start for '%s' is '%s' (prev end '%s', current end '%s')",
+              referenceDate.shortDate().c_str(),
+              periodStart.shortDate().c_str(),
+              prevPeriodEnd.shortDate().c_str(),
+              periodEnd.shortDate().c_str());
+
+    log.exit("StrDate::getPeriodStartDate()");
+    return periodStart;
+}
+
+StrDate StrDate::getPeriodEndDate(StrDate & referenceDate) {
+    Logger & log = Logger::getInstance();
+    log.entry("StrDate::getPeriodEndDate()");
+
+    // Compute end date for referenceDate's month
+    StrDate thisMonth(referenceDate.year(), referenceDate.month(), 1);
+    const int endDayThisMonth = getPeriodEndDay(thisMonth);
+    StrDate endThisMonth(thisMonth.year(), thisMonth.month(), endDayThisMonth);
+
+    // If referenceDate is on/before this month's configured end, that's the period end
+    if (referenceDate <= endThisMonth) {
+        log.debug("Period end for '%s' is '%s' (same month)",
+                  referenceDate.shortDate().c_str(),
+                  endThisMonth.shortDate().c_str());
+        log.exit("StrDate::getPeriodEndDate()");
+        return endThisMonth;
+    }
+
+    // Otherwise, period ends at next month's configured end
+    StrDate nextMonth = thisMonth.addMonths(1);
+    const int endDayNextMonth = getPeriodEndDay(nextMonth);
+    StrDate endNextMonth(nextMonth.year(), nextMonth.month(), endDayNextMonth);
+
+    log.debug("Period end for '%s' is '%s' (next month)",
+              referenceDate.shortDate().c_str(),
+              endNextMonth.shortDate().c_str());
+
+    log.exit("StrDate::getPeriodEndDate()");
+    return endNextMonth;
 }
 
 int StrDate::daysInMonth(int year, int month) {

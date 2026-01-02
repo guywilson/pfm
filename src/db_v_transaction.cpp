@@ -54,6 +54,42 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t & ac
     return result;
 }
 
+DBResult<DBTransactionView> DBTransactionView::listByAccountID(pfm_id_t & accountId, bool includeRecurring, bool thisPeriod, DBCriteria::sql_order dateSortDirection, int rowLimit) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::retrieveNonRecurringByAccountID()");
+
+    DBCriteria criteria;
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+
+    if (!includeRecurring) {
+        criteria.add(Columns::recurring, false);
+    }
+
+    if (thisPeriod) {
+        StrDate today;
+        StrDate periodStart = StrDate::getPeriodStartDate(today);
+
+        criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, periodStart);
+        criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, today);
+    }
+
+    criteria.addOrderBy(DBPayment::Columns::date, dateSortDirection);
+
+    if (rowLimit > 0) {
+        criteria.setRowLimit(rowLimit);
+    }
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    
+    DBResult<DBTransactionView> result;
+
+    result.retrieve(statement);
+
+    log.exit("DBTransactionView::retrieveNonRecurringByAccountID()");
+
+    return result;
+}
+
 DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveReconciledByAccountID()");
@@ -68,30 +104,6 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm
     result.retrieve(statement);
 
     log.exit("DBTransactionView::retrieveReconciledByAccountID()");
-
-    return result;
-}
-
-DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit) {
-    Logger & log = Logger::getInstance();
-    log.entry("DBTransactionView::retrieveNonRecurringByAccountID()");
-
-    DBCriteria criteria;
-    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
-    criteria.add(Columns::recurring, false);
-    criteria.addOrderBy(DBPayment::Columns::date, dateSortDirection);
-
-    if (rowLimit > 0) {
-        criteria.setRowLimit(rowLimit);
-    }
-
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
-    
-    DBResult<DBTransactionView> result;
-
-    result.retrieve(statement);
-
-    log.exit("DBTransactionView::retrieveNonRecurringByAccountID()");
 
     return result;
 }
