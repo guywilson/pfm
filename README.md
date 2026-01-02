@@ -136,6 +136,10 @@ Add a new recurring charge to the currently selected account
 
 Lists the oustanding charges for the currently selected account.
 
+**list-paid-charges, lpc**
+
+Lists the paid charges for the currently selected account.
+
 **add-transaction, at, add [parameters]**
 
 Add a new transaction to the currently selected account
@@ -167,6 +171,9 @@ List transactions for the currently selected account
 - num - number of results to be returned
 - all - return non-recurring and recurring transactions
 - nr - return only non-recurring transactions (the default)
+- rc - return only recurring transactions
+- period - return transactions in the current period
+- any - return transations from any timeframe
 - asc - sort the results in ascending date order
 - desc - sort the results in descending date order (the default)
 

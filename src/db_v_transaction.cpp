@@ -54,15 +54,15 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t & ac
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::listByAccountID(pfm_id_t & accountId, bool includeRecurring, bool thisPeriod, DBCriteria::sql_order dateSortDirection, int rowLimit) {
+DBResult<DBTransactionView> DBTransactionView::listByAccountID(pfm_id_t & accountId, recurring_type recurringType, bool thisPeriod, DBCriteria::sql_order dateSortDirection, int rowLimit) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::retrieveNonRecurringByAccountID()");
 
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
 
-    if (!includeRecurring) {
-        criteria.add(Columns::recurring, false);
+    if (!(recurringType == all)) {
+        criteria.add(Columns::recurring, (recurringType == non_recurring ? false : true));
     }
 
     if (thisPeriod) {

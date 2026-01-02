@@ -105,7 +105,7 @@ void Command::handleExceptions(const string & command, const string & token) {
         }
     }
     else {
-        if (value == "all" || value == "nr") {
+        if (value == "all" || value == "nr" || value == "rc") {
             string name = "recurring";
             parameters[name].push_back(value);
         }

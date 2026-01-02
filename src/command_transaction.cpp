@@ -143,7 +143,7 @@ void Command::addTransferTransaction() {
 void Command::listTransactions() {
     checkAccountSelected();
 
-    bool includeRecurring = false;
+    DBTransactionView::recurring_type recurringType = DBTransactionView::non_recurring;
     bool thisPeriod = false;
     bool showTotal = false;
     uint32_t rowLimit = 25;
@@ -168,10 +168,13 @@ void Command::listTransactions() {
         string recurring = getParameter("recurring");
         if (!recurring.empty()) {
             if (recurring.compare("all") == 0) {
-                includeRecurring = true;
+                recurringType = DBTransactionView::all;
             }
             else if (recurring.compare("nr") == 0) {
-                includeRecurring = false;
+                recurringType = DBTransactionView::non_recurring;
+            }
+            else if (recurring.compare("rc") == 0) {
+                recurringType = DBTransactionView::recurring_only;
             }
         }
 
@@ -195,7 +198,7 @@ void Command::listTransactions() {
     DBResult<DBTransactionView> result = 
         transactionInstance.listByAccountID(
                                 selectedAccount.id, 
-                                includeRecurring, 
+                                recurringType, 
                                 thisPeriod, 
                                 sortDirection, 
                                 rowLimit);

@@ -54,6 +54,12 @@ class DBTransactionView : public DBTransaction {
 
         Money total; // For category, payee reports
 
+        enum recurring_type {
+            non_recurring,
+            recurring_only,
+            all
+        };
+
         DBTransactionView() : DBTransaction() {
             clear();
         }
@@ -127,7 +133,7 @@ class DBTransactionView : public DBTransaction {
 
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t & accountId);
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
-        DBResult<DBTransactionView> listByAccountID(pfm_id_t & accountId, bool includeRecurring, bool thisPeriod, DBCriteria::sql_order dateSortDirection, int rowLimit);
+        DBResult<DBTransactionView> listByAccountID(pfm_id_t & accountId, recurring_type recurringType, bool thisPeriod, DBCriteria::sql_order dateSortDirection, int rowLimit);
         DBResult<DBTransactionView> retrieveReconciledByAccountID(pfm_id_t & accountId);
         DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
