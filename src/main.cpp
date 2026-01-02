@@ -129,7 +129,7 @@ void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ALL);
 
-    setOverrideDate("2025-12-15");
+    // setOverrideDate("2025-12-15");
 
     StrDate startDate = StrDate::getPeriodStartDate();
     StrDate endDate = StrDate::getPeriodEndDate();
@@ -224,7 +224,7 @@ int main(int argc, char ** argv) {
     rl_utils::loadShortcuts(shortcutPairs);
 
     DBPublicHoliday::populatePublicHolidays();
-    
+
     cfgmgr & cfg = cfgmgr::getInstance();
     cfg.initialise();
 
