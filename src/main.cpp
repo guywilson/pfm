@@ -129,12 +129,14 @@ void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ALL);
 
-    // setOverrideDate("2025-12-15");
+    // StrDate startDate = StrDate::getPeriodStartDate();
+    // StrDate endDate = StrDate::getPeriodEndDate();
 
-    StrDate startDate = StrDate::getPeriodStartDate();
-    StrDate endDate = StrDate::getPeriodEndDate();
+    // cout << "Got period start date '" << startDate.shortDate() << "', period end date '" << endDate.shortDate() << "'" << endl << endl;
 
-    cout << "Got period start date '" << startDate.shortDate() << "', period end date '" << endDate.shortDate() << "'" << endl << endl;
+    Money amount = 0.55f;
+
+    cout << "Money raw value: '" << amount.rawStringValue() << "', formatted value: '" << amount.localeFormattedStringValue() << "'" << endl << endl;
 }
 
 int main(int argc, char ** argv) {
