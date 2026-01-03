@@ -229,23 +229,18 @@ string Money::localeFormattedStringValue(const string & localeString) const {
         ** Here we will check for the bug, and fix it if it exists...
         */
         string value = s.str();
-        bool foundDecimalPoint = false;
 
         for (size_t i = (value.length() - 1);i >= 0;i--) {
             char c = value[i];
 
-            if (foundDecimalPoint) {
+            if (c == '.') {
                 /*
                 ** The char immediately before the decimal point should be a '0'...
                 */
-                if (c != '0') {
-                    value.insert(i, "0");
+                if (value[i - 1] != '0') {
+                    value.insert(i, "0.");
                 }
                 return value;
-            }
-
-            if (c == '.') {
-                foundDecimalPoint = true;
             }
         }
     }
