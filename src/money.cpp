@@ -178,7 +178,6 @@ double Money::doubleValue() {
 }
 
 string Money::rawStringValue() const {
-    char buffer[AMOUNT_BUFFER_LENGTH];
     money_t whole = this->representedValue / 100;
     money_t decimal = this->representedValue - (whole * 100);
 
@@ -186,10 +185,10 @@ string Money::rawStringValue() const {
         decimal = decimal * -1;
     }
 
-    snprintf(buffer, AMOUNT_BUFFER_LENGTH, "%d.%02d", whole, decimal);
+    stringstream s;
+    s << to_string(whole) << "." << setw(2) << decimal;
 
-    string value = buffer;
-    return value;
+    return s.str();
 }
 
 string Money::rawStringValue(string & currencySymbol) const {
@@ -201,10 +200,7 @@ string Money::localeFormattedStringValue() const {
 }
 
 string Money::localeFormattedStringValue(const string & localeString) const {    
-    char buffer[AMOUNT_BUFFER_LENGTH];
-    snprintf(buffer, AMOUNT_BUFFER_LENGTH, "%d", this->representedValue);
-
-    string raw = buffer;
+    string raw = to_string(this->representedValue);
 
     stringstream s;
 
@@ -220,6 +216,38 @@ string Money::localeFormattedStringValue(const string & localeString) const {
         s.clear();
         s.imbue(locale(""));
         s << showbase << put_money(raw);
+    }
+
+    if (this->representedValue < 100) {
+        /*
+        ** The locale formatted string should have a leading zero before
+        ** the decimal point if the value is less than 100, e.g $0.71.
+        **
+        ** However, there seems to be a bug in the std C++ library, on 
+        ** Ubuntu at least, whereby the leading zero is dropped. 
+        **
+        ** Here we will check for the bug, and fix it if it exists...
+        */
+        string value = s.str();
+        bool foundDecimalPoint = false;
+
+        for (size_t i = (value.length() - 1);i >= 0;i--) {
+            char c = value[i];
+
+            if (foundDecimalPoint) {
+                /*
+                ** The char immediately before the decimal point should be a '0'...
+                */
+                if (c != '0') {
+                    value.insert(i, "0");
+                }
+                return value;
+            }
+
+            if (c == '.') {
+                foundDecimalPoint = true;
+            }
+        }
     }
 
     return s.str();
