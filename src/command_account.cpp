@@ -56,9 +56,11 @@ void Command::listAccounts() {
 void Command::chooseAccount() {
     log.entry("Command::chooseAccount()");
 
-    string accountCode = getParameter(SIMPLE_PARAM_NAME);
+    string accountCode = selectedAccount.code;
 
-    log.debug("Choose account with code '%s'", accountCode.c_str());
+    if (hasParameters()) {
+        accountCode = getParameter(SIMPLE_PARAM_NAME);
+    }
 
     if (accountCode.length() == 0) {
         ChooseAccountView view;
@@ -66,6 +68,8 @@ void Command::chooseAccount() {
 
         accountCode = view.getCode();
     }
+
+    log.debug("Choose account with code '%s'", accountCode.c_str());
 
     DBAccount account;
     account.retrieveByCode(accountCode);
