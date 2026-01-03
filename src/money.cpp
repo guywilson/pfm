@@ -238,7 +238,7 @@ string Money::localeFormattedStringValue(const string & localeString) const {
                 ** The char immediately before the decimal point should be a '0'...
                 */
                 if (value[i - 1] != '0') {
-                    value.insert(i, "0.");
+                    value.insert(i, "0");
                 }
                 return value;
             }
