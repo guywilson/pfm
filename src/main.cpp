@@ -85,7 +85,6 @@ void test() {
     StrDateTest::run();
     cout << endl << endl;
     testAccount();
-    exit(0);
 }
 #endif
 
@@ -139,9 +138,26 @@ void unitTestCodeFragment() {
     cout << "Money raw value: '" << amount.rawStringValue() << "', formatted value: '" << amount.localeFormattedStringValue() << "'" << endl << endl;
 }
 
+static void initialiseReferenceData() {
+    vector<pair<string, string>> shortcutPairs = DBShortcut::populate();
+    
+    rl_utils::setup();
+    rl_utils::loadShortcuts(shortcutPairs);
+
+    DBPublicHoliday::populatePublicHolidays();
+}
+
+static int getNumAccounts() {
+    DBResult<DBAccount> accounts;
+    accounts.retrieveAll();
+
+    return accounts.size();
+}
+
 int main(int argc, char ** argv) {
     char * pszDatabase = NULL;
     int defaultLogLevel = LOG_LEVEL_ERROR | LOG_LEVEL_FATAL;
+    int status = 0;
     bool runScratch = false;
 
 #ifdef RUN_IN_DEBUGGER
@@ -218,14 +234,10 @@ int main(int argc, char ** argv) {
 
 #ifdef PFM_TEST_SUITE_ENABLED
     test();
+    return status;
 #endif
 
-    vector<pair<string, string>> shortcutPairs = DBShortcut::populate();
-    
-    rl_utils::setup();
-    rl_utils::loadShortcuts(shortcutPairs);
-
-    DBPublicHoliday::populatePublicHolidays();
+    initialiseReferenceData();
 
     cfgmgr & cfg = cfgmgr::getInstance();
     cfg.initialise();
@@ -239,16 +251,12 @@ int main(int argc, char ** argv) {
         db.close();
         log.close();
 
-        return 0;
+        return status;
     }
 
-    DBResult<DBAccount> accounts;
-    accounts.retrieveAll();
-
-    int numAccounts = accounts.size();
-
     Command command;
-    
+    int numAccounts = getNumAccounts();
+
     if (numAccounts == 0) {
         cout << endl << "*** Welcome to PFM ***" << endl << endl << "Create your first account using the add-account command..." << endl << endl;
     }
@@ -269,8 +277,9 @@ int main(int argc, char ** argv) {
                 loop = command.process(cmdString);
             }
             catch (pfm_fatal & f) {
-                fprintf(stderr, "Fatal error: %s\n", f.what());
-                exit(-1);
+                cerr << "Fatal error: " << f.what() << endl;
+                status = -1;
+                break;
             }
             catch (pfm_field_cancel_error & cancelledError) {
                 cout << endl;
@@ -285,5 +294,5 @@ int main(int argc, char ** argv) {
     db.close();
     log.close();
 
-    return 0; 
+    return status; 
 }
