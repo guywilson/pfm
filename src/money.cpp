@@ -221,10 +221,13 @@ string Money::localeFormattedStringValue(const string & localeString) const {
     if (this->representedValue < 100) {
         /*
         ** The locale formatted string should have a leading zero before
-        ** the decimal point if the value is less than 100, e.g $0.71.
+        ** the decimal point if the value is less than 100, e.g. $0.71
         **
-        ** However, there seems to be a bug in the std C++ library, on 
-        ** Ubuntu at least, whereby the leading zero is dropped. 
+        ** However, there is a bug in in the libstdc++ library with GCC, 
+        ** whereby the leading zero is dropped when the value is less 
+        ** than 100: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81138
+        **
+        ** This works fine in CLANG, for example, on macOS.
         **
         ** Here we will check for the bug, and fix it if it exists...
         */
