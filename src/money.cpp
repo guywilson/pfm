@@ -219,7 +219,7 @@ string Money::localeFormattedStringValue(const string & localeString) const {
         s << showbase << put_money(raw);
     }
 
-    if (this->representedValue < 100) {
+    if (abs(this->representedValue) < 100) {
         /*
         ** The locale formatted string should have a leading zero before
         ** the decimal point if the value is less than 100, e.g. $0.71
