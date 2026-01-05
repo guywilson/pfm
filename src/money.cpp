@@ -185,10 +185,11 @@ string Money::rawStringValue() const {
         decimal = decimal * -1;
     }
 
-    stringstream s;
-    s << to_string(whole) << "." << setw(2) << decimal;
+    char buffer[AMOUNT_BUFFER_LENGTH];
+    snprintf(buffer, AMOUNT_BUFFER_LENGTH, "%d.%02d", whole, decimal);
+    string raw = buffer;
 
-    return s.str();
+    return raw;
 }
 
 string Money::rawStringValue(string & currencySymbol) const {
