@@ -44,9 +44,9 @@ class Logger {
     public:
         ~Logger() {}
 
-        static int getLogLevelFromString(string & logLevel);
+        static int getLogLevelFromString(const string & logLevel);
 
-        void init(string & filename, int logLevel);
+        void init(const string & filename, int logLevel);
         void init(int logLevel);
         
         void close();

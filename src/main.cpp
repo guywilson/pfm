@@ -200,21 +200,23 @@ static int commandProcessor() {
 }
 
 int main(int argc, char ** argv) {
-    char * pszDatabase = NULL;
-    int defaultLogLevel = LOG_LEVEL_ERROR | LOG_LEVEL_FATAL;
-    int status = 0;
-    bool runScratch = false;
-
 #ifdef RUN_IN_DEBUGGER
-    defaultLogLevel = LOG_LEVEL_ALL;
+    int defaultLogLevel = LOG_LEVEL_ALL;
+#else
+    int defaultLogLevel = LOG_LEVEL_ERROR | LOG_LEVEL_FATAL;
 #endif
 
     CmdArg cmdarg(argc, argv);
+
+    char * pszDatabase = strdup(DEFAULT_DATABASE_NAME);
+    int status = 0;
+    bool runScratch = false;
 
     while (cmdarg.hasMoreArgs()) {
         string arg = cmdarg.nextArg();
 
         if (arg.compare("-db") == 0) {
+            free(pszDatabase);
             pszDatabase = strdup(cmdarg.nextArg().c_str());
         }
         else if (arg.compare("-h") == 0 || arg.compare("-?") == 0) {
@@ -239,7 +241,7 @@ int main(int argc, char ** argv) {
             defaultLogLevel |= LOG_LEVEL_SQL;
         }
         else if (arg.compare("--debug-logging") == 0) {
-            defaultLogLevel |= LOG_LEVEL_DEBUG | LOG_LEVEL_INFO;
+            defaultLogLevel |= (LOG_LEVEL_DEBUG | LOG_LEVEL_INFO);
         }
         else if (arg.compare("--run-scratch") == 0) {
             runScratch = true;
@@ -251,14 +253,8 @@ int main(int argc, char ** argv) {
         }
     }
 
-    if (pszDatabase == NULL) {
-        pszDatabase = strdup(DEFAULT_DATABASE_NAME);
-    }
-
-    string logFileName = "./pfm.log";
-
     Logger & log = Logger::getInstance();
-    log.init(logFileName, defaultLogLevel);
+    log.init("./pfm.log", defaultLogLevel);
 
     checkTerminalSize();
 
@@ -277,31 +273,22 @@ int main(int argc, char ** argv) {
 
     free(pszDatabase);
 
-#ifdef PFM_TEST_SUITE_ENABLED
-    test();
-    return status;
-#endif
-
     initialiseReferenceData();
 
-    /*
-    ** Run scratch code, suitable for unit testing...
-    */
     if (runScratch) {
+        /*
+        ** Run scratch code, suitable for unit testing...
+        */
         unitTestCodeFragment();
-
-        db.close();
-        log.close();
-
-        return status;
     }
-
-    /*
-    ** The command processor, it should only exit out of here when:
-    ** 1) There is a fatal error
-    ** 2) The user explicitly quits the application
-    */
-    status = commandProcessor();
+    else {
+        /*
+        ** The command processor, it should only exit out of here when:
+        ** 1) There is a fatal error
+        ** 2) The user explicitly quits the application
+        */
+        status = commandProcessor();
+    }
 
     db.close();
     log.close();

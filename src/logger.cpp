@@ -45,7 +45,7 @@ char * Logger::trim(const char * src) {
     return trimmedString;
 }
 
-void Logger::init(string & filename, int logLevel) {
+void Logger::init(const string & filename, int logLevel) {
     this->loggingLevel = logLevel;
 
     if (filename.length() > 0) {
@@ -88,7 +88,7 @@ bool Logger::isLogLevel(int logLevel) {
     return ((this->loggingLevel & logLevel) == logLevel ? true : false);
 }
 
-int Logger::getLogLevelFromString(string & logLevel) {
+int Logger::getLogLevelFromString(const string & logLevel) {
     int             level = 0;
 
     char * pszLogLevel = strdup(logLevel.c_str());
