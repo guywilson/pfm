@@ -145,6 +145,9 @@ static void initialiseReferenceData() {
     rl_utils::loadShortcuts(shortcutPairs);
 
     DBPublicHoliday::populatePublicHolidays();
+
+    cfgmgr & cfg = cfgmgr::getInstance();
+    cfg.initialise();
 }
 
 static int getNumAccounts() {
@@ -152,6 +155,48 @@ static int getNumAccounts() {
     accounts.retrieveAll();
 
     return accounts.size();
+}
+
+static int commandProcessor() {
+    Command command;
+    int numAccounts = getNumAccounts();
+
+    if (numAccounts == 0) {
+        cout << endl << "*** Welcome to PFM ***" << endl << endl << "Create your first account using the add-account command..." << endl << endl;
+    }
+    else {
+        string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
+        command.process("use " + primaryAccountCode);
+    }
+
+    int status = 0;
+    bool loop = true;
+
+    while (loop) {
+        rl_utils::setLineLength(DEFAULT_LINE_LENGTH);
+
+        string cmdString = readline("pfm > ");
+
+        if (cmdString.length()) {
+            try {
+                loop = command.process(cmdString);
+            }
+            catch (pfm_fatal & f) {
+                cerr << "Fatal error: " << f.what() << endl;
+                status = -1;
+                break;
+            }
+            catch (pfm_field_cancel_error & cancelledError) {
+                cout << endl;
+                continue;
+            }
+            catch (pfm_error & e) {
+                cout << "Error running command: " << e.what() << endl;
+            }
+        }
+    }
+
+    return status;
 }
 
 int main(int argc, char ** argv) {
@@ -239,9 +284,6 @@ int main(int argc, char ** argv) {
 
     initialiseReferenceData();
 
-    cfgmgr & cfg = cfgmgr::getInstance();
-    cfg.initialise();
-
     /*
     ** Run scratch code, suitable for unit testing...
     */
@@ -254,42 +296,12 @@ int main(int argc, char ** argv) {
         return status;
     }
 
-    Command command;
-    int numAccounts = getNumAccounts();
-
-    if (numAccounts == 0) {
-        cout << endl << "*** Welcome to PFM ***" << endl << endl << "Create your first account using the add-account command..." << endl << endl;
-    }
-    else {
-        string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
-        command.process("use " + primaryAccountCode);
-    }
-
-    bool loop = true;
-
-    while (loop) {
-        rl_utils::setLineLength(DEFAULT_LINE_LENGTH);
-
-        string cmdString = readline("pfm > ");
-
-        if (cmdString.length()) {
-            try {
-                loop = command.process(cmdString);
-            }
-            catch (pfm_fatal & f) {
-                cerr << "Fatal error: " << f.what() << endl;
-                status = -1;
-                break;
-            }
-            catch (pfm_field_cancel_error & cancelledError) {
-                cout << endl;
-                continue;
-            }
-            catch (pfm_error & e) {
-                cout << "Error running command: " << e.what() << endl;
-            }
-        }
-    }
+    /*
+    ** The command processor, it should only exit out of here when:
+    ** 1) There is a fatal error
+    ** 2) The user explicitly quits the application
+    */
+    status = commandProcessor();
 
     db.close();
     log.close();
