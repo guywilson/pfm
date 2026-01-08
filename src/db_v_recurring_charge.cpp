@@ -19,6 +19,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_i
 
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
+    criteria.addOrderBy(DBRecurringCharge::Columns::lastPaymentDate, DBCriteria::descending);
 
     string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringChargeView> result;
