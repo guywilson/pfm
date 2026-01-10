@@ -230,46 +230,51 @@ void Command::findTransactions() {
             findTransactions(sql);
         }
         else {
-            vector<StrDate> betweenTheseDatesList;
-            vector<StrDate> onTheseDatesList;
-            vector<string> withTheseAccountsList;
-            vector<string> withTheseCategoriesList;
-            vector<string> withThesePayeesList;
-            vector<Money> betweenTheseAmountList;
+            DBCriteria criteria;
             
             string dateAfter = getParameter("date>");
             if (!dateAfter.empty()) {
-                betweenTheseDatesList.push_back(dateAfter);
+                criteria = DBTransactionView::FindCriteriaHelper::handleGreaterThanThisDate(criteria, dateAfter);
             }
 
             string dateBefore = getParameter("date<");
             if (!dateBefore.empty()) {
-                betweenTheseDatesList.push_back(dateBefore);
+                criteria = DBTransactionView::FindCriteriaHelper::handleLessThanThisDate(criteria, dateBefore);
             }
 
             vector<string> dates = getParameters("date");
+            vector<StrDate> onTheseDates;
             for (string & s : dates) {
-                onTheseDatesList.push_back(s);
+                onTheseDates.push_back(s);
             }
+            criteria = DBTransactionView::FindCriteriaHelper::handleOnTheseDates(criteria, onTheseDates);
 
-            withTheseAccountsList = getParameters("acc");
-            withTheseCategoriesList = getParameters("c");
-            withThesePayeesList = getParameters("p");
+            vector<string> withTheseAccountsList = getParameters("acc");
+            criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseAccounts(criteria, withTheseAccountsList);
+
+            vector<string> withTheseCategoriesList = getParameters("c");
+            criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseCategories(criteria, withTheseCategoriesList);
+
+            vector<string> withThesePayeesList = getParameters("p");
+            criteria = DBTransactionView::FindCriteriaHelper::handleWithThesePayees(criteria, withThesePayeesList);
             
             string amountGreater = getParameter("amnt>");
             if (!amountGreater.empty()) {
-                betweenTheseAmountList.push_back(amountGreater);
+                criteria = DBTransactionView::FindCriteriaHelper::handleGreaterThanThisAmount(criteria, amountGreater);
             }
             
             string amountLess = getParameter("amnt<");
             if (!amountLess.empty()) {
-                betweenTheseAmountList.push_back(amountLess);
+                criteria = DBTransactionView::FindCriteriaHelper::handleLessThanThisAmount(criteria, amountLess);
             }
 
             string type = getParameter("type");
             transform(type.begin(), type.end(), type.begin(), ::toupper);
 
             string recurring = getParameter("rec");
+            if (!recurring.empty()) {
+                criteria = DBTransactionView::FindCriteriaHelper::handleIsRecurring(criteria, recurring.compare("r") == 0 ? true : false);
+            }
 
             auto replaceWildcards = [](string & s) {
                 for (size_t i = 0;i < s.length();i++) {
@@ -286,31 +291,12 @@ void Command::findTransactions() {
 
             string description = getParameter("desc");
             if (!description.empty()) {
-                description = replaceWildcards(description);
+                criteria = DBTransactionView::FindCriteriaHelper::handleWithThisDescription(criteria, replaceWildcards(description));
             }
 
             string reference = getParameter("ref");
             if (!reference.empty()) {
-                reference = replaceWildcards(reference);
-            }
-
-            DBCriteria criteria;
-
-            criteria = DBTransactionView::FindCriteriaHelper::handleBetweenTheseDates(criteria, betweenTheseDatesList);
-            criteria = DBTransactionView::FindCriteriaHelper::handleOnTheseDates(criteria, onTheseDatesList);
-
-            criteria = DBTransactionView::FindCriteriaHelper::handleBetweenTheseAmounts(criteria, betweenTheseAmountList);
-
-            criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseAccounts(criteria, withTheseAccountsList);
-            criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseCategories(criteria, withTheseCategoriesList);
-            criteria = DBTransactionView::FindCriteriaHelper::handleWithThesePayees(criteria, withThesePayeesList);
-
-            criteria = DBTransactionView::FindCriteriaHelper::handleWithThisDescription(criteria, description);
-            criteria = DBTransactionView::FindCriteriaHelper::handleWithThisReference(criteria, reference);
-            criteria = DBTransactionView::FindCriteriaHelper::handleWithThisType(criteria, type);
-
-            if (!recurring.empty()) {
-                criteria = DBTransactionView::FindCriteriaHelper::handleIsRecurring(criteria, recurring.compare("r") == 0 ? true : false);
+                criteria = DBTransactionView::FindCriteriaHelper::handleWithThisReference(criteria, replaceWildcards(reference));
             }
 
             findTransactions(criteria);

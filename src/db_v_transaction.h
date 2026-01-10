@@ -146,21 +146,13 @@ class DBTransactionView : public DBTransaction {
 
         class FindCriteriaHelper {
             public:
-                static DBCriteria handleBetweenTheseDates(DBCriteria & src, vector<StrDate> & dates) {
-                    if (dates.size() == 0) {
-                        return src;
-                    }
-                    else if (dates.size() == 1) {
-                        src.add(DBPayment::Columns::date, DBCriteria::greater_than, dates[0]);
-                    }
-                    else if (dates.size() == 2) {
-                        src.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, dates[0]);
-                        src.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, dates[1]);
-                    }
-                    else {
-                        throw pfm_error("Too many date criterion supplied.");
-                    }
+                static DBCriteria handleGreaterThanThisDate(DBCriteria & src, const StrDate & date) {
+                    src.add(DBPayment::Columns::date, DBCriteria::greater_than, date);
+                    return src;
+                }
 
+                static DBCriteria handleLessThanThisDate(DBCriteria & src, const StrDate & date) {
+                    src.add(DBPayment::Columns::date, DBCriteria::less_than, date);
                     return src;
                 }
 
@@ -176,29 +168,13 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleBetweenTheseAmounts(DBCriteria & src, vector<Money> & amounts) {
-                    if (amounts.size() == 0) {
-                        return src;
-                    }
-                    else if (amounts.size() == 1) {
-                        src.add(DBPayment::Columns::amount, DBCriteria::greater_than, amounts[0]);
-                    }
-                    else if (amounts.size() == 2) {
-                        src.add(DBPayment::Columns::amount, DBCriteria::greater_than_or_equal, amounts[0]);
-                        src.add(DBPayment::Columns::amount, DBCriteria::less_than_or_equal, amounts[1]);
-                    }
-                    else {
-                        throw pfm_error("Too many amount criterion supplied.");
-                    }
-
+                static DBCriteria handleLessThanThisAmount(DBCriteria & src, const Money & amount) {
+                    src.add(DBPayment::Columns::amount, DBCriteria::less_than, amount);
                     return src;
                 }
 
-                static DBCriteria handleLessThanThisAmount(DBCriteria & src, Money & amount) {
-                    if (amount > 0.0) {
-                        src.add(DBPayment::Columns::amount, DBCriteria::less_than, amount);
-                    }
-                    
+                static DBCriteria handleGreaterThanThisAmount(DBCriteria & src, const Money & amount) {
+                    src.add(DBPayment::Columns::amount, DBCriteria::greater_than, amount);
                     return src;
                 }
 
