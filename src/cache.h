@@ -14,6 +14,7 @@
 #include "db_transaction_report.h"
 #include "db_shortcut.h"
 #include "db_public_holiday.h"
+#include "db_transfer_transaction_record.h"
 
 using namespace std;
 
@@ -35,6 +36,7 @@ class CacheMgr {
         unordered_map<int, DBTransactionReport> reportBySequence;
         unordered_map<int, DBShortcut> shortcutBySequence;
         unordered_map<int, DBPublicHoliday> holidayBySequence;
+        unordered_map<int, DBTransferTransactionRecord> transferBySequence;
 
         string findCriteria;
 
@@ -61,6 +63,10 @@ class CacheMgr {
             holidayBySequence.clear();
         }
 
+        void clearTransferRecords() {
+            transferBySequence.clear();
+        }
+
         void clearFindCriteria() {
             findCriteria.clear();
         }
@@ -83,6 +89,10 @@ class CacheMgr {
 
         void addHoliday(int sequence, DBPublicHoliday & holiday) {
             holidayBySequence.insert({sequence, holiday});
+        }
+
+        void addTransfer(int sequence, DBTransferTransactionRecord & transfer) {
+            transferBySequence.insert({sequence, transfer});
         }
 
         DBRecurringCharge getRecurringCharge(int sequence) {
@@ -133,6 +143,16 @@ class CacheMgr {
             }
 
             throw pfm_error("DBPublicHoliday not found in cache.");
+        }
+
+        DBTransferTransactionRecord getTransfer(int sequence) {
+            unordered_map<int, DBTransferTransactionRecord>::const_iterator item = transferBySequence.find(sequence);
+
+            if (item != transferBySequence.end()) {
+                return item->second;
+            }
+
+            throw pfm_error("DBTransferRecord not found in cache.");
         }
 
         void addFindCriteria(const string & criteria) {

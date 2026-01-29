@@ -186,10 +186,6 @@ const vector<CommandEntry> commandTable = {
         "Add a new transaction for the currently selected account", 
         [](Command& c){ c.addTransaction(); }},
 
-    {"transfer-transaction", {"tr", "transfer"}, 
-        "Add a new transfer transaction for the currently selected account", 
-        [](Command& c){ c.addTransferTransaction(); }},
-
     {"list-transactions", {"lt", "list"}, 
         "List all transactions for the currently selected account", 
         [](Command& c){ c.listTransactions(); }},
@@ -229,6 +225,18 @@ const vector<CommandEntry> commandTable = {
     {"export-transactions-csv", {"xtc"}, 
         "Export all transactions to the specified file in CSV format", 
         [](Command& c){ c.exportTransactionsAsCSV(); }},
+
+    {"transfer-transaction", {"tr", "transfer"}, 
+        "Add a new transfer transaction for the currently selected account", 
+        [](Command& c){ c.addTransferTransaction(); }},
+
+    {"list-transfer-records", {"ltr"}, 
+        "List all transfer transaction records", 
+        [](Command& c){ c.listTransferRecords(); }},
+
+    {"delete-transfer-record", {"dtr"}, 
+        "Delete the transfer transaction record specified with the sequence supplied", 
+        [](Command& c){ c.deleteTransferRecord(); }},
 
     {"add-report", {"arp"}, 
         "Add a new report", 

@@ -15,6 +15,8 @@
 #include "db_payee.h"
 #include "db_v_transaction.h"
 #include "db_transaction.h"
+#include "db_v_transfer_record.h"
+#include "db_transfer_transaction_record.h"
 #include "db_carried_over.h"
 #include "db_transaction_report.h"
 #include "db_shortcut.h"
@@ -154,7 +156,6 @@ class Command {
         void clearRecurringTransactions();
 
         void addTransaction();
-        void addTransferTransaction();
         void listTransactions();
         void findTransactions();
         void findTransactions(const string & where);
@@ -169,6 +170,11 @@ class Command {
         void importTransactions();
         void exportTransactions();
         void exportTransactionsAsCSV();
+
+        void addTransferTransaction();
+        void listTransferRecords();
+        DBTransferTransactionRecord getTransferRecord(int sequence);
+        void deleteTransferRecord();
 
         void addReport();
         void copyReport();

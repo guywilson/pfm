@@ -86,61 +86,6 @@ class AddTransactionView : public CLIView {
         }
 };
 
-class TransferToAccountView : public CLIView {
-    private:
-        AccountSpinField accountField = AccountSpinField("Account to transfer to (max. 5 chars): ");
-        CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
-        DateField dateField = DateField("Date [today]: ");
-        CLITextField descriptionField = CLITextField("Description: ");
-        CLICurrencyField amountField = CLICurrencyField("Amount: ");
-        CLITextField isReconciledField = CLITextField("Is reconciled [N]: ");
-
-        bool strtobool(const char * yes_no) {
-            if (yes_no[0] == 'y' || yes_no[0] == 'Y') {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-
-    public:
-        TransferToAccountView() : TransferToAccountView("Transfer to Account") {}
-
-        TransferToAccountView(const char * title) : CLIView(title) {
-            string today = StrDate::today();
-            dateField.setDefaultValue(today);
-        }
-
-        void show() override {
-            CLIView::show();
-
-            accountField.show();
-            categoryField.show();
-            dateField.show();
-            descriptionField.show();
-            amountField.show();
-        }
-
-        DBTransaction getSourceTransaction() {
-            DBTransaction transaction;
-
-            transaction.category = categoryField.getCategory();
-            transaction.categoryId = transaction.category.id;
-
-            transaction.date = dateField.getValue();
-            transaction.description = descriptionField.getValue();
-            transaction.amount = amountField.getDoubleValue();
-            transaction.isReconciled = strtobool(isReconciledField.getValue().c_str());
-
-            return transaction;
-        }
-
-        DBAccount getAccountTo() {
-            return accountField.getAccount();
-        }
-};
-
 class TransactionListView : public CLIListView {
     private:
         Money total;
