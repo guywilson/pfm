@@ -75,6 +75,8 @@ desc:"The quick brown fox jumped over the lazy dog"
 **delete-transaction, dt**
 
 **transfer-transaction, transfer, tr** (*See extended form below*)
+**list-transfer-records, ltr**
+**delete-transfer-record, dtr**
 
 **add-report, arp**
 **list-reports, show-reports, lrp**
@@ -157,17 +159,6 @@ Add a new transaction to the currently selected account
 - amnt:[amount] - The amount
 - rec:[Y/N] - Is the transaction reconciled or not
 
-**transfer-transaction, transfer, tr [parameters]**
-
-Add a new transfer transaction to the currently selected account
-
-- to:[account code] - The code of the account to transfer to
-- c:[category code] - The category code of the transaction
-- date:[date] - The date for the transaction (defaults to today)
-- desc:[description] - The description
-- amnt:[amount] - The amount
-- rec:[Y/N] - Is the transaction reconciled or not
-
 **list-transactions, lt, list [parameters]**
 
 List transactions for the currently selected account
@@ -244,9 +235,16 @@ Sets the primary account, like the immortals in *Highlander*, there can be only 
 
 Deletes **all** stored categories, used for example if you don’t want any of the default categories created with a new file.
 
-**transfer-transaction, tr, transfer**
+**transfer-transaction, transfer, tr [parameters]**
 
-Add a transfer transaction to another account, this will create a debit transaction from the currently selected account, and a debit transaction in the ‘transfer to’ account.
+Add a new transfer transaction to the currently selected account
+
+- to:[account code] - The code of the account to transfer to
+- c:[category code] - The category code of the transaction
+- date:[date] - The date for the transaction (defaults to today)
+- desc:[description] - The description
+- amnt:[amount] - The amount
+- rec:[Y/N] - Is the transaction reconciled or not
 
 **reconcile-transaction, reconcile, rt [sequence number]**
 
