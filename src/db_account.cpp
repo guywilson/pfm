@@ -238,6 +238,9 @@ Money DBAccount::calculateCurrentBalance() {
     DBCarriedOver co;
     int numCORecords = co.retrieveLatestByAccountId(this->id);
 
+    StrDate dateToday;
+    StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
+
     Money balance = 0.00;
 
     /*
@@ -245,7 +248,7 @@ Money DBAccount::calculateCurrentBalance() {
     ** as it includes the account's opening balance. Otherwise, just use
     ** the account's opening balance.
     */
-    if (numCORecords) {
+    if (numCORecords && openingDate < periodStartDate) {
         balance = co.balance;
 
         log.debug(
@@ -259,9 +262,6 @@ Money DBAccount::calculateCurrentBalance() {
     }
 
     try {
-        StrDate dateToday;
-        StrDate periodStartDate(dateToday.year(), dateToday.month(), 1);
-
         DBTransactionView tr;
         DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, DBCriteria::ascending, periodStartDate, dateToday);
 
@@ -365,6 +365,9 @@ Money DBAccount::calculateBalanceAfterBills() {
     DBCarriedOver co;
     int numCORecords = co.retrieveLatestByAccountId(this->id);
 
+    StrDate dateToday;
+    StrDate periodStartDate = dateToday.firstDayInMonth();
+
     Money balance = 0.00;
 
     /*
@@ -372,7 +375,7 @@ Money DBAccount::calculateBalanceAfterBills() {
     ** as it includes the account's opening balance. Otherwise, just use
     ** the account's opening balance.
     */
-    if (numCORecords) {
+    if (numCORecords && openingDate < periodStartDate) {
         balance = co.balance;
 
         log.debug(
