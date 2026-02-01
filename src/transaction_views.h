@@ -91,11 +91,15 @@ class TransactionListView : public CLIListView {
         Money total;
         bool isTotalEnabled;
 
-        void showResultsTable(DBResult<DBTransactionView> & result) {
+        void showResultsTable(DBResult<DBTransactionView> & result, bool showAccount) {
             CLIListRow headerRow;
 
             headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("Acct.", 5, CLIListColumn::leftAligned));
+
+            if (showAccount) {
+                headerRow.addColumn(CLIListColumn("Acct.", 5, CLIListColumn::leftAligned));
+            }
+
             headerRow.addColumn(CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
             headerRow.addColumn(CLIListColumn("RC", 2, CLIListColumn::leftAligned));
             headerRow.addColumn(CLIListColumn("Description", 25, CLIListColumn::leftAligned));
@@ -114,7 +118,11 @@ class TransactionListView : public CLIListView {
                 CLIListRow row(headerRow);
 
                 row.addCellValue(transaction.sequence);
-                row.addCellValue(transaction.account);
+
+                if (showAccount) {
+                    row.addCellValue(transaction.account);
+                }
+
                 row.addCellValue(transaction.date.shortDate());
                 row.addCellValue(transaction.isRecurring);
                 row.addCellValue(transaction.description);
@@ -128,6 +136,10 @@ class TransactionListView : public CLIListView {
                 total += transaction.getSignedAmount();
                 addRow(row);
             }
+        }
+
+        void showResultsTable(DBResult<DBTransactionView> & result) {
+            showResultsTable(result, true);
         }
 
     public:
@@ -146,7 +158,7 @@ class TransactionListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions list (%d)", result.size());
             setTitle(szTitle);
 
-            showResultsTable(result);
+            showResultsTable(result, true);
         }
 
         void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
@@ -155,7 +167,7 @@ class TransactionListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%d)", accountCode.c_str(), result.size());
             setTitle(szTitle);
 
-            showResultsTable(result);
+            showResultsTable(result, false);
         }
 
         void show() override {
