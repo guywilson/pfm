@@ -94,38 +94,17 @@ class TransactionListView : public CLIListView {
         void showResultsTable(DBResult<DBTransactionView> & result) {
             CLIListRow headerRow;
 
-            CLIListColumn column0 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
-            headerRow.addColumn(column0);
-
-            CLIListColumn column1 = CLIListColumn("Acct.", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("RC", 2, CLIListColumn::leftAligned);
-            headerRow.addColumn(column3);
-
-            CLIListColumn column4 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
-            headerRow.addColumn(column4);
-
-            CLIListColumn column5 = CLIListColumn("Reference", 9, CLIListColumn::leftAligned);
-            headerRow.addColumn(column5);
-
-            CLIListColumn column6 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column6);
-
-            CLIListColumn column7 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column7);
-
-            CLIListColumn column8 = CLIListColumn("Tp", 2, CLIListColumn::leftAligned);
-            headerRow.addColumn(column8);
-
-            CLIListColumn column9 = CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
-            headerRow.addColumn(column9);
-
-            CLIListColumn column10 = CLIListColumn("R", 1, CLIListColumn::leftAligned);
-            headerRow.addColumn(column10);
+            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("Acct.", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("RC", 2, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Description", 25, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Reference", 9, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Payee", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Tp", 2, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("R", 1, CLIListColumn::leftAligned));
 
             addHeaderRow(headerRow);
 
@@ -198,14 +177,9 @@ class TransactionCategoryReportListView : public CLIListView {
         void showResultsTable(DBResult<DBTransactionView> & result) {
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Category", 15, CLIListColumn::leftAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("% of Total", 15, CLIListColumn::rightAligned);
-            headerRow.addColumn(column3);
+            headerRow.addColumn(CLIListColumn("Category", 15, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("% of Total", 15, CLIListColumn::rightAligned));
 
             addHeaderRow(headerRow);
 
@@ -261,14 +235,9 @@ class TransactionPayeeReportListView : public CLIListView {
         void showResultsTable(DBResult<DBTransactionView> & result) {
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Payee", 15, CLIListColumn::leftAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("% of Total", 15, CLIListColumn::rightAligned);
-            headerRow.addColumn(column3);
+            headerRow.addColumn(CLIListColumn("Payee", 15, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("% of Total", 15, CLIListColumn::rightAligned));
 
             addHeaderRow(headerRow);
 

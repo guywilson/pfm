@@ -166,26 +166,13 @@ class AccountListView : public CLIListView {
 
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Code", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Name", 20, CLIListColumn::leftAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("Balance", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
-            headerRow.addColumn(column3);
-
-            CLIListColumn column4 = CLIListColumn("Reconciled", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
-            headerRow.addColumn(column4);
-
-            CLIListColumn column5 = CLIListColumn("After Bills", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
-            headerRow.addColumn(column5);
-
-            CLIListColumn column6 = CLIListColumn("Remaining", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
-            headerRow.addColumn(column6);
-
-            CLIListColumn column7 = CLIListColumn("P", 1, CLIListColumn::leftAligned);
-            headerRow.addColumn(column7);
+            headerRow.addColumn(CLIListColumn("Code", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Name", 20, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Balance", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("Reconciled", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("After Bills", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("Remaining", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("P", 1, CLIListColumn::leftAligned));
 
             addHeaderRow(headerRow);
 

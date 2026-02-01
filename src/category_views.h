@@ -77,11 +77,8 @@ class CategoryListView : public CLIListView {
 
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Code", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Description", 55, CLIListColumn::leftAligned);
-            headerRow.addColumn(column2);
+            headerRow.addColumn(CLIListColumn("Code", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Description", 55, CLIListColumn::leftAligned));
 
             addHeaderRow(headerRow);
 

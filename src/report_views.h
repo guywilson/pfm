@@ -55,14 +55,9 @@ class ReportListView : public CLIListView {
         void showResultsTable(DBResult<DBTransactionReport> & result) {
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Description.", 24, CLIListColumn::leftAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("Where Clause", 73, CLIListColumn::leftAligned);
-            headerRow.addColumn(column3);
+            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("Description.", 24, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Where Clause", 73, CLIListColumn::leftAligned));
 
             addHeaderRow(headerRow);
 

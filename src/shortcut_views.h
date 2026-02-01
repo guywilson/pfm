@@ -53,14 +53,9 @@ class ShortcutListView : public CLIListView {
         void showResultsTable(DBResult<DBShortcut> & result) {
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Shortcut", 10, CLIListColumn::leftAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("Replacement", 80, CLIListColumn::leftAligned);
-            headerRow.addColumn(column3);
+            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("Shortcut", 10, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Replacement", 80, CLIListColumn::leftAligned));
 
             addHeaderRow(headerRow);
 

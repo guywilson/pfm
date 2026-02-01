@@ -123,32 +123,15 @@ class RecurringChargeListView : public CLIListView {
 
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Start", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("Last Paid", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
-            headerRow.addColumn(column3);
-
-            CLIListColumn column4 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
-            headerRow.addColumn(column4);
-
-            CLIListColumn column5 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column5);
-
-            CLIListColumn column6 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column6);
-
-            CLIListColumn column7 = CLIListColumn("Frq", 4, CLIListColumn::leftAligned);
-            headerRow.addColumn(column7);
-
-            CLIListColumn column8 = CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
-            headerRow.addColumn(column8);
-
-            CLIListColumn column9 = CLIListColumn("Tr", 2, CLIListColumn::leftAligned);
-            headerRow.addColumn(column9);
+            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("Start", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Last Paid", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Description", 25, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Payee", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Frq", 4, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("Tr", 2, CLIListColumn::leftAligned));
 
             addHeaderRow(headerRow);
 

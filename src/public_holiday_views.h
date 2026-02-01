@@ -74,14 +74,9 @@ class HolidayListView : public CLIListView {
 
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("Description", 40, CLIListColumn::leftAligned);
-            headerRow.addColumn(column3);
+            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Description", 40, CLIListColumn::leftAligned));
 
             addHeaderRow(headerRow);
 

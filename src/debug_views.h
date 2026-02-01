@@ -26,17 +26,10 @@ class CarriedOverListView : public CLIListView {
 
             CLIListRow headerRow;
 
-            CLIListColumn column1 = CLIListColumn("Account", 7, CLIListColumn::leftAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
-            headerRow.addColumn(column3);
-
-            CLIListColumn column4 = CLIListColumn("Balance", 16, CLIListColumn::rightAligned);
-            headerRow.addColumn(column4);
+            headerRow.addColumn(CLIListColumn("Account", 7, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Description", 25, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Balance", 16, CLIListColumn::rightAligned));
 
             addHeaderRow(headerRow);
 
@@ -102,14 +95,14 @@ class GenericListView : public CLIListView {
                         width = (int)name.length();
                     }
 
-                    CLIListColumn column = CLIListColumn(name.c_str(), width, CLIListColumn::leftAligned);
-                    remainingWidth -= column.getColumnWidth();
+                    int columnWidth = width + 3;
 
-                    if (remainingWidth < 0) {
+                    if (remainingWidth < columnWidth) {
                         break;
                     }
                     else {
-                        headerRow.addColumn(column);
+                        remainingWidth -= columnWidth;
+                        headerRow.addColumn(CLIListColumn(name.c_str(), width, CLIListColumn::leftAligned));
                         numColumns++;
                     }
                 }

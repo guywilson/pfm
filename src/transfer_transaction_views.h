@@ -81,29 +81,14 @@ class TransferListView : public CLIListView {
         void showResultsTable(DBResult<DBTransferRecordView> & result) {
             CLIListRow headerRow;
 
-            CLIListColumn column0 = CLIListColumn("Seq", 3, CLIListColumn::rightAligned);
-            headerRow.addColumn(column0);
-
-            CLIListColumn column1 = CLIListColumn("From:", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column1);
-
-            CLIListColumn column2 = CLIListColumn("To:", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column2);
-
-            CLIListColumn column3 = CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned);
-            headerRow.addColumn(column3);
-
-            CLIListColumn column4 = CLIListColumn("Description", 25, CLIListColumn::leftAligned);
-            headerRow.addColumn(column4);
-
-            CLIListColumn column5 = CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column5);
-
-            CLIListColumn column6 = CLIListColumn("Payee", 5, CLIListColumn::leftAligned);
-            headerRow.addColumn(column6);
-
-            CLIListColumn column7 = CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned);
-            headerRow.addColumn(column7);
+            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("From:", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("To:", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Description", 25, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Payee", 5, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
 
             addHeaderRow(headerRow);
 
