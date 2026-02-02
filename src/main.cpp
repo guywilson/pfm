@@ -89,11 +89,10 @@ void test() {
 #endif
 
 static void checkTerminalSize(void) {
-    Terminal & t = Terminal::getInstance();
     Logger & log = Logger::getInstance();
 
-    uint16_t width = t.getWidth();
-    uint16_t height = t.getHeight();
+    uint16_t width = Terminal::getWidth();
+    uint16_t height = Terminal::getHeight();
 
     log.debug(
             "Terminal size (w x h) reported as %u x %u", 

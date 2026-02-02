@@ -89,7 +89,7 @@ class AccountDetailsView : public CLIView {
         DBAccount account;
 
         void printHorizontalLine() {
-            cout << "+--------------------------------------------+---------------+" << endl;
+            cout << "+--------------------------------+---------------+" << endl;
         }
 
         void printRow(const string & label, const Money & amount) {
@@ -97,7 +97,7 @@ class AccountDetailsView : public CLIView {
                 << left
                 << "| "
                 << right 
-                << setw(42) 
+                << setw(30) 
                 << label 
                 << left
                 << " | "

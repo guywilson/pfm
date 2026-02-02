@@ -58,8 +58,7 @@ class GenericListView : public CLIListView {
             setTitle(szTitle);
 
             if (rows.size() > 0) {
-                Terminal & terminal = Terminal::getInstance();
-                int remainingWidth = terminal.getWidth();
+                int remainingWidth = Terminal::getWidth();
 
                 CLIListRow headerRow;
 

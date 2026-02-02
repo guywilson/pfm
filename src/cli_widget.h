@@ -25,7 +25,13 @@ using namespace std;
 #define CODE_FIELD_MAX_LENGTH                    5
 #define CRITERIA_FIELD_MAX_LEN                 256
 
-#define LIST_VIEW_AMOUNT_WIDTH                  14
+#define LIST_VIEW_SEQUENCE_WIDTH                3
+#define LIST_VIEW_CODE_WIDTH                    CODE_FIELD_MAX_LENGTH
+#define LIST_VIEW_AMOUNT_WIDTH                  (AMOUNT_FIELD_STRING_LEN - 2)
+#define LIST_VIEW_DESCRIPTION_WIDTH             25
+#define LIST_VIEW_REFERENCE_WIDTH               9
+#define LIST_VIEW_TYPE_WIDTH                    2
+#define LIST_VIEW_RECONCILED_WIDTH              1
 
 #define CLI_CANCEL_KEY                         'x'
 
@@ -650,6 +656,10 @@ class CLIListView : public CLIView {
         CLIListView() : CLIView() {}
         CLIListView(string & title) : CLIView(title) {}
         CLIListView(const char * szTitle) : CLIView(szTitle) {}
+
+        virtual uint16_t getMinimumWidth() {
+            return 0;
+        }
 
         void addHeaderRow(CLIListRow & header) {
             headerRow = header;

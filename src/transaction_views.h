@@ -3,6 +3,7 @@
 #include <string.h>
 #include <vector>
 
+#include "terminal.h"
 #include "pfm_error.h"
 #include "cli_widget.h"
 #include "custom_widgets.h"
@@ -94,21 +95,21 @@ class TransactionListView : public CLIListView {
         void showResultsTable(DBResult<DBTransactionView> & result, bool showAccount) {
             CLIListRow headerRow;
 
-            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
+            headerRow.addColumn(CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned));
 
             if (showAccount) {
-                headerRow.addColumn(CLIListColumn("Acct.", 5, CLIListColumn::leftAligned));
+                headerRow.addColumn(CLIListColumn("Acct.", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned));
             }
 
             headerRow.addColumn(CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("RC", 2, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Description", 25, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Reference", 9, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Payee", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Tp", 2, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("RC", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Description", LIST_VIEW_DESCRIPTION_WIDTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Reference", LIST_VIEW_REFERENCE_WIDTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Ctgry", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Payee", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("Tp", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned));
             headerRow.addColumn(CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("R", 1, CLIListColumn::leftAligned));
+            headerRow.addColumn(CLIListColumn("R", LIST_VIEW_RECONCILED_WIDTH, CLIListColumn::leftAligned));
 
             addHeaderRow(headerRow);
 
@@ -145,6 +146,23 @@ class TransactionListView : public CLIListView {
     public:
         TransactionListView() : CLIListView() {
             isTotalEnabled = false;
+
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for TransactionListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                LIST_VIEW_SEQUENCE_WIDTH + 
+                DATE_FIELD_LENGTH + 
+                LIST_VIEW_DESCRIPTION_WIDTH + 
+                LIST_VIEW_TYPE_WIDTH + 
+                LIST_VIEW_AMOUNT_WIDTH);
         }
 
         void addTotal() {
