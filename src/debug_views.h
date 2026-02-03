@@ -37,7 +37,7 @@ class CarriedOverListView : public CLIListView {
         void addResults(DBResult<DBCarriedOverView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Carried Over Logs (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Carried Over Logs (%zu)", result.size());
             setTitle(szTitle);
 
             setColumns({
@@ -47,7 +47,7 @@ class CarriedOverListView : public CLIListView {
                 CLIListColumn("Balance", 16, CLIListColumn::rightAligned)
             });
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBCarriedOverView co = result.at(i);
 
                 CLIListRow row(getNumColumns());

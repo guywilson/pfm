@@ -316,7 +316,7 @@ class DBCriteria {
         }
 
         void addToInClause(const string & columnName, const string & value) {
-            inClauses.insert(pair{columnName, value});
+            inClauses.insert(pair<string, string>{columnName, value});
         }
 
         void addToInClause(const string & columnName, const StrDate & value) {
@@ -749,7 +749,7 @@ class DBEntity {
 
 class Result {
     private:
-        int numRows;
+        size_t numRows;
         int sequenceCounter;
 
     public:
@@ -762,7 +762,7 @@ class Result {
             sequenceCounter = 1;
         }
 
-        int size() {
+        size_t size() {
             return numRows;
         }
 

@@ -41,7 +41,7 @@ void Command::listReports() {
 
     cacheMgr.clearReports();
 
-    for (int i = 0;i < result.size();i++) {
+    for (size_t i = 0;i < result.size();i++) {
         DBTransactionReport report = result[i];
         cacheMgr.addReport(report.sequence, report);
     }

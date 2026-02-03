@@ -181,9 +181,11 @@ class AccountListView : public CLIListView {
         void addResults(DBResult<DBAccount> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Accounts (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Accounts (%zu)", result.size());
             setTitle(szTitle);
 
+            reserveRows(result.size());
+            
             setColumns({
                 CLIListColumn("Code", 5, CLIListColumn::leftAligned),
                 CLIListColumn("Name", 20, CLIListColumn::leftAligned),
@@ -194,7 +196,7 @@ class AccountListView : public CLIListView {
                 CLIListColumn("P", 1, CLIListColumn::leftAligned)
             });
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBAccount account = result[i];
 
                 CLIListRow row(getNumColumns());

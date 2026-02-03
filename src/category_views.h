@@ -87,15 +87,17 @@ class CategoryListView : public CLIListView {
         void addResults(DBResult<DBCategory> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Categories (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Categories (%zu)", result.size());
             setTitle(szTitle);
 
+            reserveRows(result.size());
+            
             setColumns({
                 CLIListColumn("Code", 5, CLIListColumn::leftAligned),
                 CLIListColumn("Description", 55, CLIListColumn::leftAligned)
             });
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBCategory category = result.at(i);
 
                 CLIListRow row(getNumColumns());

@@ -85,16 +85,18 @@ class HolidayListView : public CLIListView {
         void addResults(DBResult<DBPublicHoliday> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Holidays (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Holidays (%zu)", result.size());
             setTitle(szTitle);
 
+            reserveRows(result.size());
+            
             setColumns({
                 CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
                 CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
                 CLIListColumn("Description", 40, CLIListColumn::leftAligned)
             });
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBPublicHoliday holiday = result[i];
 
                 CLIListRow row(getNumColumns());

@@ -91,9 +91,14 @@ class TransactionListView : public CLIListView {
     private:
         Money total;
         bool isTotalEnabled;
+        int totalAlignmentColumn;
 
         void showResultsTable(DBResult<DBTransactionView> & result, bool showAccount) {
+            reserveRows(result.size());
+
             if (showAccount) {
+                totalAlignmentColumn = 9;
+
                 setColumns({
                     CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
                     CLIListColumn("Acct.", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
@@ -109,6 +114,8 @@ class TransactionListView : public CLIListView {
                 });
             }
             else {
+                totalAlignmentColumn = 8;
+                
                 setColumns({
                     CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
                     CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
@@ -123,7 +130,7 @@ class TransactionListView : public CLIListView {
                 });
             }
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBTransactionView transaction = result.at(i);
 
                 CLIListRow row = CLIListRow(getNumColumns());
@@ -183,7 +190,7 @@ class TransactionListView : public CLIListView {
         void addResults(DBResult<DBTransactionView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions list (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions list (%zu)", result.size());
             setTitle(szTitle);
 
             showResultsTable(result, true);
@@ -192,7 +199,7 @@ class TransactionListView : public CLIListView {
         void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%d)", accountCode.c_str(), result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%zu)", accountCode.c_str(), result.size());
             setTitle(szTitle);
 
             showResultsTable(result, false);
@@ -202,7 +209,7 @@ class TransactionListView : public CLIListView {
             CLIListView::showNoExtraCR();
 
             if (isTotalEnabled) {
-                showTotal(9, "Total amount: ", total);
+                showTotal(totalAlignmentColumn, "Total amount: ", total);
             }
             else {
                 cout << endl;
@@ -215,20 +222,22 @@ class TransactionCategoryReportListView : public CLIListView {
         Money total = 0.0;
 
         void showResultsTable(DBResult<DBTransactionView> & result) {
+            reserveRows(result.size());
+            
             setColumns({
                 CLIListColumn("Category", 15, CLIListColumn::leftAligned),
                 CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
                 CLIListColumn("% of Total", 15, CLIListColumn::rightAligned)
             });
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBTransactionView transaction = result[i];
                 total += transaction.total;
             }
 
             char percentOfTotal[8];
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBTransactionView transaction = result[i];
 
                 snprintf(
@@ -267,7 +276,7 @@ class TransactionCategoryReportListView : public CLIListView {
         void addResults(DBResult<DBTransactionView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Category report (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Category report (%zu)", result.size());
             setTitle(szTitle);
 
             showResultsTable(result);
@@ -285,20 +294,22 @@ class TransactionPayeeReportListView : public CLIListView {
         Money total = 0.0;
 
         void showResultsTable(DBResult<DBTransactionView> & result) {
+            reserveRows(result.size());
+            
             setColumns({
                 CLIListColumn("Payee", 15, CLIListColumn::leftAligned),
                 CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
                 CLIListColumn("% of Total", 15, CLIListColumn::rightAligned)
             });
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBTransactionView transaction = result[i];
                 total += transaction.total;
             }
 
             char percentOfTotal[8];
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBTransactionView transaction = result.at(i);
 
                 snprintf(
@@ -337,7 +348,7 @@ class TransactionPayeeReportListView : public CLIListView {
         void addResults(DBResult<DBTransactionView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Payee report (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Payee report (%zu)", result.size());
             setTitle(szTitle);
 
             showResultsTable(result);

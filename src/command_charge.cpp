@@ -88,7 +88,7 @@ void Command::listRecurringCharges() {
 
     cacheMgr.clearRecurringCharges();
 
-    for (int i = 0;i < result.size();i++) {
+    for (size_t i = 0;i < result.size();i++) {
         DBRecurringCharge charge = result.at(i);
         cacheMgr.addRecurringCharge(charge.sequence, charge);
     }
@@ -108,7 +108,7 @@ void Command::listOutstandingCharges() {
 
     cacheMgr.clearRecurringCharges();
 
-    for (int i = 0;i < result.size();i++) {
+    for (size_t i = 0;i < result.size();i++) {
         DBRecurringChargeView charge = result[i];
         cacheMgr.addRecurringCharge(charge.sequence, charge);
     }
@@ -128,7 +128,7 @@ void Command::listPaidCharges() {
 
     cacheMgr.clearRecurringCharges();
 
-    for (int i = 0;i < result.size();i++) {
+    for (size_t i = 0;i < result.size();i++) {
         DBRecurringChargeView charge = result[i];
         cacheMgr.addRecurringCharge(charge.sequence, charge);
     }

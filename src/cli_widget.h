@@ -508,6 +508,7 @@ class CLIListRow : public CLIWidget {
     public:
         CLIListRow(const size_t columns) {
             numColumns = columns;
+            cells.reserve(columns);
         }
 
         void addCell(const string & value) {
@@ -597,6 +598,10 @@ class CLIListView : public CLIView {
         }
 
     protected:
+        void reserveRows(size_t numRows) {
+            rows.reserve(numRows);
+        } 
+        
         void showHeader() {
             printTopBorder();
 
@@ -611,6 +616,9 @@ class CLIListView : public CLIView {
 
     public:
         void setColumns(const vector<CLIListColumn> & cols) {
+            columns.reserve(cols.size());
+            columnWidths.reserve(cols.size());
+            
             for (auto c : cols) {
                 columns.push_back(c);
                 columnWidths.push_back(c.getColumnWidth());

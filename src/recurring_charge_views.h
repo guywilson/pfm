@@ -151,6 +151,8 @@ class RecurringChargeListView : public CLIListView {
 
             setTitle(title);
 
+            reserveRows(result.size());
+            
             setColumns({
                 CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
                 CLIListColumn("Start", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
@@ -165,7 +167,7 @@ class RecurringChargeListView : public CLIListView {
 
             total = 0.0;
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBRecurringChargeView charge = result.at(i);
 
                 CLIListRow row(getNumColumns());

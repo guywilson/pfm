@@ -80,6 +80,8 @@ class TransferListView : public CLIListView {
         bool isTotalEnabled;
 
         void showResultsTable(DBResult<DBTransferRecordView> & result) {
+            reserveRows(result.size());
+            
             setColumns({
                 CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
                 CLIListColumn("From:", 5, CLIListColumn::leftAligned),
@@ -91,7 +93,7 @@ class TransferListView : public CLIListView {
                 CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned)
             });
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBTransferRecordView transfer = result[i];
 
                 CLIListRow row(getNumColumns());
@@ -143,7 +145,7 @@ class TransferListView : public CLIListView {
         void addResults(DBResult<DBTransferRecordView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Transfer list (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transfer list (%zu)", result.size());
             setTitle(szTitle);
 
             showResultsTable(result);

@@ -36,7 +36,7 @@ void Command::listShortcuts() {
 
     cacheMgr.clearShortcuts();
 
-    for (int i = 0;i < result.size();i++) {
+    for (size_t i = 0;i < result.size();i++) {
         DBShortcut shortcut = result[i];
         cacheMgr.addShortcut(shortcut.sequence, shortcut);
     }

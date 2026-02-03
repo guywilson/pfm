@@ -93,9 +93,13 @@ class ConfigListView : public CLIListView {
         void addResults(DBResult<DBConfig> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Config items (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Config items (%zu)", result.size());
             setTitle(szTitle);
 
+            reserveRows(result.size());
+            
+            reserveRows(result.size());
+            
             setColumns({
                 CLIListColumn("Key", 17, CLIListColumn::leftAligned),
                 CLIListColumn("Value", 25, CLIListColumn::leftAligned),
@@ -103,7 +107,7 @@ class ConfigListView : public CLIListView {
                 CLIListColumn("R/W", 3, CLIListColumn::leftAligned)
             });
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBConfig config = result[i];
 
                 CLIListRow row(getNumColumns());

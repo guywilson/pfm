@@ -84,7 +84,7 @@ void Command::listTransferRecords() {
 
     cacheMgr.clearTransactions();
 
-    for (int i = 0;i < result.size();i++) {
+    for (size_t i = 0;i < result.size();i++) {
         DBTransferRecordView transfer = result[i];
 
         DBTransferTransactionRecord record;

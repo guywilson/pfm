@@ -54,13 +54,15 @@ class AddReportView : public CLIView {
 class ReportListView : public CLIListView {
     private:
         void showResultsTable(DBResult<DBTransactionReport> & result) {
+            reserveRows(result.size());
+            
             setColumns({
                 CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
                 CLIListColumn("Description.", 24, CLIListColumn::leftAligned),
                 CLIListColumn("Where Clause", 73, CLIListColumn::leftAligned)
             });
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBTransactionReport report = result[i];
 
                 CLIListRow row(getNumColumns());
@@ -94,7 +96,7 @@ class ReportListView : public CLIListView {
         void addResults(DBResult<DBTransactionReport> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Report list (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Report list (%zu)", result.size());
             setTitle(szTitle);
 
             showResultsTable(result);

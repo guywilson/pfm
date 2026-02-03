@@ -91,7 +91,7 @@ void Command::chooseAccount() {
 
     cacheMgr.clearTransactions();
 
-    for (int i = 0;i < result.size();i++) {
+    for (size_t i = 0;i < result.size();i++) {
         DBTransactionView transaction = result[i];
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }

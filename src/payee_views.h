@@ -87,15 +87,17 @@ class PayeeListView : public CLIListView {
         void addResults(DBResult<DBPayee> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Payees (%d)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Payees (%zu)", result.size());
             setTitle(szTitle);
 
+            reserveRows(result.size());
+            
             setColumns({
                 CLIListColumn("Code", 5, CLIListColumn::leftAligned),
                 CLIListColumn("Name", 55, CLIListColumn::leftAligned)
             });
 
-            for (int i = 0;i < result.size();i++) {
+            for (size_t i = 0;i < result.size();i++) {
                 DBPayee payee = result.at(i);
 
                 CLIListRow row(getNumColumns());
