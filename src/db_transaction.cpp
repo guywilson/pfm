@@ -402,12 +402,12 @@ void DBTransaction::linkTransferTransactions() {
         throw pfm_validation_error("Failed to link transfer transactions, there should be an equal number of source and target transactions");
     }
 
-    int matchCount = 0;
+    size_t matchCount = 0;
 
     for (size_t i = 0;i < sourceTransactions.size();i++) {
         DBTransaction source = sourceTransactions[i];
 
-        for (int j = 0;j < targetTransactions.size();j++) {
+        for (size_t j = 0;j < targetTransactions.size();j++) {
             DBTransaction target = targetTransactions[j];
 
             if (target.categoryId.getValue() == source.categoryId.getValue() &&
