@@ -93,46 +93,56 @@ class TransactionListView : public CLIListView {
         bool isTotalEnabled;
 
         void showResultsTable(DBResult<DBTransactionView> & result, bool showAccount) {
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned));
-
             if (showAccount) {
-                headerRow.addColumn(CLIListColumn("Acct.", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned));
+                setColumns({
+                    CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("Acct.", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
+                    CLIListColumn("RC", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Description", LIST_VIEW_DESCRIPTION_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Reference", LIST_VIEW_REFERENCE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Ctgry", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Payee", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Tp", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("R", LIST_VIEW_RECONCILED_WIDTH, CLIListColumn::leftAligned)
+                });
             }
-
-            headerRow.addColumn(CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("RC", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Description", LIST_VIEW_DESCRIPTION_WIDTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Reference", LIST_VIEW_REFERENCE_WIDTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Ctgry", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Payee", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Tp", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("R", LIST_VIEW_RECONCILED_WIDTH, CLIListColumn::leftAligned));
-
-            addHeaderRow(headerRow);
+            else {
+                setColumns({
+                    CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
+                    CLIListColumn("RC", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Description", LIST_VIEW_DESCRIPTION_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Reference", LIST_VIEW_REFERENCE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Ctgry", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Payee", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Tp", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("R", LIST_VIEW_RECONCILED_WIDTH, CLIListColumn::leftAligned)
+                });
+            }
 
             for (int i = 0;i < result.size();i++) {
                 DBTransactionView transaction = result.at(i);
 
-                CLIListRow row(headerRow);
+                CLIListRow row = CLIListRow(getNumColumns());
 
-                row.addCellValue(transaction.sequence);
+                row.addCell(transaction.sequence);
 
                 if (showAccount) {
-                    row.addCellValue(transaction.account);
+                    row.addCell(transaction.account);
                 }
 
-                row.addCellValue(transaction.date.shortDate());
-                row.addCellValue(transaction.isRecurring);
-                row.addCellValue(transaction.description);
-                row.addCellValue(transaction.reference);
-                row.addCellValue(transaction.category);
-                row.addCellValue(transaction.payee);
-                row.addCellValue(transaction.type);
-                row.addCellValue(transaction.amount);
-                row.addCellValue(transaction.getIsReconciledValue());
+                row.addCell(transaction.date);
+                row.addCell(transaction.isRecurring);
+                row.addCell(transaction.description);
+                row.addCell(transaction.reference);
+                row.addCell(transaction.category);
+                row.addCell(transaction.payee);
+                row.addCell(transaction.type);
+                row.addCell(transaction.amount);
+                row.addCell(transaction.isReconciled);
 
                 total += transaction.getSignedAmount();
                 addRow(row);
@@ -192,7 +202,7 @@ class TransactionListView : public CLIListView {
             CLIListView::showNoExtraCR();
 
             if (isTotalEnabled) {
-                showTotal(9, total.localeFormattedStringValue());
+                showTotal(9, "Total amount: ", total);
             }
             else {
                 cout << endl;
@@ -205,13 +215,11 @@ class TransactionCategoryReportListView : public CLIListView {
         Money total = 0.0;
 
         void showResultsTable(DBResult<DBTransactionView> & result) {
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Category", 15, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("% of Total", 15, CLIListColumn::rightAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Category", 15, CLIListColumn::leftAligned),
+                CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("% of Total", 15, CLIListColumn::rightAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBTransactionView transaction = result[i];
@@ -228,11 +236,11 @@ class TransactionCategoryReportListView : public CLIListView {
                     8, 
                     "%.2f%%", ((float)transaction.total.doubleValue() / (float)total.doubleValue() * 100.0f));
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(transaction.category);
-                row.addCellValue(transaction.total);
-                row.addCellValue(percentOfTotal);
+                row.addCell(transaction.category);
+                row.addCell(transaction.total);
+                row.addCell(string(percentOfTotal));
 
                 addRow(row);
             }
@@ -240,6 +248,20 @@ class TransactionCategoryReportListView : public CLIListView {
 
     public:
         TransactionCategoryReportListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for TransactionCategoryReportListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                15 + 
+                LIST_VIEW_AMOUNT_WIDTH + 
+                15);
         }
 
         void addResults(DBResult<DBTransactionView> & result) {
@@ -254,7 +276,7 @@ class TransactionCategoryReportListView : public CLIListView {
         void show() override {
             CLIListView::showNoExtraCR();
 
-            showTotal(1, total.localeFormattedStringValue());
+            showTotal(1, "Total amount: ", total);
         }
 };
 
@@ -263,13 +285,11 @@ class TransactionPayeeReportListView : public CLIListView {
         Money total = 0.0;
 
         void showResultsTable(DBResult<DBTransactionView> & result) {
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Payee", 15, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("% of Total", 15, CLIListColumn::rightAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Payee", 15, CLIListColumn::leftAligned),
+                CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("% of Total", 15, CLIListColumn::rightAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBTransactionView transaction = result[i];
@@ -286,11 +306,11 @@ class TransactionPayeeReportListView : public CLIListView {
                     8, 
                     "%.2f%%", ((float)transaction.total.doubleValue() / (float)total.doubleValue() * 100.0f));
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(transaction.payee);
-                row.addCellValue(transaction.total);
-                row.addCellValue(percentOfTotal);
+                row.addCell(transaction.payee);
+                row.addCell(transaction.total);
+                row.addCell(string(percentOfTotal));
 
                 addRow(row);
             }
@@ -298,6 +318,20 @@ class TransactionPayeeReportListView : public CLIListView {
 
     public:
         TransactionPayeeReportListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for TransactionPayeeReportListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                15 + 
+                LIST_VIEW_AMOUNT_WIDTH + 
+                15);
         }
 
         void addResults(DBResult<DBTransactionView> & result) {
@@ -312,7 +346,7 @@ class TransactionPayeeReportListView : public CLIListView {
         void show() override {
             CLIListView::showNoExtraCR();
 
-            showTotal(1, total.localeFormattedStringValue());
+            showTotal(1, "Total amount: ", total);
         }
 };
 

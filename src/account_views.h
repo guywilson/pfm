@@ -5,6 +5,7 @@
 
 #include "pfm_error.h"
 #include "cli_widget.h"
+#include "terminal.h"
 #include "custom_widgets.h"
 #include "db_account.h"
 #include "bold_modifier.h"
@@ -156,7 +157,26 @@ class AccountDetailsView : public CLIView {
 
 class AccountListView : public CLIListView {
     public:
-        AccountListView() : CLIListView() {}
+        AccountListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for AccountListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                5 + 
+                20 + 
+                LIST_VIEW_AMOUNT_WIDTH + 
+                LIST_VIEW_AMOUNT_WIDTH + 
+                LIST_VIEW_AMOUNT_WIDTH + 
+                LIST_VIEW_AMOUNT_WIDTH + 
+                1);
+        }
 
         void addResults(DBResult<DBAccount> & result) {
             char szTitle[TITLE_BUFFER_LEN];
@@ -164,22 +184,20 @@ class AccountListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Accounts (%d)", result.size());
             setTitle(szTitle);
 
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Code", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Name", 20, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Balance", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("Reconciled", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("After Bills", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("Remaining", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("P", 1, CLIListColumn::leftAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Code", 5, CLIListColumn::leftAligned),
+                CLIListColumn("Name", 20, CLIListColumn::leftAligned),
+                CLIListColumn("Balance", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("Reconciled", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("After Bills", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("Remaining", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("P", 1, CLIListColumn::leftAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBAccount account = result[i];
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
                 account.doBalancePrerequisites();
                 
@@ -188,13 +206,13 @@ class AccountListView : public CLIListView {
                 Money balanceAfterBills = account.calculateBalanceAfterBills();
                 Money remainingBalance = account.calculateRemainingBalance(balanceAfterBills);
 
-                row.addCellValue(account.code);
-                row.addCellValue(account.name);
-                row.addCellValue(currentBalance);
-                row.addCellValue(reconciledBalance);
-                row.addCellValue(balanceAfterBills);
-                row.addCellValue(remainingBalance);
-                row.addCellValue(account.isPrimary() ? "*" : "");
+                row.addCell(account.code);
+                row.addCell(account.name);
+                row.addCell(currentBalance);
+                row.addCell(reconciledBalance);
+                row.addCell(balanceAfterBills);
+                row.addCell(remainingBalance);
+                row.addCell(account.isPrimary() ? "*" : "");
 
                 addRow(row);
             }

@@ -8,6 +8,7 @@
 
 #include "pfm_error.h"
 #include "cli_widget.h"
+#include "terminal.h"
 #include "custom_widgets.h"
 #include "db_transaction.h"
 #include "db_v_transaction.h"
@@ -53,22 +54,20 @@ class AddReportView : public CLIView {
 class ReportListView : public CLIListView {
     private:
         void showResultsTable(DBResult<DBTransactionReport> & result) {
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("Description.", 24, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Where Clause", 73, CLIListColumn::leftAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
+                CLIListColumn("Description.", 24, CLIListColumn::leftAligned),
+                CLIListColumn("Where Clause", 73, CLIListColumn::leftAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBTransactionReport report = result[i];
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(report.sequence);
-                row.addCellValue(report.description);
-                row.addCellValue(report.sqlWhereClause);
+                row.addCell(report.sequence);
+                row.addCell(report.description);
+                row.addCell(report.sqlWhereClause);
 
                 addRow(row);
             }
@@ -76,6 +75,20 @@ class ReportListView : public CLIListView {
 
     public:
         ReportListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for ReportListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                3 + 
+                24 + 
+                73);
         }
 
         void addResults(DBResult<DBTransactionReport> & result) {

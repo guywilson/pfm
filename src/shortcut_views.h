@@ -8,6 +8,7 @@
 
 #include "pfm_error.h"
 #include "cli_widget.h"
+#include "terminal.h"
 #include "custom_widgets.h"
 #include "db_shortcut.h"
 #include "cfgmgr.h"
@@ -51,22 +52,20 @@ class AddShortcutView : public CLIView {
 class ShortcutListView : public CLIListView {
     private:
         void showResultsTable(DBResult<DBShortcut> & result) {
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("Shortcut", 10, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Replacement", 80, CLIListColumn::leftAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
+                CLIListColumn("Shortcut", 10, CLIListColumn::leftAligned),
+                CLIListColumn("Replacement", 80, CLIListColumn::leftAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBShortcut shortcut = result[i];
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(shortcut.sequence);
-                row.addCellValue(shortcut.shortcut);
-                row.addCellValue(shortcut.replacementText);
+                row.addCell(shortcut.sequence);
+                row.addCell(shortcut.shortcut);
+                row.addCell(shortcut.replacementText);
 
                 addRow(row);
             }
@@ -74,6 +73,20 @@ class ShortcutListView : public CLIListView {
 
     public:
         ShortcutListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for ShortcutListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                3 + 
+                10 + 
+                80);
         }
 
         void addResults(DBResult<DBShortcut> & result) {

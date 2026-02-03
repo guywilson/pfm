@@ -5,6 +5,7 @@
 
 #include "pfm_error.h"
 #include "cli_widget.h"
+#include "terminal.h"
 #include "custom_widgets.h"
 #include "db_config.h"
 
@@ -71,7 +72,23 @@ class ChooseConfigView : public CLIView {
 
 class ConfigListView : public CLIListView {
     public:
-        ConfigListView() : CLIListView() {}
+        ConfigListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for ConfigListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                17 + 
+                25 + 
+                55 + 
+                3);
+        }
 
         void addResults(DBResult<DBConfig> & result) {
             char szTitle[TITLE_BUFFER_LEN];
@@ -79,24 +96,22 @@ class ConfigListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Config items (%d)", result.size());
             setTitle(szTitle);
 
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Key", 17, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Value", 25, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Description", 55, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("R/W", 3, CLIListColumn::leftAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Key", 17, CLIListColumn::leftAligned),
+                CLIListColumn("Value", 25, CLIListColumn::leftAligned),
+                CLIListColumn("Description", 55, CLIListColumn::leftAligned),
+                CLIListColumn("R/W", 3, CLIListColumn::leftAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBConfig config = result[i];
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(config.key);
-                row.addCellValue(config.value);
-                row.addCellValue(config.description);
-                row.addCellValue(config.isReadOnly ? "RO" : "RW");
+                row.addCell(config.key);
+                row.addCell(config.value);
+                row.addCell(config.description);
+                row.addCell(config.isReadOnly ? "RO" : "RW");
 
                 addRow(row);
             }

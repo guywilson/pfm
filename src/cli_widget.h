@@ -8,6 +8,7 @@
 #include <inttypes.h>
 
 #include "money.h"
+#include "strdate.h"
 #include "cfgmgr.h"
 #include "pfm_error.h"
 #include "rlcustom.h"
@@ -46,7 +47,7 @@ static int countMultiByteChars(const string & str) {
     return i;
 }
 
-static int calculateFieldWidth(const string & amount, int baseWidth) {
+static int calculateFieldWidth(const string & value, int baseWidth) {
     /*
     ** Handle 2-byte characters, e.g. currency symbols,
     ** width is adjusted here for such strings.
@@ -54,7 +55,7 @@ static int calculateFieldWidth(const string & amount, int baseWidth) {
     ** https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p2675r1.pdf
     */
     int width = baseWidth;
-    int numMultiByteChars = countMultiByteChars(amount);
+    int numMultiByteChars = countMultiByteChars(value);
 
     if (numMultiByteChars > 0) {
         if (numMultiByteChars >= 2) {
@@ -494,29 +495,93 @@ class CLIListColumn : public CLIField {
 
 class CLIListRow : public CLIWidget {
     private:
-        vector<CLIListColumn> columnDefintions;
-        vector<string> columnValues;
+        vector<string> cells;
+        size_t numColumns;
+
+        static const int CONVERT_BUFFER_SIZE = 32;
+        char convertBuffer[CONVERT_BUFFER_SIZE];
+
+        inline string convertBufferString() {
+            return string(convertBuffer);
+        }
 
     public:
-        CLIListRow() : CLIWidget() {}
+        CLIListRow(const size_t columns) {
+            numColumns = columns;
+        }
 
-        CLIListRow(const CLIListRow & row) {
-            for (int i = 0;i < row.getNumColumns();i++) {
-                addColumn(row.getColumnAt(i));
-            }
+        void addCell(const string & value) {
+            cells.push_back(value);
 
-            for (int i = 0;i < row.getNumValues();i++) {
-                addCellValue(row.getValueAt(i));
+            if (cells.size() > numColumns) {
+                throw pfm_error(pfm_error::buildMsg("Adding cell %zu to row, expected %zu columns", cells.size(), numColumns));
             }
         }
+
+        void addCell(Money & value) {
+            addCell(value.localeFormattedStringValue());
+        }
+
+        void addCell(StrDate & value) {
+            addCell(value.shortDate());
+        }
+
+        void addCell(double val) {
+            snprintf(convertBuffer, CONVERT_BUFFER_SIZE, "%.2f", val);
+            addCell(convertBufferString());
+        }
+
+        void addCell(int32_t val) {
+            snprintf(convertBuffer, CONVERT_BUFFER_SIZE, "%d", (int)val);
+            addCell(convertBufferString());
+        }
+
+        void addCell(uint32_t val) {
+            snprintf(convertBuffer, CONVERT_BUFFER_SIZE, "%u", (unsigned int)val);
+            addCell(convertBufferString());
+        }
+
+        void addCell(int64_t val) {
+            snprintf(convertBuffer, CONVERT_BUFFER_SIZE, "%" PRId64, val);
+            addCell(convertBufferString());
+        }
+
+        void addCell(uint64_t val) {
+            snprintf(convertBuffer, CONVERT_BUFFER_SIZE, "%" PRIu64, val);
+            addCell(convertBufferString());
+        }
+
+        void addCell(bool val) {
+            string value = (val ? "Y" : "N");
+            addCell(value);
+        }
+
+        void show() override {
+
+        }
+
+        void show(const vector<CLIListColumn> & columns) {
+            cout << "| ";
+
+            for (int i = 0;i < numColumns;i++) {
+                CLIListColumn column = columns[i];
+                column.printCell(cells[i]);
+            }
+
+            cout << endl;
+        }
+};
+
+class CLIListView : public CLIView {
+    private:
+        vector<CLIListColumn> columns;
+        vector<CLIListRow> rows;
 
         void printTopBorder() {
             cout << "+";
 
-            for (int i = 0;i < getNumColumns();i++) {
-                CLIListColumn column = getColumnAt(i);
-
-                for (int j = 0;j < column.getColumnWidth() - 1;j++) {
+            for (auto & c : columns) {
+                for (int i = 0;i < c.getColumnWidth() - 1;i++) {
                     cout << '-';
                 }
 
@@ -530,154 +595,61 @@ class CLIListRow : public CLIWidget {
             printTopBorder();
         }
 
-        int getNumColumns() const {
-            return columnDefintions.size();
-        }
-
-        int getNumValues() const {
-            return columnValues.size();
-        }
-
-        CLIListColumn getColumnAt(int i) const {
-            if (i < getNumColumns()) {
-                return columnDefintions[i];
-            }
-            else {
-                throw pfm_error("CLIListRow::getColumnAt() - Index out of range");
-            }
-        }
-
-        string getValueAt(int i) const {
-            if (i < getNumValues()) {
-                return columnValues[i];
-            }
-            else {
-                throw pfm_error("CLIListRow::getValueAt() - Index out of range");
-            }
-        }
-
-        void addColumn(const CLIListColumn & column) {
-            columnDefintions.push_back(column);
-        }
-
-        void addCellValue(const string & value) {
-            columnValues.push_back(value);
-        }
-
-        void addCellValue(const char * szValue) {
-            string value = szValue;
-            columnValues.push_back(value);
-        }
-
-        void addCellValue(Money & val) {
-            string value = val.localeFormattedStringValue();
-            columnValues.push_back(value);
-        }
-
-        void addCellValue(double val) {
-            char buffer[32];
-
-            snprintf(buffer, 32, "%.2f", val);
-            string value = buffer;
-            columnValues.push_back(value);
-        }
-
-        void addCellValue(int32_t val) {
-            char buffer[32];
-
-            snprintf(buffer, 32, "%d", val);
-            string value = buffer;
-            columnValues.push_back(value);
-        }
-
-        void addCellValue(uint32_t val) {
-            char buffer[32];
-
-            snprintf(buffer, 32, "%u", val);
-            string value = buffer;
-            columnValues.push_back(value);
-        }
-
-        void addCellValue(int64_t val) {
-            char buffer[32];
-
-            snprintf(buffer, 32, "%" PRId64, val);
-            string value = buffer;
-            columnValues.push_back(value);
-        }
-
-        void addCellValue(uint64_t val) {
-            char buffer[32];
-
-            snprintf(buffer, 32, "%" PRIu64, val);
-            string value = buffer;
-            columnValues.push_back(value);
-        }
-
-        void addCellValue(bool val) {
-            columnValues.push_back(val ? "Y" : "N");
-        }
-
-        void showHeaderRow() {
+    protected:
+        void showHeader() {
             printTopBorder();
 
             cout << "| ";
-
-            for (int i = 0;i < getNumColumns();i++) {
-                CLIListColumn column = getColumnAt(i);
-                column.printColumnHeader();
+            for (auto & c : columns) {
+                c.printColumnHeader();
             }
-
             cout << endl;
 
             printTopBorder();
         }
 
-        void show() override {
-            cout << "| ";
-
-            for (int i = 0;i < getNumColumns();i++) {
-                CLIListColumn column = getColumnAt(i);
-                string value = getValueAt(i);
-
-                column.printCell(value);
-            }
-
-            cout << endl;
-        }
-};
-
-class CLIListView : public CLIView {
-    private:
-        CLIListRow headerRow;
-        vector<CLIListRow> dataRows;
-    
     public:
-        CLIListView() : CLIView() {}
-        CLIListView(string & title) : CLIView(title) {}
-        CLIListView(const char * szTitle) : CLIView(szTitle) {}
+        void setColumns(const vector<CLIListColumn> & cols) {
+            for (auto c : cols) {
+                columns.push_back(c);
+            }
+        }
 
         virtual uint16_t getMinimumWidth() {
             return 0;
         }
 
-        void addHeaderRow(CLIListRow & header) {
-            headerRow = header;
+        inline size_t getNumColumns() {
+            return columns.size();
         }
 
         void addRow(CLIListRow & row) {
-            dataRows.push_back(row);
+            rows.push_back(row);
         }
 
-        void showBottomBorder() {
-            headerRow.printBottomBorder();
+        void showNoExtraCR() {
+            printTitle();
+            showHeader();
+
+            for (auto & r : rows) {
+                r.show(columns);
+            }
+
+            if (!rows.empty()) {
+                printBottomBorder();
+            }
         }
 
-        void showTotal(int alignedColumn, const string & total) {
+        void show() override {
+            showNoExtraCR();
+            cout << endl;
+        }
+
+        void showTotal(int alignedColumn, const string & label, const Money & total) {
             int numPaddingSpaces = 0;
 
             for (int i = 0;i < alignedColumn;i++) {
-                CLIListColumn column = headerRow.getColumnAt(i);
+                CLIListColumn column = columns[i];
 
                 for (int j = 0;j < column.getColumnWidth() - 1;j++) {
                     numPaddingSpaces++;
@@ -685,36 +657,16 @@ class CLIListView : public CLIView {
                 numPaddingSpaces++;
             }
 
-            string label = "Total amount: ";
-
             numPaddingSpaces -= (int)label.length();
 
             for (int i = 0;i < numPaddingSpaces;i++) {
                 cout << ' ';
             }
 
-            int fieldWidth = calculateFieldWidth(total, LIST_VIEW_AMOUNT_WIDTH);
+            string totalStr = total.localeFormattedStringValue();
+            int fieldWidth = calculateFieldWidth(totalStr, LIST_VIEW_AMOUNT_WIDTH);
 
-            cout << label << "| " << bold_on << right << setw(fieldWidth) << total << bold_off << " |" << endl << endl;
-        }
-
-        void showNoExtraCR() {
-            printTitle();
-
-            headerRow.showHeaderRow();
-
-            for (int i = 0;i < (int)dataRows.size();i++) {
-                dataRows[i].show();
-            }
-
-            if (!dataRows.empty()) {
-                showBottomBorder();
-            }
-        }
-
-        void show() override {
-            showNoExtraCR();
-            cout << endl;
+            cout << label << "| " << bold_on << right << setw(fieldWidth) << totalStr << bold_off << " |" << endl << endl;
         }
 };
 

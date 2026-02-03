@@ -5,6 +5,7 @@
 
 #include "pfm_error.h"
 #include "cli_widget.h"
+#include "terminal.h"
 #include "custom_widgets.h"
 #include "db_category.h"
 
@@ -67,7 +68,21 @@ class ChooseCategoryView : public CLIView {
 
 class CategoryListView : public CLIListView {
     public:
-        CategoryListView() : CLIListView() {}
+        CategoryListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for CategoryListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                5 + 
+                55);
+        }
 
         void addResults(DBResult<DBCategory> & result) {
             char szTitle[TITLE_BUFFER_LEN];
@@ -75,20 +90,18 @@ class CategoryListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Categories (%d)", result.size());
             setTitle(szTitle);
 
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Code", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Description", 55, CLIListColumn::leftAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Code", 5, CLIListColumn::leftAligned),
+                CLIListColumn("Description", 55, CLIListColumn::leftAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBCategory category = result.at(i);
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(category.code);
-                row.addCellValue(category.description);
+                row.addCell(category.code);
+                row.addCell(category.description);
 
                 addRow(row);
             }

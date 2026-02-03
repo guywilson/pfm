@@ -5,6 +5,7 @@
 
 #include "pfm_error.h"
 #include "cli_widget.h"
+#include "terminal.h"
 #include "custom_widgets.h"
 #include "db_public_holiday.h"
 
@@ -64,7 +65,22 @@ class ChooseHolidayView : public CLIView {
 
 class HolidayListView : public CLIListView {
     public:
-        HolidayListView() : CLIListView() {}
+        HolidayListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for HolidayListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                3 + 
+                DATE_FIELD_LENGTH + 
+                40);
+        }
 
         void addResults(DBResult<DBPublicHoliday> & result) {
             char szTitle[TITLE_BUFFER_LEN];
@@ -72,22 +88,20 @@ class HolidayListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Holidays (%d)", result.size());
             setTitle(szTitle);
 
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Description", 40, CLIListColumn::leftAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
+                CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
+                CLIListColumn("Description", 40, CLIListColumn::leftAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBPublicHoliday holiday = result[i];
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(holiday.sequence);
-                row.addCellValue(holiday.date.shortDate());
-                row.addCellValue(holiday.description);
+                row.addCell(holiday.sequence);
+                row.addCell(holiday.date);
+                row.addCell(holiday.description);
 
                 addRow(row);
             }

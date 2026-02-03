@@ -5,6 +5,7 @@
 
 #include "pfm_error.h"
 #include "cli_widget.h"
+#include "terminal.h"
 #include "custom_widgets.h"
 #include "db_base.h"
 #include "db_transfer_transaction_record.h"
@@ -79,32 +80,30 @@ class TransferListView : public CLIListView {
         bool isTotalEnabled;
 
         void showResultsTable(DBResult<DBTransferRecordView> & result) {
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("From:", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("To:", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Description", 25, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Payee", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
+                CLIListColumn("From:", 5, CLIListColumn::leftAligned),
+                CLIListColumn("To:", 5, CLIListColumn::leftAligned),
+                CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
+                CLIListColumn("Description", 25, CLIListColumn::leftAligned),
+                CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned),
+                CLIListColumn("Payee", 5, CLIListColumn::leftAligned),
+                CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBTransferRecordView transfer = result[i];
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(transfer.sequence);
-                row.addCellValue(transfer.accountFromCode);
-                row.addCellValue(transfer.accountToCode);
-                row.addCellValue(transfer.date.shortDate());
-                row.addCellValue(transfer.description);
-                row.addCellValue(transfer.categoryCode);
-                row.addCellValue(transfer.payeeCode);
-                row.addCellValue(transfer.amount);
+                row.addCell(transfer.sequence);
+                row.addCell(transfer.accountFromCode);
+                row.addCell(transfer.accountToCode);
+                row.addCell(transfer.date);
+                row.addCell(transfer.description);
+                row.addCell(transfer.categoryCode);
+                row.addCell(transfer.payeeCode);
+                row.addCell(transfer.amount);
 
                 total += transfer.amount;
                 addRow(row);
@@ -114,6 +113,26 @@ class TransferListView : public CLIListView {
     public:
         TransferListView() : CLIListView() {
             isTotalEnabled = false;
+
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for TransferListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                3 + 
+                5 + 
+                5 + 
+                DATE_FIELD_LENGTH + 
+                25 + 
+                5 + 
+                5 + 
+                LIST_VIEW_AMOUNT_WIDTH);
         }
 
         void addTotal() {
@@ -134,7 +153,7 @@ class TransferListView : public CLIListView {
             CLIListView::showNoExtraCR();
 
             if (isTotalEnabled) {
-                showTotal(7, total.localeFormattedStringValue());
+                showTotal(7, "Total amount: ", total);
             }
             else {
                 cout << endl;

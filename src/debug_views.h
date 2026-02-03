@@ -16,7 +16,23 @@ using namespace std;
 
 class CarriedOverListView : public CLIListView {
     public:
-        CarriedOverListView() : CLIListView() {}
+        CarriedOverListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for CarriedOverListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                7 + 
+                DATE_FIELD_LENGTH + 
+                25 + 
+                16);
+        }
 
         void addResults(DBResult<DBCarriedOverView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
@@ -24,24 +40,22 @@ class CarriedOverListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Carried Over Logs (%d)", result.size());
             setTitle(szTitle);
 
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Account", 7, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Description", 25, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Balance", 16, CLIListColumn::rightAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Account", 7, CLIListColumn::leftAligned),
+                CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
+                CLIListColumn("Description", 25, CLIListColumn::leftAligned),
+                CLIListColumn("Balance", 16, CLIListColumn::rightAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBCarriedOverView co = result.at(i);
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(co.accountCode);
-                row.addCellValue(co.date.shortDate());
-                row.addCellValue(co.description);
-                row.addCellValue(co.balance);
+                row.addCell(co.accountCode);
+                row.addCell(co.date);
+                row.addCell(co.description);
+                row.addCell(co.balance);
 
                 addRow(row);
             }
@@ -50,7 +64,19 @@ class CarriedOverListView : public CLIListView {
 
 class GenericListView : public CLIListView {
     public:
-        GenericListView() : CLIListView() {}
+        GenericListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for GenericListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return 0;
+        }
 
         void addRows(vector<DBRow> & rows) {
             char szTitle[TITLE_BUFFER_LEN];
@@ -60,7 +86,7 @@ class GenericListView : public CLIListView {
             if (rows.size() > 0) {
                 int remainingWidth = Terminal::getWidth();
 
-                CLIListRow headerRow;
+                vector<CLIListColumn> columns;
 
                 DBRow r = rows[0];
 
@@ -101,31 +127,31 @@ class GenericListView : public CLIListView {
                     }
                     else {
                         remainingWidth -= columnWidth;
-                        headerRow.addColumn(CLIListColumn(name.c_str(), width, CLIListColumn::leftAligned));
+                        columns.push_back(CLIListColumn(name.c_str(), width, CLIListColumn::leftAligned));
                         numColumns++;
                     }
                 }
 
-                addHeaderRow(headerRow);
+                setColumns(columns);
 
                 for (size_t i = 0;i < rows.size();i++) {
                     DBRow r = rows[i];
 
-                    CLIListRow row(headerRow);
+                    CLIListRow row(getNumColumns());
 
                     for (int columnIndex = 0;columnIndex < numColumns;columnIndex++) {
                         DBColumn c = r.getColumnAt(columnIndex);
 
                         if (c.getName() == "date") {
                             StrDate date = c.getValue();
-                            row.addCellValue(date.shortDate());
+                            row.addCell(date);
                         }
                         else if (c.getName() == "amount" || c.getName() == "balance" || c.getName() == "balance_limit") {
                             Money amount = c.doubleValue();
-                            row.addCellValue(amount.localeFormattedStringValue());
+                            row.addCell(amount);
                         }
                         else {
-                            row.addCellValue(c.getValue());
+                            row.addCell(c.getValue());
                         }
                     }
 

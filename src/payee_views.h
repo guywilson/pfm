@@ -5,6 +5,7 @@
 
 #include "pfm_error.h"
 #include "cli_widget.h"
+#include "terminal.h"
 #include "custom_widgets.h"
 #include "db_payee.h"
 
@@ -67,7 +68,21 @@ class ChoosePayeeView : public CLIView {
 
 class PayeeListView : public CLIListView {
     public:
-        PayeeListView() : CLIListView() {}
+        PayeeListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for PayeeListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                5 + 
+                55);
+        }
 
         void addResults(DBResult<DBPayee> & result) {
             char szTitle[TITLE_BUFFER_LEN];
@@ -75,20 +90,18 @@ class PayeeListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Payees (%d)", result.size());
             setTitle(szTitle);
 
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Code", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Name", 55, CLIListColumn::leftAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Code", 5, CLIListColumn::leftAligned),
+                CLIListColumn("Name", 55, CLIListColumn::leftAligned)
+            });
 
             for (int i = 0;i < result.size();i++) {
                 DBPayee payee = result.at(i);
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(payee.code);
-                row.addCellValue(payee.name);
+                row.addCell(payee.code);
+                row.addCell(payee.name);
 
                 addRow(row);
             }

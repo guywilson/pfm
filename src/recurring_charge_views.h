@@ -5,6 +5,7 @@
 
 #include "pfm_error.h"
 #include "cli_widget.h"
+#include "terminal.h"
 #include "custom_widgets.h"
 #include "db_account.h"
 #include "db_recurring_charge.h"
@@ -110,10 +111,39 @@ class RecurringChargeListView : public CLIListView {
     public:
         RecurringChargeListView(DBAccount & account) : CLIListView() {
             title = "Recurring charges for account: " + account.code;
+
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for RecurringChargeListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
         }
 
         RecurringChargeListView(const string & title) : CLIListView() {
             this->title = title;
+
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for RecurringChargeListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                3 + 
+                DATE_FIELD_LENGTH + 
+                DATE_FIELD_LENGTH + 
+                25 + 
+                5 + 
+                5 + 
+                4 + 
+                LIST_VIEW_AMOUNT_WIDTH + 
+                2);
         }
 
         void addResults(DBResult<DBRecurringChargeView> & result) {
@@ -121,36 +151,34 @@ class RecurringChargeListView : public CLIListView {
 
             setTitle(title);
 
-            CLIListRow headerRow;
-
-            headerRow.addColumn(CLIListColumn("Seq", 3, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("Start", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Last Paid", DATE_FIELD_LENGTH, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Description", 25, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Payee", 5, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Frq", 4, CLIListColumn::leftAligned));
-            headerRow.addColumn(CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned));
-            headerRow.addColumn(CLIListColumn("Tr", 2, CLIListColumn::leftAligned));
-
-            addHeaderRow(headerRow);
+            setColumns({
+                CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
+                CLIListColumn("Start", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
+                CLIListColumn("Last Paid", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
+                CLIListColumn("Description", 25, CLIListColumn::leftAligned),
+                CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned),
+                CLIListColumn("Payee", 5, CLIListColumn::leftAligned),
+                CLIListColumn("Frq", 4, CLIListColumn::leftAligned),
+                CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("Tr", 2, CLIListColumn::leftAligned)
+            });
 
             total = 0.0;
 
             for (int i = 0;i < result.size();i++) {
                 DBRecurringChargeView charge = result.at(i);
 
-                CLIListRow row(headerRow);
+                CLIListRow row(getNumColumns());
 
-                row.addCellValue(charge.sequence);
-                row.addCellValue(charge.date.shortDate());
-                row.addCellValue(charge.lastPaymentDate.shortDate());
-                row.addCellValue(charge.description);
-                row.addCellValue(charge.categoryCode);
-                row.addCellValue(charge.payeeCode);
-                row.addCellValue(charge.frequency.toString());
-                row.addCellValue(charge.amount);
-                row.addCellValue(charge.getIsTransferValue());
+                row.addCell(charge.sequence);
+                row.addCell(charge.date);
+                row.addCell(charge.lastPaymentDate);
+                row.addCell(charge.description);
+                row.addCell(charge.categoryCode);
+                row.addCell(charge.payeeCode);
+                row.addCell(charge.frequency.toString());
+                row.addCell(charge.amount);
+                row.addCell(charge.getIsTransferValue());
 
                 total += charge.amount;
                 addRow(row);
@@ -160,7 +188,7 @@ class RecurringChargeListView : public CLIListView {
         void show() override {
             CLIListView::showNoExtraCR();
 
-            showTotal(7, total.localeFormattedStringValue());
+            showTotal(7, "Total amount: ", total);
         }
 };
 
