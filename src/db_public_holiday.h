@@ -129,7 +129,7 @@ class DBPublicHoliday : public DBEntity {
             DBResult<DBPublicHoliday> holidays;
             holidays.retrieveAll();
 
-            for (int i = 0;i < holidays.size();i++) {
+            for (size_t i = 0;i < holidays.size();i++) {
                 DBPublicHoliday holiday = holidays[i];
 
                 pair<StrDate, string> holidayPair;

@@ -64,7 +64,7 @@ void DBAccount::createRecurringTransactions() {
             cout << "Creating recurring transactions for account '" << this->code << "': " << endl;
         }
 
-        for (int i = 0;i < chargeResult.size();i++) {
+        for (size_t i = 0;i < chargeResult.size();i++) {
             DBRecurringChargeView charge = chargeResult.at(i);
 
             if (charge.isActive()) {
@@ -140,7 +140,7 @@ void DBAccount::beforeUpdate() {
         DBCarriedOver co;
         DBResult<DBCarriedOver> coResult = co.retrieveByAccountId(id);
 
-        for (int i = 0;i < coResult.size();i++) {
+        for (size_t i = 0;i < coResult.size();i++) {
             DBCarriedOver carriedOver = coResult.at(i);
             carriedOver.remove();
         }
@@ -148,7 +148,7 @@ void DBAccount::beforeUpdate() {
         DBRecurringChargeView ch;
         DBResult<DBRecurringChargeView> chResult = ch.retrieveByAccountID(id);
 
-        for (int i = 0;i < chResult.size();i++) {
+        for (size_t i = 0;i < chResult.size();i++) {
             DBRecurringCharge charge = chResult.at(i);
 
             DBTransaction tr;
@@ -265,7 +265,7 @@ Money DBAccount::calculateCurrentBalance() {
         DBTransactionView tr;
         DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, DBCriteria::ascending, periodStartDate, dateToday);
 
-        for (int i = 0;i < transactionResult.size();i++) {
+        for (size_t i = 0;i < transactionResult.size();i++) {
             DBTransaction transaction = transactionResult.at(i);
 
             log.debug(
@@ -335,7 +335,7 @@ Money DBAccount::calculateReconciledBalance() {
         DBTransactionView tr;
         DBResult<DBTransactionView> transactionResult = tr.retrieveReconciledByAccountIDForPeriod(this->id, periodStartDate, dateToday);
 
-        for (int i = 0;i < transactionResult.size();i++) {
+        for (size_t i = 0;i < transactionResult.size();i++) {
             DBTransaction transaction = transactionResult.at(i);
 
             log.debug(
@@ -398,7 +398,7 @@ Money DBAccount::calculateBalanceAfterBills() {
         DBTransactionView tr;
         DBResult<DBTransactionView> transactionResult = tr.retrieveByAccountIDForPeriod(this->id, DBCriteria::ascending, periodStartDate, dateToday);
 
-        for (int i = 0;i < transactionResult.size();i++) {
+        for (size_t i = 0;i < transactionResult.size();i++) {
             DBTransaction transaction = transactionResult.at(i);
 
             log.debug(
@@ -418,7 +418,7 @@ Money DBAccount::calculateBalanceAfterBills() {
             cout << "Identified charges due this period:" << endl;
         }
 
-        for (int i = 0;i < chargeResult.size();i++) {
+        for (size_t i = 0;i < chargeResult.size();i++) {
             DBRecurringCharge charge = chargeResult.at(i);
 
             if (charge.isChargeDueThisPeriod()) {

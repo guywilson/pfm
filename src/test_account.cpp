@@ -213,7 +213,7 @@ void testAccount() {
 
     DBResult<DBCarriedOver> coResultAfterInsert = co.retrieveByAccountId(accountId);
 
-    for (int i = 0;i < coResultAfterInsert.size();i++) {
+    for (size_t i = 0;i < coResultAfterInsert.size();i++) {
         DBCarriedOver coBefore = coResultBeforeInsert.at(i);
         DBCarriedOver coAfter = coResultAfterInsert.at(i);
 
@@ -240,7 +240,7 @@ void testAccount() {
 
     DBResult<DBCarriedOver> coResultAfterUpdate = co.retrieveByAccountId(accountId);
 
-    for (int i = 0;i < coResultAfterUpdate.size();i++) {
+    for (size_t i = 0;i < coResultAfterUpdate.size();i++) {
         DBCarriedOver coBefore = coResultBeforeInsert.at(i);
         DBCarriedOver coAfter = coResultAfterUpdate.at(i);
 
@@ -267,7 +267,7 @@ void testAccount() {
 
     DBResult<DBCarriedOver> coResultAfterUpdate2 = co.retrieveByAccountId(accountId);
 
-    for (int i = 0;i < coResultAfterUpdate2.size();i++) {
+    for (size_t i = 0;i < coResultAfterUpdate2.size();i++) {
         DBCarriedOver coBefore = coResultBeforeInsert.at(i);
         DBCarriedOver coAfter = coResultAfterUpdate2.at(i);
 
@@ -293,7 +293,7 @@ void testAccount() {
 
     DBResult<DBCarriedOver> coResultAfterDelete = co.retrieveByAccountId(accountId);
 
-    for (int i = 0;i < coResultAfterDelete.size();i++) {
+    for (size_t i = 0;i < coResultAfterDelete.size();i++) {
         DBCarriedOver coBefore = coResultBeforeInsert.at(i);
         DBCarriedOver coAfter = coResultAfterDelete.at(i);
 

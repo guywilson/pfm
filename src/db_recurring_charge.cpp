@@ -220,7 +220,7 @@ void DBRecurringCharge::migrateToTransferCharge(pfm_id_t & accountToId) {
         DBTransaction tr;
         DBResult<DBTransaction> recurringTransactions = tr.retrieveByRecurringChargeIDAfterDate(id, accountTo.openingDate);
 
-        for (int i = 0;i < recurringTransactions.size();i++) {
+        for (size_t i = 0;i < recurringTransactions.size();i++) {
             DBTransaction sourceTransaction = recurringTransactions[i];
             DBTransaction::createTransferPairFromSource(sourceTransaction, accountTo);
         }
@@ -257,7 +257,7 @@ void DBRecurringCharge::beforeRemove() {
     DBTransaction tr;
     DBResult<DBTransaction> recurringTransactions = tr.retrieveByRecurringChargeID(this->id);
 
-    for (int i = 0;i < recurringTransactions.size();i++) {
+    for (size_t i = 0;i < recurringTransactions.size();i++) {
         DBTransaction recurringTransaction = recurringTransactions[i];
 
         recurringTransaction.recurringChargeId.clear();
@@ -284,7 +284,7 @@ void DBRecurringCharge::beforeUpdate() {
         DBTransaction tr;
         DBResult<DBTransaction> trResult = tr.retrieveByRecurringChargeID(id);
 
-        for (int i = 0;i < trResult.size();i++) {
+        for (size_t i = 0;i < trResult.size();i++) {
             DBTransaction transaction = trResult.at(i);
 
             transaction.description = this->description;

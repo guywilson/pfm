@@ -404,7 +404,7 @@ void DBTransaction::linkTransferTransactions() {
 
     int matchCount = 0;
 
-    for (int i = 0;i < sourceTransactions.size();i++) {
+    for (size_t i = 0;i < sourceTransactions.size();i++) {
         DBTransaction source = sourceTransactions[i];
 
         for (int j = 0;j < targetTransactions.size();j++) {
@@ -507,7 +507,7 @@ void DBTransaction::afterInsert() {
     DBCarriedOver co;
     DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
 
-    for (int i = 0;i < coResult.size();i++) {
+    for (size_t i = 0;i < coResult.size();i++) {
         DBCarriedOver carriedOver = coResult.at(i);
 
         carriedOver.balance += getSignedAmount();
@@ -533,7 +533,7 @@ void DBTransaction::beforeUpdate() {
         DBCarriedOver co;
         DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
 
-        for (int i = 0;i < coResult.size();i++) {
+        for (size_t i = 0;i < coResult.size();i++) {
             DBCarriedOver carriedOver = coResult.at(i);
 
             log.debug("Updating CO with date '%s'", carriedOver.date.shortDate().c_str());
@@ -554,7 +554,7 @@ void DBTransaction::afterRemove() {
     DBCarriedOver co;
     DBResult<DBCarriedOver> coResult = co.retrieveByAccountIdAfterDate(accountId, date);
 
-    for (int i = 0;i < coResult.size();i++) {
+    for (size_t i = 0;i < coResult.size();i++) {
         DBCarriedOver carriedOver = coResult.at(i);
 
         carriedOver.balance -= getSignedAmount();

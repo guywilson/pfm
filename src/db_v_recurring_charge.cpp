@@ -69,7 +69,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::getChargesOutstandingThis
 
     DBResult<DBRecurringChargeView> results;
 
-    for (int i = 0;i < charges.size();i++) {
+    for (size_t i = 0;i < charges.size();i++) {
         DBRecurringChargeView charge = charges[i];
 
         StrDate chargeDate = charge.getNextRecurringTransactionDate();

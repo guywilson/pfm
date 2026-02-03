@@ -93,7 +93,7 @@ DBCarriedOver DBCarriedOver::createForPeriod(pfm_id_t & accountId, Money & start
 
         Money total = startingBalance;
 
-        for (int i = 0;i < transactionResult.size();i++) {
+        for (size_t i = 0;i < transactionResult.size();i++) {
             DBTransaction transaction = transactionResult.at(i);
             total += transaction.getSignedAmount();
         }
