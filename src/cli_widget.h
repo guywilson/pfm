@@ -576,6 +576,7 @@ class CLIListView : public CLIView {
     private:
         vector<CLIListColumn> columns;
         vector<CLIListRow> rows;
+        vector<int> columnWidths;
 
         void printTopBorder() {
             cout << "+";
@@ -612,6 +613,7 @@ class CLIListView : public CLIView {
         void setColumns(const vector<CLIListColumn> & cols) {
             for (auto c : cols) {
                 columns.push_back(c);
+                columnWidths.push_back(c.getColumnWidth());
             }
         }
 
@@ -649,12 +651,7 @@ class CLIListView : public CLIView {
             int numPaddingSpaces = 0;
 
             for (int i = 0;i < alignedColumn;i++) {
-                CLIListColumn column = columns[i];
-
-                for (int j = 0;j < column.getColumnWidth() - 1;j++) {
-                    numPaddingSpaces++;
-                }
-                numPaddingSpaces++;
+                numPaddingSpaces += columnWidths[i];
             }
 
             numPaddingSpaces -= (int)label.length();
