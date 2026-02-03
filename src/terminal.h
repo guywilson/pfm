@@ -9,28 +9,28 @@ using namespace std;
 #ifndef __INCL_TERMINAL
 #define __INCL_TERMINAL
 
-#define TERMINAL_MIN_WIDTH                   110
-#define TERMINAL_MIN_HEIGHT                   24
+#define TERMINAL_MIN_WIDTH                   110U
+#define TERMINAL_MIN_HEIGHT                   24U
 
 class Terminal {
     public:
-        static uint16_t getWidth() {
+        static unsigned long getWidth() {
             struct winsize w;
             ioctl(0, TIOCGWINSZ, &w);
             return w.ws_col;
         }
 
-        static uint16_t getHeight() {
+        static unsigned long getHeight() {
             struct winsize w;
             ioctl(0, TIOCGWINSZ, &w);
             return w.ws_row;
         }
 
-        static inline uint16_t fullWidthMinimum() {
+        static inline unsigned long fullWidthMinimum() {
             return TERMINAL_MIN_WIDTH;
         }
 
-        static inline uint16_t fullHeightMinimum() {
+        static inline unsigned long fullHeightMinimum() {
             return TERMINAL_MIN_HEIGHT;
         }
 };

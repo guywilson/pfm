@@ -157,19 +157,11 @@ class CLIField : public CLIWidget {
     public:
         CLIField() : CLIWidget() {}
 
-        CLIField(string & label) {
+        CLIField(const string & label) {
             this->label = label;
         }
 
-        CLIField(const char * label) {
-            this->label = label;
-        }
-
-        void setLabel(string & label) {
-            this->label = label;
-        }
-
-        void setLabel(const char * label) {
+        void setLabel(const string & label) {
             this->label = label;
         }
 
@@ -396,15 +388,14 @@ class CLIView : public CLIWidget {
 
 class CLIListColumn : public CLIField {
     public:
-        typedef enum {
+        enum column_alignment {
             leftAligned,
             rightAligned
-        }
-        alignment;
+        };
 
     private:
         int width;
-        alignment align;
+        column_alignment align;
 
         int getNumPaddingChars(string & value) {
             return (getWidth() - value.length());
@@ -422,16 +413,7 @@ class CLIListColumn : public CLIField {
 
     public:
         CLIListColumn() : CLIField() {}
-        CLIListColumn(const char * name, int width, CLIListColumn::alignment align) : CLIField(name) {
-            this->width = width;
-            this->align = align;
-
-            if ((width + 2) < (int)strlen(name)) {
-                throw pfm_error("Column name is too long for specified width");
-            }
-        }
-
-        CLIListColumn(string & name, int width, CLIListColumn::alignment align) : CLIField(name) {
+        CLIListColumn(const string & name, int width, CLIListColumn::column_alignment align) : CLIField(name) {
             this->width = width;
             this->align = align;
 
@@ -439,7 +421,7 @@ class CLIListColumn : public CLIField {
                 throw pfm_error("Column name is too long for specified width");
             }
         }
-        
+
         int getColumnWidth() {
             string columnName = getName();
 
@@ -482,7 +464,7 @@ class CLIListColumn : public CLIField {
             return _getLabel();
         }
 
-        alignment getAlignment() {
+        inline column_alignment getAlignment() {
             return align;
         }
 
@@ -618,7 +600,7 @@ class CLIListView : public CLIView {
         void setColumns(const vector<CLIListColumn> & cols) {
             columns.reserve(cols.size());
             columnWidths.reserve(cols.size());
-            
+
             for (auto c : cols) {
                 columns.push_back(c);
                 columnWidths.push_back(c.getColumnWidth());
