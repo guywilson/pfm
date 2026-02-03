@@ -114,7 +114,7 @@ class DBShortcut : public DBEntity {
 
             os << getDeleteAllStatement() << endl;
 
-            for (int i = 0;i < results.size();i++) {
+            for (size_t i = 0;i < results.size();i++) {
                 os << results[i].getInsertStatement() << endl;
             }
 
@@ -138,7 +138,7 @@ class DBShortcut : public DBEntity {
             DBResult<DBShortcut> results;
             results.retrieveAll();
 
-            for (int i = 0;i < results.size();i++) {
+            for (size_t i = 0;i < results.size();i++) {
                 DBShortcut shortcut = results[i];
 
                 shortcutPairs.push_back({shortcut.shortcut, shortcut.replacementText});

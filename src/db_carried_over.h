@@ -130,7 +130,7 @@ class DBCarriedOver : public DBEntity {
 
             os << getDeleteAllStatement() << endl;
 
-            for (int i = 0;i < results.size();i++) {
+            for (size_t i = 0;i < results.size();i++) {
                 os << results[i].getInsertStatementForRestore() << endl;
             }
 

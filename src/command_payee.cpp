@@ -101,7 +101,7 @@ void Command::exportPayees() {
 
     vector<JRecord> records;
 
-    for (int i = 0;i < results.size();i++) {
+    for (size_t i = 0;i < results.size();i++) {
         DBAccount account = results.at(i);
 
         JRecord r = account.getRecord();

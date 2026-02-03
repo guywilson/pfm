@@ -803,7 +803,7 @@ class DBResult : public Result {
             for (int i = results.size() - 1;i >= 0;i--) {
                 l.push_back(results[i]);
             }
-            for (int i = 0;i < results.size();i++) {
+            for (size_t i = 0;i < results.size();i++) {
                 results[i] = l.front();
                 l.pop_front();
             }
@@ -814,24 +814,24 @@ class DBResult : public Result {
         int retrieve(const string & sqlStatement);
         int retrieveAll();
 
-        T & at(int i) {
-            if (size() > i) {
+        T & at(unsigned int i) {
+            if (size() > (size_t)i) {
                 return results[i];
             }
             else {
                 throw pfm_error(
                         pfm_error::buildMsg(
-                            "at(): Index out of range: numRows: %d, requested row: %d", size(), i), 
+                            "at(): Index out of range: numRows: %zu, requested row: %u", size(), i), 
                         __FILE__, 
                         __LINE__);
             }
         }
 
-        T & operator[](int i) {
+        T & operator[](unsigned int i) {
             return at(i);
         }
 
-        const T & operator[](int i) const {
+        const T & operator[](unsigned int i) const {
             return at(i);
         }
 

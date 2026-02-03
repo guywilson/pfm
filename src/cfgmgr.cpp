@@ -41,7 +41,7 @@ void cfgmgr::initialise() {
 
     clear();
 
-    for (int i = 0;i < results.size();i++) {
+    for (size_t i = 0;i < results.size();i++) {
         DBConfig item = results.at(i);
 
         string key = item.key;
