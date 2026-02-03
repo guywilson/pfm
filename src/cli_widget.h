@@ -563,7 +563,7 @@ class CLIListRow : public CLIWidget {
         void show(const vector<CLIListColumn> & columns) {
             cout << "| ";
 
-            for (int i = 0;i < numColumns;i++) {
+            for (size_t i = 0;i < numColumns;i++) {
                 CLIListColumn column = columns[i];
                 column.printCell(cells[i]);
             }
