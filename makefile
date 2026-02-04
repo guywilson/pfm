@@ -6,6 +6,8 @@
 #                                                                             #
 ###############################################################################
 
+MAKEFLAGS := --jobs=4
+
 # Version number for pfm
 MAJOR_VERSION = 2
 MINOR_VERSION = 1
