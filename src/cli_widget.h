@@ -653,7 +653,7 @@ class CLIListView : public CLIView {
         void showTotal(const string & label, const Money & total) {
             int numPaddingSpaces = 0;
 
-            for (int i = 0;i < columns.size();i++) {
+            for (size_t i = 0;i < columns.size();i++) {
                 CLIListColumn c = columns[i];
 
                 if (c.getName() == "Amount" || c.getName() == "Total") {
