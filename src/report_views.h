@@ -57,9 +57,8 @@ class ReportListView : public CLIListView {
             reserveRows(result.size());
             
             setColumns({
-                CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
-                CLIListColumn("Description.", 24, CLIListColumn::leftAligned),
-                CLIListColumn("Where Clause", 73, CLIListColumn::leftAligned)
+                CLIListColumn("Sq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("Description.", 30, CLIListColumn::leftAligned),
             });
 
             for (size_t i = 0;i < result.size();i++) {
@@ -69,7 +68,6 @@ class ReportListView : public CLIListView {
 
                 row.addCell(report.sequence);
                 row.addCell(report.description);
-                row.addCell(report.sqlWhereClause);
 
                 addRow(row);
             }

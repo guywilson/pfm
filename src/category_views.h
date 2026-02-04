@@ -93,8 +93,8 @@ class CategoryListView : public CLIListView {
             reserveRows(result.size());
             
             setColumns({
-                CLIListColumn("Code", 5, CLIListColumn::leftAligned),
-                CLIListColumn("Description", 55, CLIListColumn::leftAligned)
+                CLIListColumn("Code", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
+                CLIListColumn("Description", 30, CLIListColumn::leftAligned)
             });
 
             for (size_t i = 0;i < result.size();i++) {

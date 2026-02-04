@@ -155,7 +155,7 @@ class TransferListView : public CLIListView {
             CLIListView::showNoExtraCR();
 
             if (isTotalEnabled) {
-                showTotal(7, "Total amount: ", total);
+                showTotal("Total amount: ", total);
             }
             else {
                 cout << endl;

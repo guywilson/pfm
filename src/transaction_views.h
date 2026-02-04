@@ -100,14 +100,12 @@ class TransactionListView : public CLIListView {
                 totalAlignmentColumn = 9;
 
                 setColumns({
-                    CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("Sq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
                     CLIListColumn("Acct.", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
-                    CLIListColumn("RC", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("C", LIST_VIEW_RECURRING_CHARGE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Description", LIST_VIEW_DESCRIPTION_WIDTH, CLIListColumn::leftAligned),
-                    CLIListColumn("Reference", LIST_VIEW_REFERENCE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Ctgry", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
-                    CLIListColumn("Payee", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Tp", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
                     CLIListColumn("R", LIST_VIEW_RECONCILED_WIDTH, CLIListColumn::leftAligned)
@@ -117,13 +115,11 @@ class TransactionListView : public CLIListView {
                 totalAlignmentColumn = 8;
                 
                 setColumns({
-                    CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("Sq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
                     CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
-                    CLIListColumn("RC", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("C", LIST_VIEW_RECURRING_CHARGE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Description", LIST_VIEW_DESCRIPTION_WIDTH, CLIListColumn::leftAligned),
-                    CLIListColumn("Reference", LIST_VIEW_REFERENCE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Ctgry", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
-                    CLIListColumn("Payee", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Tp", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
                     CLIListColumn("R", LIST_VIEW_RECONCILED_WIDTH, CLIListColumn::leftAligned)
@@ -144,9 +140,7 @@ class TransactionListView : public CLIListView {
                 row.addCell(transaction.date);
                 row.addCell(transaction.isRecurring);
                 row.addCell(transaction.description);
-                row.addCell(transaction.reference);
                 row.addCell(transaction.category);
-                row.addCell(transaction.payee);
                 row.addCell(transaction.type);
                 row.addCell(transaction.amount);
                 row.addCell(transaction.isReconciled);
@@ -188,28 +182,28 @@ class TransactionListView : public CLIListView {
         }
 
         void addResults(DBResult<DBTransactionView> & result) {
+            showResultsTable(result, true);
+
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions list (%zu)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions list (%zu) [%d]", result.size(), getTotalWidth());
             setTitle(szTitle);
-
-            showResultsTable(result, true);
         }
 
         void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
+            showResultsTable(result, false);
+
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%zu)", accountCode.c_str(), result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions for account: %s (%zu) [%d]", accountCode.c_str(), result.size(), getTotalWidth());
             setTitle(szTitle);
-
-            showResultsTable(result, false);
         }
 
         void show() override {
             CLIListView::showNoExtraCR();
 
             if (isTotalEnabled) {
-                showTotal(totalAlignmentColumn, "Total amount: ", total);
+                showTotal("Total amount: ", total);
             }
             else {
                 cout << endl;
@@ -225,9 +219,9 @@ class TransactionCategoryReportListView : public CLIListView {
             reserveRows(result.size());
             
             setColumns({
-                CLIListColumn("Category", 15, CLIListColumn::leftAligned),
+                CLIListColumn("Ctgry", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
                 CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
-                CLIListColumn("% of Total", 15, CLIListColumn::rightAligned)
+                CLIListColumn("% of Total", 10, CLIListColumn::rightAligned)
             });
 
             for (size_t i = 0;i < result.size();i++) {
@@ -285,7 +279,7 @@ class TransactionCategoryReportListView : public CLIListView {
         void show() override {
             CLIListView::showNoExtraCR();
 
-            showTotal(1, "Total amount: ", total);
+            showTotal("Total: ", total);
         }
 };
 
@@ -297,9 +291,9 @@ class TransactionPayeeReportListView : public CLIListView {
             reserveRows(result.size());
             
             setColumns({
-                CLIListColumn("Payee", 15, CLIListColumn::leftAligned),
+                CLIListColumn("Payee", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
                 CLIListColumn("Total", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
-                CLIListColumn("% of Total", 15, CLIListColumn::rightAligned)
+                CLIListColumn("% of Total", 10, CLIListColumn::rightAligned)
             });
 
             for (size_t i = 0;i < result.size();i++) {
@@ -357,7 +351,7 @@ class TransactionPayeeReportListView : public CLIListView {
         void show() override {
             CLIListView::showNoExtraCR();
 
-            showTotal(1, "Total amount: ", total);
+            showTotal("Total: ", total);
         }
 };
 
