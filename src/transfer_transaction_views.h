@@ -79,7 +79,7 @@ class TransferListView : public CLIListView {
         Money total;
         bool isTotalEnabled;
 
-        void showResultsTable(DBResult<DBTransferRecordView> & result) {
+        void buildResultsTable(DBResult<DBTransferRecordView> & result) {
             reserveRows(result.size());
             
             setColumns({
@@ -148,7 +148,7 @@ class TransferListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Transfer list (%zu)", result.size());
             setTitle(szTitle);
 
-            showResultsTable(result);
+            buildResultsTable(result);
         }
 
         void show() override {

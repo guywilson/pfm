@@ -9,8 +9,8 @@ using namespace std;
 #ifndef __INCL_TERMINAL
 #define __INCL_TERMINAL
 
-#define TERMINAL_MIN_WIDTH                   110U
-#define TERMINAL_MIN_HEIGHT                   24U
+#define TERMINAL_MIN_WIDTH                    80U
+#define TERMINAL_MIN_HEIGHT                   20U
 
 class Terminal {
     public:

@@ -53,12 +53,13 @@ class AddReportView : public CLIView {
 
 class ReportListView : public CLIListView {
     private:
-        void showResultsTable(DBResult<DBTransactionReport> & result) {
+        void buildResultsTable(DBResult<DBTransactionReport> & result) {
             reserveRows(result.size());
             
             setColumns({
                 CLIListColumn("Sq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
-                CLIListColumn("Description.", 30, CLIListColumn::leftAligned),
+                CLIListColumn("Description", LIST_VIEW_DESCRIPTION_WIDTH, CLIListColumn::leftAligned),
+                CLIListColumn("Where", 47, CLIListColumn::leftAligned)
             });
 
             for (size_t i = 0;i < result.size();i++) {
@@ -68,6 +69,7 @@ class ReportListView : public CLIListView {
 
                 row.addCell(report.sequence);
                 row.addCell(report.description);
+                row.addCell(report.sqlWhereClause);
 
                 addRow(row);
             }
@@ -92,12 +94,12 @@ class ReportListView : public CLIListView {
         }
 
         void addResults(DBResult<DBTransactionReport> & result) {
+            buildResultsTable(result);
+
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Report list (%zu)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Report list (%zu) [%d]", result.size(), getTotalWidth());
             setTitle(szTitle);
-
-            showResultsTable(result);
         }
 
         void show() override {

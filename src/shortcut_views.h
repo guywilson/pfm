@@ -51,13 +51,13 @@ class AddShortcutView : public CLIView {
 
 class ShortcutListView : public CLIListView {
     private:
-        void showResultsTable(DBResult<DBShortcut> & result) {
+        void buildResultsTable(DBResult<DBShortcut> & result) {
             reserveRows(result.size());
             
             setColumns({
-                CLIListColumn("Seq", 3, CLIListColumn::rightAligned),
-                CLIListColumn("Shortcut", 10, CLIListColumn::leftAligned),
-                CLIListColumn("Replacement", 80, CLIListColumn::leftAligned)
+                CLIListColumn("Sq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("Shortcut", 8, CLIListColumn::leftAligned),
+                CLIListColumn("Replacement", 59, CLIListColumn::leftAligned)
             });
 
             for (size_t i = 0;i < result.size();i++) {
@@ -92,12 +92,12 @@ class ShortcutListView : public CLIListView {
         }
 
         void addResults(DBResult<DBShortcut> & result) {
+            buildResultsTable(result);
+
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Shortcut list (%zu)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Shortcut list (%zu) [%d]", result.size(), getTotalWidth());
             setTitle(szTitle);
-
-            showResultsTable(result);
         }
 
         void show() override {

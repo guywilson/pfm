@@ -93,7 +93,7 @@ class TransactionListView : public CLIListView {
         bool isTotalEnabled;
         int totalAlignmentColumn;
 
-        void showResultsTable(DBResult<DBTransactionView> & result, bool showAccount) {
+        void buildResultsTable(DBResult<DBTransactionView> & result, bool showAccount) {
             reserveRows(result.size());
 
             if (showAccount) {
@@ -150,8 +150,8 @@ class TransactionListView : public CLIListView {
             }
         }
 
-        void showResultsTable(DBResult<DBTransactionView> & result) {
-            showResultsTable(result, true);
+        void buildResultsTable(DBResult<DBTransactionView> & result) {
+            buildResultsTable(result, true);
         }
 
     public:
@@ -182,7 +182,7 @@ class TransactionListView : public CLIListView {
         }
 
         void addResults(DBResult<DBTransactionView> & result) {
-            showResultsTable(result, true);
+            buildResultsTable(result, true);
 
             char szTitle[TITLE_BUFFER_LEN];
 
@@ -191,7 +191,7 @@ class TransactionListView : public CLIListView {
         }
 
         void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
-            showResultsTable(result, false);
+            buildResultsTable(result, false);
 
             char szTitle[TITLE_BUFFER_LEN];
 
@@ -215,7 +215,7 @@ class TransactionCategoryReportListView : public CLIListView {
     private:
         Money total = 0.0;
 
-        void showResultsTable(DBResult<DBTransactionView> & result) {
+        void buildResultsTable(DBResult<DBTransactionView> & result) {
             reserveRows(result.size());
             
             setColumns({
@@ -273,7 +273,7 @@ class TransactionCategoryReportListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Category report (%zu)", result.size());
             setTitle(szTitle);
 
-            showResultsTable(result);
+            buildResultsTable(result);
         }
 
         void show() override {
@@ -287,7 +287,7 @@ class TransactionPayeeReportListView : public CLIListView {
     private:
         Money total = 0.0;
 
-        void showResultsTable(DBResult<DBTransactionView> & result) {
+        void buildResultsTable(DBResult<DBTransactionView> & result) {
             reserveRows(result.size());
             
             setColumns({
@@ -345,7 +345,7 @@ class TransactionPayeeReportListView : public CLIListView {
             snprintf(szTitle, TITLE_BUFFER_LEN, "Payee report (%zu)", result.size());
             setTitle(szTitle);
 
-            showResultsTable(result);
+            buildResultsTable(result);
         }
 
         void show() override {
