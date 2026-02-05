@@ -4,7 +4,8 @@
 #include <vector>
 
 #include "pfm_error.h"
-#include "cli_widget.h"
+#include "cli/view.h"
+#include "cli/list_view.h"
 #include "terminal.h"
 #include "custom_widgets.h"
 #include "db_v_carried_over.h"

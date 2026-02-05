@@ -1,7 +1,8 @@
 #include <string>
 #include <ctype.h>
 
-#include "cli_widget.h"
+#include "cli/fields/text_field.h"
+#include "cli/fields/spin_text_field.h"
 #include "strdate.h"
 #include "db_category.h"
 #include "db_payee.h"
