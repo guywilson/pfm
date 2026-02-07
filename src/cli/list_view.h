@@ -62,7 +62,7 @@ class CLIListColumn : public CLIField {
         void printColumnHeader() {
             std::string name = getName();
 
-            std::cout << name;
+            std::cout << bold_on << name << bold_off;
             printPadding(name);
             std::cout << " | ";
         }
