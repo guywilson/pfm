@@ -90,6 +90,24 @@ void Command::addTransaction() {
     transaction.save();
 }
 
+void Command::copyTransaction() {
+    DBTransaction transaction;
+
+    if (hasParameters()) {
+        string sequence = getParameter(SEQUENCE_PARAM_NAME);
+
+        transaction = getTransaction(atoi(sequence.c_str()));
+        transaction.recurringChargeId.clear();
+    }
+    else {
+        transaction = transaction.retrieveLastNonRecurringTransaction();
+    }
+
+    transaction.id.clear();
+
+    transaction.save();
+}
+
 void Command::listTransactions() {
     checkAccountSelected();
 

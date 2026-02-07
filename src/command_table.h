@@ -186,6 +186,10 @@ const vector<CommandEntry> commandTable = {
         "Add a new transaction for the currently selected account", 
         [](Command& c){ c.addTransaction(); }},
 
+    {"copy-transaction", {"ct", "copy"}, 
+        "Copy the transaction specified with the sequence supplied, or the last transaction created", 
+        [](Command& c){ c.copyTransaction(); }},
+
     {"list-transactions", {"lt", "list"}, 
         "List all transactions for the currently selected account", 
         [](Command& c){ c.listTransactions(); }},

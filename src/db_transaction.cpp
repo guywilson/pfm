@@ -22,6 +22,24 @@
 
 using namespace std;
 
+DBTransaction DBTransaction::retrieveLastNonRecurringTransaction() {
+    DBCriteria criteria;
+    criteria.add(DBTransaction::Columns::recurringChargeId, DBCriteria::is_null);
+    criteria.addOrderBy(DBEntity::Columns::createdDate, DBCriteria::descending);
+    criteria.setRowLimit(1);
+
+    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    DBResult<DBTransaction> result;
+
+    result.retrieve(statement);
+
+    if (result.size() != 1) {
+        throw pfm_error("DBTransaction::retrieveLastNonRecurringTransaction() - expected exactly 1 result");
+    }
+
+    return result[0];
+}
+
 DBResult<DBTransaction> DBTransaction::retrieveByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransaction::retrieveByAccountID()");
@@ -220,7 +238,7 @@ DBResult<DBTransaction> DBTransaction::retrieveNonRecurringByAccountIDForPeriod(
 
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
-    criteria.add(Columns::recurringChargeId, DBCriteria::is_null, recurringChargeId);
+    criteria.add(Columns::recurringChargeId, DBCriteria::is_null);
     criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, firstDate);
     criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, secondDate);
 

@@ -156,6 +156,7 @@ class Command {
         void clearRecurringTransactions();
 
         void addTransaction();
+        void copyTransaction();
         void listTransactions();
         void findTransactions();
         void findTransactions(const string & where);

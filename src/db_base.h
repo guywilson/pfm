@@ -83,6 +83,25 @@ class DBCriteria {
             rowLimit = NULL_ROW_LIMIT;
         }
 
+        void add(const string & columnName, enum sql_operator op) {
+            string clause = columnName;
+
+            switch (op) {
+                case is_null:
+                    clause.append(" IS NULL");
+                    break;
+
+                case is_not_null:
+                    clause.append(" IS NOT NULL");
+                    break;
+
+                default:
+                    throw pfm_error("DBCriteria::add() - Illegal operation, only is_null or is_not_null expected");
+            }
+
+            whereClauses.push_back(clause);
+        }
+
         void add(const string & columnName, enum sql_operator op, const string & value) {
             string clause = columnName;
 

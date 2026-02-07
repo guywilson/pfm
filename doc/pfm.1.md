@@ -69,7 +69,8 @@ desc:"The quick brown fox jumped over the lazy dog"
 **update-recurring-charge, urc**
 **delete-recurring-charge, drc**
 
-**add-transaction, at** (*See extended form below*)
+**add-transaction, at, add** (*See extended form below*)
+**copy-transaction, ct, copy** (*Copy the last transaction*)
 **list-transactions, list, lt** (*See extended forms below*)
 **update-transaction, ut**
 **delete-transaction, dt**

@@ -271,6 +271,8 @@ class DBTransaction : public DBPayment {
         static void createTransferPairFromSource(DBTransaction & source, DBAccount & accountTo);
         static void linkTransferTransactions();
 
+        DBTransaction retrieveLastNonRecurringTransaction();
+
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t & accountId);
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
         DBResult<DBTransaction> retrieveReconciledByAccountID(pfm_id_t & accountId);
