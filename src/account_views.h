@@ -94,6 +94,9 @@ class AccountDetailsView : public CLIView {
         }
 
         void printRow(const string & label, const Money & amount) {
+            string amountStr = amount.localeFormattedStringValue();
+            int amountWidth = cli::text::calculateFieldWidth(amountStr, LIST_VIEW_AMOUNT_WIDTH);
+
             cout 
                 << left
                 << "| "
@@ -104,8 +107,8 @@ class AccountDetailsView : public CLIView {
                 << " | "
                 << right 
                 << set_style(TextStyle::Bold, Colour::Green) 
-                << setw(LIST_VIEW_AMOUNT_WIDTH) 
-                << amount.localeFormattedStringValue() 
+                << setw(amountWidth) 
+                << amountStr 
                 << set_style(TextStyle::Reset) 
                 << left
                 << " |"
