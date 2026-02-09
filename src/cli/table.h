@@ -17,16 +17,17 @@
 #include "../strdate.h"
 #include "../custom_modifiers.h"
 
-class CLIListColumn : public CLIField {
+class CLITableCell : public CLIField {
     public:
-        enum column_alignment {
+        enum cell_alignment {
             leftAligned,
             rightAligned
         };
 
     private:
         int width;
-        column_alignment align;
+        cell_alignment align;
+        string value;
 
         int getNumPaddingChars(const std::string & value) {
             return (getWidth() - value.length());
@@ -43,14 +44,10 @@ class CLIListColumn : public CLIField {
         }
 
     public:
-        CLIListColumn() : CLIField() {}
-        CLIListColumn(const std::string & name, int width, CLIListColumn::column_alignment align) : CLIField(name) {
-            this->width = width;
+        CLITableCell() : CLIField() {}
+        CLITableCell(const std::string & label, const std::string & value, CLITableCell::cell_alignment align) : CLIField(label) {
             this->align = align;
-
-            if ((width + 2) < (int)name.length()) {
-                throw pfm_error("Column name is too long for specified width");
-            }
+            this->value = value;
         }
 
         int getColumnWidth() {
@@ -62,7 +59,7 @@ class CLIListColumn : public CLIField {
         void printColumnHeader() {
             std::string name = getName();
 
-            std::cout << set_style(TextStyle::Bold) << name << set_style(TextStyle::Reset);
+            std::cout << bold_on << name << bold_off;
             printPadding(name);
             std::cout << " | ";
         }
@@ -106,91 +103,10 @@ class CLIListColumn : public CLIField {
         void show() override {}
 };
 
-class CLIListRow : public CLIWidget {
+class CLITable : public CLIView {
     private:
-        std::vector<std::string> cells;
-        size_t numColumns;
-
-        static const int CONVERT_BUFFER_SIZE = 32;
-        char convertBuffer[CONVERT_BUFFER_SIZE];
-
-        inline std::string convertBufferString() {
-            return std::string(convertBuffer);
-        }
-
-    public:
-        CLIListRow(const size_t columns) {
-            numColumns = columns;
-            cells.reserve(columns);
-        }
-
-        void addCell(const std::string & value) {
-            cells.push_back(value);
-
-            if (cells.size() > numColumns) {
-                throw pfm_error(pfm_error::buildMsg("Adding cell %zu to row, expected %zu columns", cells.size(), numColumns));
-            }
-        }
-
-        void addCell(Money & value) {
-            addCell(value.localeFormattedStringValue());
-        }
-
-        void addCell(StrDate & value) {
-            addCell(value.shortDate());
-        }
-
-        void addCell(double val) {
-            snprintf(convertBuffer, CONVERT_BUFFER_SIZE, "%.2f", val);
-            addCell(convertBufferString());
-        }
-
-        void addCell(int32_t val) {
-            snprintf(convertBuffer, CONVERT_BUFFER_SIZE, "%d", (int)val);
-            addCell(convertBufferString());
-        }
-
-        void addCell(uint32_t val) {
-            snprintf(convertBuffer, CONVERT_BUFFER_SIZE, "%u", (unsigned int)val);
-            addCell(convertBufferString());
-        }
-
-        void addCell(int64_t val) {
-            snprintf(convertBuffer, CONVERT_BUFFER_SIZE, "%" PRId64, val);
-            addCell(convertBufferString());
-        }
-
-        void addCell(uint64_t val) {
-            snprintf(convertBuffer, CONVERT_BUFFER_SIZE, "%" PRIu64, val);
-            addCell(convertBufferString());
-        }
-
-        void addCell(bool val) {
-            std::string value = (val ? "Y" : "N");
-            addCell(value);
-        }
-
-        void show() override {
-
-        }
-
-        void show(const std::vector<CLIListColumn> & columns) {
-            std::cout << "| ";
-
-            for (size_t i = 0;i < numColumns;i++) {
-                CLIListColumn column = columns[i];
-                column.printCell(cells[i]);
-            }
-
-            std::cout << std::endl;
-        }
-};
-
-class CLIListView : public CLIView {
-    private:
-        std::vector<CLIListColumn> columns;
-        std::vector<CLIListRow> rows;
-        std::vector<int> columnWidths;
+        std::vector<CLITableCell> cells;
+        int numColumns
 
         void printTopBorder() {
             std::cout << "+";
@@ -300,6 +216,6 @@ class CLIListView : public CLIView {
             std::string totalStr = total.localeFormattedStringValue();
             int fieldWidth = cli::text::calculateFieldWidth(totalStr, LIST_VIEW_AMOUNT_WIDTH);
 
-            std::cout << label << "| " << set_style(TextStyle::Bold) << std::right << std::setw(fieldWidth) << totalStr << set_style(TextStyle::Reset) << " |" << std::endl << std::endl;
+            std::cout << label << "| " << bold_on << std::right << std::setw(fieldWidth) << totalStr << bold_off << " |" << std::endl << std::endl;
         }
 };

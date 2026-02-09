@@ -28,7 +28,7 @@
 #include "jfile.h"
 #include "command.h"
 #include "command_table.h"
-#include "bold_modifier.h"
+#include "custom_modifiers.h"
 
 using namespace std;
 
@@ -56,7 +56,7 @@ void Command::help() {
             continue;
         }
         
-        cout << bold_on << entry.name << bold_off;
+        cout << set_style(TextStyle::Bold, Colour::Magenta) << entry.name << set_style(TextStyle::Reset);
 
         if (entry.aliases.empty()) {
             cout << endl;

@@ -8,7 +8,7 @@
 #include "terminal.h"
 #include "custom_widgets.h"
 #include "db_account.h"
-#include "bold_modifier.h"
+#include "custom_modifiers.h"
 
 using namespace std;
 
@@ -103,10 +103,10 @@ class AccountDetailsView : public CLIView {
                 << left
                 << " | "
                 << right 
-                << bold_on 
+                << set_style(TextStyle::Bold, Colour::Green) 
                 << setw(LIST_VIEW_AMOUNT_WIDTH) 
                 << amount.localeFormattedStringValue() 
-                << bold_off 
+                << set_style(TextStyle::Reset) 
                 << left
                 << " |"
                 << endl;
@@ -120,9 +120,9 @@ class AccountDetailsView : public CLIView {
         void show() override {
             cout 
                 << endl << endl 
-                << bold_on 
+                << set_style(TextStyle::Bold, Colour::Cyan) 
                 << account.name 
-                << bold_off 
+                << set_style(TextStyle::Reset)
                 << " [" << account.code << "]" 
                 << (account.isPrimary() ? " - primary" : "") 
                 << endl
