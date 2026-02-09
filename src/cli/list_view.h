@@ -300,6 +300,6 @@ class CLIListView : public CLIView {
             std::string totalStr = total.localeFormattedStringValue();
             int fieldWidth = cli::text::calculateFieldWidth(totalStr, LIST_VIEW_AMOUNT_WIDTH);
 
-            std::cout << label << "| " << set_style(TextStyle::Bold) << std::right << std::setw(fieldWidth) << totalStr << set_style(TextStyle::Reset) << " |" << std::endl << std::endl;
+            std::cout << set_style(TextStyle::Bold | TextStyle::Underline, Colour::Cyan) << label << set_style(TextStyle::Reset) << "| " << set_style(TextStyle::Bold) << std::right << std::setw(fieldWidth) << totalStr << set_style(TextStyle::Reset) << " |" << std::endl << std::endl;
         }
 };
