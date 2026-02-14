@@ -157,5 +157,7 @@ class CLITable : public CLIView {
 
                 printRow(columns);
             }
+
+            cout << endl;
         }
 };
