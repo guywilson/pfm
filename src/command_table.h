@@ -30,7 +30,7 @@ const vector<CommandEntry> commandTable = {
         "List all accounts", 
         [](Command& c){ c.listAccounts(); }},
 
-    {"show-account", {"show", "sa"}, 
+    {"show-account", {"sa"}, 
         "Show account details", 
         [](Command& c){ c.showAccount(); }},
 
@@ -217,6 +217,10 @@ const vector<CommandEntry> commandTable = {
     {"reconcile-transaction", {"reconcile", "rt"}, 
         "Reconcile the transaction specified with the sequence supplied", 
         [](Command& c){ c.reconcileTransaction(); }},
+
+    {"show-transaction", {"show", "st"}, 
+        "Show the transaction details specified with the sequence supplied", 
+        [](Command& c){ c.showTransaction(); }},
 
     {"import-transactions", {"it"}, 
         "Import transactions from the specified JSON file", 

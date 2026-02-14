@@ -158,6 +158,7 @@ class TransactionListView : public CLIListView {
         TransactionListView() : CLIListView() {
             isTotalEnabled = false;
 
+#ifndef RUN_IN_DEBUGGER
             if (Terminal::getWidth() < getMinimumWidth()) {
                 throw pfm_error(
                     pfm_error::buildMsg(
@@ -165,6 +166,7 @@ class TransactionListView : public CLIListView {
                         (unsigned int)Terminal::getWidth(), 
                         (unsigned int)getMinimumWidth()));
             }
+#endif
         }
 
         inline uint16_t getMinimumWidth() override {

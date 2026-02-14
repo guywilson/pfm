@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <string>
 #include <string.h>
 #include <vector>
@@ -16,27 +18,20 @@
 #include "../money.h"
 #include "../strdate.h"
 #include "../custom_modifiers.h"
+#include "../terminal.h"
 
 class CLITableCell : public CLIField {
-    public:
-        enum cell_alignment {
-            leftAligned,
-            rightAligned
-        };
-
     private:
-        int width;
-        cell_alignment align;
-        string value;
+        size_t width;
 
-        int getNumPaddingChars(const std::string & value) {
+        size_t getNumPaddingChars(const std::string & value) {
             return (getWidth() - value.length());
         }
 
-        int printPadding(const std::string & value) {
-            int numPaddingChars = getNumPaddingChars(value);
+        size_t printPadding(const std::string & value) {
+            size_t numPaddingChars = getNumPaddingChars(value);
 
-            for (int i = 0;i < numPaddingChars;i++) {
+            for (size_t i = 0;i < numPaddingChars;i++) {
                 std::cout << " ";
             }
 
@@ -45,59 +40,49 @@ class CLITableCell : public CLIField {
 
     public:
         CLITableCell() : CLIField() {}
-        CLITableCell(const std::string & label, const std::string & value, CLITableCell::cell_alignment align) : CLIField(label) {
-            this->align = align;
-            this->value = value;
+        CLITableCell(const std::string & label, const std::string & value, size_t valueWidth) : CLIField(label) {
+            _setValue(value);
+            this->width = valueWidth;
         }
 
-        int getColumnWidth() {
-            string columnName = getName();
+        string getCellContents() {
+            string value = getValue();
+            size_t w = getWidth();
+            w = cli::text::calculateFieldWidth(value, w);
 
-            return (columnName.length() + getNumPaddingChars(columnName) + 3);
-        }
-
-        void printColumnHeader() {
-            std::string name = getName();
-
-            std::cout << bold_on << name << bold_off;
-            printPadding(name);
-            std::cout << " | ";
-        }
-
-        void printCell(string & value) {
-            int width = getWidth();
-            std::string v = value;
-
-            width = cli::text::calculateFieldWidth(value, width);
-
-            if (width < (int)v.length()) {
-                v = v.substr(0, width - 3);
-                v = v.append("...");
+            if (value.length() > w) {
+                value = value.substr(0, w - 3);
+                value = value.append("...");
             }
 
-            switch (getAlignment()) {
-                case CLIListColumn::leftAligned:
-                    std::cout << std::left << std::setw(width) << v;
-                    break;
+            std::stringstream ss;
 
-                case CLIListColumn::rightAligned:
-                    std::cout << std::right << std::setw(width) << v;
-                    break;
-            }
+            ss << 
+                set_style(TextStyle::Bold, Colour::Yellow) << 
+                getLabel() << 
+                set_style(TextStyle::Reset) << 
+                ": " <<
+                std::left << 
+                std::setw(w) << 
+                value;
 
-            std::cout << " | ";
+            return ss.str();
         }
 
-        string getName() {
+        inline string getLabel() {
             return _getLabel();
         }
 
-        inline column_alignment getAlignment() {
-            return align;
+        inline size_t getWidth() {
+            return width;
         }
 
-        int getWidth() {
-            return width;
+        inline size_t getTotalWidth() {
+            return getWidth() + _getLabel().length() + 2;
+        }
+
+        inline void setWidth(size_t width) {
+            this->width = width;
         }
 
         void show() override {}
@@ -106,116 +91,71 @@ class CLITableCell : public CLIField {
 class CLITable : public CLIView {
     private:
         std::vector<CLITableCell> cells;
-        int numColumns
-
-        void printTopBorder() {
-            std::cout << "+";
-
-            for (auto & c : columns) {
-                for (int i = 0;i < c.getColumnWidth() - 1;i++) {
-                    cout << '-';
-                }
-
-                std::cout << '+';
-            }
-
-            std::cout << std::endl;
-        }
-
-        void printBottomBorder() {
-            printTopBorder();
-        }
-
-    protected:
-        void reserveRows(size_t numRows) {
-            rows.reserve(numRows);
-        } 
-        
-        void showHeader() {
-            printTopBorder();
-
-            std::cout << "| ";
-            for (auto & c : columns) {
-                c.printColumnHeader();
-            }
-            std::cout << std::endl;
-
-            printTopBorder();
-        }
+        size_t numColumns;
+        size_t numRows;
+        string title;
 
     public:
-        void setColumns(const std::vector<CLIListColumn> & cols) {
-            columns.reserve(cols.size());
-            columnWidths.reserve(cols.size());
+        CLITable(const std::string & title, size_t numRows) {
+            this->numColumns = 2;
+            this->numRows = numRows;
+            this->title = title;
 
-            for (auto c : cols) {
-                columns.push_back(c);
-                columnWidths.push_back(c.getColumnWidth());
-            }
+            cells.resize(numColumns * numRows);
         }
 
-        virtual uint16_t getMinimumWidth() {
-            return 0;
-        }
-
-        inline int getTotalWidth() {
-            int totalWidth = 0;
-
-            for (int w : columnWidths) {
-                totalWidth += w;
-            }
-
-            return totalWidth + 2;
-        }
-
-        inline size_t getNumColumns() {
-            return columns.size();
-        }
-
-        void addRow(CLIListRow & row) {
-            rows.push_back(row);
-        }
-
-        void showNoExtraCR() {
-            printTitle();
-            showHeader();
-
-            for (auto & r : rows) {
-                r.show(columns);
+        void addCell(const CLITableCell & cell, size_t column, size_t row) {
+            if (column > (numColumns - 1) || row > (numRows - 1)) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "CLITable::addCell() - specified cell location out of range. " \
+                        "Table dimensions are %zu x %zu, requested (%zu, %zu)", 
+                        numColumns, 
+                        numRows, 
+                        column, 
+                        row),
+                    __FILE__,
+                    __LINE__);
             }
 
-            if (!rows.empty()) {
-                printBottomBorder();
+            size_t index = row * numColumns + column;
+            cells[index] = cell;
+        }
+
+        void printRow(const vector<CLITableCell> & columns) {
+            for (size_t i = 0;i < columns.size();i++) {
+                CLITableCell cell = columns[i];
+
+                string contents = cell.getCellContents();
+
+                cout << contents;
+
+                bool isLastColumn = (i == (numColumns - 1));
+
+                if (!isLastColumn) {
+                    for (size_t j = (contents.length() - 1);j < ((TERMINAL_MIN_WIDTH / numColumns) + 10);j++) {
+                        cout << " ";
+                    }
+                }
             }
+
+            cout << endl;
         }
 
         void show() override {
-            showNoExtraCR();
-            std::cout << std::endl;
-        }
+            size_t i = 0;
 
-        void showTotal(const std::string & label, const Money & total) {
-            int numPaddingSpaces = 0;
+            cout << "*** " << this->title << " ***" << endl << endl;
+            
+            while (i < cells.size()) {
+                vector<CLITableCell> columns;
+                columns.reserve(numColumns);
 
-            for (size_t i = 0;i < columns.size();i++) {
-                CLIListColumn c = columns[i];
-
-                if (c.getName() == "Amount" || c.getName() == "Total") {
-                    break;
+                for (size_t c = 0;c < numColumns;c++) {
+                    columns.push_back(cells[i++]);
                 }
 
-                numPaddingSpaces += columnWidths[i];
+                printRow(columns);
             }
-
-            numPaddingSpaces -= (int)label.length();
-
-            for (int i = 0;i < numPaddingSpaces;i++) {
-                std::cout << ' ';
-            }
-
-            std::string totalStr = total.localeFormattedStringValue();
-            int fieldWidth = cli::text::calculateFieldWidth(totalStr, LIST_VIEW_AMOUNT_WIDTH);
-
-            std::cout << label << "| " << bold_on << std::right << std::setw(fieldWidth) << totalStr << bold_off << " |" << std::endl << std::endl;
         }
 };

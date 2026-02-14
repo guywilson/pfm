@@ -219,6 +219,7 @@ string Money::localeFormattedStringValue(const string & localeString) const {
         s << showbase << put_money(raw);
     }
 
+#ifndef RUN_IN_DEBUGGER
     if (abs(this->representedValue) < 100) {
         /*
         ** The locale formatted string should have a leading zero before
@@ -248,6 +249,7 @@ string Money::localeFormattedStringValue(const string & localeString) const {
             }
         }
     }
+#endif
 
     return s.str();
 }

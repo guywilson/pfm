@@ -132,9 +132,11 @@ void unitTestCodeFragment() {
 
     // cout << "Got period start date '" << startDate.shortDate() << "', period end date '" << endDate.shortDate() << "'" << endl << endl;
 
-    Money amount = 0.71f;
+    // Money amount = 0.71f;
 
-    cout << "Money raw value: '" << amount.rawStringValue() << "', formatted value: '" << amount.localeFormattedStringValue() << "'" << endl << endl;
+    // cout << "Money raw value: '" << amount.rawStringValue() << "', formatted value: '" << amount.localeFormattedStringValue() << "'" << endl << endl;
+
+
 }
 
 static void initialiseReferenceData() {

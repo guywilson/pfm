@@ -168,6 +168,7 @@ class Command {
         void updateTransaction();
         void deleteTransaction();
         void reconcileTransaction();
+        void showTransaction();
         void importTransactions();
         void exportTransactions();
         void exportTransactionsAsCSV();
