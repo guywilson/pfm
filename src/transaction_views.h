@@ -8,6 +8,9 @@
 #include "cli_widget.h"
 #include "custom_widgets.h"
 #include "db_base.h"
+#include "db_account.h"
+#include "db_category.h"
+#include "db_payee.h"
 #include "db_transaction.h"
 #include "db_v_transaction.h"
 #include "cfgmgr.h"
@@ -219,9 +222,22 @@ class TransactionDetailsView : public CLITable {
         }
 
         void setTransaction(const DBTransactionView & transaction) {
-            addCell(CLITableCell("Account", transaction.account, LIST_VIEW_CODE_WIDTH), 0, 0);
-            addCell(CLITableCell("Category", transaction.category, LIST_VIEW_CODE_WIDTH), 0, 1);
-            addCell(CLITableCell("Payee", transaction.payee, LIST_VIEW_CODE_WIDTH), 0, 2);
+            DBAccount account;
+            account.retrieve(transaction.accountId);
+
+            DBCategory category;
+            category.retrieve(transaction.categoryId);
+
+            DBPayee payee;
+            payee.retrieve(transaction.payeeId);
+
+            string accountDetails = "(" + account.code + ") " + account.name;
+            string categoryDetails = "(" + category.code + ") " + category.description;
+            string payeeDetails = "(" + payee.code + ") " + payee.name;
+
+            addCell(CLITableCell("Account", accountDetails, 25), 0, 0);
+            addCell(CLITableCell("Category", categoryDetails, 25), 0, 1);
+            addCell(CLITableCell("Payee", payeeDetails, 25), 0, 2);
             addCell(CLITableCell("Description", transaction.description, 25), 0, 3);
             addCell(CLITableCell("Date", transaction.date.shortDate(), DATE_FIELD_LENGTH), 0, 4);
             addCell(CLITableCell("Created", transaction.createdDate, TIMESTAMP_FIELD_LENGTH), 0, 5);

@@ -670,7 +670,7 @@ class DBEntity {
             return statement;
         }
 
-        virtual const string getSelectByIDStatement(pfm_id_t & key) {
+        virtual const string getSelectByIDStatement(const pfm_id_t & key) {
             DBCriteria criteria;
             criteria.add(Columns::id, DBCriteria::equal_to, key);
 
@@ -717,7 +717,7 @@ class DBEntity {
 
         void save();
         void retrieve();
-        void retrieve(pfm_id_t & id);
+        void retrieve(const pfm_id_t & id);
 
         void clear() {
             this->id.clear();

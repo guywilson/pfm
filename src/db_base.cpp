@@ -86,7 +86,7 @@ void DBEntity::retrieve() {
     retrieve(this->id);
 }
 
-void DBEntity::retrieve(pfm_id_t & id) {
+void DBEntity::retrieve(const pfm_id_t & id) {
     Logger & log = Logger::getInstance();
     
     log.entry("DBEntity::retrieve()");
