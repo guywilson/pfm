@@ -417,20 +417,10 @@ void Command::showTransaction() {
     DBTransactionView v;
     v.retrieve(transaction.id);
 
-    CLITable transactionTable = CLITable("Transaction Details", 5);
+    TransactionDetailsView view;
 
-    transactionTable.addCell(CLITableCell("Account", v.account, LIST_VIEW_CODE_WIDTH), 0, 0);
-    transactionTable.addCell(CLITableCell("Category", v.category, LIST_VIEW_CODE_WIDTH), 0, 1);
-    transactionTable.addCell(CLITableCell("Payee", v.payee, LIST_VIEW_CODE_WIDTH), 0, 2);
-    transactionTable.addCell(CLITableCell("Description", v.description, 25), 0, 3);
-    transactionTable.addCell(CLITableCell("Date", v.date.shortDate(), DATE_FIELD_LENGTH), 0, 4);
-    transactionTable.addCell(CLITableCell("Amount", v.amount.localeFormattedStringValue(), LIST_VIEW_AMOUNT_WIDTH), 1, 0);
-    transactionTable.addCell(CLITableCell("Type", v.type, LIST_VIEW_TYPE_WIDTH), 1, 1);
-    transactionTable.addCell(CLITableCell("Is Recurring", (v.isRecurring ? "Yes" : "No"), 3), 1, 2);
-    transactionTable.addCell(CLITableCell("Is Reconciled", (v.isReconciled ? "Yes" : "No"), 3), 1, 3);
-    transactionTable.addCell(CLITableCell("Reference", v.reference, 25), 1, 4);
-
-    transactionTable.show();
+    view.setTransaction(v);
+    view.show();
 }
 
 void Command::importTransactions() {

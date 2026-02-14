@@ -213,6 +213,27 @@ class TransactionListView : public CLIListView {
         }
 };
 
+class TransactionDetailsView : public CLITable {
+    public:
+        TransactionDetailsView() : CLITable("Transaction Details", 6) {
+        }
+
+        void setTransaction(const DBTransactionView & transaction) {
+            addCell(CLITableCell("Account", transaction.account, LIST_VIEW_CODE_WIDTH), 0, 0);
+            addCell(CLITableCell("Category", transaction.category, LIST_VIEW_CODE_WIDTH), 0, 1);
+            addCell(CLITableCell("Payee", transaction.payee, LIST_VIEW_CODE_WIDTH), 0, 2);
+            addCell(CLITableCell("Description", transaction.description, 25), 0, 3);
+            addCell(CLITableCell("Date", transaction.date.shortDate(), DATE_FIELD_LENGTH), 0, 4);
+            addCell(CLITableCell("Created", transaction.createdDate, TIMESTAMP_FIELD_LENGTH), 0, 5);
+            addCell(CLITableCell("Amount", transaction.amount.localeFormattedStringValue(), LIST_VIEW_AMOUNT_WIDTH), 1, 0);
+            addCell(CLITableCell("Type", transaction.type, LIST_VIEW_TYPE_WIDTH), 1, 1);
+            addCell(CLITableCell("Is Recurring", (transaction.isRecurring ? "Yes" : "No"), 3), 1, 2);
+            addCell(CLITableCell("Is Reconciled", (transaction.isReconciled ? "Yes" : "No"), 3), 1, 3);
+            addCell(CLITableCell("Reference", transaction.reference, 25), 1, 4);
+            addCell(CLITableCell("Updated", transaction.updatedDate, TIMESTAMP_FIELD_LENGTH), 1, 5);
+        }
+};
+
 class TransactionCategoryReportListView : public CLIListView {
     private:
         Money total = 0.0;
