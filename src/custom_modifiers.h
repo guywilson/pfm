@@ -13,7 +13,8 @@ enum TextStyle {
     Reset      = 0x00,      // 0
     Bold       = 0x01,      // 1
     Underline  = 0x02,      // 4
-    Inverse    = 0x04       // 7
+    Inverse    = 0x04,      // 7
+    NoStyle    = 0x80       // -
 };
 
 enum Colour {
@@ -38,7 +39,7 @@ struct os_format {
     Colour foregroundColour = Colour::White;
 };
 
-inline string getSequence(const uint8_t ts, const Colour & c) {
+inline std::string getSequence(const uint8_t ts, const Colour & c) {
     string sequence = "";
     bool isFirstSequence = true;
 
@@ -79,13 +80,16 @@ inline string getSequence(const uint8_t ts, const Colour & c) {
 ** standard library header <iomanip>
 */
 class CustomModifier {
-    uint8_t ts;
+    uint8_t ts = TextStyle::NoStyle;
     Colour c = Colour::Default;
 
     public:
         explicit CustomModifier(const uint8_t style) {
             ts = style;
             c = Colour::Default;
+        }
+        explicit CustomModifier(const Colour & colour) {
+            c = colour;
         }
         explicit CustomModifier(const uint8_t style, const Colour & colour) {
             ts = style;
@@ -105,6 +109,10 @@ class CustomModifier {
 
 inline CustomModifier set_style(const uint8_t style) {
     return CustomModifier(style);
+}
+
+inline CustomModifier set_style(const Colour & colour) {
+    return CustomModifier(colour);
 }
 
 inline CustomModifier set_style(const uint8_t style, const Colour & colour) {

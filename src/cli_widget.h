@@ -11,4 +11,5 @@
 
 #include "cli/view.h"
 #include "cli/list_view.h"
+#include "cli/detail_list_view.h"
 #include "cli/table.h"

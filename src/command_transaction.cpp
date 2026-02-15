@@ -171,14 +171,17 @@ void Command::listTransactions() {
                                 thisPeriod, 
                                 sortDirection, 
                                 rowLimit);
-
+#ifndef USE_DETAIL_LIST_VIEW
     TransactionListView view;
+#else
+    TransactionDetailsListView view;
+#endif
 
     if (showTotal) {
         view.addTotal();
     }
     
-    view.addResults(result, selectedAccount.code);
+    view.addResults(result);
     view.show();
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();

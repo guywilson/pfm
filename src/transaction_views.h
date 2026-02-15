@@ -216,6 +216,64 @@ class TransactionListView : public CLIListView {
         }
 };
 
+class TransactionDetailsListView : public CLIDetailListView {
+    private:
+        bool isTotalEnabled = false;
+        Money total;
+
+        std::string formatSequence(uint32_t sequence) {
+            char sqStr[8];
+            snprintf(sqStr, 8, "%03u", sequence);
+            return std::string(sqStr);
+        }
+
+    public:
+        TransactionDetailsListView() {
+            setTitle("Transactions");
+        }
+
+        void addTotal() {
+            total = 0.0;
+            isTotalEnabled = true;
+        }
+
+        void addResults(DBResult<DBTransactionView> & result) {
+            for (size_t i = 0;i < result.size();i++) {
+                DBTransactionView transaction = result[i];
+
+                CLIDetailListRow row;
+
+                row.addPrimaryCell(CLIDetailListCell(formatSequence(transaction.sequence), 3, TextStyle::NoStyle, Colour::Cyan));
+                row.addPrimaryCell(CLIDetailListCell(CLIDetailListCell::formatValue(transaction.date), DATE_FIELD_LENGTH, TextStyle::Bold, Colour::Yellow));
+                row.addPrimaryCell(CLIDetailListCell(transaction.description, 42, TextStyle::NoStyle, Colour::White));
+                row.addPrimaryCell(CLIDetailListCell(CLIDetailListCell::formatValue(transaction.amount), AMOUNT_FIELD_STRING_LEN, TextStyle::Bold, Colour::Yellow, CLIDetailListCell::rightAligned));
+
+                row.addSecondaryCell(CLIDetailListCell("", 3, TextStyle::NoStyle, Colour::Default));
+                row.addSecondaryCell(CLIDetailListCell(transaction.type, 2, TextStyle::Inverse, (transaction.type == "DB" ? Colour::Red : Colour::Green)));
+                row.addSecondaryCell(CLIDetailListCell(transaction.isRecurring ? "Rc" : "", 2, TextStyle::NoStyle, Colour::Magenta));
+                row.addSecondaryCell(CLIDetailListCell(transaction.isReconciled ? "✓" : "", 4, TextStyle::NoStyle, Colour::Yellow));
+                row.addSecondaryCell(CLIDetailListCell(transaction.account, 5, TextStyle::NoStyle, Colour::White));
+                row.addSecondaryCell(CLIDetailListCell(transaction.category, 5, TextStyle::NoStyle, Colour::Red));
+                row.addSecondaryCell(CLIDetailListCell(transaction.payee, 5, TextStyle::NoStyle, Colour::Green));
+                row.addSecondaryCell(CLIDetailListCell(transaction.reference, 41, TextStyle::NoStyle, Colour::White));
+
+                total += transaction.getSignedAmount();
+                addRow(row);
+            }
+        }
+
+        void show() override {
+            CLIDetailListView::show();
+
+            if (isTotalEnabled) {
+                showTotal("Total amount: ", total, 47);
+            }
+            else {
+                cout << endl;
+            }
+        }
+};
+
 class TransactionDetailsView : public CLITable {
     public:
         TransactionDetailsView() : CLITable("Transaction Details", 6) {
