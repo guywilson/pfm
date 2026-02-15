@@ -54,7 +54,7 @@ class CLIDetailListCell : public CLIField {
 
             width = cli::text::calculateFieldWidth(value, width);
 
-            if (width < (int)v.length()) {
+            if (width < v.length()) {
                 v = v.substr(0, width - 3);
                 v = v.append("...");
             }
