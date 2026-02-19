@@ -457,7 +457,7 @@ void Command::exportTransactions() {
         records.push_back(r);
     }
     
-    JFileWriter jFile = JFileWriter(jsonFileName, "DBTransaction");
+    JFileWriter jFile(jsonFileName, "DBTransaction");
     jFile.write(records, "transactions");
 }
 

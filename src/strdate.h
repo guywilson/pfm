@@ -141,6 +141,9 @@ class StrDate {
         bool operator==(StrDate & rh);
         bool operator==(string & rh);
 
+        bool operator!=(StrDate & rh);
+        bool operator!=(string & rh);
+
         bool operator<(StrDate & rh);
         bool operator<(string & rh);
 

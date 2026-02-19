@@ -890,6 +890,14 @@ bool StrDate::operator==(string & rhs) {
     return (this->epoch() == d1.epoch());
 }
 
+bool StrDate::operator!=(StrDate & rhs) {
+    return !(*this == rhs);
+}
+
+bool StrDate::operator!=(string & rhs) {
+    return !(*this == rhs);
+}
+
 bool StrDate::operator<(StrDate & rhs) {
     return (this->epoch() < rhs.epoch());
 }

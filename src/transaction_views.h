@@ -249,7 +249,7 @@ class TransactionDetailsListView : public CLIDetailListView {
                 row.addPrimaryCell(CLIDetailListCell(CLIDetailListCell::formatValue(transaction.amount), AMOUNT_FIELD_STRING_LEN, TextStyle::Bold, Colour::Yellow, CLIDetailListCell::rightAligned));
 
                 row.addSecondaryCell(CLIDetailListCell("", 3, TextStyle::NoStyle, Colour::Default));
-                row.addSecondaryCell(CLIDetailListCell(transaction.type, 2, TextStyle::Inverse, (transaction.type == "DB" ? Colour::Red : Colour::Green)));
+                row.addSecondaryCell(CLIDetailListCell(transaction.type, 2, TextStyle::Inverse, (transaction.type == "DB" ? Colour::Magenta : Colour::Green)));
                 row.addSecondaryCell(CLIDetailListCell(transaction.isRecurring ? "Rc" : "", 2, TextStyle::NoStyle, Colour::Magenta));
                 row.addSecondaryCell(CLIDetailListCell(transaction.isReconciled ? "✓" : "", 4, TextStyle::NoStyle, Colour::Yellow));
                 row.addSecondaryCell(CLIDetailListCell(transaction.account, 5, TextStyle::NoStyle, Colour::White));
