@@ -171,18 +171,28 @@ void Command::listTransactions() {
                                 thisPeriod, 
                                 sortDirection, 
                                 rowLimit);
-#ifndef USE_DETAIL_LIST_VIEW
-    TransactionListView view;
-#else
-    TransactionDetailsListView view;
-#endif
+    unsigned long terminalWidth = Terminal::getWidth();
 
-    if (showTotal) {
-        view.addTotal();
+    if (terminalWidth > 110UL) {
+        TransactionListView view;
+
+        if (showTotal) {
+            view.addTotal();
+        }
+        
+        view.addResults(result);
+        view.show();
     }
-    
-    view.addResults(result);
-    view.show();
+    else {
+        TransactionDetailsListView view;
+
+        if (showTotal) {
+            view.addTotal();
+        }
+        
+        view.addResults(result);
+        view.show();
+    }
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 

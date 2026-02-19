@@ -150,10 +150,12 @@ class RecurringChargeListView : public CLIListView {
             reserveRows(result.size());
             
             setColumns({
-                CLIListColumn("Sq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("St. Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
                 CLIListColumn("Last Paid", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
                 CLIListColumn("Description", LIST_VIEW_DESCRIPTION_WIDTH, CLIListColumn::leftAligned),
                 CLIListColumn("Ctgry", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
+                CLIListColumn("Payee", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
                 CLIListColumn("Frq", LIST_VIEW_FREQUENCY_WIDTH, CLIListColumn::leftAligned),
                 CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
                 CLIListColumn("T", LIST_VIEW_TRANSFER_WIDTH, CLIListColumn::leftAligned)
@@ -171,9 +173,11 @@ class RecurringChargeListView : public CLIListView {
                 CLIListRow row(getNumColumns());
 
                 row.addCell(charge.sequence);
+                row.addCell(charge.date);
                 row.addCell(charge.lastPaymentDate);
                 row.addCell(charge.description);
                 row.addCell(charge.categoryCode);
+                row.addCell(charge.payeeCode);
                 row.addCell(charge.frequency.toString());
                 row.addCell(charge.amount);
                 row.addCell(charge.getIsTransferValue());

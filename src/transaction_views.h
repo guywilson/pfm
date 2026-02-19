@@ -103,12 +103,13 @@ class TransactionListView : public CLIListView {
                 totalAlignmentColumn = 9;
 
                 setColumns({
-                    CLIListColumn("Sq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
                     CLIListColumn("Acct.", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
                     CLIListColumn("C", LIST_VIEW_RECURRING_CHARGE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Description", LIST_VIEW_DESCRIPTION_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Ctgry", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Payee", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Tp", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
                     CLIListColumn("R", LIST_VIEW_RECONCILED_WIDTH, CLIListColumn::leftAligned)
@@ -118,11 +119,12 @@ class TransactionListView : public CLIListView {
                 totalAlignmentColumn = 8;
                 
                 setColumns({
-                    CLIListColumn("Sq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
                     CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
                     CLIListColumn("C", LIST_VIEW_RECURRING_CHARGE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Description", LIST_VIEW_DESCRIPTION_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Ctgry", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
+                    CLIListColumn("Payee", LIST_VIEW_CODE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Tp", LIST_VIEW_TYPE_WIDTH, CLIListColumn::leftAligned),
                     CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
                     CLIListColumn("R", LIST_VIEW_RECONCILED_WIDTH, CLIListColumn::leftAligned)
@@ -144,6 +146,7 @@ class TransactionListView : public CLIListView {
                 row.addCell(transaction.isRecurring);
                 row.addCell(transaction.description);
                 row.addCell(transaction.category);
+                row.addCell(transaction.payee);
                 row.addCell(transaction.type);
                 row.addCell(transaction.amount);
                 row.addCell(transaction.isReconciled);

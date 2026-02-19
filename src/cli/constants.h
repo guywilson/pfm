@@ -7,10 +7,10 @@
 #define CODE_FIELD_MAX_LENGTH                    5
 #define CRITERIA_FIELD_MAX_LEN                 256
 
-#define LIST_VIEW_SEQUENCE_WIDTH                2
+#define LIST_VIEW_SEQUENCE_WIDTH                3
 #define LIST_VIEW_CODE_WIDTH                    CODE_FIELD_MAX_LENGTH
-#define LIST_VIEW_AMOUNT_WIDTH                  (AMOUNT_FIELD_STRING_LEN - 3)
-#define LIST_VIEW_DESCRIPTION_WIDTH             20
+#define LIST_VIEW_AMOUNT_WIDTH                  (AMOUNT_FIELD_STRING_LEN - 2)
+#define LIST_VIEW_DESCRIPTION_WIDTH             26
 #define LIST_VIEW_REFERENCE_WIDTH               9
 #define LIST_VIEW_TYPE_WIDTH                    2
 #define LIST_VIEW_RECONCILED_WIDTH              1
