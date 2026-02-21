@@ -83,9 +83,18 @@ void Command::chooseAccount() {
     DBTransactionView transaction;
     DBResult<DBTransactionView> result = transaction.retrieveByAccountID(account.id, DBCriteria::descending, 16);
 
-    TransactionListView trView;
-    trView.addResults(result, account.code);
-    trView.show();
+    unsigned long terminalWidth = Terminal::getWidth();
+
+    if (terminalWidth > LIST_VIEW_THRESHOLD_WIDTH) {
+        TransactionListView trView;
+        trView.addResults(result, account.code);
+        trView.show();
+    }
+    else {
+        TransactionDetailsListView trView;
+        trView.addResults(result);
+        trView.show();
+    }
 
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
@@ -184,6 +193,6 @@ void Command::exportAccounts() {
         records.push_back(r);
     }
     
-    JFileWriter jFile = JFileWriter(jsonFileName, "DBAccount");
+    JFileWriter jFile(jsonFileName, "DBAccount");
     jFile.write(records, "accounts");
 }
