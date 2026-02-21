@@ -194,6 +194,51 @@ class RecurringChargeListView : public CLIListView {
         }
 };
 
+class RecurringChargeDetailsListView : public CLIDetailListView {
+    private:
+        Money total;
+
+        std::string formatSequence(uint32_t sequence) {
+            char sqStr[8];
+            snprintf(sqStr, 8, "%03u", sequence);
+            return std::string(sqStr);
+        }
+
+    public:
+        RecurringChargeDetailsListView(DBAccount & account) {
+            setTitle("Recurring Charges for account: " + account.code);
+            total = 0.0;
+        }
+
+        void addResults(DBResult<DBRecurringChargeView> & result) {
+            for (size_t i = 0;i < result.size();i++) {
+                DBRecurringChargeView charge = result[i];
+
+                CLIDetailListRow row;
+
+                row.addPrimaryCell(CLIDetailListCell(formatSequence(charge.sequence), 3, TextStyle::NoStyle, Colour::Cyan));
+                row.addPrimaryCell(CLIDetailListCell(CLIDetailListCell::formatValue(charge.lastPaymentDate), DATE_FIELD_LENGTH, TextStyle::Bold, Colour::Yellow));
+                row.addPrimaryCell(CLIDetailListCell(charge.description, 42, TextStyle::NoStyle, Colour::White));
+                row.addPrimaryCell(CLIDetailListCell(CLIDetailListCell::formatValue(charge.amount), AMOUNT_FIELD_STRING_LEN, TextStyle::Bold, Colour::Yellow, CLIDetailListCell::rightAligned));
+
+                row.addSecondaryCell(CLIDetailListCell("", 3, TextStyle::NoStyle, Colour::Default));
+                row.addSecondaryCell(CLIDetailListCell(CLIDetailListCell::formatValue(charge.date), DATE_FIELD_LENGTH, TextStyle::NoStyle, Colour::Green));
+                row.addSecondaryCell(CLIDetailListCell(charge.frequency.toString(), LIST_VIEW_FREQUENCY_WIDTH + 4, TextStyle::NoStyle, Colour::Cyan));
+                row.addSecondaryCell(CLIDetailListCell(charge.categoryCode, 5, TextStyle::NoStyle, Colour::Red));
+                row.addSecondaryCell(CLIDetailListCell(charge.payeeCode, 5, TextStyle::NoStyle, Colour::Green));
+                row.addSecondaryCell(CLIDetailListCell("", 39, TextStyle::NoStyle, Colour::Default));
+
+                total += charge.amount;
+                addRow(row);
+            }
+        }
+
+        void show() override {
+            CLIDetailListView::show();
+            showTotal("Total amount: ", total, 46);
+        }
+};
+
 class MigrateChargeView : public CLIView {
     private:
         string sourceAccountCode;

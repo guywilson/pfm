@@ -161,24 +161,6 @@ class AccountDetailsView : public CLIView {
 class AccountListView : public CLIListView {
     public:
         AccountListView() : CLIListView() {
-            if (Terminal::getWidth() < getMinimumWidth()) {
-                throw pfm_error(
-                    pfm_error::buildMsg(
-                        "Terminal is not wide enough for AccountListView. Terminal width %u, minimum width %u", 
-                        (unsigned int)Terminal::getWidth(), 
-                        (unsigned int)getMinimumWidth()));
-            }
-        }
-
-        inline uint16_t getMinimumWidth() override {
-            return (
-                5 + 
-                20 + 
-                LIST_VIEW_AMOUNT_WIDTH + 
-                LIST_VIEW_AMOUNT_WIDTH + 
-                LIST_VIEW_AMOUNT_WIDTH + 
-                LIST_VIEW_AMOUNT_WIDTH + 
-                1);
         }
 
         void addResults(DBResult<DBAccount> & result) {
@@ -189,15 +171,28 @@ class AccountListView : public CLIListView {
 
             reserveRows(result.size());
             
-            setColumns({
-                CLIListColumn("Code", 5, CLIListColumn::leftAligned),
-                CLIListColumn("Name", 20, CLIListColumn::leftAligned),
-                CLIListColumn("Balance", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
-                CLIListColumn("Reconciled", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
-                CLIListColumn("After Bills", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
-                CLIListColumn("Remaining", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
-                CLIListColumn("P", 1, CLIListColumn::leftAligned)
-            });
+            unsigned long terminalWidth = Terminal::getWidth();
+
+            if (terminalWidth > LIST_VIEW_THRESHOLD_WIDTH) {
+                setColumns({
+                    CLIListColumn("Code", 5, CLIListColumn::leftAligned),
+                    CLIListColumn("Name", 20, CLIListColumn::leftAligned),
+                    CLIListColumn("Balance", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("Reconciled", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("After Bills", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("Remaining", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("P", 1, CLIListColumn::leftAligned)
+                });
+            }
+            else {
+                setColumns({
+                    CLIListColumn("Code", 5, CLIListColumn::leftAligned),
+                    CLIListColumn("Name", 20, CLIListColumn::leftAligned),
+                    CLIListColumn("Balance", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("Remaining", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned),
+                    CLIListColumn("P", 1, CLIListColumn::leftAligned)
+                });
+            }
 
             for (size_t i = 0;i < result.size();i++) {
                 DBAccount account = result[i];
@@ -207,17 +202,26 @@ class AccountListView : public CLIListView {
                 account.doBalancePrerequisites();
                 
                 Money currentBalance = account.calculateCurrentBalance();
-                Money reconciledBalance = account.calculateReconciledBalance();
                 Money balanceAfterBills = account.calculateBalanceAfterBills();
                 Money remainingBalance = account.calculateRemainingBalance(balanceAfterBills);
+                Money reconciledBalance = account.calculateReconciledBalance();
 
-                row.addCell(account.code);
-                row.addCell(account.name);
-                row.addCell(currentBalance);
-                row.addCell(reconciledBalance);
-                row.addCell(balanceAfterBills);
-                row.addCell(remainingBalance);
-                row.addCell(account.isPrimary() ? "*" : "");
+                if (terminalWidth > LIST_VIEW_THRESHOLD_WIDTH) {
+                    row.addCell(account.code);
+                    row.addCell(account.name);
+                    row.addCell(currentBalance);
+                    row.addCell(reconciledBalance);
+                    row.addCell(balanceAfterBills);
+                    row.addCell(remainingBalance);
+                    row.addCell((account.isPrimary() ? string("*") : string("")));
+                }
+                else {
+                    row.addCell(account.code);
+                    row.addCell(account.name);
+                    row.addCell(currentBalance);
+                    row.addCell(remainingBalance);
+                    row.addCell((account.isPrimary() ? string("*") : string("")));
+                }
 
                 addRow(row);
             }

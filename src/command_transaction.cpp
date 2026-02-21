@@ -171,9 +171,10 @@ void Command::listTransactions() {
                                 thisPeriod, 
                                 sortDirection, 
                                 rowLimit);
+
     unsigned long terminalWidth = Terminal::getWidth();
 
-    if (terminalWidth > 110UL) {
+    if (terminalWidth > LIST_VIEW_THRESHOLD_WIDTH) {
         TransactionListView view;
 
         if (showTotal) {
@@ -310,10 +311,20 @@ void Command::findTransactions(const string & where) {
 
     cacheMgr.addFindCriteria(where);
 
-    TransactionListView view;
-    view.addTotal();
-    view.addResults(result);
-    view.show();
+    unsigned long terminalWidth = Terminal::getWidth();
+
+    if (terminalWidth > LIST_VIEW_THRESHOLD_WIDTH) {
+        TransactionListView view;
+        view.addTotal();
+        view.addResults(result);
+        view.show();
+    }
+    else {
+        TransactionDetailsListView view;
+        view.addTotal();
+        view.addResults(result);
+        view.show();
+    }
 }
 
 void Command::findTransactions(DBCriteria & criteria) {
@@ -331,10 +342,20 @@ void Command::findTransactions(DBCriteria & criteria) {
 
     cacheMgr.addFindCriteria(criteria.getWhereClause());
 
-    TransactionListView view;
-    view.addTotal();
-    view.addResults(result);
-    view.show();
+    unsigned long terminalWidth = Terminal::getWidth();
+
+    if (terminalWidth > LIST_VIEW_THRESHOLD_WIDTH) {
+        TransactionListView view;
+        view.addTotal();
+        view.addResults(result);
+        view.show();
+    }
+    else {
+        TransactionDetailsListView view;
+        view.addTotal();
+        view.addResults(result);
+        view.show();
+    }
 }
 
 void Command::transactionsByCategory() {

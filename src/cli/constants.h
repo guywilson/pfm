@@ -18,4 +18,6 @@
 #define LIST_VIEW_TRANSFER_WIDTH                1
 #define LIST_VIEW_FREQUENCY_WIDTH               3
 
+#define LIST_VIEW_THRESHOLD_WIDTH               110UL
+
 #define CLI_CANCEL_KEY                         'x'

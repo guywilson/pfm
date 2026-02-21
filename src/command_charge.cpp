@@ -93,9 +93,18 @@ void Command::listRecurringCharges() {
         cacheMgr.addRecurringCharge(charge.sequence, charge);
     }
 
-    RecurringChargeListView view = RecurringChargeListView(selectedAccount);
-    view.addResults(result);
-    view.show();
+    unsigned long terminalWidth = Terminal::getWidth();
+
+    if (terminalWidth > LIST_VIEW_THRESHOLD_WIDTH) {
+        RecurringChargeListView view = RecurringChargeListView(selectedAccount);
+        view.addResults(result);
+        view.show();
+    }
+    else {
+        RecurringChargeDetailsListView view = RecurringChargeDetailsListView(selectedAccount);
+        view.addResults(result);
+        view.show();
+    }
 }
 
 void Command::listOutstandingCharges() {
@@ -225,7 +234,7 @@ void Command::exportRecurringCharges() {
         records.push_back(r);
     }
     
-    JFileWriter jFile = JFileWriter(jsonFileName, "DBRecurringCharge");
+    JFileWriter jFile(jsonFileName, "DBRecurringCharge");
     jFile.write(records, "charges");
 }
 
