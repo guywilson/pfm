@@ -46,7 +46,7 @@ void Command::listReports() {
         cacheMgr.addReport(report.sequence, report);
     }
 
-    ReportListView view;
+    ReportDetailsListView view;
     view.addResults(result);
     view.show();
 }

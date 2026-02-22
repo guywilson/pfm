@@ -12,6 +12,8 @@ using namespace std;
 #define TERMINAL_MIN_WIDTH                    80U
 #define TERMINAL_MIN_HEIGHT                   17U
 
+#define LIST_VIEW_THRESHOLD_WIDTH            110UL
+
 class Terminal {
     public:
         static unsigned long getWidth() {
@@ -33,6 +35,10 @@ class Terminal {
         static inline unsigned long fullHeightMinimum() {
             return TERMINAL_MIN_HEIGHT;
         }
+
+        static bool isOverWidthThreshold() {
+            return (getWidth() > LIST_VIEW_THRESHOLD_WIDTH);
+        } 
 };
 
 #endif

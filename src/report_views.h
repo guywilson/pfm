@@ -51,6 +51,42 @@ class AddReportView : public CLIView {
         }
 };
 
+class ReportDetailsListView : public CLIDetailListView {
+    private:
+        std::string formatSequence(uint32_t sequence) {
+            char sqStr[8];
+            snprintf(sqStr, 8, "%03u", sequence);
+            return std::string(sqStr);
+        }
+
+    public:
+        void addResults(DBResult<DBTransactionReport> & result) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Report list (%zu)", result.size());
+            setTitle(szTitle);
+
+            for (size_t i = 0;i < result.size();i++) {
+                DBTransactionReport report = result[i];
+
+                CLIDetailListRow row;
+
+                row.addPrimaryCell(CLIDetailListCell(formatSequence(report.sequence), 3, TextStyle::NoStyle, Colour::Cyan));
+                row.addPrimaryCell(CLIDetailListCell(report.description, 71, TextStyle::NoStyle, Colour::White));
+
+                row.addSecondaryCell(CLIDetailListCell("", 3, TextStyle::NoStyle, Colour::Default));
+                row.addSecondaryCell(CLIDetailListCell(report.sqlWhereClause, 71, TextStyle::Bold, Colour::Green));
+
+                addRow(row);
+            }
+        }
+
+        void show() override {
+            CLIDetailListView::show();
+            cout << endl;
+        }
+};
+
 class ReportListView : public CLIListView {
     private:
         void buildResultsTable(DBResult<DBTransactionReport> & result) {

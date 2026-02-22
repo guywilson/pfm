@@ -196,7 +196,8 @@ class RecurringChargeListView : public CLIListView {
 
 class RecurringChargeDetailsListView : public CLIDetailListView {
     private:
-        Money total;
+        string accountCode;
+        Money total = 0.0;
 
         std::string formatSequence(uint32_t sequence) {
             char sqStr[8];
@@ -206,11 +207,15 @@ class RecurringChargeDetailsListView : public CLIDetailListView {
 
     public:
         RecurringChargeDetailsListView(DBAccount & account) {
-            setTitle("Recurring Charges for account: " + account.code);
-            total = 0.0;
+            accountCode = account.code;
         }
 
         void addResults(DBResult<DBRecurringChargeView> & result) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Recurring charges for account: %s (%zu)", accountCode.c_str(), result.size());
+            setTitle(szTitle);
+
             for (size_t i = 0;i < result.size();i++) {
                 DBRecurringChargeView charge = result[i];
 

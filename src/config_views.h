@@ -115,10 +115,39 @@ class ConfigListView : public CLIListView {
                 row.addCell(config.key);
                 row.addCell(config.value);
                 row.addCell(config.description);
-                row.addCell(config.isReadOnly ? "RO" : "RW");
+                row.addCell((config.isReadOnly ? string("RO") : string("RW")));
 
                 addRow(row);
             }
+        }
+};
+
+class ConfigDetailsListView : public CLIDetailListView {
+    public:
+        void addResults(DBResult<DBConfig> & result) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Config items (%zu)", result.size());
+            setTitle(szTitle);
+
+            for (size_t i = 0;i < result.size();i++) {
+                DBConfig cfg = result[i];
+
+                CLIDetailListRow row;
+
+                row.addPrimaryCell(CLIDetailListCell(cfg.key, 16, TextStyle::Bold, Colour::Yellow));
+                row.addPrimaryCell(CLIDetailListCell(cfg.value, 58, TextStyle::NoStyle, Colour::Green));
+
+                row.addSecondaryCell(CLIDetailListCell((cfg.isReadOnly ? "RO" : "RW"), 2, TextStyle::Bold, Colour::Red));
+                row.addSecondaryCell(CLIDetailListCell(cfg.description, 72, TextStyle::NoStyle, Colour::Default));
+
+                addRow(row);
+            }
+        }
+
+        void show() override {
+            CLIDetailListView::show();
+            cout << endl;
         }
 };
 

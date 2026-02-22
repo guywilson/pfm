@@ -41,9 +41,16 @@ void Command::listShortcuts() {
         cacheMgr.addShortcut(shortcut.sequence, shortcut);
     }
 
-    ShortcutListView view;
-    view.addResults(result);
-    view.show();
+    if (Terminal::isOverWidthThreshold()) {
+        ShortcutListView view;
+        view.addResults(result);
+        view.show();
+    }
+    else {
+        ShortcutDetailsListView view;
+        view.addResults(result);
+        view.show();
+    }
 }
 
 DBShortcut Command::getShortcut(int sequence) {

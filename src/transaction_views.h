@@ -231,16 +231,17 @@ class TransactionDetailsListView : public CLIDetailListView {
         }
 
     public:
-        TransactionDetailsListView() {
-            setTitle("Transactions");
-        }
-
         void addTotal() {
             total = 0.0;
             isTotalEnabled = true;
         }
 
         void addResults(DBResult<DBTransactionView> & result) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Transactions list (%zu)", result.size());
+            setTitle(szTitle);
+
             for (size_t i = 0;i < result.size();i++) {
                 DBTransactionView transaction = result[i];
 

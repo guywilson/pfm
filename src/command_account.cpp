@@ -83,9 +83,7 @@ void Command::chooseAccount() {
     DBTransactionView transaction;
     DBResult<DBTransactionView> result = transaction.retrieveByAccountID(account.id, DBCriteria::descending, 16);
 
-    unsigned long terminalWidth = Terminal::getWidth();
-
-    if (terminalWidth > LIST_VIEW_THRESHOLD_WIDTH) {
+    if (Terminal::isOverWidthThreshold()) {
         TransactionListView trView;
         trView.addResults(result, account.code);
         trView.show();

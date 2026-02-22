@@ -172,9 +172,7 @@ void Command::listTransactions() {
                                 sortDirection, 
                                 rowLimit);
 
-    unsigned long terminalWidth = Terminal::getWidth();
-
-    if (terminalWidth > LIST_VIEW_THRESHOLD_WIDTH) {
+    if (Terminal::isOverWidthThreshold()) {
         TransactionListView view;
 
         if (showTotal) {

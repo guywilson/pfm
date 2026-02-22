@@ -55,9 +55,9 @@ class ShortcutListView : public CLIListView {
             reserveRows(result.size());
             
             setColumns({
-                CLIListColumn("Sq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
-                CLIListColumn("Shortcut", 8, CLIListColumn::leftAligned),
-                CLIListColumn("Replacement", 59, CLIListColumn::leftAligned)
+                CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("Shortcut", 12, CLIListColumn::leftAligned),
+                CLIListColumn("Replacement", 80, CLIListColumn::leftAligned)
             });
 
             for (size_t i = 0;i < result.size();i++) {
@@ -102,6 +102,42 @@ class ShortcutListView : public CLIListView {
 
         void show() override {
             CLIListView::show();
+        }
+};
+
+class ShortcutDetailsListView : public CLIDetailListView {
+    private:
+        std::string formatSequence(uint32_t sequence) {
+            char sqStr[8];
+            snprintf(sqStr, 8, "%03u", sequence);
+            return std::string(sqStr);
+        }
+
+    public:
+        void addResults(DBResult<DBShortcut> & result) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Shortcut list (%zu)", result.size());
+            setTitle(szTitle);
+
+            for (size_t i = 0;i < result.size();i++) {
+                DBShortcut shortcut = result[i];
+
+                CLIDetailListRow row;
+
+                row.addPrimaryCell(CLIDetailListCell(formatSequence(shortcut.sequence), 3, TextStyle::NoStyle, Colour::Cyan));
+                row.addPrimaryCell(CLIDetailListCell(shortcut.shortcut, 71, TextStyle::NoStyle, Colour::White));
+
+                row.addSecondaryCell(CLIDetailListCell("", 3, TextStyle::NoStyle, Colour::Default));
+                row.addSecondaryCell(CLIDetailListCell(shortcut.replacementText, 71, TextStyle::Bold, Colour::Green));
+
+                addRow(row);
+            }
+        }
+
+        void show() override {
+            CLIDetailListView::show();
+            cout << endl;
         }
 };
 

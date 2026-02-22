@@ -37,7 +37,7 @@ void Command::listConfigItems() {
     DBConfig config;
     DBResult<DBConfig> result = config.retrieveAllVisible();
 
-    ConfigListView view;
+    ConfigDetailsListView view;
     view.addResults(result);
     view.show();
 }

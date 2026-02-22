@@ -138,19 +138,19 @@ class CLIDetailListRow : public CLIWidget {
 
     protected:
         inline int getTotalWidth() {
-            int primaryWidth = 0;
+            int primaryWidth = 1;
 
             for (int w : primaryCellWidths) {
-                primaryWidth += w;
+                primaryWidth += (w + 1);
             }
 
-            int secondaryWidth = 0;
+            int secondaryWidth = 1;
 
             for (int w : secondaryCellWidths) {
-                secondaryWidth += w;
+                secondaryWidth += (w + 1);
             }
 
-            return (primaryWidth > secondaryWidth ? primaryWidth : secondaryWidth) + 5;
+            return (primaryWidth > secondaryWidth ? primaryWidth : secondaryWidth);
         }
 
     public:

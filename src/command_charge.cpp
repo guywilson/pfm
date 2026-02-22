@@ -93,9 +93,7 @@ void Command::listRecurringCharges() {
         cacheMgr.addRecurringCharge(charge.sequence, charge);
     }
 
-    unsigned long terminalWidth = Terminal::getWidth();
-
-    if (terminalWidth > LIST_VIEW_THRESHOLD_WIDTH) {
+    if (Terminal::isOverWidthThreshold()) {
         RecurringChargeListView view = RecurringChargeListView(selectedAccount);
         view.addResults(result);
         view.show();
