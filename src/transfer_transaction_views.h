@@ -87,9 +87,7 @@ class TransferListView : public CLIListView {
                 CLIListColumn("From:", 5, CLIListColumn::leftAligned),
                 CLIListColumn("To:", 5, CLIListColumn::leftAligned),
                 CLIListColumn("Date", DATE_FIELD_LENGTH, CLIListColumn::leftAligned),
-                CLIListColumn("Description", 25, CLIListColumn::leftAligned),
-                CLIListColumn("Ctgry", 5, CLIListColumn::leftAligned),
-                CLIListColumn("Payee", 5, CLIListColumn::leftAligned),
+                CLIListColumn("Description", 23, CLIListColumn::leftAligned),
                 CLIListColumn("Amount", LIST_VIEW_AMOUNT_WIDTH, CLIListColumn::rightAligned)
             });
 
@@ -103,8 +101,6 @@ class TransferListView : public CLIListView {
                 row.addCell(transfer.accountToCode);
                 row.addCell(transfer.date);
                 row.addCell(transfer.description);
-                row.addCell(transfer.categoryCode);
-                row.addCell(transfer.payeeCode);
                 row.addCell(transfer.amount);
 
                 total += transfer.amount;
