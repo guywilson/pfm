@@ -163,11 +163,11 @@ const vector<CommandEntry> commandTable = {
         [](Command& c){ c.listPaidCharges(); }},
 
     {"update-recurring-charge", {"urc"}, 
-        "Update the recurring charge specified with sequence supplied", 
+        "Update the recurring charge specified by sequence", 
         [](Command& c){ c.updateRecurringCharge(); }},
 
     {"delete-recurring-charge", {"drc"}, 
-        "Delete the recurring charge specified with the sequence supplied", 
+        "Delete the recurring charge specified by sequence", 
         [](Command& c){ c.deleteRecurringCharge(); }},
 
     {"import-recurring-charges", {"irc"}, 
@@ -187,7 +187,7 @@ const vector<CommandEntry> commandTable = {
         [](Command& c){ c.addTransaction(); }},
 
     {"copy-transaction", {"ct", "copy"}, 
-        "Copy the transaction specified with the sequence supplied, or the last transaction created", 
+        "Copy the transaction specified by sequence, or the last transaction created", 
         [](Command& c){ c.copyTransaction(); }},
 
     {"list-transactions", {"lt", "list"}, 
@@ -207,19 +207,19 @@ const vector<CommandEntry> commandTable = {
         [](Command& c){ c.transactionsByPayee(); }},
 
     {"update-transaction", {"ut"}, 
-        "Update the transaction specified with the sequence supplied", 
+        "Update the transaction specified by sequence", 
         [](Command& c){ c.updateTransaction(); }},
 
     {"delete-transaction", {"dt"}, 
-        "Delete the transaction specified with the sequence supplied", 
+        "Delete the transaction specified by sequence", 
         [](Command& c){ c.deleteTransaction(); }},
 
     {"reconcile-transaction", {"reconcile", "rt"}, 
-        "Toggle the reconcile status of the transaction specified with the sequence supplied", 
+        "Toggle the reconcile status of the transaction specified by sequence", 
         [](Command& c){ c.reconcileTransaction(); }},
 
     {"show-transaction", {"show", "st"}, 
-        "Show the transaction details specified with the sequence supplied", 
+        "Show the transaction details specified by sequence", 
         [](Command& c){ c.showTransaction(); }},
 
     {"import-transactions", {"it"}, 
@@ -243,7 +243,7 @@ const vector<CommandEntry> commandTable = {
         [](Command& c){ c.listTransferRecords(); }},
 
     {"delete-transfer-record", {"dtr"}, 
-        "Delete the transfer transaction record specified with the sequence supplied", 
+        "Delete the transfer transaction record specified by sequence", 
         [](Command& c){ c.deleteTransferRecord(); }},
 
     {"add-report", {"arp"}, 
@@ -259,15 +259,15 @@ const vector<CommandEntry> commandTable = {
         [](Command& c){ c.listReports(); }},
 
     {"update-report", {"urp"}, 
-        "Update the report specified by the supplied sequence", 
+        "Update the report specified by sequence", 
         [](Command& c){ c.updateReport(); }},
 
     {"delete-report", {"drp"}, 
-        "Delete the report specified by the supplied sequence", 
+        "Delete the report specified by sequence", 
         [](Command& c){ c.deleteReport(); }},
 
     {"run-report", {"run"}, 
-        "Run the report specified by the supplied sequence, the same as running the find command with the same criteria", 
+        "Run the report specified by sequence, the same as running the find command with the same criteria", 
         [](Command& c){ c.runReport(); }},
 
     {"save-report", {"save"}, 
@@ -275,7 +275,7 @@ const vector<CommandEntry> commandTable = {
         [](Command& c){ c.saveReport(); }},
 
     {"show-report", {"srp", "show"}, 
-        "Show the criteria of the report specified with the supplied sequence", 
+        "Show the criteria of the report specified by sequence", 
         [](Command& c){ c.showReport(); }},
 
     {"add-shortcut", {"ash"}, 
@@ -287,11 +287,11 @@ const vector<CommandEntry> commandTable = {
         [](Command& c){ c.listShortcuts(); }},
 
     {"update-shortcut", {"ush"}, 
-        "Update the shortcut specified by the supplied sequence", 
+        "Update the shortcut specified by sequence", 
         [](Command& c){ c.updateShortcut(); }},
 
     {"delete-shortcut", {"dsh"}, 
-        "Delete the shortcut specified by the supplied sequence", 
+        "Delete the shortcut specified by sequence", 
         [](Command& c){ c.deleteShortcut(); }},
 
     {"backup", {}, 
