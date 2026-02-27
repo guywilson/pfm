@@ -438,7 +438,14 @@ void Command::reconcileTransaction() {
     DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
 
     transaction.retrieve();
-    transaction.isReconciled = true;
+
+    if (transaction.isReconciled) {
+        transaction.isReconciled = false;
+    }
+    else {
+        transaction.isReconciled = true;
+    }
+    
     transaction.save();
 }
 

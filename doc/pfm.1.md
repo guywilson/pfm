@@ -250,7 +250,7 @@ Add a new transfer transaction to the currently selected account
 
 **reconcile-transaction, reconcile, rt [sequence number]**
 
-Reconcile the transaction with the supplied sequence number.
+Toggle the reconciled status of the transaction specified by sequence.
 
 **change-password**
 

@@ -215,7 +215,7 @@ const vector<CommandEntry> commandTable = {
         [](Command& c){ c.deleteTransaction(); }},
 
     {"reconcile-transaction", {"reconcile", "rt"}, 
-        "Reconcile the transaction specified with the sequence supplied", 
+        "Toggle the reconcile status of the transaction specified with the sequence supplied", 
         [](Command& c){ c.reconcileTransaction(); }},
 
     {"show-transaction", {"show", "st"}, 
