@@ -180,7 +180,7 @@ class RecurringChargeListView : public CLIListView {
                 row.addCell(charge.payeeCode);
                 row.addCell(charge.frequency.toString());
                 row.addCell(charge.amount);
-                row.addCell(charge.getIsTransferValue());
+                row.addCell(string(charge.getIsTransferValue()));
 
                 total += charge.amount;
                 addRow(row);
