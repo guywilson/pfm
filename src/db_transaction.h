@@ -277,6 +277,7 @@ class DBTransaction : public DBPayment {
         DBResult<DBTransaction> retrieveByAccountID(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, int rowLimit);
         DBResult<DBTransaction> retrieveReconciledByAccountID(pfm_id_t & accountId);
         DBResult<DBTransaction> retrieveByRecurringChargeID(pfm_id_t & recurringChargeId);
+        DBResult<DBTransaction> retrieveByRecurringChargeIDAndDate(pfm_id_t & recurringChargeId, StrDate & onDate);
         DBResult<DBTransaction> retrieveByRecurringChargeIDAfterDate(pfm_id_t & recurringChargeId, StrDate & after);
         DBResult<DBTransaction> retrieveByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransaction> retrieveReconciledByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);

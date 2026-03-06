@@ -295,6 +295,18 @@ void DBRecurringCharge::beforeUpdate() {
         }
     }
 
+    if (this->lastPaymentDate != currentCharge.lastPaymentDate) {
+        log.debug("Updating transaction date for charge '%s'", this->description.c_str());
+        
+        DBTransaction tr;
+        DBResult<DBTransaction> trResult = tr.retrieveByRecurringChargeIDAndDate(id, currentCharge.lastPaymentDate);
+
+        DBTransaction transaction = trResult[0];
+
+        transaction.date = this->lastPaymentDate;
+        transaction.save();
+    }
+
     log.exit("DBRecurringCharge::beforeUpdate()");
 }
 
