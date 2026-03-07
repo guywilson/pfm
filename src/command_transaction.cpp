@@ -251,6 +251,7 @@ void Command::findTransactions() {
 
             string type = getParameter("type");
             transform(type.begin(), type.end(), type.begin(), ::toupper);
+            criteria = DBTransactionView::FindCriteriaHelper::handleWithThisType(criteria, type);
 
             string recurring = getParameter("rec");
             if (!recurring.empty()) {

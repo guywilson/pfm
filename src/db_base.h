@@ -80,6 +80,8 @@ class DBCriteria {
         void clear() {
             whereClauses.clear();
             orderClauses.clear();
+            groupClauses.clear();
+            inClauses.clear();
             rowLimit = NULL_ROW_LIMIT;
         }
 
@@ -412,18 +414,16 @@ class DBCriteria {
             rowLimit = numRows;
         }
 
-        const string getWhereClause() {
+        const string getWhereClause() const {
             if (whereClauses.empty()) {
                 return "";
             }
 
             string where = " WHERE ";
+            for (size_t i = 0; i < whereClauses.size(); i++) {
+                where += whereClauses[i];
 
-            while (!whereClauses.empty()) {
-                where += whereClauses.front();
-                whereClauses.pop_front();
-
-                if (!whereClauses.empty()) {
+                if (i + 1 < whereClauses.size()) {
                     where += " AND ";
                 }
             }
@@ -431,18 +431,16 @@ class DBCriteria {
             return where;
         }
 
-        const string getOrderBy() {
+        const string getOrderBy() const {
             if (orderClauses.empty()) {
                 return "";
             }
 
             string orderBy = " ORDER BY ";
+            for (size_t i = 0; i < orderClauses.size(); i++) {
+                orderBy += orderClauses[i];
 
-            while (!orderClauses.empty()) {
-                orderBy += orderClauses.front();
-                orderClauses.pop_front();
-
-                if (!orderClauses.empty()) {
+                if (i + 1 < orderClauses.size()) {
                     orderBy += ", ";
                 }
             }
@@ -450,18 +448,16 @@ class DBCriteria {
             return orderBy;
         }
 
-        const string getGroupBy() {
+        const string getGroupBy() const {
             if (groupClauses.empty()) {
                 return "";
             }
 
             string groupBy = " GROUP BY ";
+            for (size_t i = 0; i < groupClauses.size(); i++) {
+                groupBy += groupClauses[i];
 
-            while (!groupClauses.empty()) {
-                groupBy += groupClauses.front();
-                groupClauses.pop_front();
-
-                if (!groupClauses.empty()) {
+                if (i + 1 < groupClauses.size()) {
                     groupBy += ", ";
                 }
             }
@@ -469,7 +465,7 @@ class DBCriteria {
             return groupBy;
         }
 
-        const string getLimitClause() {
+        const string getLimitClause() const {
             if (rowLimit == NULL_ROW_LIMIT) {
                 return "";
             }
@@ -480,7 +476,7 @@ class DBCriteria {
             return string(limitString);
         }
 
-        const string getStatementCriteria() {
+        const string getStatementCriteria() const {
             string criteria =
                 getWhereClause() + 
                 getOrderBy() + 

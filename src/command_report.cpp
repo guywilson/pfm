@@ -104,13 +104,12 @@ void Command::saveReport() {
         view.show();
 
         report = view.getReport();
-        report.sqlWhereClause = cacheMgr.getFindCriteria();
     }
     else {
         report.description = description;
-        report.sqlWhereClause = cacheMgr.getFindCriteria();
     }
 
+    report.sqlWhereClause = cacheMgr.getFindCriteria();    
     report.save();
 
     cacheMgr.clearFindCriteria();
