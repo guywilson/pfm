@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -12,9 +14,6 @@
 #include "strdate.h"
 
 using namespace std;
-
-#ifndef __INCL_RECURRING_TRANSFER
-#define __INCL_RECURRING_TRANSFER
 
 class DBRecurringTransfer : public DBEntity {
     protected:
@@ -112,4 +111,3 @@ class DBRecurringTransfer : public DBEntity {
         int retrieveByRecurringChargeId(pfm_id_t & recurringChargeId);
 };
 
-#endif

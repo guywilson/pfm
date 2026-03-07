@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -17,9 +19,6 @@
 #include "strdate.h"
 
 using namespace std;
-
-#ifndef __INCL_TRANSACTION
-#define __INCL_TRANSACTION
 
 #define TYPE_CREDIT         "CR"
 #define TYPE_DEBIT          "DB"
@@ -285,4 +284,3 @@ class DBTransaction : public DBPayment {
         DBResult<DBTransaction> findTransactionsForAccountID(pfm_id_t & accountId, string & criteria);
 };
 
-#endif

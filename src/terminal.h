@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <stdint.h>
@@ -5,9 +7,6 @@
 #include <sys/ioctl.h>
 
 using namespace std;
-
-#ifndef __INCL_TERMINAL
-#define __INCL_TERMINAL
 
 #define TERMINAL_MIN_WIDTH                    80U
 #define TERMINAL_MIN_HEIGHT                   17U
@@ -41,4 +40,3 @@ class Terminal {
         } 
 };
 
-#endif

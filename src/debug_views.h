@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -11,9 +13,6 @@
 #include "db_v_carried_over.h"
 
 using namespace std;
-
-#ifndef __DEBUG_VIEWS
-#define __DEBUG_VIEWS
 
 class CarriedOverListView : public CLIListView {
     public:
@@ -161,5 +160,3 @@ class GenericListView : public CLIListView {
             }
         }
 };
-
-#endif

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -8,9 +10,6 @@
 #include <stdarg.h>
 
 using namespace std;
-
-#ifndef _INCL_CONFIGMGR
-#define _INCL_CONFIGMGR
 
 class cfgmgr {
     public:
@@ -40,5 +39,3 @@ class cfgmgr {
 
         void dumpConfig();
 };
-
-#endif

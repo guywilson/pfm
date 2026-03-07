@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <stdint.h>
@@ -7,9 +9,6 @@
 #include "pfm_error.h"
 
 using namespace std;
-
-#ifndef __INCL_MONEY
-#define __INCL_MONEY
 
 #define DECIMAL_POINT_NOT_FOUND_VALUE               -1
 #define AMOUNT_BUFFER_LENGTH                        64
@@ -869,5 +868,4 @@ class MoneyTest {
             cout << "Tests passed: " << numTestsPassed << ", tests failed: " << numTestsFailed << endl;
         }
 };
-#endif
 #endif

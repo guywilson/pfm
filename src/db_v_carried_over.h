@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -12,9 +14,6 @@
 #include "strdate.h"
 
 using namespace std;
-
-#ifndef __INCL_CARRIED_OVER_VIEW
-#define __INCL_CARRIED_OVER_VIEW
 
 class DBCarriedOverView : public DBCarriedOver {
     protected:
@@ -63,4 +62,3 @@ class DBCarriedOverView : public DBCarriedOver {
         }
 };
 
-#endif

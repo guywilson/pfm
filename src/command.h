@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -23,9 +25,6 @@
 #include "db_public_holiday.h"
 
 using namespace std;
-
-#ifndef __INCL_COMMAND
-#define __INCL_COMMAND
 
 #define SIMPLE_PARAM_NAME                   "param"
 #define SEQUENCE_PARAM_NAME                 "sequence"
@@ -215,4 +214,3 @@ class Command {
         bool process(const string & commandLine);
 };
 
-#endif

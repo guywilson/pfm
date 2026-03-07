@@ -1,25 +1,15 @@
+#pragma once
+
 #include <string>
 #include <unordered_map>
-#include <stdint.h>
 
-#include <sqlcipher/sqlite3.h>
-
-#include "pfm_error.h"
-#include "db_account.h"
-#include "db_category.h"
-#include "db_payee.h"
+#include "db_public_holiday.h"
 #include "db_recurring_charge.h"
-#include "db_v_transaction.h"
+#include "db_shortcut.h"
 #include "db_transaction.h"
 #include "db_transaction_report.h"
-#include "db_shortcut.h"
-#include "db_public_holiday.h"
 #include "db_transfer_transaction_record.h"
-
-using namespace std;
-
-#ifndef __INCL_CACHE
-#define __INCL_CACHE
+#include "pfm_error.h"
 
 class CacheMgr {
     public:
@@ -28,145 +18,137 @@ class CacheMgr {
             return instance;
         }
 
-    private:
-        CacheMgr() {}
+        CacheMgr(const CacheMgr &) = delete;
+        CacheMgr & operator=(const CacheMgr &) = delete;
+        CacheMgr(CacheMgr &&) = delete;
+        CacheMgr & operator=(CacheMgr &&) = delete;
 
-        unordered_map<int, DBRecurringCharge> recurringChargeBySequence;
-        unordered_map<int, DBTransaction> transactionBySequence;
-        unordered_map<int, DBTransactionReport> reportBySequence;
-        unordered_map<int, DBShortcut> shortcutBySequence;
-        unordered_map<int, DBPublicHoliday> holidayBySequence;
-        unordered_map<int, DBTransferTransactionRecord> transferBySequence;
-
-        string findCriteria;
-
-    public:
-        ~CacheMgr() {}
+        ~CacheMgr() = default;
 
         void clearRecurringCharges() {
-            recurringChargeBySequence.clear();
+            clearCache(recurringChargeBySequence);
         }
 
         void clearTransactions() {
-            transactionBySequence.clear();
+            clearCache(transactionBySequence);
         }
 
         void clearReports() {
-            reportBySequence.clear();
+            clearCache(reportBySequence);
         }
 
         void clearShortcuts() {
-            shortcutBySequence.clear();
+            clearCache(shortcutBySequence);
         }
 
         void clearHolidays() {
-            holidayBySequence.clear();
+            clearCache(holidayBySequence);
         }
 
         void clearTransferRecords() {
-            transferBySequence.clear();
+            clearCache(transferBySequence);
         }
 
         void clearFindCriteria() {
             findCriteria.clear();
         }
 
-        void addRecurringCharge(int sequence, DBRecurringCharge & charge) {
-            recurringChargeBySequence.insert({sequence, charge});
+        void addRecurringCharge(int sequence, const DBRecurringCharge & charge) {
+            putItem(recurringChargeBySequence, sequence, charge);
         }
 
-        void addTransaction(int sequence, DBTransaction & transaction) {
-            transactionBySequence.insert({sequence, transaction});
+        void addTransaction(int sequence, const DBTransaction & transaction) {
+            putItem(transactionBySequence, sequence, transaction);
         }
 
-        void addReport(int sequence, DBTransactionReport & report) {
-            reportBySequence.insert({sequence, report});
+        void addReport(int sequence, const DBTransactionReport & report) {
+            putItem(reportBySequence, sequence, report);
         }
 
-        void addShortcut(int sequence, DBShortcut & shortcut) {
-            shortcutBySequence.insert({sequence, shortcut});
+        void addShortcut(int sequence, const DBShortcut & shortcut) {
+            putItem(shortcutBySequence, sequence, shortcut);
         }
 
-        void addHoliday(int sequence, DBPublicHoliday & holiday) {
-            holidayBySequence.insert({sequence, holiday});
+        void addHoliday(int sequence, const DBPublicHoliday & holiday) {
+            putItem(holidayBySequence, sequence, holiday);
         }
 
-        void addTransfer(int sequence, DBTransferTransactionRecord & transfer) {
-            transferBySequence.insert({sequence, transfer});
+        void addTransfer(int sequence, const DBTransferTransactionRecord & transfer) {
+            putItem(transferBySequence, sequence, transfer);
         }
 
-        DBRecurringCharge getRecurringCharge(int sequence) {
-            unordered_map<int, DBRecurringCharge>::const_iterator item = recurringChargeBySequence.find(sequence);
-
-            if (item != recurringChargeBySequence.end()) {
-                return item->second;
-            }
-
-            throw pfm_error("DBRecurringCharge not found in cache.");
+        const DBRecurringCharge & getRecurringCharge(int sequence) const {
+            return getItem(recurringChargeBySequence, sequence, "DBRecurringCharge not found in cache.");
         }
 
-        DBTransaction getTransaction(int sequence) {
-            unordered_map<int, DBTransaction>::const_iterator item = transactionBySequence.find(sequence);
-
-            if (item != transactionBySequence.end()) {
-                return item->second;
-            }
-
-            throw pfm_error("DBTransaction not found in cache.");
+        const DBTransaction & getTransaction(int sequence) const {
+            return getItem(transactionBySequence, sequence, "DBTransaction not found in cache.");
         }
 
-        DBTransactionReport getReport(int sequence) {
-            unordered_map<int, DBTransactionReport>::const_iterator item = reportBySequence.find(sequence);
-
-            if (item != reportBySequence.end()) {
-                return item->second;
-            }
-
-            throw pfm_error("DBTransactionReport not found in cache.");
+        const DBTransactionReport & getReport(int sequence) const {
+            return getItem(reportBySequence, sequence, "DBTransactionReport not found in cache.");
         }
 
-        DBShortcut getShortcut(int sequence) {
-            unordered_map<int, DBShortcut>::const_iterator item = shortcutBySequence.find(sequence);
-
-            if (item != shortcutBySequence.end()) {
-                return item->second;
-            }
-
-            throw pfm_error("DBShortcut not found in cache.");
+        const DBShortcut & getShortcut(int sequence) const {
+            return getItem(shortcutBySequence, sequence, "DBShortcut not found in cache.");
         }
 
-        DBPublicHoliday getHoliday(int sequence) {
-            unordered_map<int, DBPublicHoliday>::const_iterator item = holidayBySequence.find(sequence);
-
-            if (item != holidayBySequence.end()) {
-                return item->second;
-            }
-
-            throw pfm_error("DBPublicHoliday not found in cache.");
+        const DBPublicHoliday & getHoliday(int sequence) const {
+            return getItem(holidayBySequence, sequence, "DBPublicHoliday not found in cache.");
         }
 
-        DBTransferTransactionRecord getTransfer(int sequence) {
-            unordered_map<int, DBTransferTransactionRecord>::const_iterator item = transferBySequence.find(sequence);
-
-            if (item != transferBySequence.end()) {
-                return item->second;
-            }
-
-            throw pfm_error("DBTransferRecord not found in cache.");
+        const DBTransferTransactionRecord & getTransfer(int sequence) const {
+            return getItem(transferBySequence, sequence, "DBTransferRecord not found in cache.");
         }
 
-        void addFindCriteria(const string & criteria) {
+        void setFindCriteria(const std::string & criteria) {
             findCriteria = criteria;
         }
 
-        string getFindCriteria() {
+        const std::string & getFindCriteria() const {
+            return findCriteria;
+        }
 
-            if (findCriteria.length() > 0) {
-                return findCriteria;
+    private:
+        template <typename T>
+        using SequenceCache = std::unordered_map<int, T>;
+
+        CacheMgr() = default;
+
+        template <typename T>
+        static void clearCache(SequenceCache<T> & cache) {
+            cache.clear();
+        }
+
+        template <typename T>
+        static void putItem(SequenceCache<T> & cache, int sequence, const T & item) {
+            typename SequenceCache<T>::iterator existing = cache.find(sequence);
+
+            if (existing != cache.end()) {
+                existing->second = item;
+                return;
             }
 
-            throw pfm_error("No find criteria found in cache.");
+            cache.insert(typename SequenceCache<T>::value_type(sequence, item));
         }
-};
 
-#endif
+        template <typename T>
+        static const T & getItem(const SequenceCache<T> & cache, int sequence, const char * errorMessage) {
+            typename SequenceCache<T>::const_iterator item = cache.find(sequence);
+
+            if (item != cache.end()) {
+                return item->second;
+            }
+
+            throw pfm_error(errorMessage);
+        }
+
+        SequenceCache<DBRecurringCharge> recurringChargeBySequence;
+        SequenceCache<DBTransaction> transactionBySequence;
+        SequenceCache<DBTransactionReport> reportBySequence;
+        SequenceCache<DBShortcut> shortcutBySequence;
+        SequenceCache<DBPublicHoliday> holidayBySequence;
+        SequenceCache<DBTransferTransactionRecord> transferBySequence;
+
+        std::string findCriteria;
+};

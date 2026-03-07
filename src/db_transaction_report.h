@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -12,9 +14,6 @@
 #include "cfgmgr.h"
 
 using namespace std;
-
-#ifndef __INCL_TRANSACTION_REPORT
-#define __INCL_TRANSACTION_REPORT
 
 class DBTransactionReport : public DBEntity {
     protected:
@@ -131,5 +130,3 @@ class DBTransactionReport : public DBEntity {
             }
         }
 };
-
-#endif

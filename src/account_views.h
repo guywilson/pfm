@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -11,9 +13,6 @@
 #include "custom_modifiers.h"
 
 using namespace std;
-
-#ifndef __ACCOUNT_VIEW
-#define __ACCOUNT_VIEW
 
 class AddAccountView : public CLIView {
     private:
@@ -300,5 +299,3 @@ class UpdateAccountView : public CLIView {
             return account;
         }
 };
-
-#endif

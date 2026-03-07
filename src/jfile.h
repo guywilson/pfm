@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -16,9 +18,6 @@ using json = nlohmann::json;
 
 using object_t = std::map<std::string, std::string>;
 using objects_t = std::vector<object_t>;
-
-#ifndef __INCL_JSON_ENTITY
-#define __INCL_JSON_ENTITY
 
 class JRecord {
     private:
@@ -62,4 +61,3 @@ class JFileWriter {
         void write(vector<JRecord> & records, const string & name);
 };
 
-#endif

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -10,9 +12,6 @@
 #include "strdate.h"
 
 using namespace std;
-
-#ifndef __INCL_PAYEE
-#define __INCL_PAYEE
 
 class DBPayee : public DBEntity {
     protected:
@@ -130,4 +129,3 @@ class DBPayee : public DBEntity {
         void retrieveByCode(string & code);
 };
 
-#endif

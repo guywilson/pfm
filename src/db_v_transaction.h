@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -13,9 +15,6 @@
 #include "pfm_error.h"
 
 using namespace std;
-
-#ifndef __INCL_TRANSACTION_VIEW
-#define __INCL_TRANSACTION_VIEW
 
 class DBTransactionView : public DBTransaction {
     protected:
@@ -255,4 +254,3 @@ class DBTransactionView : public DBTransaction {
         };
 };
 
-#endif

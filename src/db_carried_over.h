@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -14,9 +16,6 @@
 #include "cfgmgr.h"
 
 using namespace std;
-
-#ifndef __INCL_CARRIED_OVER
-#define __INCL_CARRIED_OVER
 
 class DBCarriedOver : public DBEntity {
     private:
@@ -161,4 +160,3 @@ class DBCarriedOver : public DBEntity {
         static DBCarriedOver createForPeriod(pfm_id_t & accountId, Money & startingBalance, StrDate & startDate, StrDate & endDate);
 };
 
-#endif

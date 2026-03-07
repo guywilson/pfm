@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -10,9 +12,6 @@
 #include "db_public_holiday.h"
 
 using namespace std;
-
-#ifndef __PUBLIC_HOLIDAY_VIEW
-#define __PUBLIC_HOLIDAY_VIEW
 
 class AddHolidayView : public CLIView {
     private:
@@ -156,5 +155,3 @@ class UpdateHolidayView : public CLIView {
             return holiday;
         }
 };
-
-#endif

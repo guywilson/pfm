@@ -308,7 +308,7 @@ void Command::findTransactions(const string & where) {
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }
 
-    cacheMgr.addFindCriteria(where);
+    cacheMgr.setFindCriteria(where);
 
     unsigned long terminalWidth = Terminal::getWidth();
 
@@ -339,7 +339,7 @@ void Command::findTransactions(DBCriteria & criteria) {
         cacheMgr.addTransaction(transaction.sequence, transaction);
     }
 
-    cacheMgr.addFindCriteria(criteria.getWhereCriteria());
+    cacheMgr.setFindCriteria(criteria.getWhereCriteria());
 
     unsigned long terminalWidth = Terminal::getWidth();
 

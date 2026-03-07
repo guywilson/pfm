@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -10,9 +12,6 @@
 #include "db_payee.h"
 
 using namespace std;
-
-#ifndef __PAYEE_VIEW
-#define __PAYEE_VIEW
 
 class AddPayeeView : public CLIView {
     private:
@@ -160,5 +159,3 @@ class UpdatePayeeView : public CLIView {
             return payee;
         }
 };
-
-#endif

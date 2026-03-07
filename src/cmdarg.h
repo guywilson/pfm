@@ -1,12 +1,11 @@
+#pragma once
+
 #include <string>
 #include <vector>
 
 #include <stdbool.h>
 
 using namespace std;
-
-#ifndef __INCL_CMDARG
-#define __INCL_CMDARG
 
 class CmdArg {
     private:
@@ -24,4 +23,3 @@ class CmdArg {
         string getArg(int i);
 };
  
-#endif

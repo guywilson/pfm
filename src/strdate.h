@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <time.h>
@@ -8,9 +10,6 @@
 #include "pfm_error.h"
 
 using namespace std;
-
-#ifndef __INCL_STRDATE
-#define __INCL_STRDATE
 
 #define TIME_STAMP_BUFFER_LEN               64
 #define DATE_STAMP_BUFFER_LEN               32
@@ -1031,5 +1030,4 @@ class StrDateTest {
             cout << "Tests passed: " << numTestsPassed << ", tests failed: " << numTestsFailed << endl;
         }
 };
-#endif
 #endif

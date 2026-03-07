@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -13,9 +15,6 @@
 #include "logger.h"
 
 using namespace std;
-
-#ifndef __INCL_DB
-#define __INCL_DB
 
 #define SQLITE_ERROR_BUFFER_LEN                     512
 #define SQL_STATEMENT_BUFFER_LEN                   2048
@@ -184,5 +183,3 @@ class PFM_DB {
         void commit();
         void rollback();
 };
-
-#endif

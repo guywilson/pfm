@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -16,9 +18,6 @@
 #include "strdate.h"
 
 using namespace std;
-
-#ifndef __INCL_RECURRING_CHARGE_VIEW
-#define __INCL_RECURRING_CHARGE_VIEW
 
 class DBRecurringChargeView : public DBRecurringCharge {
     protected:
@@ -89,4 +88,3 @@ class DBRecurringChargeView : public DBRecurringCharge {
         DBResult<DBRecurringChargeView> retrieveByAccountIDBetweenDates(pfm_id_t & accountId, StrDate & dateAfter, StrDate & dateBefore);
 };
 
-#endif

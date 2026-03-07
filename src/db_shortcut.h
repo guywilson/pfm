@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -13,9 +15,6 @@
 #include "cfgmgr.h"
 
 using namespace std;
-
-#ifndef __INCL_SHORTCUT
-#define __INCL_SHORTCUT
 
 class DBShortcut : public DBEntity {
     protected:
@@ -148,4 +147,3 @@ class DBShortcut : public DBEntity {
         }
 };
 
-#endif

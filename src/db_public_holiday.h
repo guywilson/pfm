@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -10,9 +12,6 @@
 #include "strdate.h"
 
 using namespace std;
-
-#ifndef __INCL_PUBLIC_HOLIDAY
-#define __INCL_PUBLIC_HOLIDAY
 
 class DBPublicHoliday : public DBEntity {
     protected:
@@ -141,4 +140,3 @@ class DBPublicHoliday : public DBEntity {
         }
 };
 
-#endif

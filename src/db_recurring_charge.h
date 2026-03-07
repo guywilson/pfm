@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -17,9 +19,6 @@
 #include "strdate.h"
 
 using namespace std;
-
-#ifndef __INCL_RECURRING_CHARGE
-#define __INCL_RECURRING_CHARGE
 
 #define CHARGE_OK                   0
 #define CHARGE_NOT_DUE              -1
@@ -379,4 +378,3 @@ class DBRecurringCharge : public DBPayment {
         DBResult<DBRecurringCharge> retrieveByAccountIDBetweenDates(pfm_id_t & accountId, StrDate & dateAfter, StrDate & dateBefore);
 };
 
-#endif

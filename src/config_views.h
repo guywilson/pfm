@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -10,9 +12,6 @@
 #include "db_config.h"
 
 using namespace std;
-
-#ifndef __CONFIG_VIEW
-#define __CONFIG_VIEW
 
 class AddConfigView : public CLIView {
     private:
@@ -209,5 +208,3 @@ class UpdateConfigView : public CLIView {
             return config;
         }
 };
-
-#endif

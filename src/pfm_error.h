@@ -1,3 +1,5 @@
+#pragma once
+
 #include <exception>
 #include <string>
 #include <string.h>
@@ -5,9 +7,6 @@
 #include <stdarg.h>
 
 using namespace std;
-
-#ifndef __PFM_ERROR
-#define __PFM_ERROR
 
 #define MESSAGE_BUFFER_LEN                  4096
 
@@ -92,4 +91,4 @@ class pfm_field_cancel_error : public pfm_error {
         pfm_field_cancel_error(const char * fieldLabel) : pfm_error(fieldLabel) {}
 };
 
-#endif
+

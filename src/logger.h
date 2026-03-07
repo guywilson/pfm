@@ -1,12 +1,11 @@
+#pragma once
+
 #include <string>
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
 
 using namespace std;
-
-#ifndef _INCL_LOGGER
-#define _INCL_LOGGER
 
 /*
 ** Supported log levels...
@@ -67,4 +66,3 @@ class Logger {
         int fatal(const char * fmt, ...);
 };
 
-#endif

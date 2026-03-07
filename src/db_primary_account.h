@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -11,9 +13,6 @@
 #include "strdate.h"
 
 using namespace std;
-
-#ifndef __INCL_PRIMARY_ACCOUNT
-#define __INCL_PRIMARY_ACCOUNT
 
 class DBPrimaryAccount : public DBEntity {
     protected:
@@ -108,4 +107,3 @@ class DBPrimaryAccount : public DBEntity {
         static void setPrimaryAccount(string & accountCode);
 };
 
-#endif

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -19,9 +21,6 @@
 #include "pfm_error.h"
 
 using namespace std;
-
-#ifndef __INCL_DB_BASE
-#define __INCL_DB_BASE
 
 #define SQL_STATEMENT_LENGTH                   256
 #define LIMIT_CLAUSE_BUFFER_LEN                 32
@@ -916,4 +915,3 @@ int DBResult<T>::retrieve(const string & sqlStatement) {
     return rowsRetrievedCount;
 }
 
-#endif

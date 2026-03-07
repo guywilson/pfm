@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <ctype.h>
 
@@ -8,9 +10,6 @@
 #include "db_payee.h"
 
 using namespace std;
-
-#ifndef __INCL_CUSTOM_WIDGETS
-#define __INCL_CUSTOM_WIDGETS
 
 #define DATE_FIELD_LENGTH                       10
 #define TIMESTAMP_FIELD_LENGTH                  19
@@ -283,4 +282,3 @@ class FrequencyField : public CLITextField {
         }
 };
 
-#endif

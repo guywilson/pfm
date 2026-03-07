@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -10,9 +12,6 @@
 #include "db_category.h"
 
 using namespace std;
-
-#ifndef __CATEGORY_VIEW
-#define __CATEGORY_VIEW
 
 class AddCategoryView : public CLIView {
     private:
@@ -160,5 +159,3 @@ class UpdateCategoryView : public CLIView {
             return category;
         }
 };
-
-#endif

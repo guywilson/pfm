@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -9,9 +11,6 @@
 #include "strdate.h"
 
 using namespace std;
-
-#ifndef __INCL_CONFIG
-#define __INCL_CONFIG
 
 class DBConfig : public DBEntity {
     protected:
@@ -164,4 +163,3 @@ class DBConfig : public DBEntity {
         DBResult<DBConfig> retrieveAllVisible();
 };
 
-#endif

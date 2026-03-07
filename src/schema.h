@@ -1,5 +1,4 @@
-#ifndef __INCL_SCHEMA
-#define __INCL_SCHEMA
+#pragma once
 
 /*
 ** You must get this right, there is no way for the code
@@ -544,4 +543,3 @@ static const char * pszCategoryCodeIndex =
 static const char * pszPayeeCodeIndex = 
     "CREATE UNIQUE INDEX idx_payee_code ON payee(code);";
 
-#endif

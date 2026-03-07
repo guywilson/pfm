@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -14,9 +16,6 @@
 #include "cfgmgr.h"
 
 using namespace std;
-
-#ifndef __INCL_ACCOUNT
-#define __INCL_ACCOUNT
 
 class DBAccount : public DBEntity {
     private:
@@ -196,4 +195,3 @@ class DBAccount : public DBEntity {
         bool isPrimary();
 };
 
-#endif

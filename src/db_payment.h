@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -17,9 +19,6 @@
 #include "cfgmgr.h"
 
 using namespace std;
-
-#ifndef __INCL_PAYMENT
-#define __INCL_PAYMENT
 
 class DBPayment : public DBEntity {
     protected:
@@ -233,4 +232,3 @@ class DBPayment : public DBEntity {
         }
 };
 
-#endif

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -15,9 +17,6 @@
 #include "cfgmgr.h"
 
 using namespace std;
-
-#ifndef __RECURRING_CHARGE_VIEW
-#define __RECURRING_CHARGE_VIEW
 
 class AddRecurringChargeView : public CLIView {
     private:
@@ -371,5 +370,3 @@ class UpdateRecurringChargeView : public CLIView {
             return charge;
         }
 };
-
-#endif

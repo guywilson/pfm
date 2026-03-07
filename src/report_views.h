@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -16,9 +18,6 @@
 #include "cfgmgr.h"
 
 using namespace std;
-
-#ifndef __REPORT_VIEW
-#define __REPORT_VIEW
 
 #define CRITERIA_BUFFER_LENGTH                      64
 #define REPORT_PROMPT_LENGTH                       256
@@ -245,5 +244,3 @@ class ShowReportView : public CLIView {
             printf("SQL: '%s'\n", rp.sqlWhereClause.c_str());
         }
 };
-
-#endif

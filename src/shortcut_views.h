@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -14,9 +16,6 @@
 #include "cfgmgr.h"
 
 using namespace std;
-
-#ifndef __REPORT_VIEW
-#define __REPORT_VIEW
 
 #define CRITERIA_BUFFER_LENGTH                      64
 #define SHORTCUT_PROMPT_LENGTH                      80
@@ -189,5 +188,3 @@ class UpdateShortcutView : public CLIView {
             return shortcut;
         }
 };
-
-#endif

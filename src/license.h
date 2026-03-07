@@ -1,5 +1,4 @@
-#ifndef __INCL_LICENSE
-#define __INCL_LICENSE
+#pragma once
 
 const char * licenseText = 
     "Copyright (c) 2025, Guy Wilson\n" \
@@ -53,4 +52,3 @@ const char * licenseText =
     "(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n" \
     "SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.";
 
-#endif

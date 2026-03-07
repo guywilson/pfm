@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <vector>
 #include <functional>
@@ -5,9 +7,6 @@
 #include "command.h"
 
 using namespace std;
-
-#ifndef __INCL_COMMAND_TABLE
-#define __INCL_COMMAND_TABLE
 
 struct CommandEntry {
     string                      name;
@@ -335,4 +334,3 @@ const vector<CommandEntry> commandTable = {
         [](Command& c){ c.saveDBKey(); }}
 };
 
-#endif

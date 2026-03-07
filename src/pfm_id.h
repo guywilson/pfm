@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <stdio.h>
 #include <stdint.h>
@@ -9,9 +11,6 @@
 #include "logger.h"
 
 using namespace std;
-
-#ifndef __INCL_PFM_ID
-#define __INCL_PFM_ID
 
 class pfm_id_t {
     private:
@@ -172,5 +171,3 @@ class pfm_id_t {
             return (this->_value.compare(id.getValue()) != 0);
         }
 };
-
-#endif

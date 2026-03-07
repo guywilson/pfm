@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -14,9 +16,6 @@
 #include "cfgmgr.h"
 
 using namespace std;
-
-#ifndef __INCL_TRANSFER_TRANSACTION_RECORD
-#define __INCL_TRANSFER_TRANSACTION_RECORD
 
 class DBTransferTransactionRecord : public DBEntity {
     protected:
@@ -117,4 +116,3 @@ class DBTransferTransactionRecord : public DBEntity {
         static DBTransferTransactionRecord createFromTransactions(DBTransaction & transactionTo, DBTransaction & transactionFrom);
 };
 
-#endif

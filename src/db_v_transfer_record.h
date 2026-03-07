@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -13,9 +15,6 @@
 #include "pfm_error.h"
 
 using namespace std;
-
-#ifndef __INCL_TRANSFER_RECORD_VIEW
-#define __INCL_TRANSFER_RECORD_VIEW
 
 class DBTransferRecordView : public DBEntity {
     protected:
@@ -148,4 +147,3 @@ class DBTransferRecordView : public DBEntity {
         }
 };
 
-#endif
