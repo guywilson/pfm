@@ -414,12 +414,12 @@ class DBCriteria {
             rowLimit = numRows;
         }
 
-        const string getWhereClause() const {
+        const string getWhereCriteria() const {
             if (whereClauses.empty()) {
                 return "";
             }
 
-            string where = " WHERE ";
+            string where;
             for (size_t i = 0; i < whereClauses.size(); i++) {
                 where += whereClauses[i];
 
@@ -429,6 +429,10 @@ class DBCriteria {
             }
 
             return where;
+        }
+
+        const string getWhereClause() const {
+            return " WHERE " + getWhereCriteria();
         }
 
         const string getOrderBy() const {
