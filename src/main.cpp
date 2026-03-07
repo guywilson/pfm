@@ -168,9 +168,6 @@ static int commandProcessor() {
     else {
         string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
         command.process("use " + primaryAccountCode);
-
-        command.process("find c:INCME desc:*Salary");
-        command.process("save Test");
     }
 
     int status = 0;
