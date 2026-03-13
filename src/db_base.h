@@ -631,7 +631,12 @@ class DBEntity {
 
         string createdDate;
         string updatedDate;
-        uint32_t sequence;           // Not persistent
+        
+        /*
+        ** Not persistent...
+        */
+        uint32_t sequence;
+        bool isSavedBySystem = false;
 
         DBEntity() {
             clear();
@@ -721,6 +726,7 @@ class DBEntity {
         void clear() {
             this->id.clear();
             this->sequence = 0;
+            this->isSavedBySystem = false;
             this->createdDate = "";
             this->updatedDate = "";
         }
@@ -730,6 +736,7 @@ class DBEntity {
             this->createdDate = src.createdDate;
             this->updatedDate = src.updatedDate;
             this->sequence = src.sequence;
+            this->isSavedBySystem = src.isSavedBySystem;
         }
 
         virtual void assignColumn(DBColumn & column) {

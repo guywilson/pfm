@@ -107,6 +107,7 @@ void DBAccount::createRecurringTransactions() {
                     DBTransaction::createFromRecurringChargeAndDate(charge, transactionDate);
 
                     // Persist lastPaymentDate on the recurring charge (this makes it robust/idempotent)
+                    charge.isSavedBySystem = true;
                     charge.updateLastPaymentDate(transactionDate);
                     charge.retrieve();
 

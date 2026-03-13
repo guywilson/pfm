@@ -295,7 +295,15 @@ void DBRecurringCharge::beforeUpdate() {
         }
     }
 
-    if (this->lastPaymentDate != currentCharge.lastPaymentDate) {
+    /*
+    ** If we have manually updated the last payment date, we should
+    ** also update the corresponding transaction date. However, we
+    ** need a way of checking if the last payment date was updated
+    ** manually by the user, rather than when a charge becomes due
+    ** and the last payment date is updated by the system. So we
+    ** have introduced the isSavedBySystem flag for that purpose...
+    */
+    if (!isSavedBySystem && this->lastPaymentDate != currentCharge.lastPaymentDate) {
         log.debug("Updating transaction date for charge '%s'", this->description.c_str());
         
         DBTransaction tr;

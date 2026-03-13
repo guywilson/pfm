@@ -303,7 +303,7 @@ class DBRecurringCharge : public DBPayment {
 
         void inline updateLastPaymentDate(StrDate & date) {
             DBRecurringCharge rc;
-            rc.id = this->id;
+            rc.set(*this);
 
             rc.retrieve();
             rc.lastPaymentDate = date;
