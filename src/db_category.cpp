@@ -34,3 +34,20 @@ void DBCategory::retrieveByCode(string & code) {
 
     log.exit("DBCategory::retrieveByCode()");
 }
+
+DBResult<DBCategory> DBCategory::retrieveOrderedByCode() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBCategory::retrieveOrderedByCode()");
+
+    DBCriteria criteria;
+    criteria.addOrderBy(Columns::code, DBCriteria::ascending);
+
+    string statement = getSelectStatement() + criteria.getOrderBy();
+    DBResult<DBCategory> result;
+
+    result.retrieve(statement);
+
+    log.exit("DBCategory::retrieveOrderedByCode()");
+
+    return result;
+}

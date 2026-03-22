@@ -127,5 +127,6 @@ class DBPayee : public DBEntity {
         }
 
         void retrieveByCode(string & code);
+        DBResult<DBPayee> retrieveOrderedByCode();
 };
 

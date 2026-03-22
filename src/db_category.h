@@ -127,5 +127,6 @@ class DBCategory : public DBEntity {
         }
 
         void retrieveByCode(string & code);
+        DBResult<DBCategory> retrieveOrderedByCode();
 };
 

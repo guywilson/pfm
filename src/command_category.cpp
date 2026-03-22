@@ -25,8 +25,9 @@ void Command::addCategory() {
 }
 
 void Command::listCategories() {
-    DBResult<DBCategory> result;
-    result.retrieveAll();
+    DBCategory category;
+    
+    DBResult<DBCategory> result = category.retrieveOrderedByCode();
 
     CategoryListView view;
     view.addResults(result);

@@ -26,8 +26,8 @@ class CategorySpinField : public CLISpinTextField {
         void show() override {
             rl_utils::setLineLength(maxLength);
 
-            DBResult<DBCategory> result;
-            result.retrieveAll();
+            DBCategory category;
+            DBResult<DBCategory> result = category.retrieveOrderedByCode();
 
             for (size_t i = 0;i < result.size();i++) {
                 DBCategory category = result.at(i);
@@ -70,8 +70,8 @@ class PayeeSpinField : public CLISpinTextField {
         PayeeSpinField(const char * label) : CLISpinTextField(label) {}
 
         void show() override {
-            DBResult<DBPayee> result;
-            result.retrieveAll();
+            DBPayee payee;
+            DBResult<DBPayee> result = payee.retrieveOrderedByCode();
 
             for (size_t i = 0;i < result.size();i++) {
                 DBPayee payee = result.at(i);

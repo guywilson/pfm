@@ -34,3 +34,20 @@ void DBPayee::retrieveByCode(string & code) {
 
     log.exit("DBPayee::retrieveByCode()");
 }
+
+DBResult<DBPayee> DBPayee::retrieveOrderedByCode() {
+    Logger & log = Logger::getInstance();
+    log.entry("DBPayee::retrieveOrderedByCode()");
+
+    DBCriteria criteria;
+    criteria.addOrderBy(Columns::code, DBCriteria::ascending);
+
+    string statement = getSelectStatement() + criteria.getOrderBy();
+    DBResult<DBPayee> result;
+
+    result.retrieve(statement);
+
+    log.exit("DBPayee::retrieveOrderedByCode()");
+
+    return result;
+}

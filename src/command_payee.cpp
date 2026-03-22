@@ -25,8 +25,9 @@ void Command::addPayee() {
 }
 
 void Command::listPayees() {
-    DBResult<DBPayee> result;
-    result.retrieveAll();
+    DBPayee payee;
+    
+    DBResult<DBPayee> result = payee.retrieveOrderedByCode();
 
     PayeeListView view;
     view.addResults(result);
