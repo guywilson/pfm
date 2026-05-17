@@ -472,25 +472,25 @@ void Command::importTransactions() {
     vector<JRecord> records = jfile.read("transactions");
 
     for (JRecord & record : records) {
-        DBAccount account;
+        DBTransaction transaction;
 
-        account.set(record);
-        account.save();
+        transaction.set(record);
+        transaction.save();
     }
 }
 
 void Command::exportTransactions() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    DBResult<DBAccount> results;
+    DBResult<DBTransaction> results;
     results.retrieveAll();
 
     vector<JRecord> records;
 
     for (size_t i = 0;i < results.size();i++) {
-        DBAccount account = results.at(i);
+        DBTransaction transaction = results.at(i);
 
-        JRecord r = account.getRecord();
+        JRecord r = transaction.getRecord();
         records.push_back(r);
     }
     

@@ -210,25 +210,25 @@ void Command::importRecurringCharges() {
     vector<JRecord> records = jfile.read("charges");
 
     for (JRecord & record : records) {
-        DBAccount account;
+        DBRecurringCharge charge;
 
-        account.set(record);
-        account.save();
+        charge.set(record);
+        charge.save();
     }
 }
 
 void Command::exportRecurringCharges() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
-    DBResult<DBAccount> results;
+    DBResult<DBRecurringCharge> results;
     results.retrieveAll();
 
     vector<JRecord> records;
 
     for (size_t i = 0;i < results.size();i++) {
-        DBAccount account = results.at(i);
+        DBRecurringCharge charge = results.at(i);
 
-        JRecord r = account.getRecord();
+        JRecord r = charge.getRecord();
         records.push_back(r);
     }
     

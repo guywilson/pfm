@@ -109,7 +109,7 @@ void Command::exportCategories() {
         records.push_back(r);
     }
     
-    JFileWriter jFile = JFileWriter(jsonFileName, "DBCategory");
+    JFileWriter jFile(jsonFileName, "DBCategory");
     jFile.write(records, "categories");
 }
 
