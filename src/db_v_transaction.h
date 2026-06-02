@@ -63,6 +63,14 @@ class DBTransactionView : public DBTransaction {
             clear();
         }
 
+        DBTransactionView(const DBTransactionView & src) {
+            set(src);
+        }
+
+        DBTransactionView(const DBTransaction & src) {
+            DBTransaction::set(src);
+        }
+
         void clear() {
             DBTransaction::clear();
 
@@ -128,6 +136,17 @@ class DBTransactionView : public DBTransaction {
 
         const string getClassName() const override {
             return "DBTransactionView";
+        }
+
+        DBCriteria getMatchCriteria() {
+            DBCriteria matchCriteria;
+
+            matchCriteria.add(DBPayment::Columns::amount, DBCriteria::equal_to, this->amount);
+            matchCriteria.add(DBPayment::Columns::date, DBCriteria::greater_than, this->date.addDays(-3));
+            matchCriteria.add(DBPayment::Columns::date, DBCriteria::less_than, this->date.addDays(3));
+            matchCriteria.add(Columns::type, DBCriteria::equal_to, this->type);
+
+            return matchCriteria;
         }
 
         DBResult<DBTransactionView> retrieveByAccountID(pfm_id_t & accountId);

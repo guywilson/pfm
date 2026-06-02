@@ -144,9 +144,11 @@ class DBPayment : public DBEntity {
         JRecord getRecord() override {
             JRecord r;
 
-            DBAccount account;
-            account.retrieve(this->accountId);
-            r.add("accountCode", account.code);
+            if (!this->accountId.isNull()) {
+                DBAccount account;
+                account.retrieve(this->accountId);
+                r.add("accountCode", account.code);
+            }
 
             if (!this->categoryId.isNull()) {
                 DBCategory category;

@@ -463,6 +463,44 @@ void Command::showTransaction() {
     view.show();
 }
 
+bool Command::matchExistingTransactions(DBTransactionView & matchTransaction) {
+    DBCriteria matchCriteria = matchTransaction.getMatchCriteria();
+
+    DBTransactionView transactionToMatch;
+    DBResult<DBTransactionView> matches = transactionToMatch.findTransactionsForCriteria(matchCriteria);
+
+    bool isMatched = false;
+
+    if (matches.size() == 1) {
+        DBTransactionView tr = matches[0];
+
+        cout << "Matched transaction:" << endl;
+        matchTransaction.print();
+        cout << "With:" << endl;
+        tr.print();
+
+        isMatched = true;
+    }
+    else if (matches.size() > 1) {
+        cout << "Matched transaction:" << endl;
+        matchTransaction.print();
+
+        for (int i = 0;i < matches.size();i++) {
+            DBTransactionView tr = matches[i];
+
+            cout << "With:" << endl;
+            tr.print();
+        }
+
+        isMatched = true;
+    }
+    else {
+        isMatched = false;
+    }
+
+    return isMatched;
+}
+
 void Command::importTransactions() {
     string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
@@ -475,7 +513,12 @@ void Command::importTransactions() {
         DBTransaction transaction;
 
         transaction.set(record);
-        transaction.save();
+
+        DBTransactionView transactionView = transaction;
+
+        if (!matchExistingTransactions(transactionView)) {
+            transaction.save();
+        }
     }
 }
 

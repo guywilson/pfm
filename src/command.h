@@ -168,6 +168,7 @@ class Command {
         void deleteTransaction();
         void reconcileTransaction();
         void showTransaction();
+        bool matchExistingTransactions(DBTransactionView & matchTransaction);
         void importTransactions();
         void exportTransactions();
         void exportTransactionsAsCSV();

@@ -85,6 +85,10 @@ class DBTransaction : public DBPayment {
             clear();
         }
 
+        DBTransaction(const DBTransaction & src) {
+            set(src);
+        }
+        
         static const string getCSVHeader() {
             return "accountCode,categoryCode,payeeCode,date,description,reference,creditDebit,isReconciled,isTransfer,amount\n";
         }
