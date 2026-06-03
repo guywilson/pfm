@@ -127,6 +127,20 @@ void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ALL);
 
+    // DBRecurringCharge charge;
+
+    // charge.id = 10;
+    // charge.date = "2026-06-22";
+    // charge.endDate = "";
+    // charge.lastPaymentDate = "";
+    // charge.description = "Thames water";
+    // charge.categoryId = 2;
+    // charge.payeeId = 10;
+    // charge.frequency.parse("1m");
+    // charge.amount = 72.00;
+
+    // charge.save();
+
     // StrDate startDate = StrDate::getPeriodStartDate();
     // StrDate endDate = StrDate::getPeriodEndDate();
 

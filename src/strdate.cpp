@@ -498,19 +498,21 @@ time_t StrDate::epoch() {
     const time_t    secsPerDay = 3600 * 24;
     time_t          value = 0;
     
-    for (int i = EPOCH_YEAR;i < year();i++) {
-        value += (secsPerDay * (StrDate::isLeapYear(i) ? 366 : 365));
-    }
+    if (!isNull()) {
+        for (int i = EPOCH_YEAR;i < year();i++) {
+            value += (secsPerDay * (StrDate::isLeapYear(i) ? 366 : 365));
+        }
 
-    for (int i = EPOCH_MONTH;i < month();i++) {
-        value += (secsPerDay * daysInMonth(year(), i));
-    }
+        for (int i = EPOCH_MONTH;i < month();i++) {
+            value += (secsPerDay * daysInMonth(year(), i));
+        }
 
-    /*
-    ** Months start at day 1, not day 0 so subtract
-    ** 1 from the day...
-    */
-    value += ((day() - 1) * secsPerDay);
+        /*
+        ** Months start at day 1, not day 0 so subtract
+        ** 1 from the day...
+        */
+        value += ((day() - 1) * secsPerDay);
+    }
     
     return value;
 }
