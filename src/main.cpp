@@ -127,17 +127,17 @@ void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ALL);
 
+    // setOverrideDate("2026-06-29");
+
     // DBRecurringCharge charge;
 
-    // charge.id = 10;
-    // charge.date = "2026-06-22";
-    // charge.endDate = "";
-    // charge.lastPaymentDate = "";
-    // charge.description = "Thames water";
-    // charge.categoryId = 2;
-    // charge.payeeId = 10;
-    // charge.frequency.parse("1m");
-    // charge.amount = 72.00;
+    // charge.retrieve(10);
+
+    // StrDate transactionDate = charge.getNextRecurringTransactionDate();
+    // bool isDueThisPeriod = charge.isChargeDueThisPeriod();
+
+    // cout << "Got next transaction date '" << transactionDate.shortDate() << "' is due = " << isDueThisPeriod << endl;
+
 
     // charge.save();
 
