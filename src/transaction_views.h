@@ -371,7 +371,7 @@ class TransactionCategoryReportListView : public CLIListView {
         void addResults(DBResult<DBTransactionView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Category report (%zu)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Category report this period (%zu)", result.size());
             setTitle(szTitle);
 
             buildResultsTable(result);
@@ -443,7 +443,7 @@ class TransactionPayeeReportListView : public CLIListView {
         void addResults(DBResult<DBTransactionView> & result) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Payee report (%zu)", result.size());
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Payee report this period (%zu)", result.size());
             setTitle(szTitle);
 
             buildResultsTable(result);

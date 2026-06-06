@@ -359,7 +359,7 @@ void Command::findTransactions(DBCriteria & criteria) {
 
 void Command::transactionsByCategory() {
     DBTransactionView tr;
-    DBResult<DBTransactionView> result = tr.reportByCategory();
+    DBResult<DBTransactionView> result = tr.reportByCategory(selectedAccount);
 
     TransactionCategoryReportListView view;
     view.addResults(result);
@@ -368,7 +368,7 @@ void Command::transactionsByCategory() {
 
 void Command::transactionsByPayee() {
     DBTransactionView tr;
-    DBResult<DBTransactionView> result = tr.reportByPayee();
+    DBResult<DBTransactionView> result = tr.reportByPayee(selectedAccount);
 
     TransactionPayeeReportListView view;
     view.addResults(result);

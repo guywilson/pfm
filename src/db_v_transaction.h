@@ -79,6 +79,7 @@ class DBTransactionView : public DBTransaction {
             this->category = "";
             this->isRecurring = false;
             this->isTransfer = false;
+            this->total = 0.0;
         }
 
         void set(const DBTransactionView & src) {
@@ -89,6 +90,7 @@ class DBTransactionView : public DBTransaction {
             this->category = src.category;
             this->isRecurring = src.isRecurring;
             this->isTransfer = src.isTransfer;
+            this->total = src.total;
         }
 
         void print() {
@@ -159,8 +161,8 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> findTransactions(const string & sql);
         DBResult<DBTransactionView> findTransactionsForCriteria(DBCriteria & criteria);
         DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t & accountId, DBCriteria & criteria);
-        DBResult<DBTransactionView> reportByCategory();
-        DBResult<DBTransactionView> reportByPayee();
+        DBResult<DBTransactionView> reportByCategory(DBAccount & account);
+        DBResult<DBTransactionView> reportByPayee(DBAccount & account);
 
         class FindCriteriaHelper {
             public:

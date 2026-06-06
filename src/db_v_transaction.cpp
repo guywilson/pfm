@@ -212,7 +212,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDFo
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::reportByCategory() {
+DBResult<DBTransactionView> DBTransactionView::reportByCategory(DBAccount & account) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::reportByCategory()");
 
@@ -226,9 +226,15 @@ DBResult<DBTransactionView> DBTransactionView::reportByCategory() {
     statement.append("FROM ");
     statement.append(getTableName());
 
+    StrDate periodStart = StrDate::getPeriodStartDate();
+    StrDate periodEnd = StrDate::getPeriodEndDate();
+
     DBCriteria criteria;
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, account.id);
     criteria.add(Columns::recurring, false);
     criteria.add(Columns::type, DBCriteria::equal_to, string(TYPE_DEBIT));
+    criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, periodStart);
+    criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, periodEnd);
     criteria.addGroupBy(Columns::category);
 
     statement += criteria.getStatementCriteria();
@@ -241,7 +247,7 @@ DBResult<DBTransactionView> DBTransactionView::reportByCategory() {
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::reportByPayee() {
+DBResult<DBTransactionView> DBTransactionView::reportByPayee(DBAccount & account) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::reportByPayee()");
 
@@ -255,9 +261,15 @@ DBResult<DBTransactionView> DBTransactionView::reportByPayee() {
     statement.append("FROM ");
     statement.append(getTableName());
 
+    StrDate periodStart = StrDate::getPeriodStartDate();
+    StrDate periodEnd = StrDate::getPeriodEndDate();
+
     DBCriteria criteria;
+    criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, account.id);
     criteria.add(Columns::recurring, false);
     criteria.add(Columns::type, DBCriteria::equal_to, string(TYPE_DEBIT));
+    criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, periodStart);
+    criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, periodEnd);
     criteria.addGroupBy(Columns::payee);
 
     statement += criteria.getStatementCriteria();
