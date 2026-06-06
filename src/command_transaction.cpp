@@ -485,7 +485,7 @@ bool Command::matchExistingTransactions(DBTransactionView & matchTransaction) {
         cout << "Matched transaction:" << endl;
         matchTransaction.print();
 
-        for (int i = 0;i < matches.size();i++) {
+        for (size_t i = 0;i < matches.size();i++) {
             DBTransactionView tr = matches[i];
 
             cout << "With:" << endl;
