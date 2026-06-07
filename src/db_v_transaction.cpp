@@ -212,7 +212,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDFo
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::reportByCategory(DBAccount & account) {
+DBResult<DBTransactionView> DBTransactionView::reportByCategory(DBAccount & account, StrDate & periodStart, StrDate & periodEnd) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::reportByCategory()");
 
@@ -225,9 +225,6 @@ DBResult<DBTransactionView> DBTransactionView::reportByCategory(DBAccount & acco
     statement.append(") AS total ");
     statement.append("FROM ");
     statement.append(getTableName());
-
-    StrDate periodStart = StrDate::getPeriodStartDate();
-    StrDate periodEnd = StrDate::getPeriodEndDate();
 
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, account.id);
@@ -247,7 +244,7 @@ DBResult<DBTransactionView> DBTransactionView::reportByCategory(DBAccount & acco
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::reportByPayee(DBAccount & account) {
+DBResult<DBTransactionView> DBTransactionView::reportByPayee(DBAccount & account, StrDate & periodStart, StrDate & periodEnd) {
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::reportByPayee()");
 
@@ -260,9 +257,6 @@ DBResult<DBTransactionView> DBTransactionView::reportByPayee(DBAccount & account
     statement.append(") AS total ");
     statement.append("FROM ");
     statement.append(getTableName());
-
-    StrDate periodStart = StrDate::getPeriodStartDate();
-    StrDate periodEnd = StrDate::getPeriodEndDate();
 
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, account.id);

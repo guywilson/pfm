@@ -358,20 +358,54 @@ void Command::findTransactions(DBCriteria & criteria) {
 }
 
 void Command::transactionsByCategory() {
+    StrDate periodStart;
+    StrDate periodEnd;
+
+    if (hasParameters()) {
+        int year = atoi(getParameter("y").c_str());
+        int month = atoi(getParameter("m").c_str());
+        int day = 15;
+
+        StrDate reference = StrDate(year, month, day);
+        periodStart = periodStart.getPeriodStartDate(reference);
+        periodEnd = periodEnd.getPeriodEndDate(reference);
+    }
+    else {
+        periodStart = StrDate::getPeriodStartDate();
+        periodEnd = StrDate::getPeriodEndDate();
+    }
+
     DBTransactionView tr;
-    DBResult<DBTransactionView> result = tr.reportByCategory(selectedAccount);
+    DBResult<DBTransactionView> result = tr.reportByCategory(selectedAccount, periodStart, periodEnd);
 
     TransactionCategoryReportListView view;
-    view.addResults(result);
+    view.addResults(result, selectedAccount.code, periodStart, periodEnd);
     view.show();
 }
 
 void Command::transactionsByPayee() {
+    StrDate periodStart;
+    StrDate periodEnd;
+
+    if (hasParameters()) {
+        int year = atoi(getParameter("y").c_str());
+        int month = atoi(getParameter("m").c_str());
+        int day = 15;
+
+        StrDate reference = StrDate(year, month, day);
+        periodStart = periodStart.getPeriodStartDate(reference);
+        periodEnd = periodEnd.getPeriodEndDate(reference);
+    }
+    else {
+        periodStart = StrDate::getPeriodStartDate();
+        periodEnd = StrDate::getPeriodEndDate();
+    }
+
     DBTransactionView tr;
-    DBResult<DBTransactionView> result = tr.reportByPayee(selectedAccount);
+    DBResult<DBTransactionView> result = tr.reportByPayee(selectedAccount, periodStart, periodEnd);
 
     TransactionPayeeReportListView view;
-    view.addResults(result);
+    view.addResults(result, selectedAccount.code, periodStart, periodEnd);
     view.show();
 }
 

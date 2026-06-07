@@ -368,10 +368,18 @@ class TransactionCategoryReportListView : public CLIListView {
                 15);
         }
 
-        void addResults(DBResult<DBTransactionView> & result) {
+        void addResults(DBResult<DBTransactionView> & result, const string & accountCode, StrDate & periodStart, StrDate & periodEnd) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Category report this period (%zu)", result.size());
+            snprintf(
+                szTitle, 
+                TITLE_BUFFER_LEN, 
+                "Category report for account: %s - [%s to %s] (%zu)", 
+                accountCode.c_str(), 
+                periodStart.shortDate().c_str(), 
+                periodEnd.shortDate().c_str(), 
+                result.size());
+
             setTitle(szTitle);
 
             buildResultsTable(result);
@@ -440,10 +448,18 @@ class TransactionPayeeReportListView : public CLIListView {
                 15);
         }
 
-        void addResults(DBResult<DBTransactionView> & result) {
+        void addResults(DBResult<DBTransactionView> & result, const string & accountCode, StrDate & periodStart, StrDate & periodEnd) {
             char szTitle[TITLE_BUFFER_LEN];
 
-            snprintf(szTitle, TITLE_BUFFER_LEN, "Payee report this period (%zu)", result.size());
+            snprintf(
+                szTitle, 
+                TITLE_BUFFER_LEN, 
+                "Payee report for account: %s - [%s to %s] (%zu)", 
+                accountCode.c_str(), 
+                periodStart.shortDate().c_str(), 
+                periodEnd.shortDate().c_str(), 
+                result.size());
+
             setTitle(szTitle);
 
             buildResultsTable(result);

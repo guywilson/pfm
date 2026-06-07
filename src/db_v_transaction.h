@@ -161,8 +161,8 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> findTransactions(const string & sql);
         DBResult<DBTransactionView> findTransactionsForCriteria(DBCriteria & criteria);
         DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t & accountId, DBCriteria & criteria);
-        DBResult<DBTransactionView> reportByCategory(DBAccount & account);
-        DBResult<DBTransactionView> reportByPayee(DBAccount & account);
+        DBResult<DBTransactionView> reportByCategory(DBAccount & account, StrDate & periodStart, StrDate & periodEnd);
+        DBResult<DBTransactionView> reportByPayee(DBAccount & account, StrDate & periodStart, StrDate & periodEnd);
 
         class FindCriteriaHelper {
             public:
