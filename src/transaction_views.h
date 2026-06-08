@@ -374,11 +374,11 @@ class TransactionCategoryReportListView : public CLIListView {
             snprintf(
                 szTitle, 
                 TITLE_BUFFER_LEN, 
-                "Category report for account: %s - [%s to %s] (%zu)", 
+                "Category report for account: %s (%zu) - from %s to %s", 
                 accountCode.c_str(), 
-                periodStart.shortDate().c_str(), 
-                periodEnd.shortDate().c_str(), 
-                result.size());
+                result.size(),
+                periodStart.shortDate().c_str(),
+                periodEnd.shortDate().c_str());
 
             setTitle(szTitle);
 
@@ -454,11 +454,11 @@ class TransactionPayeeReportListView : public CLIListView {
             snprintf(
                 szTitle, 
                 TITLE_BUFFER_LEN, 
-                "Payee report for account: %s - [%s to %s] (%zu)", 
+                "Payee report for account: %s (%zu) - from %s to %s", 
                 accountCode.c_str(), 
-                periodStart.shortDate().c_str(), 
-                periodEnd.shortDate().c_str(), 
-                result.size());
+                result.size(),
+                periodStart.shortDate().c_str(),
+                periodEnd.shortDate().c_str());
 
             setTitle(szTitle);
 
