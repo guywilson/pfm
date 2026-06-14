@@ -5,21 +5,30 @@
 
 #include <stdbool.h>
 
-using namespace std;
-
 class CmdArg {
     private:
         int argPointer;
-        vector<string> args;
+        std::vector<std::string> args;
 
     public:
         CmdArg(int argc, char ** argv);
         ~CmdArg();
 
-        int getNumArgs();
-        bool hasMoreArgs();
-        string nextArg();
+        void dumpArgs();
 
-        string getArg(int i);
+        inline int getNumArgs() {
+            return args.size();
+        }
+
+        inline bool hasMoreArgs() {
+            return argPointer < getNumArgs();
+        }
+
+        inline bool isLastArg() {
+            return argPointer == getNumArgs();
+        }
+
+        std::string nextArg();
+        std::string getArg(int i);
 };
  

@@ -104,6 +104,7 @@ class Command {
         
         void addAccount();
         void listAccounts();
+        DBAccount selectAccount(const string & accountCode);
         void chooseAccount();
         void showAccount();
         void setPrimaryAccount();

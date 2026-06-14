@@ -19,6 +19,17 @@
 
 using namespace std;
 
+DBAccount Command::selectAccount(const string & accountCode) {
+    string code = accountCode;
+
+    DBAccount account;
+    account.retrieveByCode(code);
+    
+    selectedAccount = account;
+
+    return account;
+}
+
 void Command::addAccount() {
     AddAccountView view;
     view.show();
@@ -71,10 +82,7 @@ void Command::chooseAccount() {
 
     log.debug("Choose account with code '%s'", accountCode.c_str());
 
-    DBAccount account;
-    account.retrieveByCode(accountCode);
-    
-    selectedAccount = account;
+    DBAccount account = selectAccount(accountCode);
 
     AccountDetailsView view;
     view.setAccount(account);

@@ -238,8 +238,47 @@ int main(int argc, char ** argv) {
             printUsage();
             return 0;
         }
+        else if (arg.compare("-c") == 0) {
+            string cmd = cmdarg.nextArg();
+
+            if (!cmdarg.isLastArg()) {
+                throw pfm_error("Command provided by the '-c' option must be the last comand line argument.");
+            }
+
+            Logger & log = Logger::getInstance();
+            log.init("./pfm.log", defaultLogLevel);
+
+            PFM_DB & db = PFM_DB::getInstance();
+
+            try {
+                db.open(pszDatabase);
+            }
+            catch (pfm_fatal & f) {
+                cout << "Fatal error issuing command '" << cmd << "': " << f.what() << endl;
+                free(pszDatabase);
+                return -1;
+            }
+
+            free(pszDatabase);
+
+            initialiseReferenceData();
+
+            cout << "Running command: '" << cmd << "'" << endl;
+
+            Command command;
+
+            string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
+
+            command.selectAccount(primaryAccountCode);
+            command.process(cmd);
+
+            db.close();
+            log.close();
+
+            return 0;
+        }
         else if (arg.compare("-date") == 0) {
-            setOverrideDate(cmdarg.nextArg().c_str());
+            setOverrideDate(cmdarg.nextArg());
         }
         else if (arg.compare("-v") == 0 || arg.compare("--version") == 0) {
             Command::version();

@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <vector>
 #include <exception>
@@ -5,8 +6,6 @@
 #include <string.h>
 
 #include "cmdarg.h"
-
-using namespace std;
 
 CmdArg::CmdArg(int argc, char ** argv) {
     for (int i = 1;i < argc;i++) {
@@ -20,25 +19,25 @@ CmdArg::~CmdArg() {
     args.clear();
 }
 
-int CmdArg::getNumArgs() {
-    return args.size();
+void CmdArg::dumpArgs() {
+    std::cout << "Args:" << std::endl;
+    for (size_t i = 0;i < args.size();i++) {
+        std::cout << "\t'" << args[i] << "'" << std::endl;
+    }
+    std::cout << std::endl;
 }
 
-bool CmdArg::hasMoreArgs() {
-    return argPointer < getNumArgs();
-}
-
-string CmdArg::nextArg() {
+std::string CmdArg::nextArg() {
     if (argPointer >= getNumArgs()) {
-        throw exception();
+        throw std::exception();
     }
 
     return args[argPointer++];
 }
 
-string CmdArg::getArg(int i) {
+std::string CmdArg::getArg(int i) {
     if (i >= getNumArgs()) {
-        throw exception();
+        throw std::exception();
     }
 
     return args[i];

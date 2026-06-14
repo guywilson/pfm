@@ -64,6 +64,18 @@ void Command::addTransaction() {
             transaction.payeeId.clear();
         }
 
+        string accountCode = getParameter("acc");
+
+        if (accountCode.length() == 0) {
+            transaction.accountId = selectedAccount.id;
+        }
+        else {
+            DBAccount account;
+            account.retrieveByCode(accountCode);
+
+            transaction.accountId = account.id;
+        }
+
         string date = getParameter("date");
         transaction.date = date.empty() ? StrDate::today() : date;
 
@@ -74,7 +86,6 @@ void Command::addTransaction() {
         string reconciled = getParameter("rec");
         transaction.isReconciled = reconciled == "Y" ? true : false;
         
-        transaction.accountId = selectedAccount.id;
         transaction.description = getParameter("desc");
         transaction.reference = getParameter("ref");
         transaction.amount = getParameter("amnt");
