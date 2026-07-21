@@ -91,11 +91,7 @@ using namespace std;
 #endif
 
 #define CREDENTIAL_SERVICE      "pfm-credential-service"
-#ifdef __APPLE__
 #define CREDENTIAL_ACCOUNT      "admin@pfm.org"
-#else
-#define CREDENTIAL_ACCOUNT      "org.freedesktop.secrets"
-#endif
 #define PASSWORD_MAX_LEN        256
 
 static int __getch(void) {
