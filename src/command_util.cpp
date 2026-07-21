@@ -50,7 +50,7 @@ void Command::saveDBKey() {
 
     if (accessKey.compare(cfg.getValue("access.key")) == 0) {
         string dbKey = db.getKey("Database password: ");
-        db.saveKeyFile(dbKey);
+        db.saveKeyToCredentialStore(dbKey);
     }
     else {
         cout << "Invalid access password supplied" << endl << endl;

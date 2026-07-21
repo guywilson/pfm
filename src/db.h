@@ -134,10 +134,8 @@ class PFM_DB {
         void createDB(const string & dbName);
         bool isNewFileRequired(int errorCode);
 
-        void encryptKey(const string & key, uint8_t * buffer, int bufferLength);
-        string decryptKey(uint8_t * buffer, int bufferLength);
         void applyDatabaseKey(const string & dbName, const string & key);
-        string readKeyFile(const string & keyFileName);
+        string getKeyFromCredentialStore();
 
         void createAccessKeyRecord(const string & key);
         void _executeSQLNoCallback(const string & sql);
@@ -162,7 +160,7 @@ class PFM_DB {
 
         string getKey(const string & prompt);
 
-        void saveKeyFile(const string & key);
+        void saveKeyToCredentialStore(const string & key);
 
         void changePassword();
 

@@ -64,11 +64,11 @@ PANDOCFLAGS = -s -t man
 
 # Libraries
 STDLIBS=
-EXTLIBS=-lreadline -lhistory -lcurses -lsqlcipher -lgcrypt
+EXTLIBS=-lreadline -lhistory -lcurses -lsqlcipher -lgcrypt -lcred
 
 COMPILE.cpp=$(CPP) $(CPPFLAGS) -o $@
 COMPILE.c=$(C) $(CFLAGS) -o $@
-LINK.o=$(LINKER) -o $@
+LINK.o=$(LINKER) -rpath /usr/local/lib -o $@
 
 PANDOC.md = $(PANDOC) $(PANDOCFLAGS) -o $@
 

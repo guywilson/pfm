@@ -75,6 +75,8 @@
 #include <sqlcipher/sqlite3.h>
 #include <gcrypt.h>
 
+#include <libcred.hpp>
+
 #include "logger.h"
 #include "cfgmgr.h"
 #include "db.h"
@@ -88,8 +90,8 @@ using namespace std;
 #define DEBUG_PASSWORD          ""
 #endif
 
-#define KEY_FILE_NAME           "./.pfm_key"
-#define KEY_KEY                 "A3FD703B6EDA53752F9019EC9491ED63A1E58ECE0B9EA8B582E00C1AA47A85A6"
+#define CREDENTIAL_SERVICE      "pfm-credential_service"
+#define CREDENTIAL_ACCOUNT      "admin@pfm.org"
 
 #define PASSWORD_MAX_LEN        256
 
@@ -118,29 +120,6 @@ static int __getch(void) {
 #endif
 
     return ch;
-}
-
-static string getUserString() {
-    struct passwd pw;
-	struct passwd * pwp;
-	char buf[1024];
-	
-	int status = getpwuid_r(geteuid(), &pw, buf, sizeof(buf), &pwp);
-
-    if (status == 0) {
-        string userString = string(pw.pw_name) + '_' + to_string(pw.pw_uid) + '_' + string(pw.pw_gecos);
-
-        memset(&pw, 0, sizeof(pw));
-        memset(buf, 0, sizeof(buf));
-
-        return userString;
-    }
-    else {
-        memset(&pw, 0, sizeof(pw));
-        memset(buf, 0, sizeof(buf));
-
-        throw pfm_error("Failed to get current user details", __FILE__, __LINE__);
-    }
 }
 
 static string getPassword(const string & prompt) {
@@ -299,56 +278,6 @@ void PFM_DB::createDB(const string & dbName) {
     }
 }
 
-void PFM_DB::encryptKey(const string & key, uint8_t * buffer, int bufferLength) {
-#if defined (__linux__) || defined(__APPLE__)
-    string encryptionKey;
-    try {
-        string userString = getUserString();
-        encryptionKey = getKeyFromPassword(userString);
-    }
-    catch (pfm_error & e) {
-        log.error("Failed to generate encryption key from user details, using default key instead");
-        encryptionKey = KEY_KEY;
-    }
-#else
-    string encryptionKey = KEY_KEY;
-#endif
-
-    if (bufferLength < (int)key.length()) {
-        throw pfm_error(
-            pfm_error::buildMsg(
-                "PFM_DB::encryptKey() - supplied buffer is not long enough, it needs to be at least '%d' bytes long", 
-                (int)key.length()));
-    }
-
-    for (int i = 0;i < (int)key.length();i++) {
-        buffer[i] = ((uint8_t)key[i] ^ (uint8_t)encryptionKey[i]);
-    }
-}
-
-string PFM_DB::decryptKey(uint8_t * buffer, int bufferLength) {
-#if defined (__linux__) || defined(__APPLE__)
-    string encryptionKey;
-    try {
-        string userString = getUserString();
-        encryptionKey = getKeyFromPassword(userString);
-    }
-    catch (pfm_error & e) {
-        log.error("Failed to generate encryption key from user details, using default key instead");
-        encryptionKey = KEY_KEY;
-    }
-#else
-    string encryptionKey = KEY_KEY;
-#endif
-
-    string key;
-    for (int i = 0;i < (int)encryptionKey.length();i++) {
-        key += (char)(buffer[i] ^ (uint8_t)encryptionKey[i]);
-    }
-
-    return key;
-}
-
 void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
     int keyError = sqlite3_key(this->dbHandle, key.c_str(), key.length());
 
@@ -370,61 +299,24 @@ void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
     }
 }
 
-string PFM_DB::readKeyFile(const string & keyFileName) {
-    FILE * fptr = fopen(keyFileName.c_str(), "rb");
+string PFM_DB::getKeyFromCredentialStore() {
+    std::string key;
+    std::string lcErrorString;
+    libcred::LIBCRED_RESULT result = libcred::get_password(CREDENTIAL_SERVICE, CREDENTIAL_ACCOUNT, &key, &lcErrorString);
 
-    if (fptr == NULL) {
-        log.error("Could not open key file '%s'", keyFileName.c_str());
-        throw pfm_error(pfm_error::buildMsg("Failed to open key file '%s'", keyFileName.c_str()));
+    if (result != libcred::SUCCESS) {
+        throw pfm_error(pfm_error::buildMsg("Failed to retrieve key from credential store: %s", lcErrorString.c_str()), __FILE__, __LINE__);
     }
-
-	uint32_t keyFileSize = gcry_md_get_algo_dlen(GCRY_MD_SHA3_256) * 2;
-
-    uint8_t * buffer = (uint8_t *)malloc(keyFileSize);
-
-    int bytesRead = fread(buffer, 1, keyFileSize, fptr);
-    fclose(fptr);
-
-    string key = decryptKey(buffer, keyFileSize);
-    free(buffer);
-
-    if (bytesRead < (int)keyFileSize) {
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Read %d bytes from file '%s' but expected %d bytes", 
-                    bytesRead, 
-                    keyFileName.c_str(), 
-                    keyFileSize));
-    }
-
 
     return key;
 }
 
-void PFM_DB::saveKeyFile(const string & key) {
-    const char * keyFileName = KEY_FILE_NAME;
+void PFM_DB::saveKeyToCredentialStore(const string & key) {
+    std::string lcErrorString;
+    libcred::LIBCRED_RESULT result = libcred::set_password(CREDENTIAL_SERVICE, CREDENTIAL_ACCOUNT, key, &lcErrorString);
 
-    // Permissions: 0600 => rw------- (owner can read/write)
-    mode_t mode = S_IRUSR | S_IWUSR;
-
-    int fd = ::open(keyFileName, O_CREAT | O_WRONLY | O_TRUNC, mode);
-    if (fd == -1) {
-        throw pfm_error(pfm_error::buildMsg("Could not open key file '%s' for writing: %s", keyFileName, strerror(errno)));
-    }
-
-    uint8_t * buffer = (uint8_t *)malloc(key.length());
-    encryptKey(key, buffer, key.length());
-
-    int bytesWritten = write(fd, buffer, key.length());
-    ::close(fd);
-
-    if (bytesWritten < (int)key.length()) {
-        throw pfm_error(
-                pfm_error::buildMsg(
-                    "Wrote %d bytes to file '%s' but expected to write %d bytes", 
-                    bytesWritten, 
-                    keyFileName, 
-                    key.length()));
+    if (result != libcred::SUCCESS) {
+        throw pfm_error(pfm_error::buildMsg("Failed to save key to credential store: %s", lcErrorString.c_str()), __FILE__, __LINE__);
     }
 }    
 
@@ -494,7 +386,7 @@ void PFM_DB::open(const string & dbName) {
         }
         else {
             try {
-                key = readKeyFile(KEY_FILE_NAME);
+                key = getKeyFromCredentialStore();
             }
             catch (pfm_error & e) {
 #ifndef RUN_IN_DEBUGGER
@@ -573,13 +465,14 @@ void PFM_DB::changePassword() {
                     errorMsg));
     }
 
-    int unlinkRtn = unlink(KEY_FILE_NAME);
+    std::string lcErrorString;
+    libcred::LIBCRED_RESULT result = libcred::delete_password(CREDENTIAL_SERVICE, CREDENTIAL_ACCOUNT, &lcErrorString);
 
-    if (unlinkRtn < 0) {
-        log.error("PFM_DB::changePassword() - Failed to delete key file '%s'", strerror(errno));
+    if (result != libcred::SUCCESS) {
+        log.error("PFM_DB::changePassword() - Failed to delete key from credential store '%s'", lcErrorString.c_str());
     }
     else {
-        log.debug("PFM_DB::changePassword() - Successfully deleted key file");
+        log.debug("PFM_DB::changePassword() - Successfully deleted key from credential store");
     }
 
     close();
