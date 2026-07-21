@@ -90,7 +90,11 @@ using namespace std;
 #define DEBUG_PASSWORD          ""
 #endif
 
-#define CREDENTIAL_SERVICE      "pfm-credential_service"
+#ifdef __APPLE__
+#define CREDENTIAL_SERVICE      "pfm-credential-service"
+#else
+#define CREDENTIAL_SERVICE      "org.freedesktop.secrets"
+#endif
 #define CREDENTIAL_ACCOUNT      "admin@pfm.org"
 
 #define PASSWORD_MAX_LEN        256

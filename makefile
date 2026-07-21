@@ -68,7 +68,7 @@ EXTLIBS=-lreadline -lhistory -lcurses -lsqlcipher -lgcrypt -lcred
 
 COMPILE.cpp=$(CPP) $(CPPFLAGS) -o $@
 COMPILE.c=$(C) $(CFLAGS) -o $@
-LINK.o=$(LINKER) -rpath /usr/local/lib -o $@
+LINK.o=$(LINKER) -o $@
 
 PANDOC.md = $(PANDOC) $(PANDOCFLAGS) -o $@
 
