@@ -91,6 +91,8 @@ using namespace std;
 #define KEY_FILE_NAME           "./.pfm_key"
 #define KEY_KEY                 "A3FD703B6EDA53752F9019EC9491ED63A1E58ECE0B9EA8B582E00C1AA47A85A6"
 
+#define PASSWORD_MAX_LEN        256
+
 static int __getch(void) {
 	int		ch;
 
@@ -144,18 +146,26 @@ static string getUserString() {
 static string getPassword(const string & prompt) {
     cout << prompt;
 
-    char password[256];
+    char password[PASSWORD_MAX_LEN];
 	int	ch = 0;
 	int i = 0;
 	
     while (ch != '\n') {
         ch = __getch();
 
+        if (ch == EOF) {
+            break;
+        }
+
         if (ch != '\n' && ch != '\r') {
             putchar('*');
             fflush(stdout);
 
             password[i++] = (char)ch;
+        }
+
+        if (i == PASSWORD_MAX_LEN - 1) {
+            break;
         }
     }
 
@@ -399,7 +409,7 @@ void PFM_DB::saveKeyFile(const string & key) {
 
     int fd = ::open(keyFileName, O_CREAT | O_WRONLY | O_TRUNC, mode);
     if (fd == -1) {
-        throw pfm_error(pfm_error::buildMsg("Could not open key file '%s' for writing", keyFileName));
+        throw pfm_error(pfm_error::buildMsg("Could not open key file '%s' for writing: %s", keyFileName, strerror(errno)));
     }
 
     uint8_t * buffer = (uint8_t *)malloc(key.length());
