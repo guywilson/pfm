@@ -54,10 +54,6 @@
 #include <string>
 #include <vector>
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <pwd.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,17 +61,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef _WIN32
-#include <conio.h>
-#else
-#include <termios.h>
-#endif
-
 #include <pthread.h>
 #include <sqlcipher/sqlite3.h>
-#include <gcrypt.h>
-
-#include <libcred.hpp>
 
 #include "logger.h"
 #include "cfgmgr.h"
@@ -83,104 +70,13 @@
 #include "strdate.h"
 #include "pfm_error.h"
 #include "schema.h"
+#include "system.h"
 
 using namespace std;
 
 #ifndef DEBUG_PASSWORD
 #define DEBUG_PASSWORD          ""
 #endif
-
-#define CREDENTIAL_SERVICE      "pfm-credential-service"
-#define CREDENTIAL_ACCOUNT      "admin@pfm.org"
-#define PASSWORD_MAX_LEN        256
-
-static int __getch(void) {
-	int		ch;
-
-#ifndef _WIN32
-	struct termios current;
-	struct termios original;
-
-	tcgetattr(fileno(stdin), &original); /* grab old terminal i/o settings */
-	current = original; /* make new settings same as old settings */
-	current.c_lflag &= ~ICANON; /* disable buffered i/o */
-	current.c_lflag &= ~ECHO; /* set echo mode */
-	tcsetattr(fileno(stdin), TCSANOW, &current); /* use these new terminal i/o settings now */
-#endif
-
-#ifdef _WIN32
-    ch = _getch();
-#else
-    ch = getchar();
-#endif
-
-#ifndef _WIN32
-	tcsetattr(0, TCSANOW, &original);
-#endif
-
-    return ch;
-}
-
-static string getPassword(const string & prompt) {
-    cout << prompt;
-
-    char password[PASSWORD_MAX_LEN];
-	int	ch = 0;
-	int i = 0;
-	
-    while (ch != '\n') {
-        ch = __getch();
-
-        if (ch == EOF) {
-            break;
-        }
-
-        if (ch != '\n' && ch != '\r') {
-            putchar('*');
-            fflush(stdout);
-
-            password[i++] = (char)ch;
-        }
-
-        if (i == PASSWORD_MAX_LEN - 1) {
-            break;
-        }
-    }
-
-	password[i] = 0;
-	
-    cout << endl;
-    fflush(stdout);
-
-    return string(password);
-}
-
-static string getKeyFromPassword(const string & password) {
-	uint32_t keySize = gcry_md_get_algo_dlen(GCRY_MD_SHA3_256);
-
-	uint8_t * keyBuffer = (uint8_t *)malloc(keySize);
-	char * k = (char *)malloc((keySize * 2) + 1);
-
-	gcry_md_hash_buffer(GCRY_MD_SHA3_256, keyBuffer, password.c_str(), password.length());
-
-	char hexBuffer[3];
-    int j = 0;
-    for (int i = 0;i < (int)keySize;i++) {
-        snprintf(hexBuffer, 3, "%02X", keyBuffer[i]);
-
-        k[j++] = hexBuffer[0];
-        k[j++] = hexBuffer[1];
-    }
-
-    k[j] = 0;
-
-    string key(k);
-
-	free(keyBuffer);
-	free(k);
-	
-	return key;
-}
 
 /******************************************************************************
 **
@@ -208,13 +104,6 @@ static inline int _retrieveCallback(void * p, int numColumns, char ** columns, c
     rows->push_back(row);
 
     return SQLITE_OK;
-}
-
-string PFM_DB::getKey(const string & prompt) {
-    string password = getPassword(prompt);
-    string key = getKeyFromPassword(password);
-	
-	return key;
 }
 
 int PFM_DB::openReadWrite(const string & dbName) {
@@ -298,27 +187,6 @@ void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
     }
 }
 
-string PFM_DB::getKeyFromCredentialStore() {
-    std::string key;
-    std::string lcErrorString;
-    libcred::LIBCRED_RESULT result = libcred::get_password(CREDENTIAL_SERVICE, CREDENTIAL_ACCOUNT, &key, &lcErrorString);
-
-    if (result != libcred::SUCCESS) {
-        throw pfm_error(pfm_error::buildMsg("Failed to retrieve key from credential store: %s", lcErrorString.c_str()), __FILE__, __LINE__);
-    }
-
-    return key;
-}
-
-void PFM_DB::saveKeyToCredentialStore(const string & key) {
-    std::string lcErrorString;
-    libcred::LIBCRED_RESULT result = libcred::set_password(CREDENTIAL_SERVICE, CREDENTIAL_ACCOUNT, key, &lcErrorString);
-
-    if (result != libcred::SUCCESS) {
-        throw pfm_error(pfm_error::buildMsg("Failed to save key to credential store: %s", lcErrorString.c_str()), __FILE__, __LINE__);
-    }
-}    
-
 void PFM_DB::createAccessKeyRecord(const string & key) {
     log.entry("PFM_DB::createAccessKeyRecord()");
 
@@ -366,7 +234,7 @@ void PFM_DB::open(const string & dbName) {
             createDB(dbName);
 
             cout << "Please enter a password that will be used to encrypt the database file." << endl;
-            key = getKey("Enter a password: ");
+            key = System::getKey("Enter a password: ");
 
             cout << endl;
 
@@ -377,19 +245,28 @@ void PFM_DB::open(const string & dbName) {
 
             cout << "Please enter an admin access password, this is used to control access" << endl;
             cout << "to admin functions." << endl;
-            string accessKey = getKey("Enter admin password: ");
+            string accessKey = System::getKey("Enter admin password: ");
 
             cout << endl;
 
             createAccessKeyRecord(accessKey);
         }
         else {
-            try {
-                key = getKeyFromCredentialStore();
-            }
-            catch (pfm_error & e) {
+            if (!System::isLikelyHeadlessLinux()) {
+                try {
+                    key = System::getKeyFromCredentialStore();
+                }
+                catch (pfm_error & e) {
 #ifndef RUN_IN_DEBUGGER
-                key = getKey("Enter database password: ");
+                    key = System::getKey("Enter database password: ");
+#else
+                    key = getKeyFromPassword(DEBUG_PASSWORD);
+#endif
+                }
+            }
+            else {
+#ifndef RUN_IN_DEBUGGER
+                key = System::getKey("Enter database password: ");
 #else
                 key = getKeyFromPassword(DEBUG_PASSWORD);
 #endif
@@ -441,7 +318,7 @@ void PFM_DB::close() {
 void PFM_DB::changePassword() {
     log.entry("PFM_DB::changePassword()");
 
-    string newPassword = getKey("Enter new database password: ");
+    string newPassword = System::getKey("Enter new database password: ");
 
     int error = sqlite3_rekey(dbHandle, newPassword.c_str(), newPassword.length());
 
@@ -464,15 +341,7 @@ void PFM_DB::changePassword() {
                     errorMsg));
     }
 
-    std::string lcErrorString;
-    libcred::LIBCRED_RESULT result = libcred::delete_password(CREDENTIAL_SERVICE, CREDENTIAL_ACCOUNT, &lcErrorString);
-
-    if (result != libcred::SUCCESS) {
-        log.error("PFM_DB::changePassword() - Failed to delete key from credential store '%s'", lcErrorString.c_str());
-    }
-    else {
-        log.debug("PFM_DB::changePassword() - Successfully deleted key from credential store");
-    }
+    System::deleteKeyFromCredentialStore();
 
     close();
     open();

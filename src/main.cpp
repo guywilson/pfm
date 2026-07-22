@@ -36,6 +36,7 @@
 #include <readline/history.h>
 
 #include "db.h"
+#include "system.h"
 #include "logger.h"
 #include "db_account.h"
 #include "db_primary_account.h"
@@ -287,6 +288,9 @@ int main(int argc, char ** argv) {
         else if (arg.compare("-l") == 0 || arg.compare("--license") == 0) {
             printLicense();
             return 0;
+        }
+        else if (arg.compare("--headless") == 0) {
+            System::setIsHeadlessLinux(true);
         }
         else if (arg.compare("--full-logging") == 0) {
             defaultLogLevel = LOG_LEVEL_ALL;

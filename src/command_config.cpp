@@ -4,7 +4,7 @@
 
 #include "command.h"
 #include "pfm_error.h"
-#include "db.h"
+#include "system.h"
 #include "strdate.h"
 #include "cfgmgr.h"
 #include "cache.h"
@@ -16,9 +16,7 @@
 using namespace std;
 
 void Command::addConfig() {
-    PFM_DB & db = PFM_DB::getInstance();
-
-    string accessKey = db.getKey("Access password: ");
+    string accessKey = System::getKey("Access password: ");
 
     if (accessKey.compare(cfg.getValue("access.key")) == 0) {
         AddConfigView view;
@@ -89,9 +87,7 @@ void Command::deleteConfig() {
 
     DBConfig config = getConfig(configKey);
 
-    PFM_DB & db = PFM_DB::getInstance();
-
-    string accessKey = db.getKey("Access password: ");
+    string accessKey = System::getKey("Access password: ");
 
     if (accessKey.compare(cfg.getValue("access.key")) == 0) {
         if (config.isReadOnly) {

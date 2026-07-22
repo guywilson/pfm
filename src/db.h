@@ -135,7 +135,6 @@ class PFM_DB {
         bool isNewFileRequired(int errorCode);
 
         void applyDatabaseKey(const string & dbName, const string & key);
-        string getKeyFromCredentialStore();
 
         void createAccessKeyRecord(const string & key);
         void _executeSQLNoCallback(const string & sql);
@@ -157,10 +156,6 @@ class PFM_DB {
         void open(const string & dbName);
         void open();
         void close();
-
-        string getKey(const string & prompt);
-
-        void saveKeyToCredentialStore(const string & key);
 
         void changePassword();
 

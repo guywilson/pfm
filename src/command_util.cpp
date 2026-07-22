@@ -12,6 +12,7 @@
 #include "rlcustom.h"
 #include "pfm_error.h"
 #include "db.h"
+#include "system.h"
 #include "strdate.h"
 #include "cfgmgr.h"
 #include "cache.h"
@@ -30,12 +31,10 @@ void Command::changePassword() {
 }
 
 void Command::getDBKey() {
-    PFM_DB & db = PFM_DB::getInstance();
-
-    string accessKey = db.getKey("Access password: ");
+    string accessKey = System::getKey("Access password: ");
 
     if (accessKey.compare(cfg.getValue("access.key")) == 0) {
-        string dbKey = db.getKey("Database password: ");
+        string dbKey = System::getKey("Database password: ");
         cout << "Key: " << dbKey << endl;
     }
     else {
@@ -44,13 +43,15 @@ void Command::getDBKey() {
 }
 
 void Command::saveDBKey() {
-    PFM_DB & db = PFM_DB::getInstance();
-
-    string accessKey = db.getKey("Access password: ");
+    if (System::isLikelyHeadlessLinux()) {
+        throw pfm_error("Sorry, passwordless login is not supported on headless (server) systems.");
+    }
+    
+    string accessKey = System::getKey("Access password: ");
 
     if (accessKey.compare(cfg.getValue("access.key")) == 0) {
-        string dbKey = db.getKey("Database password: ");
-        db.saveKeyToCredentialStore(dbKey);
+        string dbKey = System::getKey("Database password: ");
+        System::saveKeyToCredentialStore(dbKey);
     }
     else {
         cout << "Invalid access password supplied" << endl << endl;
@@ -111,7 +112,7 @@ void Command::enterSQLMode() {
     cfgmgr & cfg = cfgmgr::getInstance();
     Logger & log = Logger::getInstance();
 
-    string key = db.getKey("Access password: ");
+    string key = System::getKey("Access password: ");
 
     if (key.compare(cfg.getValue("access.key")) != 0) {
         cerr << "Access denied!" << endl;

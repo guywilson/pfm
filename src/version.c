@@ -1,7 +1,7 @@
 #include "version.h"
 
-#define __BDATE__      "2026-07-21 21:26:30"
-#define __BVERSION__   "2.1.095"
+#define __BDATE__      "2026-07-22 22:16:51"
+#define __BVERSION__   "2.1.096"
 
 const char * getVersion(void) {
     return __BVERSION__;
