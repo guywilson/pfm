@@ -186,10 +186,10 @@ void System::setIsHeadlessLinux(const bool isHeadless) {
 }
 
 bool System::isLikelyHeadlessLinux() {
-#ifdef __linux__
     if (__isHeadless) {
         return true;
     }
+#ifdef __linux__
     return !hasGraphicalDisplay();
 #else
     return false;
