@@ -70,7 +70,7 @@ int Tokenizer::findNextTokenPos() {
     char ch;
     int tokenLen = 0;
 
-    for (size_t i = startIndex;i < (int)expression.length();i++) {
+    for (size_t i = startIndex;i < expression.length();i++) {
         ch = expression[i];
 
         if (isDelimiter(ch) || isSpaceDelimiter(ch)) {
