@@ -313,6 +313,10 @@ const vector<CommandEntry> commandTable = {
         "", 
         [](Command& c){ c.enterSQLMode(); }},
 
+    {"calc", {}, 
+        "", 
+        [](Command& c){ c.enterCalcMode(); }},
+
     {"clear-recurring-transactions", {}, 
         "", 
         [](Command& c){ c.clearRecurringTransactions(); }},

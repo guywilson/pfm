@@ -10,7 +10,7 @@
 
 # Version number for pfm
 MAJOR_VERSION = 2
-MINOR_VERSION = 1
+MINOR_VERSION = 2
 
 # Directories
 SOURCE = src
@@ -64,7 +64,7 @@ PANDOCFLAGS = -s -t man
 
 # Libraries
 STDLIBS=
-EXTLIBS=-lreadline -lhistory -lcurses -lsqlcipher -lgcrypt -lcred
+EXTLIBS=-lreadline -lhistory -lcurses -lsqlcipher -lgcrypt -lcred -lmpfr -lgmp
 
 COMPILE.cpp=$(CPP) $(CPPFLAGS) -o $@
 COMPILE.c=$(C) $(CFLAGS) -o $@

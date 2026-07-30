@@ -205,6 +205,7 @@ class Command {
         void saveDBKey();
 
         void enterSQLMode();
+        void enterCalcMode();
 
         int getLogLevelParameter(string & level);
         void setLoggingLevel();

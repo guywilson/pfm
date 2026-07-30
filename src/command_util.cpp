@@ -8,6 +8,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include "expression.h"
 #include "command.h"
 #include "rlcustom.h"
 #include "pfm_error.h"
@@ -23,6 +24,85 @@ using namespace std;
 
 #define DEFAULT_BACKUP_FILE_NAME                    "pfm_backup.sql"
 #define LINE_BUFFER_LENGTH                          4096
+
+
+/*
+** Inserts thousands separators into the integer part of a decimal string.
+** - Keeps an optional leading + / -
+** - Preserves fractional part and any scientific exponent (e.g. "e+42")
+** - Works for arbitrarily long strings (>> 2^64)
+*/
+static string addThousandsSeparators(const string & input) {
+    char separator = use_facet< numpunct<char> >(cout.getloc()).thousands_sep();
+    char decimalPoint = use_facet< numpunct<char> >(cout.getloc()).decimal_point();
+
+    /*
+    ** 1) Split off sign.
+    */
+    string sign;
+    size_t pos = 0;
+    if (input[pos] == '+' || input[pos] == '-') {
+        sign.assign(1, input[pos]);
+        ++pos;
+    }
+
+    /*
+    ** 2) Split mantissa and exponent (e/E …). We keep the exponent untouched.
+    */
+    size_t exp_pos = input.find_first_of("eE", pos);
+    string mantissa = 
+            (exp_pos == string::npos) ? 
+                input.substr(pos) : 
+                input.substr(pos, exp_pos - pos);
+
+    string exponent = 
+            (exp_pos == string::npos) ? 
+                string() : 
+                input.substr(exp_pos); // includes the 'e' or 'E' and whatever follows
+
+    /*
+    ** 3) Split integer and fractional parts of the mantissa.
+    */
+    size_t dot_pos = mantissa.find(decimalPoint);
+    string int_part = 
+            (dot_pos == string::npos) ? 
+                mantissa : 
+                mantissa.substr(0, dot_pos);
+
+    string frac_part = 
+            (dot_pos == std::string::npos) ? 
+            string() : 
+            mantissa.substr(dot_pos); // keep decimal point + fraction as-is
+
+    /*
+    ** 4) Insert separators into the integer part, grouping from the right.
+    */
+    const size_t n = int_part.size();
+    if (n <= 3) {
+        // No grouping needed.
+        return sign + int_part + frac_part + exponent;
+    }
+
+    string grouped;
+    grouped.reserve(n + n / 3);
+
+    size_t first_group = n % 3;
+    if (first_group == 0) {
+        first_group = 3;
+    }
+
+    grouped.append(int_part.data(), first_group);
+    
+    for (size_t i = first_group; i < n; i += 3) {
+        grouped.push_back(separator);
+        grouped.append(int_part, i, 3);
+    }
+
+    /*
+    ** 5) Reassemble and return.
+    */
+    return sign + grouped + frac_part + exponent;
+}
 
 void Command::changePassword() {
     PFM_DB & db = PFM_DB::getInstance();
@@ -166,6 +246,36 @@ void Command::enterSQLMode() {
         catch (pfm_error & e) {
             log.error("SQL mode: Failed to execute statement: %s", e.what());
             cout << "Error: " << e.what() << endl << endl;
+        }
+    }
+}
+
+void Command::enterCalcMode() {
+    clear_history();
+
+    bool loop = true;
+
+    while (loop) {
+        rl_utils::setLineLength(256);
+
+        string calculation = readline("calc > ");
+
+        if (calculation == "q") {
+            loop = false;
+            continue;
+        }
+
+        add_history(calculation.c_str());
+
+        if (calculation.length() > 0) {
+            try {
+                Expression expression;
+                string answer = expression.evaluate(calculation);
+                cout << "\t" << calculation << " = " << addThousandsSeparators(answer) << endl << endl;
+            }
+            catch (calc_error & e) {
+                cout << "Error: " << e.what() << endl << endl;
+            }
         }
     }
 }
