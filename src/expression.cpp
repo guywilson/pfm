@@ -30,7 +30,7 @@ TokenQueue Expression::getRPNQueue(TokenArray & tokens) {
     TokenQueue tokenQueue;
     TokenStack operatorStack;
 
-    for (int i = 0;i < tokens.size();i++) {
+    for (size_t i = 0;i < tokens.size();i++) {
         Token * token = tokens.at(i);
 
         if (isOperand(token)) {
