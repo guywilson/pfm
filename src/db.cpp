@@ -101,7 +101,7 @@ static inline int _retrieveCallback(void * p, int numColumns, char ** columns, c
         columnVector.push_back(column);
     }
 
-    DBRow row(numColumns, columnVector);
+    DBRow row(columnVector);
 
     rows->push_back(row);
 

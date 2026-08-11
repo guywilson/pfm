@@ -97,7 +97,7 @@ class DBRow {
         vector<DBColumn>  columns;
 
     public:
-        DBRow(int numColumns, vector<DBColumn> & columnVector) {
+        DBRow(vector<DBColumn> & columnVector) {
             for (size_t i = 0;i < columnVector.size();i++) {
                 columns.push_back(columnVector[i]);
             }
