@@ -76,9 +76,6 @@ static std::string getPassword(const std::string & prompt) {
         }
 
         if (ch != '\n' && ch != '\r') {
-            putchar('*');
-            fflush(stdout);
-
             password[i++] = (char)ch;
         }
 
@@ -122,8 +119,8 @@ static std::string getKeyFromPassword(const std::string & password) {
 	return key;
 }
 
-static bool hasGraphicalDisplay() {
 #ifdef __linux__
+static bool hasGraphicalDisplay() {
     const char* waylandDisplay = std::getenv("WAYLAND_DISPLAY");
     if (waylandDisplay && *waylandDisplay)
         return true;
@@ -133,11 +130,8 @@ static bool hasGraphicalDisplay() {
         return true;
 
     return false;
-#else
-    // This function only classifies Linux environments.
-    return true;
-#endif
 }
+#endif
 
 std::string System::getKey(const std::string & prompt) {
     std::string password = getPassword(prompt);
