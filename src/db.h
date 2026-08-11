@@ -134,6 +134,7 @@ class PFM_DB {
         void createDB(const string & dbName);
         bool isNewFileRequired(int errorCode);
 
+        void checkDecryptionSuccessfull();
         void applyDatabaseKey(const string & dbName, const string & key);
 
         void createAccessKeyRecord(const string & key);

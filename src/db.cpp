@@ -78,6 +78,8 @@ using namespace std;
 #define DEBUG_PASSWORD          ""
 #endif
 
+#define CHECK_DECRYPTION_SUCCESSFULL_QUERY              "SELECT COUNT(*) FROM category;"
+
 /******************************************************************************
 **
 ** _retrieveCallback() - sqlite3 callback function
@@ -166,6 +168,23 @@ void PFM_DB::createDB(const string & dbName) {
     }
 }
 
+void PFM_DB::checkDecryptionSuccessfull() {
+    log.entry("PFM_DB::checkDecryptionSuccessfull()");
+
+    try {
+        vector<DBRow> rows;
+
+        int rowCount = executeSelect(CHECK_DECRYPTION_SUCCESSFULL_QUERY, &rows);
+        log.debug("Got %d rows from '%s'", rowCount, CHECK_DECRYPTION_SUCCESSFULL_QUERY);
+        log.info("Successfully decrypted database file");
+    }
+    catch (pfm_error & e) {
+        throw pfm_error("Failed to decrypt database file!");
+    }
+
+    log.exit("PFM_DB::checkDecryptionSuccessfull()");
+}
+
 void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
     log.entry("PFM_DB::applyDatabaseKey()");
 
@@ -188,16 +207,7 @@ void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
                     errorMsg));
     }
 
-    vector<DBRow> rows;
-
-    try {
-        int rowCount = executeSelect("SELECT COUNT(*) FROM category;", &rows);
-        log.debug("Got %d rows from 'SELECT COUNT(*) FROM category'", rowCount);
-        log.info("Successfully decrypted database file");
-    }
-    catch (pfm_error & e) {
-        throw pfm_error("Failed to decrypt database file!");
-    }
+    checkDecryptionSuccessfull();
 
     log.exit("PFM_DB::applyDatabaseKey()");
 }
