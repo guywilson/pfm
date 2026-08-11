@@ -167,6 +167,8 @@ void PFM_DB::createDB(const string & dbName) {
 }
 
 void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
+    log.entry("PFM_DB::applyDatabaseKey()");
+
     int keyError = sqlite3_key(this->dbHandle, key.c_str(), key.length());
 
     if (keyError != SQLITE_OK) {
@@ -185,6 +187,19 @@ void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
                     keyError,
                     errorMsg));
     }
+
+    vector<DBRow> rows;
+
+    try {
+        int rowCount = executeSelect("SELECT COUNT(*) FROM category;", &rows);
+        log.debug("Got %d rows from 'SELECT COUNT(*) FROM category'", rowCount);
+        log.info("Successfully decrypted database file");
+    }
+    catch (pfm_error & e) {
+        throw pfm_error("Failed to decrypt database file!");
+    }
+
+    log.exit("PFM_DB::applyDatabaseKey()");
 }
 
 void PFM_DB::createAccessKeyRecord(const string & key) {
