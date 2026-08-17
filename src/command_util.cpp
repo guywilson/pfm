@@ -60,6 +60,14 @@ void Command::saveDBKey() {
     }
 }
 
+void Command::getAPISession() {
+    SessionManager sessionManager;
+
+    const string sessionId = sessionManager.createSession();
+
+    cout << "Session ID: " << sessionId << endl;
+}
+
 int Command::getLogLevelParameter(string & level) {
     int levelID = 0;
 

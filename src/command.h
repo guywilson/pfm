@@ -204,6 +204,8 @@ class Command {
         void getDBKey();
         void saveDBKey();
 
+        void getAPISession();
+
         void enterSQLMode();
         void enterCalcMode();
 
