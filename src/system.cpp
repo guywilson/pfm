@@ -281,7 +281,7 @@ std::string SessionManager::createSession() {
     return id;
 }
 
-bool SessionManager::isValid(const std::string& sessionId) {
+bool SessionManager::isValid(const char * sessionId) {
     std::lock_guard<std::mutex> lock(mutex_);
     
     if (!active_) {
@@ -294,6 +294,14 @@ bool SessionManager::isValid(const std::string& sessionId) {
     }
     
     return constantTimeEqual(active_->id, sessionId);
+}
+
+bool SessionManager::isValid(const std::string & sessionId) {
+    return isValid(sessionId.c_str());
+}
+
+bool SessionManager::isValid(const std::string_view & sessionId) {
+    return isValid(sessionId.data());
 }
 
 bool SessionManager::revoke(const std::string& sessionId) {

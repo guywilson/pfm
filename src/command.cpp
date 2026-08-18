@@ -10,6 +10,8 @@
 #include <sstream>
 #include <functional>
 
+#include <httpserver.hpp>
+
 #include <sqlcipher/sqlite3.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -29,6 +31,7 @@
 #include "command.h"
 #include "command_table.h"
 #include "custom_modifiers.h"
+#include "system.h"
 
 using namespace std;
 
@@ -203,6 +206,18 @@ string Command::parse(const string & commandLine) {
     return command;
 }
 
+string Command::parse(const httpserver::http_request & request) {
+    string_view sessionKey = request.get_header("X-Session-ID");
+
+    SessionManager session;
+
+    if (!session.isValid(sessionKey)) {
+        throw pfm_fatal("Invalid session key");
+    }
+
+    return request.get_header("command-name").data();
+}
+
 bool Command::process(const string & commandLine) {
     clear_history();
 
@@ -250,4 +265,30 @@ bool Command::process(const string & commandLine) {
                 pfm_error::buildMsg(
                     "Sorry, I do not understand command '%s', please see the manual for supported commands.", 
                     command.c_str()));
+}
+
+bool Command::process(const httpserver::http_request & request) {
+    string command = parse(request);
+
+    if (command.compare("version") == 0) {
+        Command::version();
+        return true;
+    }
+    else {
+        bool isAlias = false;
+        for (const auto &entry : commandTable) {
+            for (const auto & alias : entry.aliases) {
+                if (command == alias) {
+                    isAlias = true;
+                }
+            }
+            if (command == entry.name || isAlias) {
+                entry.handler(*this);
+
+                return true;
+            }
+        }
+    }
+
+    return false;
 }

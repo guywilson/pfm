@@ -36,6 +36,9 @@ class SessionManager {
 
         // A session may authenticate any number of calls until it expires/revokes.
         [[nodiscard]] bool isValid(const std::string & sessionId);
+        [[nodiscard]] bool isValid(const std::string_view & sessionId);
+        [[nodiscard]] bool isValid(const char * sessionId);
+
 
         // Explicitly ends the current session. Returns true only on a match.
         bool revoke(const std::string & sessionId);

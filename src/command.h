@@ -6,6 +6,8 @@
 #include <string.h>
 #include <exception>
 
+#include <httpserver.hpp>
+
 #include "logger.h"
 #include "cfgmgr.h"
 #include "db.h"
@@ -42,6 +44,7 @@ class Command {
         bool isStringNumeric(const string & s);
 
         string parse(const string & commandLine);
+        string parse(const httpserver::http_request & request);
         void handleExceptions(const string & command, const string & token);
  
         bool hasParameters() {
@@ -217,5 +220,6 @@ class Command {
         static void version();
 
         bool process(const string & commandLine);
+        bool process(const httpserver::http_request & request);
 };
 

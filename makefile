@@ -64,7 +64,7 @@ PANDOCFLAGS = -s -t man
 
 # Libraries
 STDLIBS=
-EXTLIBS=-lreadline -lhistory -lcurses -lsqlcipher -lgcrypt -lcred -lmpfr -lgmp
+EXTLIBS=-lreadline -lhistory -lcurses -lsqlcipher -lgcrypt -lcred -lmpfr -lgmp -lhttpserver
 
 COMPILE.cpp=$(CPP) $(CPPFLAGS) -o $@
 COMPILE.c=$(C) $(CFLAGS) -o $@
