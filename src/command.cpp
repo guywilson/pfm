@@ -212,7 +212,15 @@ string Command::parse(const httpserver::http_request & request) {
     SessionManager session;
 
     if (!session.isValid(sessionKey)) {
-        throw pfm_fatal("Invalid session key");
+        throw pfm_validation_error("Invalid session supplied");
+    }
+
+    httpserver::http::header_view_map headers = request.get_headers();
+
+    for (auto & header : headers) {
+        if (header.first != "command-name" && header.first != "X-Session-ID") {
+            parameters[header.first.data()].push_back(header.second.data());
+        }
     }
 
     return request.get_header("command-name").data();

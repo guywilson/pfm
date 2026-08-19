@@ -32,6 +32,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <httpserver.hpp>
+
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -215,6 +217,16 @@ static int commandProcessor() {
     return status;
 }
 
+static void serviceAPIDaemon() {
+    httpserver::webserver ws{httpserver::create_webserver(8080)};
+
+    ws.on_get("/api/transaction/list-transactions", [](const httpserver::http_request&) {
+        return httpserver::http_response::string("Hello, World!");
+    });
+
+    ws.start(true);
+}
+
 int main(int argc, char ** argv) {
 #ifdef RUN_IN_DEBUGGER
     int defaultLogLevel = LOG_LEVEL_ALL;
@@ -227,6 +239,7 @@ int main(int argc, char ** argv) {
     char * pszDatabase = strdup(DEFAULT_DATABASE_NAME);
     int status = 0;
     bool runScratch = false;
+    bool startServer = false;
 
     while (cmdarg.hasMoreArgs()) {
         string arg = cmdarg.nextArg();
@@ -292,6 +305,9 @@ int main(int argc, char ** argv) {
         else if (arg.compare("--headless") == 0) {
             System::setIsHeadlessLinux(true);
         }
+        else if (arg.compare("--start-server") == 0) {
+            startServer = true;
+        }
         else if (arg.compare("--full-logging") == 0) {
             defaultLogLevel = LOG_LEVEL_ALL;
         }
@@ -333,7 +349,10 @@ int main(int argc, char ** argv) {
 
     initialiseReferenceData();
 
-    if (runScratch) {
+    if (startServer) {
+        serviceAPIDaemon();
+    }
+    else if (runScratch) {
         /*
         ** Run scratch code, suitable for unit testing...
         */
