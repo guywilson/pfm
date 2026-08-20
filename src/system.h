@@ -13,6 +13,7 @@ class System {
         static std::string getKeyFromCredentialStore();
         static void deleteKeyFromCredentialStore();
 
+        static std::string getKeyFromPassword(const std::string & password);
         static std::string getKey(const std::string & prompt);
 
         static void setIsHeadlessLinux(const bool isHeadless);

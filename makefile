@@ -63,12 +63,12 @@ endif
 PANDOCFLAGS = -s -t man
 
 # Libraries
-STDLIBS=
+STDLIBS=-pthread
 EXTLIBS=-lreadline -lhistory -lcurses -lsqlcipher -lgcrypt -lcred -lmpfr -lgmp -lhttpserver
 
 COMPILE.cpp=$(CPP) $(CPPFLAGS) -o $@
 COMPILE.c=$(C) $(CFLAGS) -o $@
-LINK.o=$(LINKER) -o $@
+LINK.o=$(LINKER) $(STDLIBS) -o $@
 
 PANDOC.md = $(PANDOC) $(PANDOCFLAGS) -o $@
 

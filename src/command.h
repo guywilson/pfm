@@ -25,6 +25,7 @@
 #include "db_transaction_report.h"
 #include "db_shortcut.h"
 #include "db_public_holiday.h"
+#include "web_api.h"
 
 using namespace std;
 
@@ -37,6 +38,7 @@ class Command {
 
         vector<string> commandHistory;
         DBAccount selectedAccount;
+        APIListener listener;
 
         Logger & log = Logger::getInstance();
         cfgmgr & cfg = cfgmgr::getInstance();
@@ -208,6 +210,7 @@ class Command {
         void saveDBKey();
 
         void getAPISession();
+        void startAPIServer();
 
         void enterSQLMode();
         void enterCalcMode();

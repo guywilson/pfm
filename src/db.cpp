@@ -285,7 +285,7 @@ void PFM_DB::open(const string & dbName) {
 #ifndef RUN_IN_DEBUGGER
                     key = System::getKey("Enter database password: ");
 #else
-                    key = getKeyFromPassword(DEBUG_PASSWORD);
+                    key = System::getKeyFromPassword(DEBUG_PASSWORD);
 #endif
                 }
             }
@@ -293,7 +293,7 @@ void PFM_DB::open(const string & dbName) {
 #ifndef RUN_IN_DEBUGGER
                 key = System::getKey("Enter database password: ");
 #else
-                key = getKeyFromPassword(DEBUG_PASSWORD);
+                key = System::getKeyFromPassword(DEBUG_PASSWORD);
 #endif
             }
 

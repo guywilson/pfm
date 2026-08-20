@@ -339,6 +339,9 @@ const vector<CommandEntry> commandTable = {
 
     {"save-db-key", {}, 
         "Save the database key to an encrypted file in the users current directory. Useful to access pfm without having to enter the password each time", 
-        [](Command& c){ c.saveDBKey(); }}
-};
+        [](Command& c){ c.saveDBKey(); }},
 
+    {"start-api-server", {"start"}, 
+        "", 
+        [](Command& c){ c.startAPIServer(); }}
+};

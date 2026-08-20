@@ -106,33 +106,6 @@ static std::string getPassword(const std::string & prompt) {
     return std::string(password);
 }
 
-static std::string getKeyFromPassword(const std::string & password) {
-	uint32_t keySize = gcry_md_get_algo_dlen(GCRY_MD_SHA3_256);
-
-	uint8_t * keyBuffer = (uint8_t *)malloc(keySize);
-	char * k = (char *)malloc((keySize * 2) + 1);
-
-	gcry_md_hash_buffer(GCRY_MD_SHA3_256, keyBuffer, password.c_str(), password.length());
-
-	char hexBuffer[3];
-    int j = 0;
-    for (int i = 0;i < (int)keySize;i++) {
-        snprintf(hexBuffer, 3, "%02X", keyBuffer[i]);
-
-        k[j++] = hexBuffer[0];
-        k[j++] = hexBuffer[1];
-    }
-
-    k[j] = 0;
-
-    string key(k);
-
-	free(keyBuffer);
-	free(k);
-	
-	return key;
-}
-
 #ifdef __linux__
 static bool hasGraphicalDisplay() {
     const char* waylandDisplay = std::getenv("WAYLAND_DISPLAY");
@@ -196,6 +169,33 @@ std::string base64UrlEncode(const unsigned char* data, std::size_t size) {
         result.push_back(alphabet[(buffer << (6 - bits)) & 0x3f]);
     }
     return result;
+}
+
+std::string System::getKeyFromPassword(const std::string & password) {
+	uint32_t keySize = gcry_md_get_algo_dlen(GCRY_MD_SHA3_256);
+
+	uint8_t * keyBuffer = (uint8_t *)malloc(keySize);
+	char * k = (char *)malloc((keySize * 2) + 1);
+
+	gcry_md_hash_buffer(GCRY_MD_SHA3_256, keyBuffer, password.c_str(), password.length());
+
+	char hexBuffer[3];
+    int j = 0;
+    for (int i = 0;i < (int)keySize;i++) {
+        snprintf(hexBuffer, 3, "%02X", keyBuffer[i]);
+
+        k[j++] = hexBuffer[0];
+        k[j++] = hexBuffer[1];
+    }
+
+    k[j] = 0;
+
+    string key(k);
+
+	free(keyBuffer);
+	free(k);
+	
+	return key;
 }
 
 std::string System::getKey(const std::string & prompt) {

@@ -20,6 +20,7 @@
 #include "cache.h"
 #include "jfile.h"
 #include "debug_views.h"
+#include "web_api.h"
 
 using namespace std;
 
@@ -66,6 +67,10 @@ void Command::getAPISession() {
     const string sessionId = sessionManager.createSession();
 
     cout << "Session ID: " << sessionId << endl;
+}
+
+void Command::startAPIServer() {
+    listener.start();
 }
 
 int Command::getLogLevelParameter(string & level) {

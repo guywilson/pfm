@@ -49,6 +49,8 @@
 #include "db_shortcut.h"
 #include "db_public_holiday.h"
 #include "command.h"
+#include "web_api.h"
+#include "posixthread.h"
 #include "cfgmgr.h"
 #include "cmdarg.h"
 #include "terminal.h"
@@ -130,30 +132,8 @@ void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ALL);
 
-    // setOverrideDate("2026-06-29");
-
-    // DBRecurringCharge charge;
-
-    // charge.retrieve(10);
-
-    // StrDate transactionDate = charge.getNextRecurringTransactionDate();
-    // bool isDueThisPeriod = charge.isChargeDueThisPeriod();
-
-    // cout << "Got next transaction date '" << transactionDate.shortDate() << "' is due = " << isDueThisPeriod << endl;
-
-
-    // charge.save();
-
-    // StrDate startDate = StrDate::getPeriodStartDate();
-    // StrDate endDate = StrDate::getPeriodEndDate();
-
-    // cout << "Got period start date '" << startDate.shortDate() << "', period end date '" << endDate.shortDate() << "'" << endl << endl;
-
-    // Money amount = 0.71f;
-
-    // cout << "Money raw value: '" << amount.rawStringValue() << "', formatted value: '" << amount.localeFormattedStringValue() << "'" << endl << endl;
-
-
+    Command command;
+    command.startAPIServer();
 }
 
 static void initialiseReferenceData() {
@@ -217,16 +197,6 @@ static int commandProcessor() {
     return status;
 }
 
-static void serviceAPIDaemon() {
-    httpserver::webserver ws{httpserver::create_webserver(8080)};
-
-    ws.on_get("/api/transaction/list-transactions", [](const httpserver::http_request&) {
-        return httpserver::http_response::string("Hello, World!");
-    });
-
-    ws.start(true);
-}
-
 int main(int argc, char ** argv) {
 #ifdef RUN_IN_DEBUGGER
     int defaultLogLevel = LOG_LEVEL_ALL;
@@ -239,7 +209,6 @@ int main(int argc, char ** argv) {
     char * pszDatabase = strdup(DEFAULT_DATABASE_NAME);
     int status = 0;
     bool runScratch = false;
-    bool startServer = false;
 
     while (cmdarg.hasMoreArgs()) {
         string arg = cmdarg.nextArg();
@@ -305,9 +274,6 @@ int main(int argc, char ** argv) {
         else if (arg.compare("--headless") == 0) {
             System::setIsHeadlessLinux(true);
         }
-        else if (arg.compare("--start-server") == 0) {
-            startServer = true;
-        }
         else if (arg.compare("--full-logging") == 0) {
             defaultLogLevel = LOG_LEVEL_ALL;
         }
@@ -349,10 +315,7 @@ int main(int argc, char ** argv) {
 
     initialiseReferenceData();
 
-    if (startServer) {
-        serviceAPIDaemon();
-    }
-    else if (runScratch) {
+    if (runScratch) {
         /*
         ** Run scratch code, suitable for unit testing...
         */
@@ -366,7 +329,7 @@ int main(int argc, char ** argv) {
         */
         status = commandProcessor();
     }
-
+ 
     db.close();
     log.close();
 
