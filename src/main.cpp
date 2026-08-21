@@ -66,6 +66,12 @@ using namespace std;
 
 #define DEFAULT_DATABASE_NAME                   ".pfm"
 
+#ifndef RUN_IN_DEBUGGER
+#define DEFAULT_LOG_LEVEL                       LOG_LEVEL_ERROR | LOG_LEVEL_FATAL
+#else
+#define DEFAULT_LOG_LEVEL                       LOG_LEVEL_ALL
+#endif
+
 #ifdef PFM_TEST_SUITE_ENABLED
 extern void testAccount();
 #endif
@@ -198,17 +204,12 @@ static int commandProcessor() {
 }
 
 int main(int argc, char ** argv) {
-#ifdef RUN_IN_DEBUGGER
-    int defaultLogLevel = LOG_LEVEL_ALL;
-#else
-    int defaultLogLevel = LOG_LEVEL_ERROR | LOG_LEVEL_FATAL;
-#endif
-
     CmdArg cmdarg(argc, argv);
 
     char * pszDatabase = strdup(DEFAULT_DATABASE_NAME);
     int status = 0;
     bool runScratch = false;
+    int defaultLogLevel = DEFAULT_LOG_LEVEL;
 
     while (cmdarg.hasMoreArgs()) {
         string arg = cmdarg.nextArg();
