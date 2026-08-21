@@ -1,6 +1,6 @@
 % PFM(1) PFM User Manual
 % Guy Wilson
-% July 1, 2025
+% Aug 21, 2026
 
 # NAME
 
@@ -21,6 +21,14 @@ PFM supports multiple accounts, transactions, recurring charges, categories and 
 **-db [db file]**
 
 Specifies the filename of the SQLite database to open. If you do not specify this option, it assumes a database file named ‘.pfm’ in the current directory.
+
+**--headless**
+
+Explicitly tells PFM that it is running in a headless (server) environment. Without this, PFM will try to work it out for itself.
+
+**--license, -l**
+
+Prints the license information of the PFM program and exits.
 
 **--version, -v**
 

@@ -204,12 +204,12 @@ static int commandProcessor() {
 }
 
 int main(int argc, char ** argv) {
-    CmdArg cmdarg(argc, argv);
-
     char * pszDatabase = strdup(DEFAULT_DATABASE_NAME);
     int status = 0;
     bool runScratch = false;
     int defaultLogLevel = DEFAULT_LOG_LEVEL;
+
+    CmdArg cmdarg(argc, argv);
 
     while (cmdarg.hasMoreArgs()) {
         string arg = cmdarg.nextArg();
@@ -220,45 +220,6 @@ int main(int argc, char ** argv) {
         }
         else if (arg.compare("-h") == 0 || arg.compare("-?") == 0) {
             printUsage();
-            return 0;
-        }
-        else if (arg.compare("-c") == 0) {
-            string cmd = cmdarg.nextArg();
-
-            if (!cmdarg.isLastArg()) {
-                throw pfm_error("Command provided by the '-c' option must be the last comand line argument.");
-            }
-
-            Logger & log = Logger::getInstance();
-            log.init("./pfm.log", defaultLogLevel);
-
-            PFM_DB & db = PFM_DB::getInstance();
-
-            try {
-                db.open(pszDatabase);
-            }
-            catch (pfm_fatal & f) {
-                cout << "Fatal error issuing command '" << cmd << "': " << f.what() << endl;
-                free(pszDatabase);
-                return -1;
-            }
-
-            free(pszDatabase);
-
-            initialiseReferenceData();
-
-            cout << "Running command: '" << cmd << "'" << endl;
-
-            Command command;
-
-            string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
-
-            command.selectAccount(primaryAccountCode);
-            command.process(cmd);
-
-            db.close();
-            log.close();
-
             return 0;
         }
         else if (arg.compare("-date") == 0) {

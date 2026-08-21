@@ -1,7 +1,7 @@
 #pragma once
 
 const char * licenseText = 
-    "Copyright (c) 2025, Guy Wilson\n" \
+    "Copyright (c) 2026, Guy Wilson\n" \
     "\n" \
     "Redistribution and use in source and binary forms, with or without\n" \
     "modification, are permitted provided that the following conditions are met:\n" \
@@ -27,7 +27,7 @@ const char * licenseText =
     "Portions of this software use the SQLCipher library, the license for this\n" \
     "is shown below:\n" \
     "\n" \
-    "Copyright (c) 2025, ZETETIC LLC\n" \
+    "Copyright (c) 2026, ZETETIC LLC\n" \
     "All rights reserved.\n" \
     "\n" \
     "Redistribution and use in source and binary forms, with or without\n" \
