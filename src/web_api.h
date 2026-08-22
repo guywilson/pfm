@@ -5,9 +5,12 @@
 #include "posixthread.h"
 
 class APIListener : public PosixThread {
-    public:
-        httpserver::webserver * ws;
+    private:
+        void registerEndPoints(httpserver::webserver & ws);
 
+        static httpserver::http_response handleFindTransactions(const httpserver::http_request & request);
+
+    public:
         APIListener() : PosixThread() {}
 
         void * run() override;

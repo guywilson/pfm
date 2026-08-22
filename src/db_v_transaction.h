@@ -176,9 +176,9 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleOnTheseDates(DBCriteria & src, vector<StrDate> & dates) {
+                static DBCriteria handleOnTheseDates(DBCriteria & src, const vector<StrDate> & dates) {
                     if (dates.size() > 0) {
-                        for (StrDate & date : dates) {
+                        for (const StrDate & date : dates) {
                             src.addToInClause(DBPayment::Columns::date, date);
                         }
 
@@ -198,9 +198,9 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleWithTheseAccounts(DBCriteria & src, vector<string> & accounts) {
+                static DBCriteria handleWithTheseAccounts(DBCriteria & src, const vector<string> & accounts) {
                     if (accounts.size() > 0) {
-                        for (string & account : accounts) {
+                        for (const string & account : accounts) {
                             src.addToInClause(Columns::account, account);
                         }
 
@@ -210,9 +210,9 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleWithTheseCategories(DBCriteria & src, vector<string> & categories) {
+                static DBCriteria handleWithTheseCategories(DBCriteria & src, const vector<string> & categories) {
                     if (categories.size() > 0) {
-                        for (string & category : categories) {
+                        for (const string & category : categories) {
                             src.addToInClause(Columns::category, category);
                         }
 
@@ -222,9 +222,9 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleWithThesePayees(DBCriteria & src, vector<string> & payees) {
+                static DBCriteria handleWithThesePayees(DBCriteria & src, const vector<string> & payees) {
                     if (payees.size() > 0) {
-                        for (string & payee : payees) {
+                        for (const string & payee : payees) {
                             src.addToInClause(Columns::payee, payee);
                         }
 
@@ -270,6 +270,11 @@ class DBTransactionView : public DBTransaction {
 
                 static DBCriteria handleIsRecurring(DBCriteria & src, const bool & isRecurring) {
                     src.add(Columns::recurring, isRecurring);
+                    return src;
+                }
+
+                static DBCriteria handleIsRecconciled(DBCriteria & src, const bool & isReconciled) {
+                    src.add(Columns::isReconciled, isReconciled);
                     return src;
                 }
         };
