@@ -103,6 +103,74 @@ httpserver::http_response APIListener::handleFindTransactions(const httpserver::
     return httpserver::http_response::string(entity.dump());
 }
 
+httpserver::http_response APIListener::handleAddTransaction(const httpserver::http_request & request) {
+    Logger & log = Logger::getInstance();
+
+    log.entry("APIListener::handleAddTransaction()");
+
+    log.debug("APIListener::handleAddTransaction() - received request body:");
+    log.debug("%s", request.get_content().data());
+
+    json js = json::parse(request.get_content().data());
+
+    DBTransaction transaction;
+
+    if (js.contains("account")) {
+        std::string code = js["account"].get<std::string>();
+
+        DBAccount account;
+        account.retrieveByCode(code);
+
+        transaction.accountId = account.id;
+    }
+    if (js.contains("category")) {
+        std::string code = js["category"].get<std::string>();
+
+        DBCategory category;
+        category.retrieveByCode(code);
+
+        transaction.categoryId = category.id;
+    }
+    if (js.contains("payee")) {
+        std::string code = js["payee"].get<std::string>();
+
+        DBPayee payee;
+        payee.retrieveByCode(code);
+
+        transaction.payeeId = payee.id;
+    }
+    if (js.contains("description")) {
+        std::string description = js["description"].get<std::string>();
+        transaction.description = description;
+    }
+    if (js.contains("reference")) {
+        std::string reference = js["reference"].get<std::string>();
+        transaction.reference = reference;
+    }
+    if (js.contains("type")) {
+        std::string type = js["type"].get<std::string>();
+        transaction.type = type;
+    }
+    if (js.contains("date")) {
+        std::string date = js["date"].get<std::string>();
+        transaction.date = date;
+    }
+    if (js.contains("reconciled")) {
+        bool isReconciled = js["reconciled"].get<bool>();
+        transaction.isReconciled = isReconciled;
+    }
+    if (js.contains("amount")) {
+        std::string amount = js["amount"].get<std::string>();
+        transaction.amount = amount;
+    }
+
+    transaction.save();
+
+    log.exit("APIListener::handleAddTransaction()");
+
+    return httpserver::http_response::string("OK");
+}
+
 void APIListener::registerEndPoints(httpserver::webserver & ws) {
     Logger & log = Logger::getInstance();
 
@@ -110,6 +178,9 @@ void APIListener::registerEndPoints(httpserver::webserver & ws) {
 
     ws.on_post("/api/transaction/find-transactions", [](const httpserver::http_request & request) {
         return APIListener::handleFindTransactions(request);
+    });
+    ws.on_post("/api/transaction/add-transaction", [](const httpserver::http_request & request) {
+        return APIListener::handleAddTransaction(request);
     });
 
     log.exit("APIListener::registerEndPoints()");

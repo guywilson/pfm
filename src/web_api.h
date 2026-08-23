@@ -9,6 +9,7 @@ class APIListener : public PosixThread {
         void registerEndPoints(httpserver::webserver & ws);
 
         static httpserver::http_response handleFindTransactions(const httpserver::http_request & request);
+        static httpserver::http_response handleAddTransaction(const httpserver::http_request & request);
 
     public:
         APIListener() : PosixThread() {}
