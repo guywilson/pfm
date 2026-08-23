@@ -135,11 +135,8 @@ static void checkTerminalSize(void) {
 }
 
 void unitTestCodeFragment() {
-    Logger & log = Logger::getInstance();
-    log.setLogLevel(LOG_LEVEL_ALL);
-
     Command command;
-    command.startAPIServer();
+    command.process("start");
 }
 
 static void initialiseReferenceData() {
@@ -282,6 +279,7 @@ int main(int argc, char ** argv) {
         ** Run scratch code, suitable for unit testing...
         */
         unitTestCodeFragment();
+        status = commandProcessor();
     }
     else {
         /*

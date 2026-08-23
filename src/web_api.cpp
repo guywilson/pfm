@@ -16,58 +16,63 @@ httpserver::http_response APIListener::handleFindTransactions(const httpserver::
 
     log.entry("APIListener::handleFindTransactions()");
 
+    log.debug("APIListener::handleFindTransactions() - received request body:");
+    log.debug("%s", request.get_content().data());
+
+    json js = json::parse(request.get_content().data());
+
     DBCriteria criteria;
 
-    if (request.get_header("account").length() > 0) {
-        std::string code = request.get_header("account").data();
+    if (js.contains("account")) {
+        std::string code = js["account"].get<std::string>();
         criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseAccounts(criteria, {code});
     }
-    if (request.get_header("category").length() > 0) {
-        std::string code = request.get_header("category").data();
+    if (js.contains("category")) {
+        std::string code = js["category"].get<std::string>();
         criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseCategories(criteria, {code});
     }
-    if (request.get_header("payee").length() > 0) {
-        std::string code = request.get_header("payee").data();
-        criteria = DBTransactionView::FindCriteriaHelper::handleWithThesePayees(criteria, {code});
+    if (js.contains("payee")) {
+        std::string code = js["payee"].get<std::string>();
+        criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseCategories(criteria, {code});
     }
-    if (request.get_header("description").length() > 0) {
-        std::string description = request.get_header("description").data();
+    if (js.contains("description")) {
+        std::string description = js["description"].get<std::string>();
         criteria = DBTransactionView::FindCriteriaHelper::handleWithThisDescription(criteria, description);
     }
-    if (request.get_header("reference").length() > 0) {
-        std::string reference = request.get_header("reference").data();
+    if (js.contains("reference")) {
+        std::string reference = js["reference"].get<std::string>();
         criteria = DBTransactionView::FindCriteriaHelper::handleWithThisReference(criteria, reference);
     }
-    if (request.get_header("type").length() > 0) {
-        std::string type = request.get_header("type").data();
+    if (js.contains("type")) {
+        std::string type = js["type"].get<std::string>();
         criteria = DBTransactionView::FindCriteriaHelper::handleWithThisType(criteria, type);
     }
-    if (request.get_header("date").length() > 0) {
-        std::string date = request.get_header("date").data();
+    if (js.contains("date")) {
+        std::string date = js["date"].get<std::string>();
         criteria = DBTransactionView::FindCriteriaHelper::handleOnTheseDates(criteria, {date});
     }
-    if (request.get_header("reconciled").length() > 0) {
-        bool isReconciled = request.get_header("reconciled").data();
+    if (js.contains("reconciled")) {
+        bool isReconciled = js["reconciled"].get<bool>();
         criteria = DBTransactionView::FindCriteriaHelper::handleIsRecconciled(criteria, isReconciled);
     }
-    if (request.get_header("recurring").length() > 0) {
-        bool isRecurring = request.get_header("recurring").data();
+    if (js.contains("recurring")) {
+        bool isRecurring = js["recurring"].get<bool>();
         criteria = DBTransactionView::FindCriteriaHelper::handleIsRecurring(criteria, isRecurring);
     }
-    if (request.get_header("after").length() > 0) {
-        std::string date = request.get_header("after").data();
+    if (js.contains("after")) {
+        std::string date = js["after"].get<std::string>();
         criteria = DBTransactionView::FindCriteriaHelper::handleGreaterThanThisDate(criteria, date);
     }
-    if (request.get_header("before").length() > 0) {
-        std::string date = request.get_header("before").data();
+    if (js.contains("before")) {
+        std::string date = js["before"].get<std::string>();
         criteria = DBTransactionView::FindCriteriaHelper::handleLessThanThisDate(criteria, date);
     }
-    if (request.get_header("gt").length() > 0) {
-        std::string amount = request.get_header("gt").data();
+    if (js.contains("gt")) {
+        std::string amount = js["gt"].get<std::string>();
         criteria = DBTransactionView::FindCriteriaHelper::handleGreaterThanThisAmount(criteria, amount);
     }
-    if (request.get_header("lt").length() > 0) {
-        std::string amount = request.get_header("lt").data();
+    if (js.contains("lt")) {
+        std::string amount = js["lt"].get<std::string>();
         criteria = DBTransactionView::FindCriteriaHelper::handleLessThanThisAmount(criteria, amount);
     }
 
@@ -103,7 +108,7 @@ void APIListener::registerEndPoints(httpserver::webserver & ws) {
 
     log.entry("APIListener::registerEndPoints()");
 
-    ws.on_get("/api/transaction/find-transactions", [](const httpserver::http_request & request) {
+    ws.on_post("/api/transaction/find-transactions", [](const httpserver::http_request & request) {
         return APIListener::handleFindTransactions(request);
     });
 
@@ -118,7 +123,7 @@ void * APIListener::run() {
     cfgmgr & cfg = cfgmgr::getInstance();
     uint16_t port = (uint16_t)cfg.getValueAsInteger("server.port");
 
-    httpserver::webserver ws{httpserver::create_webserver(port)};
+    httpserver::webserver ws{httpserver::create_webserver(port).put_processed_data_to_content(true)};
 
     registerEndPoints(ws);
 
