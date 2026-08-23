@@ -82,7 +82,7 @@ httpserver::http_response APIListener::handleFindTransactions(const httpserver::
     auto jsonEntities = json::array();
 
     for (size_t i = 0;i < results.size();i++) {
-        DBTransaction transaction = results.at(i);
+        DBTransactionView transaction = results.at(i);
         JRecord record = transaction.getRecord();
 
         json j = json::object();
