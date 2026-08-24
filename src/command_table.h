@@ -317,10 +317,6 @@ const vector<CommandEntry> commandTable = {
         "", 
         [](Command& c){ c.enterCalcMode(); }},
 
-    {"get-api-session", {}, 
-        "", 
-        [](Command& c){ c.getAPISession(); }},
-
     {"clear-recurring-transactions", {}, 
         "", 
         [](Command& c){ c.clearRecurringTransactions(); }},

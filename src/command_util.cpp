@@ -21,6 +21,7 @@
 #include "jfile.h"
 #include "debug_views.h"
 #include "web_api.h"
+#include "posixthread.h"
 
 using namespace std;
 
@@ -61,16 +62,9 @@ void Command::saveDBKey() {
     }
 }
 
-void Command::getAPISession() {
-    SessionManager sessionManager;
-
-    const string sessionId = sessionManager.createSession();
-
-    cout << "Session ID: " << sessionId << endl;
-}
-
 void Command::startAPIServer() {
     listener.start();
+    PosixThread::sleep(1UL);
 }
 
 int Command::getLogLevelParameter(string & level) {

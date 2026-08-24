@@ -209,7 +209,6 @@ class Command {
         void getDBKey();
         void saveDBKey();
 
-        void getAPISession();
         void startAPIServer();
 
         void enterSQLMode();

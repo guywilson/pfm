@@ -6,6 +6,8 @@
 
 class APIListener : public PosixThread {
     private:
+        static void validateSession(const httpserver::http_request & request);
+        
         void registerEndPoints(httpserver::webserver & ws);
 
         static httpserver::http_response handleFindTransactions(const httpserver::http_request & request);

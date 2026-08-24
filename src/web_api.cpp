@@ -1,5 +1,7 @@
 #include <string>
 
+#include <stdio.h>
+
 #include <httpserver.hpp>
 #include <nlohmann/json.hpp>
 
@@ -8,8 +10,26 @@
 #include "logger.h"
 #include "cfgmgr.h"
 #include "command.h"
+#include "system.h"
 #include "posixthread.h"
 #include "web_api.h"
+
+static SessionManager session;
+
+void APIListener::validateSession(const httpserver::http_request & request) {
+    Logger & log = Logger::getInstance();
+
+    log.entry("APIListener::validateSession");
+
+    string_view sessionKey = request.get_header("X-Session-ID");
+
+    if (!session.isValid(sessionKey)) {
+        log.error("Got invalid session ID!");
+        throw pfm_validation_error("Invalid session supplied");
+    }
+
+    log.exit("APIListener::validateSession");
+}
 
 httpserver::http_response APIListener::handleFindTransactions(const httpserver::http_request & request) {
     Logger & log = Logger::getInstance();
@@ -177,9 +197,11 @@ void APIListener::registerEndPoints(httpserver::webserver & ws) {
     log.entry("APIListener::registerEndPoints()");
 
     ws.on_post("/api/transaction/find-transactions", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
         return APIListener::handleFindTransactions(request);
     });
     ws.on_post("/api/transaction/add-transaction", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
         return APIListener::handleAddTransaction(request);
     });
 
@@ -197,6 +219,9 @@ void * APIListener::run() {
     httpserver::webserver ws{httpserver::create_webserver(port).put_processed_data_to_content(true)};
 
     registerEndPoints(ws);
+
+    cout << "Session ID: " << session.createSession() << endl;
+    fflush(stdout);
 
     log.debug("Starting web API server on port %u...", (unsigned int)port);
 
