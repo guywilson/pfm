@@ -3,6 +3,7 @@
 /.vscode
 pfm
 pfm.1
+pfm.pass.key
 *.db
 *.json
 .pfm

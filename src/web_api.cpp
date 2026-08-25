@@ -214,9 +214,23 @@ void * APIListener::run() {
     log.entry("APIListener::run()");
 
     cfgmgr & cfg = cfgmgr::getInstance();
+
     uint16_t port = (uint16_t)cfg.getValueAsInteger("server.port");
 
-    httpserver::webserver ws{httpserver::create_webserver(port).put_processed_data_to_content(true)};
+    std::string tls_key_path = cfg.getValue("server.key");
+    std::string tls_cert_path = cfg.getValue("server.cert");
+
+    httpserver::webserver ws{
+        httpserver::create_webserver(port)
+            .put_processed_data_to_content()
+            .use_ssl()
+            .https_mem_key(tls_key_path)
+            .https_mem_cert(tls_cert_path)
+            .https_priorities(
+                "NORMAL:-VERS-TLS-ALL"
+                ":+VERS-TLS1.2:+VERS-TLS1.3"
+                ":%SAFE_RENEGOTIATION")
+    };
 
     registerEndPoints(ws);
 
