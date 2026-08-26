@@ -7,17 +7,21 @@
 #include "db_v_transaction.h"
 #include "pfm_error.h"
 #include "logger.h"
+#include "cfgmgr.h"
 #include "api.h"
 
 using namespace httpserver;
 
 http_response API::handleFindTransactions(const httpserver::http_request & request) {
     Logger & log = Logger::getInstance();
+    cfgmgr & cfg = cfgmgr::getInstance();
 
     log.entry("API::handleFindTransactions()");
 
     log.debug("API::handleFindTransactions() - received request body:");
     log.debug("%s", request.get_content().data());
+
+    bool obfuscateDescriptionField = cfg.getValueAsBoolean("server.obfuscate");
 
     json js = json::parse(request.get_content().data());
 
@@ -83,6 +87,11 @@ http_response API::handleFindTransactions(const httpserver::http_request & reque
 
     for (size_t i = 0;i < results.size();i++) {
         DBTransactionView transaction = results.at(i);
+
+        if (obfuscateDescriptionField) {
+            transaction.description = "*****";
+        }
+
         JRecord record = transaction.getRecord();
 
         json j = json::object();
@@ -105,11 +114,14 @@ http_response API::handleFindTransactions(const httpserver::http_request & reque
 
 http_response API::handleListTransactions(const httpserver::http_request & request) {
     Logger & log = Logger::getInstance();
+    cfgmgr & cfg = cfgmgr::getInstance();
 
     log.entry("API::handleListTransactions()");
 
     log.debug("API::handleListTransactions() - received request body:");
     log.debug("%s", request.get_content().data());
+
+    bool obfuscateDescriptionField = cfg.getValueAsBoolean("server.obfuscate");
 
     json js = json::parse(request.get_content().data());
 
@@ -170,6 +182,11 @@ http_response API::handleListTransactions(const httpserver::http_request & reque
 
     for (size_t i = 0;i < results.size();i++) {
         DBTransactionView transaction = results.at(i);
+
+        if (obfuscateDescriptionField) {
+            transaction.description = "*****";
+        }
+
         JRecord record = transaction.getRecord();
 
         json j = json::object();
