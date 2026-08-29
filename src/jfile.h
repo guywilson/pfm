@@ -13,7 +13,6 @@
 
 #include "pfm_error.h"
 
-using namespace std;
 using json = nlohmann::json;
 
 using object_t = std::map<std::string, std::string>;
@@ -27,11 +26,11 @@ class JRecord {
         JRecord();
         JRecord(object_t & o);
 
-        string get(const char * name);
+        std::string get(const char * name);
         bool getBoolValue(const char * name);
 
         object_t getObject();
-        void add(const char * name, const string & value);
+        void add(const char * name, const std::string & value);
         void add(const char * name, const bool value);
 };
 
@@ -40,24 +39,23 @@ class JFileReader {
         json j;
 
     public:
-        JFileReader(const string & filename);
+        JFileReader(const std::string & filename);
 
-        vector<JRecord> read(const string & name);
+        std::vector<JRecord> read(const std::string & name);
 
-        void validate(const string & className);
+        void validate(const std::string & className);
 };
 
 class JFileWriter {
     private:
-        ofstream fstream;
-        string className;
+        std::ofstream fstream;
+        std::string className;
 
     public:
-        JFileWriter(const string & filename);
-        JFileWriter(const string & filename, const string & className);
+        JFileWriter(const std::string & filename);
+        JFileWriter(const std::string & filename, const std::string & className);
         ~JFileWriter();
 
-        void write(vector<JRecord> & records, const string & name, const string & className);
-        void write(vector<JRecord> & records, const string & name);
+        void write(std::vector<JRecord> & records, const std::string & name, const std::string & className);
+        void write(std::vector<JRecord> & records, const std::string & name);
 };
-

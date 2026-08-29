@@ -9,30 +9,26 @@
 #include "logger.h"
 #include "pfm_error.h"
 
-using namespace std;
-
 #define TIME_STAMP_BUFFER_LEN               64
 #define DATE_STAMP_BUFFER_LEN               32
 #define DATE_STRING_LENGTH                  10
 
-#define PFM_TEST_SUITE_ENABLED
-
 struct TimeComponents {
-    string year;
-    string month;
-    string day;
+    std::string year;
+    std::string month;
+    std::string day;
 
-    string hour;
-    string minute;
-    string second;
+    std::string hour;
+    std::string minute;
+    std::string second;
 
-    string microsecond;
+    std::string microsecond;
 };
 
 class StrDate {
     private:
-        string _date;
-        const string _nullDate = "N/A";
+        std::string _date;
+        const std::string _nullDate = "N/A";
 
         Logger & log = Logger::getInstance();
 
@@ -57,17 +53,17 @@ class StrDate {
 
         int daysInMonth(int year, int month);
 
-        YMD splitDate(const string & date);
+        YMD splitDate(const std::string & date);
 
-        void validateDateString(const string & date);
+        void validateDateString(const std::string & date);
 
         void set(YMD & date);
         
-        static bool isYear(string & part);
-        static bool isMonth(string & part);
+        static bool isYear(std::string & part);
+        static bool isMonth(std::string & part);
 
         static bool isLeapYear(int year);
-        static string getTimestamp(bool includems);
+        static std::string getTimestamp(bool includems);
 
         static int getPeriodEndDay();
         static int getPeriodEndDay(StrDate & referenceDate);
@@ -86,12 +82,12 @@ class StrDate {
 
         StrDate();
         StrDate(const StrDate & sd);
-        StrDate(const string & sd);
+        StrDate(const std::string & sd);
         StrDate(const char * pszDate);
         StrDate(int year, int month, int day);
 
         void set(const StrDate & date);
-        void set(const string & date);
+        void set(const std::string & date);
         void set(const char * date);
         void set(int year, int month, int day);
 
@@ -99,20 +95,20 @@ class StrDate {
         
         bool isNull();
 
-        static string today();
-        static string getTimestamp();
-        static string getTimestampToMicrosecond();
+        static std::string today();
+        static std::string getTimestamp();
+        static std::string getTimestampToMicrosecond();
         static int getDaysInMonth(int year, int month);
-        static bool isDateValid(const string & date);
+        static bool isDateValid(const std::string & date);
 
         static StrDate getPeriodStartDate();
         static StrDate getPeriodEndDate();
         static StrDate getPeriodStartDate(StrDate & referenceDate);
         static StrDate getPeriodEndDate(StrDate & referenceDate);
         
-        string shortDate() const;
-        string longDate() const;
-        string getDisplayDate() const;
+        std::string shortDate() const;
+        std::string longDate() const;
+        std::string getDisplayDate() const;
     
         int year() const;
         int month() const;
@@ -136,26 +132,26 @@ class StrDate {
         StrDate addDays(int days);
 
         StrDate & operator=(const StrDate & rhs);
-        StrDate & operator=(const string & rhs);
+        StrDate & operator=(const std::string & rhs);
         StrDate & operator=(const char * rhs);
 
         bool operator==(StrDate & rh);
-        bool operator==(string & rh);
+        bool operator==(std::string & rh);
 
         bool operator!=(StrDate & rh);
-        bool operator!=(string & rh);
+        bool operator!=(std::string & rh);
 
         bool operator<(StrDate & rh);
-        bool operator<(string & rh);
+        bool operator<(std::string & rh);
 
         bool operator<=(StrDate & rh);
-        bool operator<=(string & rh);
+        bool operator<=(std::string & rh);
 
         bool operator>(StrDate & rh);
-        bool operator>(string & rh);
+        bool operator>(std::string & rh);
 
         bool operator>=(StrDate & rh);
-        bool operator>=(string & rh);
+        bool operator>=(std::string & rh);
 
         // prefix increment
         StrDate & operator++();
@@ -168,10 +164,10 @@ class StrDate {
         StrDate operator--(int);
 };
 
-void setOverrideDate(const string & date);
+void setOverrideDate(const std::string & date);
 void clearOverrideDate();
 
-void addPublicHoliday(pair<StrDate, string> & holiday);
+void addPublicHoliday(std::pair<StrDate, std::string> & holiday);
 void clearPublicHolidays();
 bool isPublicHoliday(const StrDate & date);
 
@@ -179,37 +175,37 @@ bool isPublicHoliday(const StrDate & date);
 class StrDateTest {
     private:
         static void testCreateString1() {
-            string s = "2024-01-21";
+            std::string s = "2024-01-21";
             StrDate date(s);
 
             if (date.shortDate() != "2024-01-21") {
                 throw pfm_error("testCreateString1: Test failed");
             }
             else {
-                cout << "testCreateString1: Test passed" << endl;
+                std::cout << "testCreateString1: Test passed" << std::endl;
             }
         }
 
         static void testCreateString2() {
-            string s = "2024-02-29";
+            std::string s = "2024-02-29";
             StrDate date(s);
 
             if (date.shortDate() != "2024-02-29") {
                 throw pfm_error("testCreateString2: Test failed");
             }
             else {
-                cout << "testCreateString2: Test passed" << endl;
+                std::cout << "testCreateString2: Test passed" << std::endl;
             }
         }
 
         static void testCreateString3() {
-            string s = "2023-02-29";
+            std::string s = "2023-02-29";
 
             try {
                 StrDate date(s);
             }
             catch (pfm_validation_error & e) {
-                cout << "testCreateString3: Test passed" << endl;
+                std::cout << "testCreateString3: Test passed" << std::endl;
                 return;
             }
 
@@ -217,13 +213,13 @@ class StrDateTest {
         }
 
         static void testCreateString4() {
-            string s = "2023-04-31";
+            std::string s = "2023-04-31";
 
             try {
                 StrDate date(s);
             }
             catch (pfm_validation_error & e) {
-                cout << "testCreateString4: Test passed" << endl;
+                std::cout << "testCreateString4: Test passed" << std::endl;
                 return;
             }
 
@@ -231,13 +227,13 @@ class StrDateTest {
         }
 
         static void testCreateString5() {
-            string s = "23-11-01";
+            std::string s = "23-11-01";
 
             try {
                 StrDate date(s);
             }
             catch (pfm_validation_error & e) {
-                cout << "testCreateString5: Test passed" << endl;
+                std::cout << "testCreateString5: Test passed" << std::endl;
                 return;
             }
 
@@ -251,7 +247,7 @@ class StrDateTest {
                 throw pfm_error("testCreateChar1: Test failed");
             }
             else {
-                cout << "testCreateChar1: Test passed" << endl;
+                std::cout << "testCreateChar1: Test passed" << std::endl;
             }
         }
 
@@ -262,7 +258,7 @@ class StrDateTest {
                 throw pfm_error("testCreateChar2: Test failed");
             }
             else {
-                cout << "testCreateChar2: Test passed" << endl;
+                std::cout << "testCreateChar2: Test passed" << std::endl;
             }
         }
 
@@ -273,7 +269,7 @@ class StrDateTest {
                 StrDate date(s);
             }
             catch (pfm_validation_error & e) {
-                cout << "testCreateChar3: Test passed" << endl;
+                std::cout << "testCreateChar3: Test passed" << std::endl;
                 return;
             }
 
@@ -287,7 +283,7 @@ class StrDateTest {
                 StrDate date(s);
             }
             catch (pfm_validation_error & e) {
-                cout << "testCreateChar4: Test passed" << endl;
+                std::cout << "testCreateChar4: Test passed" << std::endl;
                 return;
             }
 
@@ -301,7 +297,7 @@ class StrDateTest {
                 StrDate date(s);
             }
             catch (pfm_validation_error & e) {
-                cout << "testCreateChar5: Test passed" << endl;
+                std::cout << "testCreateChar5: Test passed" << std::endl;
                 return;
             }
 
@@ -315,7 +311,7 @@ class StrDateTest {
                 throw pfm_error("testCreateYMD1: Test failed");
             }
             else {
-                cout << "testCreateYMD1: Test passed" << endl;
+                std::cout << "testCreateYMD1: Test passed" << std::endl;
             }
         }
 
@@ -326,7 +322,7 @@ class StrDateTest {
                 throw pfm_error("testGetYear: Test failed");
             }
             else {
-                cout << "testGetYear: Test passed" << endl;
+                std::cout << "testGetYear: Test passed" << std::endl;
             }
         }
 
@@ -337,7 +333,7 @@ class StrDateTest {
                 throw pfm_error("testGetMonth: Test failed");
             }
             else {
-                cout << "testGetMonth: Test passed" << endl;
+                std::cout << "testGetMonth: Test passed" << std::endl;
             }
         }
 
@@ -348,7 +344,7 @@ class StrDateTest {
                 throw pfm_error("testGetDay: Test failed");
             }
             else {
-                cout << "testGetDay: Test passed" << endl;
+                std::cout << "testGetDay: Test passed" << std::endl;
             }
         }
 
@@ -360,7 +356,7 @@ class StrDateTest {
                 throw pfm_error("testAddYears1: Test failed");
             }
             else {
-                cout << "testAddYears1: Test passed" << endl;
+                std::cout << "testAddYears1: Test passed" << std::endl;
             }
         }
 
@@ -372,7 +368,7 @@ class StrDateTest {
                 throw pfm_error("testAddYears2: Test failed");
             }
             else {
-                cout << "testAddYears2: Test passed" << endl;
+                std::cout << "testAddYears2: Test passed" << std::endl;
             }
         }
 
@@ -384,7 +380,7 @@ class StrDateTest {
                 throw pfm_error("testAddYears3: Test failed");
             }
             else {
-                cout << "testAddYears3: Test passed" << endl;
+                std::cout << "testAddYears3: Test passed" << std::endl;
             }
         }
 
@@ -396,7 +392,7 @@ class StrDateTest {
                 throw pfm_error("testAddMonths1: Test failed");
             }
             else {
-                cout << "testAddMonths1: Test passed" << endl;
+                std::cout << "testAddMonths1: Test passed" << std::endl;
             }
         }
 
@@ -408,7 +404,7 @@ class StrDateTest {
                 throw pfm_error("testAddMonths2: Test failed");
             }
             else {
-                cout << "testAddMonths2: Test passed" << endl;
+                std::cout << "testAddMonths2: Test passed" << std::endl;
             }
         }
 
@@ -420,7 +416,7 @@ class StrDateTest {
                 throw pfm_error("testAddMonths3: Test failed");
             }
             else {
-                cout << "testAddMonths3: Test passed" << endl;
+                std::cout << "testAddMonths3: Test passed" << std::endl;
             }
         }
 
@@ -432,7 +428,7 @@ class StrDateTest {
                 throw pfm_error("testAddMonths4: Test failed");
             }
             else {
-                cout << "testAddMonths4: Test passed" << endl;
+                std::cout << "testAddMonths4: Test passed" << std::endl;
             }
         }
 
@@ -444,7 +440,7 @@ class StrDateTest {
                 throw pfm_error("testAddWeeks1: Test failed");
             }
             else {
-                cout << "testAddWeeks1: Test passed" << endl;
+                std::cout << "testAddWeeks1: Test passed" << std::endl;
             }
         }
 
@@ -456,7 +452,7 @@ class StrDateTest {
                 throw pfm_error("testAddWeeks2: Test failed");
             }
             else {
-                cout << "testAddWeeks2: Test passed" << endl;
+                std::cout << "testAddWeeks2: Test passed" << std::endl;
             }
         }
 
@@ -468,7 +464,7 @@ class StrDateTest {
                 throw pfm_error("testAddWeeks3: Test failed");
             }
             else {
-                cout << "testAddWeeks3: Test passed" << endl;
+                std::cout << "testAddWeeks3: Test passed" << std::endl;
             }
         }
 
@@ -480,7 +476,7 @@ class StrDateTest {
                 throw pfm_error("testAddDays1: Test failed");
             }
             else {
-                cout << "testAddDays1: Test passed" << endl;
+                std::cout << "testAddDays1: Test passed" << std::endl;
             }
         }
 
@@ -492,7 +488,7 @@ class StrDateTest {
                 throw pfm_error("testAddDays2: Test failed");
             }
             else {
-                cout << "testAddDays2: Test passed" << endl;
+                std::cout << "testAddDays2: Test passed" << std::endl;
             }
         }
 
@@ -504,7 +500,7 @@ class StrDateTest {
                 throw pfm_error("testAddDays3: Test failed");
             }
             else {
-                cout << "testAddDays3: Test passed" << endl;
+                std::cout << "testAddDays3: Test passed" << std::endl;
             }
         }
 
@@ -516,7 +512,7 @@ class StrDateTest {
                 throw pfm_error("testAddDays4: Test failed");
             }
             else {
-                cout << "testAddDays4: Test passed" << endl;
+                std::cout << "testAddDays4: Test passed" << std::endl;
             }
         }
 
@@ -528,19 +524,19 @@ class StrDateTest {
                 throw pfm_error("testAssignment1: Test failed");
             }
             else {
-                cout << "testAssignment1: Test passed" << endl;
+                std::cout << "testAssignment1: Test passed" << std::endl;
             }
         }
 
         static void testAssignment2() {
-            string d1("1985-06-11");
+            std::string d1("1985-06-11");
             StrDate d2 = d1;
 
             if (d2.shortDate() != "1985-06-11") {
                 throw pfm_error("testAssignment1: Test failed");
             }
             else {
-                cout << "testAssignment1: Test passed" << endl;
+                std::cout << "testAssignment1: Test passed" << std::endl;
             }
         }
 
@@ -552,19 +548,19 @@ class StrDateTest {
                 throw pfm_error("testIsEqual1: Test failed");
             }
             else {
-                cout << "testIsEqual1: Test passed" << endl;
+                std::cout << "testIsEqual1: Test passed" << std::endl;
             }
         }
 
         static void testIsEqual2() {
-            string d1("1985-06-11");
+            std::string d1("1985-06-11");
             StrDate d2("1985-06-11");
 
             if (!(d2 == d1)) {
                 throw pfm_error("testIsEqual2: Test failed");
             }
             else {
-                cout << "testIsEqual2: Test passed" << endl;
+                std::cout << "testIsEqual2: Test passed" << std::endl;
             }
         }
 
@@ -576,19 +572,19 @@ class StrDateTest {
                 throw pfm_error("testLessThan1: Test failed");
             }
             else {
-                cout << "testLessThan1: Test passed" << endl;
+                std::cout << "testLessThan1: Test passed" << std::endl;
             }
         }
 
         static void testLessThan2() {
-            string d1("1985-06-11");
+            std::string d1("1985-06-11");
             StrDate d2("1985-06-10");
 
             if (!(d2 < d1)) {
                 throw pfm_error("testLessThan2: Test failed");
             }
             else {
-                cout << "testLessThan2: Test passed" << endl;
+                std::cout << "testLessThan2: Test passed" << std::endl;
             }
         }
 
@@ -600,19 +596,19 @@ class StrDateTest {
                 throw pfm_error("testLessThanOrEqual1: Test failed");
             }
             else {
-                cout << "testLessThanOrEqual1: Test passed" << endl;
+                std::cout << "testLessThanOrEqual1: Test passed" << std::endl;
             }
         }
 
         static void testLessThanOrEqual2() {
-            string d1("1985-06-11");
+            std::string d1("1985-06-11");
             StrDate d2("1985-06-11");
 
             if (!(d2 <= d1)) {
                 throw pfm_error("testLessThanOrEqual2: Test failed");
             }
             else {
-                cout << "testLessThanOrEqual2: Test passed" << endl;
+                std::cout << "testLessThanOrEqual2: Test passed" << std::endl;
             }
         }
 
@@ -624,19 +620,19 @@ class StrDateTest {
                 throw pfm_error("testGreaterThan1: Test failed");
             }
             else {
-                cout << "testGreaterThan1: Test passed" << endl;
+                std::cout << "testGreaterThan1: Test passed" << std::endl;
             }
         }
 
         static void testGreaterThan2() {
-            string d1("1985-06-10");
+            std::string d1("1985-06-10");
             StrDate d2("1985-06-11");
 
             if (!(d2 > d1)) {
                 throw pfm_error("testGreaterThan2: Test failed");
             }
             else {
-                cout << "testGreaterThan2: Test passed" << endl;
+                std::cout << "testGreaterThan2: Test passed" << std::endl;
             }
         }
 
@@ -648,51 +644,51 @@ class StrDateTest {
                 throw pfm_error("testGreaterThanOrEqual1: Test failed");
             }
             else {
-                cout << "testGreaterThanOrEqual1: Test passed" << endl;
+                std::cout << "testGreaterThanOrEqual1: Test passed" << std::endl;
             }
         }
 
         static void testGreaterThanOrEqual2() {
-            string d1("1985-06-11");
+            std::string d1("1985-06-11");
             StrDate d2("1985-06-11");
 
             if (!(d2 >= d1)) {
                 throw pfm_error("testGreaterThanOrEqual2: Test failed");
             }
             else {
-                cout << "testGreaterThanOrEqual2: Test passed" << endl;
+                std::cout << "testGreaterThanOrEqual2: Test passed" << std::endl;
             }
         }
 
         static void assertDate(const char * testName, const StrDate & date, const char * expected) {
             if (date.shortDate() != expected) {
-                string errorMessage = string(testName) + ": Test failed";
+                std::string errorMessage = std::string(testName) + ": Test failed";
                 throw pfm_error(errorMessage.c_str());
             }
 
-            cout << testName << ": Test passed" << endl;
+            std::cout << testName << ": Test passed" << std::endl;
         }
 
         static void testCreateStringMmm1() {
-            string s = "21-Jan-2024";
+            std::string s = "21-Jan-2024";
             StrDate date(s);
             assertDate("testCreateStringMmm1", date, "2024-01-21");
         }
 
         static void testCreateStringMmm2() {
-            string s = "29-Feb-2024";
+            std::string s = "29-Feb-2024";
             StrDate date(s);
             assertDate("testCreateStringMmm2", date, "2024-02-29");
         }
 
         static void testCreateStringMmm3() {
-            string s = "29-Feb-2023";
+            std::string s = "29-Feb-2023";
 
             try {
                 StrDate date(s);
             }
             catch (pfm_validation_error & e) {
-                cout << "testCreateStringMmm3: Test passed" << endl;
+                std::cout << "testCreateStringMmm3: Test passed" << std::endl;
                 return;
             }
 
@@ -700,13 +696,13 @@ class StrDateTest {
         }
 
         static void testCreateStringMmm4() {
-            string s = "31-Apr-2023";
+            std::string s = "31-Apr-2023";
 
             try {
                 StrDate date(s);
             }
             catch (pfm_validation_error & e) {
-                cout << "testCreateStringMmm4: Test passed" << endl;
+                std::cout << "testCreateStringMmm4: Test passed" << std::endl;
                 return;
             }
 
@@ -730,7 +726,7 @@ class StrDateTest {
                 StrDate date(s);
             }
             catch (pfm_validation_error & e) {
-                cout << "testCreateCharMmm3: Test passed" << endl;
+                std::cout << "testCreateCharMmm3: Test passed" << std::endl;
                 return;
             }
 
@@ -744,7 +740,7 @@ class StrDateTest {
                 StrDate date(s);
             }
             catch (pfm_validation_error & e) {
-                cout << "testCreateCharMmm4: Test passed" << endl;
+                std::cout << "testCreateCharMmm4: Test passed" << std::endl;
                 return;
             }
 
@@ -758,7 +754,7 @@ class StrDateTest {
                 throw pfm_error("testGetYearMmm: Test failed");
             }
 
-            cout << "testGetYearMmm: Test passed" << endl;
+            std::cout << "testGetYearMmm: Test passed" << std::endl;
         }
 
         static void testGetMonthMmm() {
@@ -768,7 +764,7 @@ class StrDateTest {
                 throw pfm_error("testGetMonthMmm: Test failed");
             }
 
-            cout << "testGetMonthMmm: Test passed" << endl;
+            std::cout << "testGetMonthMmm: Test passed" << std::endl;
         }
 
         static void testGetDayMmm() {
@@ -778,7 +774,7 @@ class StrDateTest {
                 throw pfm_error("testGetDayMmm: Test failed");
             }
 
-            cout << "testGetDayMmm: Test passed" << endl;
+            std::cout << "testGetDayMmm: Test passed" << std::endl;
         }
 
         static void testAddYearsMmm1() {
@@ -872,7 +868,7 @@ class StrDateTest {
         }
 
         static void testAssignmentMmm2() {
-            string d1("11-Jun-1985");
+            std::string d1("11-Jun-1985");
             StrDate d2 = d1;
             assertDate("testAssignmentMmm2", d2, "1985-06-11");
         }
@@ -885,18 +881,18 @@ class StrDateTest {
                 throw pfm_error("testIsEqualMmm1: Test failed");
             }
 
-            cout << "testIsEqualMmm1: Test passed" << endl;
+            std::cout << "testIsEqualMmm1: Test passed" << std::endl;
         }
 
         static void testIsEqualMmm2() {
-            string d1("11-Jun-1985");
+            std::string d1("11-Jun-1985");
             StrDate d2("11-Jun-1985");
 
             if (!(d2 == d1)) {
                 throw pfm_error("testIsEqualMmm2: Test failed");
             }
 
-            cout << "testIsEqualMmm2: Test passed" << endl;
+            std::cout << "testIsEqualMmm2: Test passed" << std::endl;
         }
 
         static void testLessThanMmm1() {
@@ -907,18 +903,18 @@ class StrDateTest {
                 throw pfm_error("testLessThanMmm1: Test failed");
             }
 
-            cout << "testLessThanMmm1: Test passed" << endl;
+            std::cout << "testLessThanMmm1: Test passed" << std::endl;
         }
 
         static void testLessThanMmm2() {
-            string d1("11-Jun-1985");
+            std::string d1("11-Jun-1985");
             StrDate d2("10-Jun-1985");
 
             if (!(d2 < d1)) {
                 throw pfm_error("testLessThanMmm2: Test failed");
             }
 
-            cout << "testLessThanMmm2: Test passed" << endl;
+            std::cout << "testLessThanMmm2: Test passed" << std::endl;
         }
 
         static void testLessThanOrEqualMmm1() {
@@ -929,18 +925,18 @@ class StrDateTest {
                 throw pfm_error("testLessThanOrEqualMmm1: Test failed");
             }
 
-            cout << "testLessThanOrEqualMmm1: Test passed" << endl;
+            std::cout << "testLessThanOrEqualMmm1: Test passed" << std::endl;
         }
 
         static void testLessThanOrEqualMmm2() {
-            string d1("11-Jun-1985");
+            std::string d1("11-Jun-1985");
             StrDate d2("11-Jun-1985");
 
             if (!(d2 <= d1)) {
                 throw pfm_error("testLessThanOrEqualMmm2: Test failed");
             }
 
-            cout << "testLessThanOrEqualMmm2: Test passed" << endl;
+            std::cout << "testLessThanOrEqualMmm2: Test passed" << std::endl;
         }
 
         static void testGreaterThanMmm1() {
@@ -951,18 +947,18 @@ class StrDateTest {
                 throw pfm_error("testGreaterThanMmm1: Test failed");
             }
 
-            cout << "testGreaterThanMmm1: Test passed" << endl;
+            std::cout << "testGreaterThanMmm1: Test passed" << std::endl;
         }
 
         static void testGreaterThanMmm2() {
-            string d1("10-Jun-1985");
+            std::string d1("10-Jun-1985");
             StrDate d2("11-Jun-1985");
 
             if (!(d2 > d1)) {
                 throw pfm_error("testGreaterThanMmm2: Test failed");
             }
 
-            cout << "testGreaterThanMmm2: Test passed" << endl;
+            std::cout << "testGreaterThanMmm2: Test passed" << std::endl;
         }
 
         static void testGreaterThanOrEqualMmm1() {
@@ -973,18 +969,18 @@ class StrDateTest {
                 throw pfm_error("testGreaterThanOrEqualMmm1: Test failed");
             }
 
-            cout << "testGreaterThanOrEqualMmm1: Test passed" << endl;
+            std::cout << "testGreaterThanOrEqualMmm1: Test passed" << std::endl;
         }
 
         static void testGreaterThanOrEqualMmm2() {
-            string d1("11-Jun-1985");
+            std::string d1("11-Jun-1985");
             StrDate d2("11-Jun-1985");
 
             if (!(d2 >= d1)) {
                 throw pfm_error("testGreaterThanOrEqualMmm2: Test failed");
             }
 
-            cout << "testGreaterThanOrEqualMmm2: Test passed" << endl;
+            std::cout << "testGreaterThanOrEqualMmm2: Test passed" << std::endl;
         }
 
         static void runTest(void (*test)(), int & numTestsPassed, int & numTestsFailed) {
@@ -993,7 +989,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
         }
@@ -1008,7 +1004,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1017,7 +1013,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1026,7 +1022,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1035,7 +1031,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1044,7 +1040,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1053,7 +1049,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1062,7 +1058,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1071,7 +1067,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1080,7 +1076,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1089,7 +1085,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1098,7 +1094,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1107,7 +1103,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1116,7 +1112,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1125,7 +1121,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1134,7 +1130,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1143,7 +1139,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1152,7 +1148,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1161,7 +1157,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1170,7 +1166,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1179,7 +1175,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1188,7 +1184,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1197,7 +1193,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1206,7 +1202,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1215,7 +1211,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1224,7 +1220,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1233,7 +1229,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1242,7 +1238,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1251,7 +1247,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1260,7 +1256,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1269,7 +1265,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1278,7 +1274,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1287,7 +1283,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1296,7 +1292,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1305,7 +1301,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1314,7 +1310,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1323,7 +1319,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1332,7 +1328,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1341,7 +1337,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1350,7 +1346,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1359,7 +1355,7 @@ class StrDateTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -1401,7 +1397,7 @@ class StrDateTest {
             runTest(testGreaterThanOrEqualMmm1, numTestsPassed, numTestsFailed);
             runTest(testGreaterThanOrEqualMmm2, numTestsPassed, numTestsFailed);
 
-            cout << "Tests passed: " << numTestsPassed << ", tests failed: " << numTestsFailed << endl;
+            std::cout << "Tests passed: " << numTestsPassed << ", tests failed: " << numTestsFailed << std::endl;
         }
 };
 #endif

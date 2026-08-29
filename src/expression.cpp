@@ -12,7 +12,6 @@
 #include "tokenizer.h"
 #include "expression.h"
 
-using namespace std;
 
 static inline bool isOperand(Token * t) {
     return (t->className() == Operand::CLASS_NAME());
@@ -128,7 +127,7 @@ TokenQueue Expression::getRPNQueue(TokenArray & tokens) {
     return tokenQueue;
 }
 
-string Expression::evaluate(const string & expression) {
+std::string Expression::evaluate(const std::string & expression) {
     Tokenizer tokenizer(expression);
 
     TokenArray tokens = tokenizer.tokenize();
@@ -149,7 +148,7 @@ string Expression::evaluate(const string & expression) {
             Operand * o1 = tokenStack.poperand();
 
             op->setOperands(*o1, *o2);
-            string r = op->evaluate();
+            std::string r = op->evaluate();
 
             o1->clear();
             delete o1;
@@ -167,7 +166,7 @@ string Expression::evaluate(const string & expression) {
     ** it is the result of the calculation. Otherwise, we
     ** have too many tokens and therefore an error...
     */
-    string answer;
+    std::string answer;
 
     if (tokenStack.size() == 1) {
         Operand * result = tokenStack.poperand();

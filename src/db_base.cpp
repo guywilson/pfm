@@ -12,14 +12,13 @@
 #include "pfm_error.h"
 #include "logger.h"
 
-using namespace std;
 
 pfm_id_t DBEntity::insert() {
     Logger & log = Logger::getInstance();
     
     log.entry("DBEntity::insert()");
 
-    const string statement = getInsertStatement();
+    const std::string statement = getInsertStatement();
 
     log.sql("Executing INSERT statement '%s'", statement.c_str());
 
@@ -35,7 +34,7 @@ void DBEntity::update() {
     
     log.entry("DBEntity::update()");
 
-    const string statement = getUpdateStatement();
+    const std::string statement = getUpdateStatement();
 
     log.sql("Executing UPDATE statement '%s'", statement.c_str());
 
@@ -46,10 +45,10 @@ void DBEntity::update() {
     log.exit("DBEntity::update()");
 }
 
-uint64_t DBEntity::findSingleQuotePos(string & s, int startingPos = 0) const {
+uint64_t DBEntity::findSingleQuotePos(std::string & s, int startingPos = 0) const {
     uint64_t pos = s.find(SINGLE_QUOTE_CHAR, startingPos);
 
-    if (pos != string::npos) {
+    if (pos != std::string::npos) {
         /*
         ** If the single quote is before the end of the string, check that 
         ** we haven't already got a double single quote. Otherwise, if the 
@@ -66,15 +65,15 @@ uint64_t DBEntity::findSingleQuotePos(string & s, int startingPos = 0) const {
         }
     }
 
-    return string::npos;
+    return std::string::npos;
 }
 
-const string DBEntity::delimitSingleQuotes(string & s) const {
-    string delimited = s;
+const std::string DBEntity::delimitSingleQuotes(std::string & s) const {
+    std::string delimited = s;
 
     uint64_t searchPos = findSingleQuotePos(delimited);
 
-    while (searchPos != string::npos) {
+    while (searchPos != std::string::npos) {
         delimited.insert(searchPos, 1, SINGLE_QUOTE_CHAR);
         searchPos = findSingleQuotePos(delimited, searchPos + 2);
     }
@@ -91,11 +90,11 @@ void DBEntity::retrieve(const pfm_id_t & id) {
     
     log.entry("DBEntity::retrieve()");
 
-    const string statement = getSelectByIDStatement(id);
+    const std::string statement = getSelectByIDStatement(id);
 
     PFM_DB & db = PFM_DB::getInstance();
 
-    vector<DBRow> rows;
+    std::vector<DBRow> rows;
 
     log.debug("Executing SELECT BY id statement '%s'", statement.c_str());
     int rowsRetrievedCount = db.executeSelect(statement, &rows);
@@ -135,7 +134,7 @@ void DBEntity::remove() {
     
     log.entry("DBEntity::remove()");
 
-    const string statement = getDeleteByIDStatement(id);
+    const std::string statement = getDeleteByIDStatement(id);
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -161,7 +160,7 @@ void DBEntity::remove() {
     log.exit("DBEntity::remove()");
 }
 
-void DBEntity::remove(const string & statement) {
+void DBEntity::remove(const std::string & statement) {
     Logger & log = Logger::getInstance();
     
     log.entry("DBEntity::remove()");
@@ -191,7 +190,7 @@ void DBEntity::removeAll() {
     
     log.entry("DBEntity::remove()");
 
-    const string statement = getDeleteAllStatement();
+    const std::string statement = getDeleteAllStatement();
 
     PFM_DB & db = PFM_DB::getInstance();
 

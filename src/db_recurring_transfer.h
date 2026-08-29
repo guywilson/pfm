@@ -13,7 +13,6 @@
 #include "db_account.h"
 #include "strdate.h"
 
-using namespace std;
 
 class DBRecurringTransfer : public DBEntity {
     protected:
@@ -57,8 +56,8 @@ class DBRecurringTransfer : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "RecurringChargeId: " << recurringChargeId.getValue() << endl;
-            cout << "AccountToId: " << accountToId.getValue() << endl;
+            std::cout << "RecurringChargeId: " << recurringChargeId.getValue() << std::endl;
+            std::cout << "AccountToId: " << accountToId.getValue() << std::endl;
         }
 
         void onRowComplete(int sequence) override {
@@ -71,16 +70,16 @@ class DBRecurringTransfer : public DBEntity {
             return (id.isNull() && accountToId.isNull() && recurringChargeId.isNull());
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "recurring_transfer";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBRecurringTransfer";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::recurringChargeId, Columns::recurringChargeId_type}, recurringChargeId.getValue()},
                 {{Columns::accountToId, Columns::accountToId_type}, accountToId.getValue()}
             };
@@ -88,8 +87,8 @@ class DBRecurringTransfer : public DBEntity {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::recurringChargeId, Columns::recurringChargeId_type}, recurringChargeId.getValue()},
                 {{Columns::accountToId, Columns::accountToId_type}, accountToId.getValue()}
             };

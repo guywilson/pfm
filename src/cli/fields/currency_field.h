@@ -24,14 +24,14 @@ class CLICurrencyField : public CLITextField {
             CLITextField::setDefaultValue(szValue);
         }
 
-        void setDefaultValue(const string & value) {
+        void setDefaultValue(const std::string & value) {
             CLITextField::setDefaultValue(value);
         }
 
         void show() override {
             rl_utils::setLineLength(maxLength);
 
-            string line = readLine();
+            std::string line = readLine();
             _setValue(line);
         }
 };

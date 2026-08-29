@@ -18,7 +18,6 @@
 #include "cfgmgr.h"
 #include "strdate.h"
 
-using namespace std;
 
 #define EPOCH_YEAR                  1970
 #define EPOCH_MONTH                    1
@@ -26,11 +25,11 @@ using namespace std;
 
 #define CURRENT_DATE_BUFFER_LENGTH    11
 
-static string _currentDate;
+static std::string _currentDate;
 static bool _isDateOverride = false;
-static unordered_map<string, string> _publicHolidays;
+static std::unordered_map<std::string, std::string> _publicHolidays;
 
-void setOverrideDate(const string & date) {
+void setOverrideDate(const std::string & date) {
     _currentDate = date;
     _isDateOverride = true;
 }
@@ -39,7 +38,7 @@ void clearOverrideDate() {
     _isDateOverride = false;
 }
 
-void addPublicHoliday(pair<StrDate, string> & holiday) {
+void addPublicHoliday(std::pair<StrDate, std::string> & holiday) {
 
     _publicHolidays.insert({holiday.first.shortDate(), holiday.second});
 }
@@ -54,7 +53,7 @@ bool isPublicHoliday(const StrDate & date) {
 
 static void fillTimeStruct(TimeComponents * time) {
     auto twoDigits = [](int v) {
-        string s = to_string(v);
+        std::string s = std::to_string(v);
 
         if (s.size() < 2) {
             s.insert(s.begin(), '0');
@@ -64,7 +63,7 @@ static void fillTimeStruct(TimeComponents * time) {
     };
 
     auto fourDigits = [](int v) {
-        string s = to_string(v);
+        std::string s = std::to_string(v);
 
         while (s.size() < 4) {
             s.insert(s.begin(), '0');
@@ -89,10 +88,10 @@ static void fillTimeStruct(TimeComponents * time) {
     time->minute = twoDigits((int)ltime.tm_min);
     time->second = twoDigits((int)ltime.tm_sec);
 
-    time->microsecond = to_string(static_cast<int>(tv.tv_usec));
+    time->microsecond = std::to_string(static_cast<int>(tv.tv_usec));
 }
 
-static bool isNumeric(string & cfgDate) {
+static bool isNumeric(std::string & cfgDate) {
     bool isNumeric = true;
     for (int i = 0;i < (int)cfgDate.length();i++) {
         if (!isdigit(cfgDate.at(i))) {
@@ -104,7 +103,7 @@ static bool isNumeric(string & cfgDate) {
     return isNumeric;
 }
 
-static void checkForInvalidChars(const string & date) {
+static void checkForInvalidChars(const std::string & date) {
     for (size_t i = 0;i < date.length();i++) {
         unsigned char c = static_cast<unsigned char>(date[i]);
 
@@ -119,27 +118,27 @@ static void checkForInvalidChars(const string & date) {
     }
 }
 
-static string dayString(int day) {
-    string comp;
+static std::string dayString(int day) {
+    std::string comp;
 
     if (day == 1 || day == 21 || day == 31) {
-        comp = to_string(day) + "st";
+        comp = std::to_string(day) + "st";
     }
     else if (day == 2 || day == 22) {
-        comp = to_string(day) + "nd";
+        comp = std::to_string(day) + "nd";
     }
     else if (day == 3 || day == 23) {
-        comp = to_string(day) + "rd";
+        comp = std::to_string(day) + "rd";
     }
     else {
-        comp = to_string(day) + "th";
+        comp = std::to_string(day) + "th";
     }
 
     return comp;
 }
 
-static const string monthString(int month) {
-    string comp;
+static const std::string monthString(int month) {
+    std::string comp;
 
     switch (month) {
         case 1:
@@ -191,7 +190,7 @@ StrDate::StrDate(const StrDate & sd) {
     this->set(sd.shortDate());
 }
 
-StrDate::StrDate(const string & sd) {
+StrDate::StrDate(const std::string & sd) {
     this->set(sd);
 }
 
@@ -213,7 +212,7 @@ StrDate::StrDate(int year, int month, int day) {
     this->set(dateStr);
 }
 
-bool StrDate::isYear(string & part) {
+bool StrDate::isYear(std::string & part) {
     if (part.length() == 4) {
         for (int i = 0;i < (int)part.length();i++) {
             if (!isdigit(part[i])) {
@@ -233,40 +232,40 @@ bool StrDate::isYear(string & part) {
     return false;
 }
 
-bool StrDate::isMonth(string & part) {
+bool StrDate::isMonth(std::string & part) {
     if (part.length() == 2 &&
         isdigit(static_cast<unsigned char>(part[0])) &&
         isdigit(static_cast<unsigned char>(part[1]))) {
-        int monthCandidate = stoi(part);
+        int monthCandidate = std::stoi(part);
         return monthCandidate >= 1 && monthCandidate <= 12;
     }
 
-    static const string monthMmm[] = {
+    static const std::string monthMmm[] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
 
     return part.length() == 3 &&
-           find(begin(monthMmm), end(monthMmm), part) != end(monthMmm);
+           std::find(std::begin(monthMmm), std::end(monthMmm), part) != std::end(monthMmm);
 }
 
-static int monthNumber(const string & part) {
+static int monthNumber(const std::string & part) {
     if (part.length() == 2 &&
         isdigit(static_cast<unsigned char>(part[0])) &&
         isdigit(static_cast<unsigned char>(part[1]))) {
-        return stoi(part);
+        return std::stoi(part);
     }
 
-    static const string monthMmm[] = {
+    static const std::string monthMmm[] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
 
-    auto month = find(begin(monthMmm), end(monthMmm), part);
-    return month == end(monthMmm) ? 0 : distance(begin(monthMmm), month) + 1;
+    auto month = std::find(std::begin(monthMmm), std::end(monthMmm), part);
+    return month == std::end(monthMmm) ? 0 : std::distance(std::begin(monthMmm), month) + 1;
 }
 
-static bool isTwoDigitNumber(const string & part) {
+static bool isTwoDigitNumber(const std::string & part) {
     return part.length() == 2 &&
            isdigit(static_cast<unsigned char>(part[0])) &&
            isdigit(static_cast<unsigned char>(part[1]));
@@ -279,7 +278,7 @@ static bool isTwoDigitNumber(const string & part) {
 ** dd-mm-yyyy or dd-Mmm-yyyy
 ** As above but with / rather than -
 */
-StrDate::YMD StrDate::splitDate(const string & date) {
+StrDate::YMD StrDate::splitDate(const std::string & date) {
     auto invalidFormat = [&date]() {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
@@ -290,38 +289,38 @@ StrDate::YMD StrDate::splitDate(const string & date) {
     };
 
     size_t firstSeparator = date.find_first_of("-/");
-    size_t secondSeparator = firstSeparator == string::npos
-            ? string::npos
+    size_t secondSeparator = firstSeparator == std::string::npos
+            ? std::string::npos
             : date.find_first_of("-/", firstSeparator + 1);
 
-    if (firstSeparator == string::npos ||
-        secondSeparator == string::npos ||
-        date.find_first_of("-/", secondSeparator + 1) != string::npos ||
+    if (firstSeparator == std::string::npos ||
+        secondSeparator == std::string::npos ||
+        date.find_first_of("-/", secondSeparator + 1) != std::string::npos ||
         date[firstSeparator] != date[secondSeparator]) {
         invalidFormat();
     }
 
-    string part1 = date.substr(0, firstSeparator);
-    string part2 = date.substr(firstSeparator + 1, secondSeparator - firstSeparator - 1);
-    string part3 = date.substr(secondSeparator + 1);
+    std::string part1 = date.substr(0, firstSeparator);
+    std::string part2 = date.substr(firstSeparator + 1, secondSeparator - firstSeparator - 1);
+    std::string part3 = date.substr(secondSeparator + 1);
 
     bool isYearFirst = part1.length() == 4;
-    string & yearPart = isYearFirst ? part1 : part3;
-    string & dayPart = isYearFirst ? part3 : part1;
+    std::string & yearPart = isYearFirst ? part1 : part3;
+    std::string & dayPart = isYearFirst ? part3 : part1;
 
     if (!isTwoDigitNumber(dayPart) || !isMonth(part2) || !isYear(yearPart)) {
         invalidFormat();
     }
 
     StrDate::YMD dateComponents;
-    dateComponents.year = (unsigned int)stoi(yearPart);
+    dateComponents.year = (unsigned int)std::stoi(yearPart);
     dateComponents.month = (unsigned int)monthNumber(part2);
-    dateComponents.day = (unsigned int)stoi(dayPart);
+    dateComponents.day = (unsigned int)std::stoi(dayPart);
 
     return dateComponents;
 }
 
-string StrDate::today() {
+std::string StrDate::today() {
     if (!_isDateOverride) {
         TimeComponents tc;
         fillTimeStruct(&tc);
@@ -332,19 +331,19 @@ string StrDate::today() {
     return _currentDate;
 }
 
-string StrDate::getTimestamp() {
+std::string StrDate::getTimestamp() {
     return getTimestamp(false);
 }
 
-string StrDate::getTimestampToMicrosecond() {
+std::string StrDate::getTimestampToMicrosecond() {
     return getTimestamp(true);
 }
 
-string StrDate::getTimestamp(bool includeus) {
+std::string StrDate::getTimestamp(bool includeus) {
     TimeComponents tc;
     fillTimeStruct(&tc);
 
-    string ts =
+    std::string ts =
         tc.year + "-" +
         tc.month + "-" +
         tc.day + " " +
@@ -365,7 +364,7 @@ int StrDate::getDaysInMonth(int year, int month) {
     return d.daysInMonth(year, month);
 }
 
-bool StrDate::isDateValid(const string & date) {
+bool StrDate::isDateValid(const std::string & date) {
     try {
         StrDate d(date);
     }
@@ -376,7 +375,7 @@ bool StrDate::isDateValid(const string & date) {
     return true;
 }
 
-void StrDate::validateDateString(const string & date) {
+void StrDate::validateDateString(const std::string & date) {
     if (date == "N/A") {
         return;
     }
@@ -412,17 +411,17 @@ void StrDate::validateDateString(const string & date) {
     }
 }
 
-string StrDate::shortDate() const {
+std::string StrDate::shortDate() const {
     return _date;
 }
 
-string StrDate::longDate() const {
-    string ldate = dayString(day()) + " " + monthString(month()) + " " + to_string(year());
+std::string StrDate::longDate() const {
+    std::string ldate = dayString(day()) + " " + monthString(month()) + " " + std::to_string(year());
 
     return ldate;
 }
 
-string StrDate::getDisplayDate() const {
+std::string StrDate::getDisplayDate() const {
     if (isEpoch()) {
         return "N/A";
     }
@@ -435,7 +434,7 @@ void StrDate::set(const StrDate & date) {
     set(date.year(), date.month(), date.day());
 }
 
-void StrDate::set(const string & date) {
+void StrDate::set(const std::string & date) {
     set(date.c_str());
 }
 
@@ -537,7 +536,7 @@ int StrDate::getPeriodEndDay(StrDate & referenceDate) {
 
     cfgmgr & cfg = cfgmgr::getInstance();
 
-    string cycleEnd = cfg.getValue("cycle.end");
+    std::string cycleEnd = cfg.getValue("cycle.end");
 
     log.info("Value of config item 'cycle.end' is '%s'", cycleEnd.c_str());
 
@@ -857,7 +856,7 @@ StrDate & StrDate::operator=(const StrDate & rhs) {
     return *this;
 }
 
-StrDate & StrDate::operator=(const string & rhs) {
+StrDate & StrDate::operator=(const std::string & rhs) {
     this->set(rhs);
     return *this;
 }
@@ -871,7 +870,7 @@ bool StrDate::operator==(StrDate & rhs) {
     return (this->epoch() == rhs.epoch());
 }
 
-bool StrDate::operator==(string & rhs) {
+bool StrDate::operator==(std::string & rhs) {
     StrDate d1(rhs);
     return (this->epoch() == d1.epoch());
 }
@@ -880,7 +879,7 @@ bool StrDate::operator!=(StrDate & rhs) {
     return !(*this == rhs);
 }
 
-bool StrDate::operator!=(string & rhs) {
+bool StrDate::operator!=(std::string & rhs) {
     return !(*this == rhs);
 }
 
@@ -888,7 +887,7 @@ bool StrDate::operator<(StrDate & rhs) {
     return (this->epoch() < rhs.epoch());
 }
 
-bool StrDate::operator<(string & rhs) {
+bool StrDate::operator<(std::string & rhs) {
     StrDate d1(rhs);
     return (this->epoch() < d1.epoch());
 }
@@ -897,7 +896,7 @@ bool StrDate::operator<=(StrDate & rhs) {
     return (this->epoch() <= rhs.epoch());
 }
 
-bool StrDate::operator<=(string & rhs) {
+bool StrDate::operator<=(std::string & rhs) {
     StrDate d1(rhs);
     return (this->epoch() <= d1.epoch());
 }
@@ -906,7 +905,7 @@ bool StrDate::operator>(StrDate & rhs) {
     return (this->epoch() > rhs.epoch());
 }
 
-bool StrDate::operator>(string & rhs) {
+bool StrDate::operator>(std::string & rhs) {
     StrDate d1(rhs);
     return (this->epoch() > d1.epoch());
 }
@@ -915,7 +914,7 @@ bool StrDate::operator>=(StrDate & rhs) {
     return (this->epoch() >= rhs.epoch());
 }
 
-bool StrDate::operator>=(string & rhs) {
+bool StrDate::operator>=(std::string & rhs) {
     StrDate d1(rhs);
     return (this->epoch() >= d1.epoch());
 }

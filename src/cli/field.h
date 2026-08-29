@@ -26,15 +26,15 @@ class CLIField : public CLIWidget {
     public:
         CLIField() : CLIWidget() {}
 
-        CLIField(const string & label) {
+        CLIField(const std::string & label) {
             this->label = label;
         }
 
-        void setLabel(const string & label) {
+        void setLabel(const std::string & label) {
             this->label = label;
         }
 
-        virtual string getValue() {
+        virtual std::string getValue() {
             return _getValue();
         }
 

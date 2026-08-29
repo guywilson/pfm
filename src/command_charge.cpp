@@ -14,7 +14,6 @@
 #include "db_recurring_charge.h"
 #include "recurring_charge_views.h"
 
-using namespace std;
 
 void Command::addRecurringCharge() {
     checkAccountSelected();
@@ -24,7 +23,7 @@ void Command::addRecurringCharge() {
 
         try {
             DBCategory category;
-            string code = getParameter("c");
+            std::string code = getParameter("c");
             category.retrieveByCode(code);
             charge.categoryId = category.id;
         }
@@ -34,7 +33,7 @@ void Command::addRecurringCharge() {
 
         try {
             DBPayee payee;
-            string code = getParameter("p");
+            std::string code = getParameter("p");
             payee.retrieveByCode(code);
             charge.payeeId = payee.id;
         }
@@ -42,10 +41,10 @@ void Command::addRecurringCharge() {
             charge.payeeId.clear();
         }
 
-        string start = getParameter("start");
+        std::string start = getParameter("start");
         charge.date = start.empty() ? StrDate::today() : start;
 
-        string end = getParameter("end");
+        std::string end = getParameter("end");
         StrDate nullDate;
         nullDate.clear();
         charge.endDate = end.empty() ? nullDate : end;
@@ -55,7 +54,7 @@ void Command::addRecurringCharge() {
         charge.frequency = Frequency::parse(getParameter("freq"));
         charge.amount = getParameter("amnt");
 
-        string accountToCode = getParameter("to:");
+        std::string accountToCode = getParameter("to:");
         if (!accountToCode.empty()) {
             charge.isTransfer = true;
             charge.setTransferToAccount(accountToCode);
@@ -167,7 +166,7 @@ DBRecurringCharge Command::getRecurringCharge(int sequence) {
 }
 
 void Command::updateRecurringCharge() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
 
@@ -182,7 +181,7 @@ void Command::updateRecurringCharge() {
 }
 
 void Command::deleteRecurringCharge() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
 
@@ -202,12 +201,12 @@ void Command::deleteRecurringCharge() {
 }
 
 void Command::importRecurringCharges() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBRecurringCharge");
 
-    vector<JRecord> records = jfile.read("charges");
+    std::vector<JRecord> records = jfile.read("charges");
 
     for (JRecord & record : records) {
         DBRecurringCharge charge;
@@ -218,12 +217,12 @@ void Command::importRecurringCharges() {
 }
 
 void Command::exportRecurringCharges() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBRecurringCharge> results;
     results.retrieveAll();
 
-    vector<JRecord> records;
+    std::vector<JRecord> records;
 
     for (size_t i = 0;i < results.size();i++) {
         DBRecurringCharge charge = results.at(i);
@@ -237,7 +236,7 @@ void Command::exportRecurringCharges() {
 }
 
 void Command::migrateCharge() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBRecurringCharge charge = getRecurringCharge(atoi(sequence.c_str()));
 

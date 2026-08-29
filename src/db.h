@@ -14,7 +14,6 @@
 #include "pfm_error.h"
 #include "logger.h"
 
-using namespace std;
 
 #define SQLITE_ERROR_BUFFER_LEN                     512
 #define SQL_STATEMENT_BUFFER_LEN                   2048
@@ -31,14 +30,14 @@ enum ColumnType {
 };
 
 struct ColumnDef {
-    string      name;
+    std::string      name;
     ColumnType  type;
 };
 
 class DBColumn {
     private:
-        string name;
-        string value;
+        std::string name;
+        std::string value;
         bool isNull;
 
     public:
@@ -57,11 +56,11 @@ class DBColumn {
             }
         }
 
-        string getName() {
+        std::string getName() {
             return name;
         }
 
-        string getValue() {
+        std::string getValue() {
             return value;
         }
 
@@ -94,10 +93,10 @@ class DBColumn {
 
 class DBRow {
     private:
-        vector<DBColumn>  columns;
+        std::vector<DBColumn>  columns;
 
     public:
-        DBRow(vector<DBColumn> & columnVector) {
+        DBRow(std::vector<DBColumn> & columnVector) {
             for (size_t i = 0;i < columnVector.size();i++) {
                 columns.push_back(columnVector[i]);
             }
@@ -122,7 +121,7 @@ class PFM_DB {
     private:
         sqlite3 * dbHandle;
         bool isTransactionActive;
-        string databaseName;
+        std::string databaseName;
         pthread_mutex_t mutex;
         Logger & log = Logger::getInstance();
 
@@ -130,16 +129,16 @@ class PFM_DB {
             isTransactionActive = false;
         }
 
-        int openReadWrite(const string & dbName);
-        void createDB(const string & dbName);
+        int openReadWrite(const std::string & dbName);
+        void createDB(const std::string & dbName);
         bool isNewFileRequired(int errorCode);
 
         void checkDecryptionSuccessfull();
-        void applyDatabaseKey(const string & dbName, const string & key);
+        void applyDatabaseKey(const std::string & dbName, const std::string & key);
 
-        void createAccessKeyRecord(const string & key);
-        void _executeSQLNoCallback(const string & sql);
-        void _executeSQLCallback(const string & sql, vector<DBRow> * rows);
+        void createAccessKeyRecord(const std::string & key);
+        void _executeSQLNoCallback(const std::string & sql);
+        void _executeSQLCallback(const std::string & sql, std::vector<DBRow> * rows);
 
         bool getIsTransactionActive();
         void setIsTransactionActive();
@@ -154,7 +153,7 @@ class PFM_DB {
     public:
         ~PFM_DB() {}
 
-        void open(const string & dbName);
+        void open(const std::string & dbName);
         void open();
         void close();
 
@@ -164,14 +163,14 @@ class PFM_DB {
         void createView(const char * sql);
         void createIndex(const char * sql);
 
-        int executeSelect(const string & statement, vector<DBRow> * rows);
+        int executeSelect(const std::string & statement, std::vector<DBRow> * rows);
         
-        pfm_id_t executeInsert(const string & statement);
-        void executeUpdate(const string & statement);
-        void executeDelete(const string & statement);
+        pfm_id_t executeInsert(const std::string & statement);
+        void executeUpdate(const std::string & statement);
+        void executeDelete(const std::string & statement);
 
-        void executeRead(const string & statement, vector<DBRow> * rows);
-        void executeWrite(const string & statement);
+        void executeRead(const std::string & statement, std::vector<DBRow> * rows);
+        void executeWrite(const std::string & statement);
 
         void begin();
         void commit();

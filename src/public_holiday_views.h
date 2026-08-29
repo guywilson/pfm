@@ -11,7 +11,6 @@
 #include "custom_widgets.h"
 #include "db_public_holiday.h"
 
-using namespace std;
 
 class AddHolidayView : public CLIView {
     private:

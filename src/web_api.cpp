@@ -22,7 +22,7 @@ void APIListener::validateSession(const httpserver::http_request & request) {
 
     log.entry("APIListener::validateSession");
 
-    string_view sessionKey = request.get_header("X-Session-ID");
+    std::string_view sessionKey = request.get_header("X-Session-ID");
 
     if (!session.isValid(sessionKey)) {
         log.error("Got invalid session ID!");
@@ -91,7 +91,7 @@ void * APIListener::run() {
 
     registerEndPoints(ws);
 
-    cout << "Session ID: " << session.createSession() << endl;
+    std::cout << "Session ID: " << session.createSession() << std::endl;
     fflush(stdout);
 
     log.debug("Starting web API server on port %u...", (unsigned int)port);

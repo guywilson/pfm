@@ -1,16 +1,15 @@
 #include <string>
 
-using namespace std;
 
 #ifndef __INCL_TOKEN
 #define __INCL_TOKEN
 
 class Token {
     private:
-        string token;
+        std::string token;
 
     protected:
-        void setToken(const string & token) {
+        void setToken(const std::string & token) {
             this->token = token;
         }
         
@@ -19,17 +18,17 @@ class Token {
             this->token = "";
         }
 
-        Token(const string & token) {
+        Token(const std::string & token) {
             this->token = token;
         }
 
         virtual ~Token() {}
 
-        virtual string evaluate() {
+        virtual std::string evaluate() {
             return this->token;
         }
 
-        virtual const string className() {
+        virtual const std::string className() {
             return "Token";
         }
 };

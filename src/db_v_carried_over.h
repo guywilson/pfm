@@ -13,7 +13,6 @@
 #include "db_base.h"
 #include "strdate.h"
 
-using namespace std;
 
 class DBCarriedOverView : public DBCarriedOver {
     protected:
@@ -23,7 +22,7 @@ class DBCarriedOverView : public DBCarriedOver {
         };
 
     public:
-        string accountCode;
+        std::string accountCode;
 
         DBCarriedOverView() : DBCarriedOver() {
             clear();
@@ -53,11 +52,11 @@ class DBCarriedOverView : public DBCarriedOver {
             }
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "v_carried_over_log";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBCarriedOverView";
         }
 };

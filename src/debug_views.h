@@ -12,7 +12,6 @@
 #include "custom_widgets.h"
 #include "db_v_carried_over.h"
 
-using namespace std;
 
 class CarriedOverListView : public CLIListView {
     public:
@@ -78,7 +77,7 @@ class GenericListView : public CLIListView {
             return 0;
         }
 
-        void addRows(vector<DBRow> & rows) {
+        void addRows(std::vector<DBRow> & rows) {
             char szTitle[TITLE_BUFFER_LEN];
             snprintf(szTitle, TITLE_BUFFER_LEN, "Results (%zu rows)", rows.size());
             setTitle(szTitle);
@@ -86,7 +85,7 @@ class GenericListView : public CLIListView {
             if (rows.size() > 0) {
                 int remainingWidth = Terminal::getWidth();
 
-                vector<CLIListColumn> columns;
+                std::vector<CLIListColumn> columns;
 
                 DBRow r = rows[0];
 
@@ -95,7 +94,7 @@ class GenericListView : public CLIListView {
                 for (size_t columnIndex = 0;columnIndex < r.getNumColumns();columnIndex++) {
                     DBColumn c = r.getColumnAt(columnIndex);
 
-                    string name = c.getName();
+                    std::string name = c.getName();
                     int width = 0;
 
                     if (name == "id") {

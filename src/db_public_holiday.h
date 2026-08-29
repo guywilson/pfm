@@ -11,7 +11,6 @@
 #include "jfile.h"
 #include "strdate.h"
 
-using namespace std;
 
 class DBPublicHoliday : public DBEntity {
     protected:
@@ -25,7 +24,7 @@ class DBPublicHoliday : public DBEntity {
 
     public:
         StrDate date;
-        string description;
+        std::string description;
 
         DBPublicHoliday() : DBEntity() {
             clear();
@@ -62,18 +61,18 @@ class DBPublicHoliday : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "Date: '" << date.shortDate() << "'" << endl;
-            cout << "Description: '" << description << "'" << endl;
+            std::cout << "Date: '" << date.shortDate() << "'" << std::endl;
+            std::cout << "Description: '" << description << "'" << std::endl;
         }
 
-        void backup(ofstream & os) override {
+        void backup(std::ofstream & os) override {
             DBResult<DBPublicHoliday> results;
             results.retrieveAll();
 
-            os << getDeleteAllStatement() << endl;
+            os << getDeleteAllStatement() << std::endl;
 
             for (size_t i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatement() << endl;
+                os << results[i].getInsertStatement() << std::endl;
             }
 
             os.flush();
@@ -94,20 +93,20 @@ class DBPublicHoliday : public DBEntity {
             this->sequence = sequence;
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "public_holiday";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBPublicHoliday";
         }
 
-        const string getJSONArrayName() const override {
+        const std::string getJSONArrayName() const override {
             return "holidays";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::date, Columns::date_type}, date.shortDate()},
                 {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)}
             };
@@ -115,8 +114,8 @@ class DBPublicHoliday : public DBEntity {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::date, Columns::date_type}, date.shortDate()},
                 {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)}
             };
@@ -131,7 +130,7 @@ class DBPublicHoliday : public DBEntity {
             for (size_t i = 0;i < holidays.size();i++) {
                 DBPublicHoliday holiday = holidays[i];
 
-                pair<StrDate, string> holidayPair;
+                std::pair<StrDate, std::string> holidayPair;
                 holidayPair.first = holiday.date;
                 holidayPair.second = holiday.description;
 

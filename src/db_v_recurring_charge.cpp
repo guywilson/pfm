@@ -11,7 +11,6 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
 DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
@@ -21,7 +20,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountID(pfm_i
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
     criteria.addOrderBy(DBRecurringCharge::Columns::lastPaymentDate, DBCriteria::descending);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringChargeView> result;
 
     result.retrieve(statement);
@@ -40,7 +39,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::retrieveByAccountIDBetwee
     criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, dateAfter);
     criteria.add(DBPayment::Columns::date, DBCriteria::less_than, dateBefore);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringChargeView> result;
 
     result.retrieve(statement);
@@ -62,7 +61,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::getChargesOutstandingThis
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
     criteria.addOrderBy(DBRecurringCharge::Columns::lastPaymentDate, DBCriteria::ascending);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringChargeView> charges;
 
     charges.retrieve(statement);
@@ -106,7 +105,7 @@ DBResult<DBRecurringChargeView> DBRecurringChargeView::getChargesPaidThisPeriod(
     criteria.add(DBRecurringCharge::Columns::lastPaymentDate, DBCriteria::less_than_or_equal, today);
     criteria.addOrderBy(DBRecurringCharge::Columns::lastPaymentDate, DBCriteria::ascending);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringChargeView> results;
 
     results.retrieve(statement);

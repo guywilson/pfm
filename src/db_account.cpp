@@ -19,16 +19,15 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
-void DBAccount::retrieveByCode(string & code) {
+void DBAccount::retrieveByCode(std::string & code) {
     Logger & log = Logger::getInstance();
     log.entry("DBAccount::retrieveByCode()");
 
     DBCriteria criteria;
     criteria.add(Columns::code, DBCriteria::equal_to, code);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBAccount> result;
 
     int rowsRetrievedCount = result.retrieve(statement);
@@ -61,7 +60,7 @@ void DBAccount::createRecurringTransactions() {
         DBResult<DBRecurringChargeView> chargeResult = ch.retrieveByAccountID(this->id);
 
         if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
-            cout << "Creating recurring transactions for account '" << this->code << "': " << endl;
+            std::cout << "Creating recurring transactions for account '" << this->code << "': " << std::endl;
         }
 
         for (size_t i = 0;i < chargeResult.size();i++) {
@@ -99,8 +98,8 @@ void DBAccount::createRecurringTransactions() {
 
                 while (transactionDate <= dateToday) {
                     if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
-                        cout << "| " << transactionDate.shortDate() << " | " << charge.frequency.toString() << " | "
-                            << setw(12) << charge.amount.localeFormattedStringValue() << " | " << charge.description << endl;
+                        std::cout << "| " << transactionDate.shortDate() << " | " << charge.frequency.toString() << " | "
+                            << std::setw(12) << charge.amount.localeFormattedStringValue() << " | " << charge.description << std::endl;
                     }
 
                     // Create the transaction
@@ -416,7 +415,7 @@ Money DBAccount::calculateBalanceAfterBills() {
         DBResult<DBRecurringChargeView> chargeResult = ch.retrieveByAccountID(this->id);
 
         if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
-            cout << "Identified charges due this period:" << endl;
+            std::cout << "Identified charges due this period:" << std::endl;
         }
 
         for (size_t i = 0;i < chargeResult.size();i++) {
@@ -435,8 +434,8 @@ Money DBAccount::calculateBalanceAfterBills() {
         }
 
         if (log.isLogLevel(LOG_LEVEL_DEBUG)) {
-            cout << "Total transaction balance = " << transactionBalance.localeFormattedStringValue() << endl;
-            cout << "Total charge balance = " << chargeBalance.localeFormattedStringValue() << endl;
+            std::cout << "Total transaction balance = " << transactionBalance.localeFormattedStringValue() << std::endl;
+            std::cout << "Total charge balance = " << chargeBalance.localeFormattedStringValue() << std::endl;
         }
 
         log.exit("DBAccount::calculateBalanceAfterBills()");
@@ -478,7 +477,7 @@ bool DBAccount::isPrimary() {
     Logger & log = Logger::getInstance();
     log.entry("DBAccount::isPrimary()");
 
-    string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
+    std::string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
 
     bool isPrimaryAccount = primaryAccountCode.compare(code) == 0 ? true : false;
 

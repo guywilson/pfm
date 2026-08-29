@@ -18,7 +18,6 @@
 #include "money.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 class DBPayment : public DBEntity {
     protected:
@@ -45,7 +44,7 @@ class DBPayment : public DBEntity {
             static constexpr ColumnType isTransfer_type = ColumnType::BOOL;
         };
 
-        string getAccountCode() {
+        std::string getAccountCode() {
             DBAccount account;
             account.retrieve(this->accountId);
 
@@ -58,7 +57,7 @@ class DBPayment : public DBEntity {
         pfm_id_t payeeId;
 
         StrDate date;
-        string description;
+        std::string description;
         Money amount;
 
         bool isTransfer;
@@ -113,11 +112,11 @@ class DBPayment : public DBEntity {
         }
 
         void set(JRecord & record) {
-            string accountCode = record.get("accountCode");
+            std::string accountCode = record.get("accountCode");
             account.retrieveByCode(accountCode);
 
             try {
-                string categoryCode = record.get("categoryCode");
+                std::string categoryCode = record.get("categoryCode");
                 category.retrieveByCode(categoryCode);
             }
             catch (pfm_error & e) {
@@ -125,7 +124,7 @@ class DBPayment : public DBEntity {
             }
 
             try {
-                string payeeCode = record.get("payeeCode");
+                std::string payeeCode = record.get("payeeCode");
                 payee.retrieveByCode(payeeCode);
             }
             catch (pfm_error & e) {
@@ -173,22 +172,22 @@ class DBPayment : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "AccountID: " << accountId.getValue() << endl;
-            cout << "CategoryID: " << categoryId.getValue() << endl;
-            cout << "PayeeID: " << payeeId.getValue() << endl;
+            std::cout << "AccountID: " << accountId.getValue() << std::endl;
+            std::cout << "CategoryID: " << categoryId.getValue() << std::endl;
+            std::cout << "PayeeID: " << payeeId.getValue() << std::endl;
 
-            cout << "Date: '" << date.shortDate() << "'" << endl;
-            cout << "Description: '" << description << "'" << endl;
+            std::cout << "Date: '" << date.shortDate() << "'" << std::endl;
+            std::cout << "Description: '" << description << "'" << std::endl;
 
-            cout << fixed << setprecision(2);
-            cout << "Amount: " << amount.localeFormattedStringValue() << endl;
+            std::cout << std::fixed << std::setprecision(2);
+            std::cout << "Amount: " << amount.localeFormattedStringValue() << std::endl;
 
-            cout << "isTransfer: " << isTransfer << endl;
+            std::cout << "isTransfer: " << isTransfer << std::endl;
 
-            cout << "DBCategory (encapsulated object):" << endl;
+            std::cout << "DBCategory (encapsulated object):" << std::endl;
             category.print();
 
-            cout << "DBPayee (encapsulated object):" << endl;
+            std::cout << "DBPayee (encapsulated object):" << std::endl;
             payee.print();
         }
 
@@ -233,4 +232,3 @@ class DBPayment : public DBEntity {
             return (isTransfer ? "Y" : "N");
         }
 };
-

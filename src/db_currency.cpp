@@ -11,16 +11,15 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
-void DBCurrency::retrieveByCode(string & code) {
+void DBCurrency::retrieveByCode(std::string & code) {
     Logger & log = Logger::getInstance();
     log.entry("DBCurrency::retrieveByCode()");
 
     DBCriteria criteria;
     criteria.add(Columns::code, DBCriteria::equal_to, code);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBCurrency> result;
 
     int rowsRetrievedCount = result.retrieve(statement);

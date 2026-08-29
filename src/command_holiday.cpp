@@ -13,7 +13,6 @@
 #include "db_public_holiday.h"
 #include "public_holiday_views.h"
 
-using namespace std;
 
 void Command::addHoliday() {
     AddHolidayView view;
@@ -67,7 +66,7 @@ DBPublicHoliday Command::getHoliday(int sequence) {
 }
 
 void Command::updateHoliday() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBPublicHoliday holiday = getHoliday(atoi(sequence.c_str()));
 
@@ -83,7 +82,7 @@ void Command::updateHoliday() {
 }
 
 void Command::deleteHoliday() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBPublicHoliday holiday = getHoliday(atoi(sequence.c_str()));
 
@@ -95,12 +94,12 @@ void Command::deleteHoliday() {
 }
 
 void Command::importHolidays() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBPublicHoliday");
 
-    vector<JRecord> records = jfile.read("holidays");
+    std::vector<JRecord> records = jfile.read("holidays");
 
     for (JRecord & record : records) {
         DBPublicHoliday holiday;

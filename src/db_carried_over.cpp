@@ -13,7 +13,6 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
 int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
@@ -24,7 +23,7 @@ int DBCarriedOver::retrieveLatestByAccountId(pfm_id_t & accountId) {
     criteria.addOrderBy(Columns::date, DBCriteria::descending);
     criteria.setRowLimit(1);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
 
     DBResult<DBCarriedOver> result;
 
@@ -47,7 +46,7 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountId(pfm_id_t & accountId)
     criteria.add(Columns::accountId, DBCriteria::equal_to, accountId);
     criteria.addOrderBy(Columns::date, DBCriteria::descending);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
 
     DBResult<DBCarriedOver> result;
 
@@ -66,7 +65,7 @@ DBResult<DBCarriedOver> DBCarriedOver::retrieveByAccountIdAfterDate(pfm_id_t & a
     criteria.add(Columns::accountId, DBCriteria::equal_to, accountId);
     criteria.add(Columns::date, DBCriteria::greater_than_or_equal, after);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
 
     DBResult<DBCarriedOver> result;
 

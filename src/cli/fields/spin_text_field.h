@@ -12,7 +12,7 @@
 
 class CLISpinTextField : public CLITextField {
     private:
-        vector<std::string> items;
+        std::vector<std::string> items;
 
     protected:
         void populate() {

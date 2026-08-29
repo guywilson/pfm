@@ -14,7 +14,6 @@
 #include "strdate.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 class DBShortcut : public DBEntity {
     protected:
@@ -27,8 +26,8 @@ class DBShortcut : public DBEntity {
         };
 
     public:
-        string shortcut;
-        string replacementText;
+        std::string shortcut;
+        std::string replacementText;
 
         DBShortcut() : DBEntity() {
             clear();
@@ -69,19 +68,19 @@ class DBShortcut : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "Shortcut: '" << shortcut << "'" << endl;
-            cout << "ReplacementText: '" << replacementText << "'" << endl;
+            std::cout << "Shortcut: '" << shortcut << "'" << std::endl;
+            std::cout << "ReplacementText: '" << replacementText << "'" << std::endl;
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "shortcut";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBShortcut";
         }
 
-        const string getJSONArrayName() const override {
+        const std::string getJSONArrayName() const override {
             return "shortcuts";
         }
 
@@ -89,8 +88,8 @@ class DBShortcut : public DBEntity {
             this->sequence = sequence;
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::shortcut, Columns::shortcut_type}, shortcut},
                 {{Columns::replacementText, Columns::replacementText_type}, delimitSingleQuotes(replacementText)}
             };
@@ -98,8 +97,8 @@ class DBShortcut : public DBEntity {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::shortcut, Columns::shortcut_type}, shortcut},
                 {{Columns::replacementText, Columns::replacementText_type}, delimitSingleQuotes(replacementText)}
             };
@@ -107,14 +106,14 @@ class DBShortcut : public DBEntity {
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
-        void backup(ofstream & os) override {
+        void backup(std::ofstream & os) override {
             DBResult<DBShortcut> results;
             results.retrieveAll();
 
-            os << getDeleteAllStatement() << endl;
+            os << getDeleteAllStatement() << std::endl;
 
             for (size_t i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatement() << endl;
+                os << results[i].getInsertStatement() << std::endl;
             }
 
             os.flush();
@@ -131,8 +130,8 @@ class DBShortcut : public DBEntity {
             }
         }
 
-        static vector<pair<string, string>> populate() {
-            vector<pair<string, string>> shortcutPairs;
+        static std::vector<std::pair<std::string, std::string>> populate() {
+            std::vector<std::pair<std::string, std::string>> shortcutPairs;
 
             DBResult<DBShortcut> results;
             results.retrieveAll();

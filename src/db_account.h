@@ -15,7 +15,6 @@
 #include "money.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 class DBAccount : public DBEntity {
     private:
@@ -41,8 +40,8 @@ class DBAccount : public DBEntity {
         };
 
     public:
-        string name;
-        string code;
+        std::string name;
+        std::string code;
 
         StrDate openingDate;
 
@@ -93,20 +92,20 @@ class DBAccount : public DBEntity {
             return r;
         }
 
-        string getIDByCodeSubSelect() {
-            string idColumnName = DBEntity::Columns::id;
-            string statement = "(SELECT " + idColumnName + " FROM " + getTableName() + " WHERE " + Columns::code + " = '" + code + "')";
+        std::string getIDByCodeSubSelect() {
+            std::string idColumnName = DBEntity::Columns::id;
+            std::string statement = "(SELECT " + idColumnName + " FROM " + getTableName() + " WHERE " + Columns::code + " = '" + code + "')";
             return statement;
         }
 
-        void backup(ofstream & os) override {
+        void backup(std::ofstream & os) override {
             DBResult<DBAccount> results;
             results.retrieveAll();
 
-            os << getDeleteAllStatement() << endl;
+            os << getDeleteAllStatement() << std::endl;
 
             for (size_t i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatement() << endl;
+                os << results[i].getInsertStatement() << std::endl;
             }
 
             os.flush();
@@ -135,29 +134,29 @@ class DBAccount : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "Name: '" << name << "'" << endl;
-            cout << "Code: '" << code << "'" << endl;
-            cout << "Opening date: '" <<  openingDate.shortDate() << "'" << endl;
+            std::cout << "Name: '" << name << "'" << std::endl;
+            std::cout << "Code: '" << code << "'" << std::endl;
+            std::cout << "Opening date: '" <<  openingDate.shortDate() << "'" << std::endl;
 
-            cout << fixed << setprecision(2);
-            cout << "Opening balance: " << openingBalance.localeFormattedStringValue() << endl;
-            cout << "Balance limit: " << balanceLimit.localeFormattedStringValue() << endl;
+            std::cout << std::fixed << std::setprecision(2);
+            std::cout << "Opening balance: " << openingBalance.localeFormattedStringValue() << std::endl;
+            std::cout << "Balance limit: " << balanceLimit.localeFormattedStringValue() << std::endl;
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "account";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBAccount";
         }
 
-        const string getJSONArrayName() const override {
+        const std::string getJSONArrayName() const override {
             return "accounts";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::code, Columns::code_type}, code},
                 {{Columns::name, Columns::name_type}, name},
                 {{Columns::openingDate, Columns::openingDate_type}, openingDate.shortDate()},
@@ -168,8 +167,8 @@ class DBAccount : public DBEntity {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::code, Columns::code_type}, code},
                 {{Columns::name, Columns::name_type}, name},
                 {{Columns::openingDate, Columns::openingDate_type}, openingDate.shortDate()},
@@ -190,8 +189,7 @@ class DBAccount : public DBEntity {
         Money calculateRemainingBalance();
         Money calculateRemainingBalance(Money & balanceAfterBills);
 
-        void retrieveByCode(string & code);
+        void retrieveByCode(std::string & code);
 
         bool isPrimary();
 };
-

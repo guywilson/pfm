@@ -11,7 +11,6 @@
 #include "container.h"
 #include "tokenizer.h"
 
-using namespace std;
 
 static inline bool isCharDigit(char ch) {
     return (bool)isdigit((int)ch);
@@ -33,11 +32,11 @@ static inline bool isSpaceDelimiter(char ch) {
     return (bool)isspace((int)ch);
 }
 
-static inline bool isTokenWhiteSpace(string & token) {
+static inline bool isTokenWhiteSpace(std::string & token) {
     return isSpaceDelimiter(token[0]);
 }
 
-static bool isNegativeOperand(string & expression, int index) {
+static bool isNegativeOperand(std::string & expression, int index) {
     /*
     ** If this is the '-' character and if the next char is a digit (0-9)
     ** and the previous char is not a ')' or a digit then this must be a -ve number,
@@ -116,7 +115,7 @@ int Tokenizer::getTokenLength() {
     return (endIndex - startIndex);
 }
 
-Tokenizer::Tokenizer(const string & expression) {
+Tokenizer::Tokenizer(const std::string & expression) {
     this->expression = expression;
     this->startIndex = 0;
     this->endIndex = 0;
@@ -130,7 +129,7 @@ TokenArray Tokenizer::tokenize() {
     while (pos > 0) {
         endIndex = pos;
 
-        string token = expression.substr(startIndex, getTokenLength());
+        std::string token = expression.substr(startIndex, getTokenLength());
         
         startIndex = endIndex;
 

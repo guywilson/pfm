@@ -45,8 +45,8 @@ class CLITableCell : public CLIField {
             this->width = valueWidth;
         }
 
-        string getCellContents() {
-            string value = getValue();
+        std::string getCellContents() {
+            std::string value = getValue();
             size_t w = getWidth();
             w = cli::text::calculateFieldWidth(value, w);
 
@@ -69,7 +69,7 @@ class CLITableCell : public CLIField {
             return ss.str();
         }
 
-        inline string getLabel() {
+        inline std::string getLabel() {
             return _getLabel();
         }
 
@@ -93,7 +93,7 @@ class CLITable : public CLIView {
         std::vector<CLITableCell> cells;
         size_t numColumns;
         size_t numRows;
-        string title;
+        std::string title;
 
     public:
         CLITable(const std::string & title, size_t numRows) {
@@ -122,33 +122,33 @@ class CLITable : public CLIView {
             cells[index] = cell;
         }
 
-        void printRow(const vector<CLITableCell> & columns) {
+        void printRow(const std::vector<CLITableCell> & columns) {
             for (size_t i = 0;i < columns.size();i++) {
                 CLITableCell cell = columns[i];
 
-                string contents = cell.getCellContents();
+                std::string contents = cell.getCellContents();
 
-                cout << contents;
+                std::cout << contents;
 
                 bool isLastColumn = (i == (numColumns - 1));
 
                 if (!isLastColumn) {
                     for (size_t j = (contents.length() - 1);j < ((TERMINAL_MIN_WIDTH / numColumns) + 10);j++) {
-                        cout << " ";
+                        std::cout << " ";
                     }
                 }
             }
 
-            cout << endl;
+            std::cout << std::endl;
         }
 
         void show() override {
             size_t i = 0;
 
-            cout << "*** " << this->title << " ***" << endl << endl;
+            std::cout << "*** " << this->title << " ***" << std::endl << std::endl;
             
             while (i < cells.size()) {
-                vector<CLITableCell> columns;
+                std::vector<CLITableCell> columns;
                 columns.reserve(numColumns);
 
                 for (size_t c = 0;c < numColumns;c++) {
@@ -158,6 +158,6 @@ class CLITable : public CLIView {
                 printRow(columns);
             }
 
-            cout << endl;
+            std::cout << std::endl;
         }
 };

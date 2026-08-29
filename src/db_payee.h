@@ -11,7 +11,6 @@
 #include "jfile.h"
 #include "strdate.h"
 
-using namespace std;
 
 class DBPayee : public DBEntity {
     protected:
@@ -24,8 +23,8 @@ class DBPayee : public DBEntity {
         };
 
     public:
-        string name;
-        string code;
+        std::string name;
+        std::string code;
 
         DBPayee() : DBEntity() {
             clear();
@@ -62,24 +61,24 @@ class DBPayee : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "Description: '" << name << "'" << endl;
-            cout << "Code: '" << code << "'" << endl;
+            std::cout << "Description: '" << name << "'" << std::endl;
+            std::cout << "Code: '" << code << "'" << std::endl;
         }
 
-        string getIDByCodeSubSelect() {
-            string idColumnName = DBEntity::Columns::id;
-            string statement = "(SELECT " + idColumnName + " FROM " + getTableName() + " WHERE " + Columns::code + " = '" + code + "')";
+        std::string getIDByCodeSubSelect() {
+            std::string idColumnName = DBEntity::Columns::id;
+            std::string statement = "(SELECT " + idColumnName + " FROM " + getTableName() + " WHERE " + Columns::code + " = '" + code + "')";
             return statement;
         }
 
-        void backup(ofstream & os) override {
+        void backup(std::ofstream & os) override {
             DBResult<DBPayee> results;
             results.retrieveAll();
 
-            os << getDeleteAllStatement() << endl;
+            os << getDeleteAllStatement() << std::endl;
 
             for (size_t i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatement() << endl;
+                os << results[i].getInsertStatement() << std::endl;
             }
 
             os.flush();
@@ -96,20 +95,20 @@ class DBPayee : public DBEntity {
             }
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "payee";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBPayee";
         }
 
-        const string getJSONArrayName() const override {
+        const std::string getJSONArrayName() const override {
             return "payees";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::code, Columns::code_type}, code},
                 {{Columns::name, Columns::name_type}, delimitSingleQuotes(name)}
             };
@@ -117,8 +116,8 @@ class DBPayee : public DBEntity {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::code, Columns::code_type}, code},
                 {{Columns::name, Columns::name_type}, delimitSingleQuotes(name)}
             };
@@ -126,7 +125,7 @@ class DBPayee : public DBEntity {
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
-        void retrieveByCode(string & code);
+        void retrieveByCode(std::string & code);
         DBResult<DBPayee> retrieveOrderedByCode();
 };
 

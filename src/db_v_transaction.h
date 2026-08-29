@@ -14,7 +14,6 @@
 #include "strdate.h"
 #include "pfm_error.h"
 
-using namespace std;
 
 class DBTransactionView : public DBTransaction {
     protected:
@@ -45,9 +44,9 @@ class DBTransactionView : public DBTransaction {
         };
 
     public:
-        string account;
-        string payee;
-        string category;
+        std::string account;
+        std::string payee;
+        std::string category;
         bool isRecurring;
         bool isTransfer;
 
@@ -96,11 +95,11 @@ class DBTransactionView : public DBTransaction {
         void print() {
             DBTransaction::print();
 
-            cout << "Account: '" << account << "'" << endl;
-            cout << "IsRecurring: '" << isRecurring << "'" << endl;
-            cout << "IsTransfer: '" << isTransfer << "'" << endl;
-            cout << "Payee: '" << payee << "'" << endl;
-            cout << "Category: '" << category << "'" << endl;
+            std::cout << "Account: '" << account << "'" << std::endl;
+            std::cout << "IsRecurring: '" << isRecurring << "'" << std::endl;
+            std::cout << "IsTransfer: '" << isTransfer << "'" << std::endl;
+            std::cout << "Payee: '" << payee << "'" << std::endl;
+            std::cout << "Category: '" << category << "'" << std::endl;
         }
 
         void assignColumn(DBColumn & column) override {
@@ -132,11 +131,11 @@ class DBTransactionView : public DBTransaction {
             }
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "v_transaction_list";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBTransactionView";
         }
 
@@ -158,7 +157,7 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> retrieveByAccountIDForPeriod(pfm_id_t & accountId, DBCriteria::sql_order dateSortDirection, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransactionView> retrieveReconciledByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransactionView> findTransactions(const string & sql);
+        DBResult<DBTransactionView> findTransactions(const std::string & sql);
         DBResult<DBTransactionView> findTransactionsForCriteria(DBCriteria & criteria);
         DBResult<DBTransactionView> findTransactionsForAccountID(pfm_id_t & accountId, DBCriteria & criteria);
         DBResult<DBTransactionView> reportByCategory(DBAccount & account, StrDate & periodStart, StrDate & periodEnd);
@@ -176,7 +175,7 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleOnTheseDates(DBCriteria & src, const vector<StrDate> & dates) {
+                static DBCriteria handleOnTheseDates(DBCriteria & src, const std::vector<StrDate> & dates) {
                     if (dates.size() > 0) {
                         for (const StrDate & date : dates) {
                             src.addToInClause(DBPayment::Columns::date, date);
@@ -198,9 +197,9 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleWithTheseAccounts(DBCriteria & src, const vector<string> & accounts) {
+                static DBCriteria handleWithTheseAccounts(DBCriteria & src, const std::vector<std::string> & accounts) {
                     if (accounts.size() > 0) {
-                        for (const string & account : accounts) {
+                        for (const std::string & account : accounts) {
                             src.addToInClause(Columns::account, account);
                         }
 
@@ -210,9 +209,9 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleWithTheseCategories(DBCriteria & src, const vector<string> & categories) {
+                static DBCriteria handleWithTheseCategories(DBCriteria & src, const std::vector<std::string> & categories) {
                     if (categories.size() > 0) {
-                        for (const string & category : categories) {
+                        for (const std::string & category : categories) {
                             src.addToInClause(Columns::category, category);
                         }
 
@@ -222,9 +221,9 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleWithThesePayees(DBCriteria & src, const vector<string> & payees) {
+                static DBCriteria handleWithThesePayees(DBCriteria & src, const std::vector<std::string> & payees) {
                     if (payees.size() > 0) {
-                        for (const string & payee : payees) {
+                        for (const std::string & payee : payees) {
                             src.addToInClause(Columns::payee, payee);
                         }
 
@@ -234,9 +233,9 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleWithThisDescription(DBCriteria & src, const string & description) {
+                static DBCriteria handleWithThisDescription(DBCriteria & src, const std::string & description) {
                     if (description.length() > 0) {
-                        if (description.find_first_of('%') != string::npos || description.find_first_of('_') != string::npos) {
+                        if (description.find_first_of('%') != std::string::npos || description.find_first_of('_') != std::string::npos) {
                             src.add(DBPayment::Columns::description, DBCriteria::like, description);
                         }
                         else {
@@ -247,9 +246,9 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleWithThisReference(DBCriteria & src, const string & reference) {
+                static DBCriteria handleWithThisReference(DBCriteria & src, const std::string & reference) {
                     if (reference.length() > 0) {
-                        if (reference.find_first_of('%') != string::npos || reference.find_first_of('_') != string::npos) {
+                        if (reference.find_first_of('%') != std::string::npos || reference.find_first_of('_') != std::string::npos) {
                             src.add(DBTransaction::Columns::reference, DBCriteria::like, reference);
                         }
                         else {
@@ -260,7 +259,7 @@ class DBTransactionView : public DBTransaction {
                     return src;
                 }
 
-                static DBCriteria handleWithThisType(DBCriteria & src, const string & type) {
+                static DBCriteria handleWithThisType(DBCriteria & src, const std::string & type) {
                     if (type.length() > 0) {
                         src.add(Columns::type, DBCriteria::equal_to, type);
                     }

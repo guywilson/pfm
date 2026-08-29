@@ -14,7 +14,6 @@
 #include "db_transaction_report.h"
 #include "report_views.h"
 
-using namespace std;
 
 void Command::addReport() {
     AddReportView view;
@@ -25,7 +24,7 @@ void Command::addReport() {
 }
 
 void Command::copyReport() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransactionReport report = getReport(atoi(sequence.c_str()));
 
@@ -60,7 +59,7 @@ DBTransactionReport Command::getReport(int sequence) {
 }
 
 void Command::updateReport() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransactionReport report = getReport(atoi(sequence.c_str()));
 
@@ -73,7 +72,7 @@ void Command::updateReport() {
 }
 
 void Command::deleteReport() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransactionReport report = getReport(atoi(sequence.c_str()));
 
@@ -82,7 +81,7 @@ void Command::deleteReport() {
 }
 
 void Command::runReport() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransactionReport report = getReport(atoi(sequence.c_str()));
 
@@ -93,7 +92,7 @@ void Command::saveReport() {
     CacheMgr & cacheMgr = CacheMgr::getInstance();
 
     DBTransactionReport report;
-    string description;
+    std::string description;
 
     if (hasParameters()) {
         description = getParameter(SIMPLE_PARAM_NAME);
@@ -116,7 +115,7 @@ void Command::saveReport() {
 }
 
 void Command::showReport() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransactionReport report = getReport(atoi(sequence.c_str()));
 

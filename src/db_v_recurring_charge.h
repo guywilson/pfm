@@ -17,7 +17,6 @@
 #include "db_base.h"
 #include "strdate.h"
 
-using namespace std;
 
 class DBRecurringChargeView : public DBRecurringCharge {
     protected:
@@ -30,8 +29,8 @@ class DBRecurringChargeView : public DBRecurringCharge {
         };
 
     public:
-        string payeeCode;
-        string categoryCode;
+        std::string payeeCode;
+        std::string categoryCode;
 
         DBRecurringChargeView() : DBRecurringCharge() {
             clear();
@@ -58,8 +57,8 @@ class DBRecurringChargeView : public DBRecurringCharge {
         void print() {
             DBRecurringCharge::print();
 
-            cout << "PayeeCode: '" << payeeCode << "'" << endl;
-            cout << "CategoryCode: '" << categoryCode << "'" << endl;
+            std::cout << "PayeeCode: '" << payeeCode << "'" << std::endl;
+            std::cout << "CategoryCode: '" << categoryCode << "'" << std::endl;
         }
 
         void assignColumn(DBColumn & column) override {
@@ -73,11 +72,11 @@ class DBRecurringChargeView : public DBRecurringCharge {
             }
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "v_recurring_charge_list";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBRecurringChrageView";
         }
 

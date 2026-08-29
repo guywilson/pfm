@@ -13,7 +13,6 @@
 #include "db_category.h"
 #include "category_views.h"
 
-using namespace std;
 
 void Command::addCategory() {
     AddCategoryView view;
@@ -34,7 +33,7 @@ void Command::listCategories() {
     view.show();
 }
 
-DBCategory Command::getCategory(string & categoryCode) {
+DBCategory Command::getCategory(std::string & categoryCode) {
     if (categoryCode.length() == 0) {
         ChooseCategoryView view;
         view.show();
@@ -49,7 +48,7 @@ DBCategory Command::getCategory(string & categoryCode) {
 }
 
 void Command::updateCategory() {
-    string categoryCode;
+    std::string categoryCode;
 
     if (hasParameters()) {
         categoryCode = getParameter(SIMPLE_PARAM_NAME);
@@ -66,7 +65,7 @@ void Command::updateCategory() {
 }
 
 void Command::deleteCategory() {
-    string categoryCode;
+    std::string categoryCode;
 
     if (hasParameters()) {
         categoryCode = getParameter(SIMPLE_PARAM_NAME);
@@ -79,12 +78,12 @@ void Command::deleteCategory() {
 }
 
 void Command::importCategories() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBCategory");
 
-    vector<JRecord> records = jfile.read("categories");
+    std::vector<JRecord> records = jfile.read("categories");
 
     for (JRecord & record : records) {
         DBCategory category;
@@ -95,12 +94,12 @@ void Command::importCategories() {
 }
 
 void Command::exportCategories() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBCategory> results;
     results.retrieveAll();
 
-    vector<JRecord> records;
+    std::vector<JRecord> records;
 
     for (size_t i = 0;i < results.size();i++) {
         DBCategory category = results.at(i);

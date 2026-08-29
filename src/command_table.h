@@ -6,17 +6,16 @@
 
 #include "command.h"
 
-using namespace std;
 
 struct CommandEntry {
-    string                      name;
-    vector<string>              aliases;
-    string                      helpText;
+    std::string                      name;
+    std::vector<std::string>              aliases;
+    std::string                      helpText;
 
-    function<void(Command&)>    handler;
+    std::function<void(Command&)>    handler;
 };
 
-const vector<CommandEntry> commandTable = {
+const std::vector<CommandEntry> commandTable = {
     {"save-json-template", {"sjt"},
         "Save a json template for the selected entity", 
         [](Command& c){ c.saveJsonTemplate(); }},

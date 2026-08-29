@@ -72,7 +72,6 @@
 #include "schema.h"
 #include "system.h"
 
-using namespace std;
 
 #ifndef DEBUG_PASSWORD
 #define DEBUG_PASSWORD          ""
@@ -93,8 +92,8 @@ using namespace std;
 **
 ******************************************************************************/
 static inline int _retrieveCallback(void * p, int numColumns, char ** columns, char ** columnNames) {
-    vector<DBRow> * rows = (vector<DBRow> *)p;
-    vector<DBColumn> columnVector;
+    std::vector<DBRow> * rows = (std::vector<DBRow> *)p;
+    std::vector<DBColumn> columnVector;
 
     for (int i = 0;i < numColumns;i++) {
         DBColumn column(columnNames[i], columns[i]);
@@ -108,7 +107,7 @@ static inline int _retrieveCallback(void * p, int numColumns, char ** columns, c
     return SQLITE_OK;
 }
 
-int PFM_DB::openReadWrite(const string & dbName) {
+int PFM_DB::openReadWrite(const std::string & dbName) {
     int error = sqlite3_open_v2(
                     dbName.c_str(), 
                     &this->dbHandle, 
@@ -143,7 +142,7 @@ bool PFM_DB::isNewFileRequired(int errorCode) {
     return false;
 }
 
-void PFM_DB::createDB(const string & dbName) {
+void PFM_DB::createDB(const std::string & dbName) {
     int error = sqlite3_open_v2(
                     dbName.c_str(),
                     &this->dbHandle,
@@ -172,7 +171,7 @@ void PFM_DB::checkDecryptionSuccessfull() {
     log.entry("PFM_DB::checkDecryptionSuccessfull()");
 
     try {
-        vector<DBRow> rows;
+        std::vector<DBRow> rows;
 
         int rowCount = executeSelect(CHECK_DECRYPTION_SUCCESSFULL_QUERY, &rows);
         log.debug("Got %d rows from '%s'", rowCount, CHECK_DECRYPTION_SUCCESSFULL_QUERY);
@@ -185,7 +184,7 @@ void PFM_DB::checkDecryptionSuccessfull() {
     log.exit("PFM_DB::checkDecryptionSuccessfull()");
 }
 
-void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
+void PFM_DB::applyDatabaseKey(const std::string & dbName, const std::string & key) {
     log.entry("PFM_DB::applyDatabaseKey()");
 
     int keyError = sqlite3_key(this->dbHandle, key.c_str(), key.length());
@@ -212,7 +211,7 @@ void PFM_DB::applyDatabaseKey(const string & dbName, const string & key) {
     log.exit("PFM_DB::applyDatabaseKey()");
 }
 
-void PFM_DB::createAccessKeyRecord(const string & key) {
+void PFM_DB::createAccessKeyRecord(const std::string & key) {
     log.entry("PFM_DB::createAccessKeyRecord()");
 
     const char * insertStatement = 
@@ -220,7 +219,7 @@ void PFM_DB::createAccessKeyRecord(const string & key) {
 
     char statement[SQL_STATEMENT_BUFFER_LEN];
 
-    string now = StrDate::getTimestamp();
+    std::string now = StrDate::getTimestamp();
 
     try {
         begin();
@@ -247,32 +246,32 @@ void PFM_DB::createAccessKeyRecord(const string & key) {
     log.exit("PFM_DB::createAccessKeyRecord()");
 }
 
-void PFM_DB::open(const string & dbName) {
+void PFM_DB::open(const std::string & dbName) {
     log.entry("PFM_DB::open()");
 
     try {
         int error = openReadWrite(dbName);
 
-        string key;
+        std::string key;
 
         if (isNewFileRequired(error)) {
             createDB(dbName);
 
-            cout << "Please enter a password that will be used to encrypt the database file." << endl;
+            std::cout << "Please enter a password that will be used to encrypt the database file." << std::endl;
             key = System::getKey("Enter a password: ");
 
-            cout << endl;
+            std::cout << std::endl;
 
             applyDatabaseKey(dbName, key);
 
-            cout << "Data file '" << dbName << "' does not exist, creating..." << endl;
+            std::cout << "Data file '" << dbName << "' does not exist, creating..." << std::endl;
             createSchema();
 
-            cout << "Please enter an admin access password, this is used to control access" << endl;
-            cout << "to admin functions." << endl;
-            string accessKey = System::getKey("Enter admin password: ");
+            std::cout << "Please enter an admin access password, this is used to control access" << std::endl;
+            std::cout << "to admin functions." << std::endl;
+            std::string accessKey = System::getKey("Enter admin password: ");
 
-            cout << endl;
+            std::cout << std::endl;
 
             createAccessKeyRecord(accessKey);
         }
@@ -343,7 +342,7 @@ void PFM_DB::close() {
 void PFM_DB::changePassword() {
     log.entry("PFM_DB::changePassword()");
 
-    string newPassword = System::getKey("Enter new database password: ");
+    std::string newPassword = System::getKey("Enter new database password: ");
 
     int error = sqlite3_rekey(dbHandle, newPassword.c_str(), newPassword.length());
 
@@ -406,7 +405,7 @@ void PFM_DB::clearIsTransactionActive() {
     log.exit("PFM_DB::clearIsTransactionActive()");
 }
 
-void PFM_DB::_executeSQLNoCallback(const string & sql) {
+void PFM_DB::_executeSQLNoCallback(const std::string & sql) {
     log.entry("PFM_DB::_executeSQLNoCallback()");
 
     log.sql("Executing SQL '%s'", sql.c_str());
@@ -429,7 +428,7 @@ void PFM_DB::_executeSQLNoCallback(const string & sql) {
     log.exit("PFM_DB::_executeSQLNoCallback()");
 }
 
-void PFM_DB::_executeSQLCallback(const string & sql, vector<DBRow> * rows) {
+void PFM_DB::_executeSQLCallback(const std::string & sql, std::vector<DBRow> * rows) {
     log.entry("PFM_DB::_executeSQLCallback()");
 
     log.sql("Executing SQL '%s'", sql.c_str());
@@ -578,7 +577,7 @@ void PFM_DB::createDefaultCategories() {
 
     char statement[SQL_STATEMENT_BUFFER_LEN];
 
-    string now = StrDate::getTimestamp();
+    std::string now = StrDate::getTimestamp();
 
     try {
         begin();
@@ -616,7 +615,7 @@ void PFM_DB::createDefaultConfig() {
 
     char statement[SQL_STATEMENT_BUFFER_LEN];
 
-    string now = StrDate::getTimestamp();
+    std::string now = StrDate::getTimestamp();
 
     try {
         begin();
@@ -657,7 +656,7 @@ void PFM_DB::createCurrencies() {
 
     char statement[SQL_STATEMENT_BUFFER_LEN];
 
-    string now = StrDate::getTimestamp();
+    std::string now = StrDate::getTimestamp();
 
     try {
         begin();
@@ -688,7 +687,7 @@ void PFM_DB::createCurrencies() {
     log.exit("PFM_DB::createCurrencies()");
 }
 
-int PFM_DB::executeSelect(const string & statement, vector<DBRow> * rows) {
+int PFM_DB::executeSelect(const std::string & statement, std::vector<DBRow> * rows) {
     log.entry("PFM_DB::executeSelect()");
     executeRead(statement, rows);
     log.debug("Execute SELECT returned %d rows", rows->size());
@@ -697,7 +696,7 @@ int PFM_DB::executeSelect(const string & statement, vector<DBRow> * rows) {
     return rows->size();
 }
 
-pfm_id_t PFM_DB::executeInsert(const string & statement) {
+pfm_id_t PFM_DB::executeInsert(const std::string & statement) {
     log.entry("PFM_DB::executeInsert()");
     executeWrite(statement);
     pfm_id_t id = sqlite3_last_insert_rowid(dbHandle);
@@ -706,25 +705,25 @@ pfm_id_t PFM_DB::executeInsert(const string & statement) {
     return id;
 }
 
-void PFM_DB::executeUpdate(const string & statement) {
+void PFM_DB::executeUpdate(const std::string & statement) {
     log.entry("PFM_DB::executeUpdate()");
     executeWrite(statement);
     log.exit("PFM_DB::executeUpdate()");
 }
 
-void PFM_DB::executeDelete(const string & statement) {
+void PFM_DB::executeDelete(const std::string & statement) {
     log.entry("PFM_DB::executeDelete()");
     executeWrite(statement);
     log.exit("PFM_DB::executeDelete()");
 }
 
-void PFM_DB::executeRead(const string & statement, vector<DBRow> * rows) {
+void PFM_DB::executeRead(const std::string & statement, std::vector<DBRow> * rows) {
     log.entry("PFM_DB::executeRead()");
     _executeSQLCallback(statement, rows);
     log.exit("PFM_DB::executeRead()");
 }
 
-void PFM_DB::executeWrite(const string & statement) {
+void PFM_DB::executeWrite(const std::string & statement) {
     log.entry("PFM_DB::executeWrite()");
     _executeSQLNoCallback(statement);
     log.exit("PFM_DB::executeWrite()");

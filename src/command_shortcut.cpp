@@ -15,7 +15,6 @@
 #include "db_shortcut.h"
 #include "shortcut_views.h"
 
-using namespace std;
 
 void Command::addShortcut() {
     AddShortcutView view;
@@ -24,7 +23,7 @@ void Command::addShortcut() {
     DBShortcut shortcut = view.getShortcut();
     shortcut.save();
 
-    vector<pair<string, string>> pairs = DBShortcut::populate();
+    std::vector<std::pair<std::string, std::string>> pairs = DBShortcut::populate();
     rl_utils::loadShortcuts(pairs);
 }
 
@@ -62,7 +61,7 @@ DBShortcut Command::getShortcut(int sequence) {
 }
 
 void Command::updateShortcut() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBShortcut shortcut = getShortcut(atoi(sequence.c_str()));
 
@@ -73,18 +72,18 @@ void Command::updateShortcut() {
     DBShortcut updatedShortcut = view.getShortcut();
     updatedShortcut.save();
 
-    vector<pair<string, string>> pairs = DBShortcut::populate();
+    std::vector<std::pair<std::string, std::string>> pairs = DBShortcut::populate();
     rl_utils::loadShortcuts(pairs);
 }
 
 void Command::deleteShortcut() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBShortcut shortcut = getShortcut(atoi(sequence.c_str()));
 
     shortcut.remove();
     shortcut.clear();
 
-    vector<pair<string, string>> pairs = DBShortcut::populate();
+    std::vector<std::pair<std::string, std::string>> pairs = DBShortcut::populate();
     rl_utils::loadShortcuts(pairs);
 }

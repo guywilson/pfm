@@ -19,7 +19,6 @@
 #include "logger.h"
 #include "strdate.h"
 
-using namespace std;
 
 DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
@@ -28,7 +27,7 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountID(pfm_id_t & ac
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringCharge> result;
 
     result.retrieve(statement);
@@ -47,7 +46,7 @@ DBResult<DBRecurringCharge> DBRecurringCharge::retrieveByAccountIDBetweenDates(p
     criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, dateAfter);
     criteria.add(DBPayment::Columns::date, DBCriteria::less_than, dateBefore);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringCharge> result;
 
     result.retrieve(statement);
@@ -240,7 +239,7 @@ void DBRecurringCharge::migrateToTransferCharge(pfm_id_t & accountToId) {
 
         db.commit();
     }
-    catch (exception & e) {
+    catch (std::exception & e) {
         db.rollback();
         log.error("Failed to migrate charge '%s'", this->description.c_str());
 

@@ -15,7 +15,6 @@
 #include "db_shortcut.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 #define CRITERIA_BUFFER_LENGTH                      64
 #define SHORTCUT_PROMPT_LENGTH                      80
@@ -136,7 +135,7 @@ class ShortcutDetailsListView : public CLIDetailListView {
 
         void show() override {
             CLIDetailListView::show();
-            cout << endl;
+            std::cout << std::endl;
         }
 };
 

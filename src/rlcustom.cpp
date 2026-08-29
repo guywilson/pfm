@@ -10,10 +10,9 @@
 #include "pfm_error.h"
 #include "rlcustom.h"
 
-using namespace std;
 
 uint16_t _lineLength = DEFAULT_LINE_LENGTH;
-unordered_map<string, string> shortcuts;
+std::unordered_map<std::string, std::string> shortcuts;
 
 static int handle_cancel_key(int count, int key) {
     throw pfm_field_cancel_error();
@@ -31,11 +30,11 @@ static int expand_shortcut(int count, int key) {
     int end = cursor;
 
     if (start < end) {
-        string word(rl_line_buffer + start, rl_line_buffer + end);
+        std::string word(rl_line_buffer + start, rl_line_buffer + end);
 
         auto it = shortcuts.find(word);
         if (it != shortcuts.end()) {
-            const string & replacement = it->second;
+            const std::string & replacement = it->second;
 
             // Remove the original word
             rl_delete_text(start, end);
@@ -66,10 +65,10 @@ static int limited_insert(int count, int key) {
     return 0;
 }
 
-void rl_utils::loadShortcuts(vector<pair<string, string>> & shortcutPairs) {
+void rl_utils::loadShortcuts(std::vector<std::pair<std::string, std::string>> & shortcutPairs) {
     shortcuts.clear();
     
-    for (pair<string, string> & p : shortcutPairs) {
+    for (std::pair<std::string, std::string> & p : shortcutPairs) {
         shortcuts.insert({p.first, p.second});
     }
 }

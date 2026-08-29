@@ -10,7 +10,7 @@
 
 # Version number for pfm
 MAJOR_VERSION = 2
-MINOR_VERSION = 3
+MINOR_VERSION = 4
 
 # Directories
 SOURCE = src

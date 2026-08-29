@@ -33,9 +33,8 @@
 #include "custom_modifiers.h"
 #include "system.h"
 
-using namespace std;
 
-bool Command::isStringNumeric(const string & s) {
+bool Command::isStringNumeric(const std::string & s) {
     bool isNumeric = true;
 
     for (char c : s) {
@@ -49,108 +48,108 @@ bool Command::isStringNumeric(const string & s) {
 }
 
 void Command::help() {
-    cout << "For more detailed help, please see the manual" << endl;
-    cout << "e.g. man pfm" << endl << endl;
+    std::cout << "For more detailed help, please see the manual" << std::endl;
+    std::cout << "e.g. man pfm" << std::endl << std::endl;
 
-    cout << "Commands supported:" << endl << endl;
+    std::cout << "Commands supported:" << std::endl << std::endl;
 
     for (const auto &entry : commandTable) {
         if (entry.helpText.length() == 0) {
             continue;
         }
         
-        cout << set_style(TextStyle::Bold, Colour::Magenta) << entry.name << set_style(TextStyle::Reset);
+        std::cout << set_style(TextStyle::Bold, Colour::Magenta) << entry.name << set_style(TextStyle::Reset);
 
         if (entry.aliases.empty()) {
-            cout << endl;
+            std::cout << std::endl;
         }
         else {
-            cout << " [ ";
+            std::cout << " [ ";
 
             size_t i = 0;
             for (const auto & alias : entry.aliases) {
-                cout << alias;
+                std::cout << alias;
 
                 if (i < entry.aliases.size() - 1) {
-                    cout << ", ";
+                    std::cout << ", ";
                 }
 
                 i++;
             }
 
-            cout << " ]" << endl;
+            std::cout << " ]" << std::endl;
         }
 
         if (entry.helpText.length() > 0) {
-            cout << entry.helpText << endl;
+            std::cout << entry.helpText << std::endl;
         }
-        cout << endl;
+        std::cout << std::endl;
     }
 
-    cout << endl;
+    std::cout << std::endl;
 }
 
 void Command::version() {
-    cout << "PFM version '" << getVersion() << "' - built [" << getBuildDate() << "]" << endl << endl;
+    std::cout << "PFM version '" << getVersion() << "' - built [" << getBuildDate() << "]" << std::endl << std::endl;
 }
 
-void Command::handleExceptions(const string & command, const string & token) {
-    string value = trim(token);
+void Command::handleExceptions(const std::string & command, const std::string & token) {
+    std::string value = trim(token);
 
     if (isStringNumeric(token)) {
         if (command == "list") {
-            string name = "rows";
+            std::string name = "rows";
             parameters[name].push_back(value);
         }
         else {
-            string name = SEQUENCE_PARAM_NAME;
+            std::string name = SEQUENCE_PARAM_NAME;
             parameters[name].push_back(value);
         }
     }
     else {
         if (value == "all" || value == "nr" || value == "rc") {
-            string name = "recurring";
+            std::string name = "recurring";
             parameters[name].push_back(value);
         }
         else if (value == "period" || value == "any") {
-            string name = "timeframe";
+            std::string name = "timeframe";
             parameters[name].push_back(value);
         }
         else if (value == "asc" || value == "desc") {
-            string name = "sort";
+            std::string name = "sort";
             parameters[name].push_back(value);
         }
         else if (value == "total") {
-            string name = "total";
+            std::string name = "total";
             parameters[name].push_back(value);
         }
         else {
-            string name = SIMPLE_PARAM_NAME;
+            std::string name = SIMPLE_PARAM_NAME;
             parameters[name].push_back(value);
         }
     }
 }
 
-string Command::parse(const string & commandLine) {
+std::string Command::parse(const std::string & commandLine) {
     parameters.clear();
 
     // Find command name (before first space)
     auto firstSpace = commandLine.find(' ');
 
-    if (firstSpace == string::npos) {
+    if (firstSpace == std::string::npos) {
         // No parameters; the whole line is just the command
         return trim(commandLine);
     }
 
-    string command   = trim(commandLine.substr(0, firstSpace));
-    string paramPart = commandLine.substr(firstSpace + 1);
+    std::string command   = trim(commandLine.substr(0, firstSpace));
+    std::string paramPart = commandLine.substr(firstSpace + 1);
 
     // Tokenize parameter part:
     // - split on whitespace when we are NOT inside quotes
     // - keep everything (including spaces) between quotes as part of one token
-    vector<string> tokens;
+    std::vector<std::string> tokens;
     bool inQuotes = false;
-    string current;
+    std::string current;
 
     for (char ch : paramPart) {
         if (ch == '"') {
@@ -178,7 +177,7 @@ string Command::parse(const string & commandLine) {
 
     // Process tokens as name:value or delegated to handleExceptions
     for (const auto & rawToken : tokens) {
-        string token = trim(rawToken);
+        std::string token = trim(rawToken);
         if (token.empty()) {
             continue;
         }
@@ -186,7 +185,7 @@ string Command::parse(const string & commandLine) {
         // Split "name:value" on the first ':'
         auto colonPos = token.find(':');
 
-        if (colonPos == string::npos) {
+        if (colonPos == std::string::npos) {
             /*
             ** No ':' present: treat as a 'simple' parameter and let
             ** handleExceptions() interpret it according to the command.
@@ -195,8 +194,8 @@ string Command::parse(const string & commandLine) {
             continue;
         }
 
-        string name  = trim(token.substr(0, colonPos));
-        string value = trim(token.substr(colonPos + 1));
+        std::string name  = trim(token.substr(0, colonPos));
+        std::string value = trim(token.substr(colonPos + 1));
 
         if (!name.empty()) {
             parameters[name].push_back(value);
@@ -206,8 +205,8 @@ string Command::parse(const string & commandLine) {
     return command;
 }
 
-string Command::parse(const httpserver::http_request & request) {
-    string_view sessionKey = request.get_header("X-Session-ID");
+std::string Command::parse(const httpserver::http_request & request) {
+    std::string_view sessionKey = request.get_header("X-Session-ID");
 
     SessionManager session;
 
@@ -226,14 +225,14 @@ string Command::parse(const httpserver::http_request & request) {
     return request.get_header("command-name").data();
 }
 
-bool Command::process(const string & commandLine) {
+bool Command::process(const std::string & commandLine) {
     clear_history();
 
-    for (string & cmd : commandHistory) {
+    for (std::string & cmd : commandHistory) {
         add_history(cmd.c_str());
     }
 
-    string command = parse(commandLine);
+    std::string command = parse(commandLine);
 
     add_history(commandLine.c_str());
     commandHistory.push_back(commandLine);
@@ -260,7 +259,7 @@ bool Command::process(const string & commandLine) {
             if (command == entry.name || isAlias) {
                 entry.handler(*this);
 
-                for (string & command : commandHistory) {
+                for (std::string & command : commandHistory) {
                     add_history(command.c_str());
                 }
 
@@ -276,7 +275,7 @@ bool Command::process(const string & commandLine) {
 }
 
 bool Command::process(const httpserver::http_request & request) {
-    string command = parse(request);
+    std::string command = parse(request);
 
     if (command.compare("version") == 0) {
         Command::version();

@@ -11,9 +11,8 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
-void DBConfig::retrieveByKey(const string & key) {
+void DBConfig::retrieveByKey(const std::string & key) {
     Logger & log = Logger::getInstance();
     log.entry("DBConfig::retrieveByKey()");
 
@@ -21,7 +20,7 @@ void DBConfig::retrieveByKey(const string & key) {
     criteria.add(Columns::key, DBCriteria::equal_to, key);
     criteria.add(Columns::isVisible, true);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBConfig> result;
 
     int rowsRetrievedCount = result.retrieve(statement);
@@ -45,7 +44,7 @@ DBResult<DBConfig> DBConfig::retrieveAllVisible() {
     DBCriteria criteria;
     criteria.add(Columns::isVisible, true);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBConfig> result;
 
     result.retrieve(statement);

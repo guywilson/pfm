@@ -13,9 +13,8 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
-string DBPrimaryAccount::getPrimaryAccountCode() {
+std::string DBPrimaryAccount::getPrimaryAccountCode() {
     Logger & log = Logger::getInstance();
     log.entry("DBPrimaryAccount::getPrimaryAccountCode()");
 
@@ -40,7 +39,7 @@ string DBPrimaryAccount::getPrimaryAccountCode() {
     log.exit("DBPrimaryAccount::getPrimaryAccountCode()");
 }
 
-void DBPrimaryAccount::setPrimaryAccount(string & accountCode) {
+void DBPrimaryAccount::setPrimaryAccount(std::string & accountCode) {
     Logger & log = Logger::getInstance();
     log.entry("DBPrimaryAccount::setPrimaryAccount()");
 

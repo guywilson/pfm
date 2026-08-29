@@ -190,7 +190,7 @@ std::string System::getKeyFromPassword(const std::string & password) {
 
     k[j] = 0;
 
-    string key(k);
+    std::string key(k);
 
 	free(keyBuffer);
 	free(k);

@@ -62,8 +62,6 @@
 
 //#define RUN_IN_DEBUGGER
 
-using namespace std;
-
 #define DEFAULT_DATABASE_NAME                   ".pfm"
 
 #ifndef RUN_IN_DEBUGGER
@@ -73,16 +71,16 @@ using namespace std;
 #endif
 
 static void printUsage(void) {
-    cout << "pfm [options]" << endl;
-    cout << "Options:" << endl;
-    cout << "\t-db <db name> if not specified, defaults to '.pfm' in the current dir" << endl;
-    cout << "\t-h displays the usage information" << endl;
-    cout << "\t--license, -l print the license" << endl;
-    cout << "\t--version, -v print the program version" << endl << endl;
+    std::cout << "pfm [options]" << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "\t-db <db name> if not specified, defaults to '.pfm' in the current dir" << std::endl;
+    std::cout << "\t-h displays the usage information" << std::endl;
+    std::cout << "\t--license, -l print the license" << std::endl;
+    std::cout << "\t--version, -v print the program version" << std::endl << std::endl;
 }
 
 static void printLicense(void) {
-    cout << licenseText << endl << endl;
+    std::cout << licenseText << std::endl << std::endl;
 }
 
 static void checkTerminalSize(void) {
@@ -121,11 +119,10 @@ static void checkTerminalSize(void) {
 }
 
 void unitTestCodeFragment() {
-    StrDateTest::run();
 }
 
 static void initialiseReferenceData() {
-    vector<pair<string, string>> shortcutPairs = DBShortcut::populate();
+    std::vector<std::pair<std::string, std::string>> shortcutPairs = DBShortcut::populate();
     
     rl_utils::setup();
     rl_utils::loadShortcuts(shortcutPairs);
@@ -148,10 +145,10 @@ static int commandProcessor() {
     int numAccounts = getNumAccounts();
 
     if (numAccounts == 0) {
-        cout << endl << "*** Welcome to PFM ***" << endl << endl << "Create your first account using the add-account command..." << endl << endl;
+        std::cout << std::endl << "*** Welcome to PFM ***" << std::endl << std::endl << "Create your first account using the add-account command..." << std::endl << std::endl;
     }
     else {
-        string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
+        std::string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
         command.process("use " + primaryAccountCode);
     }
 
@@ -161,23 +158,23 @@ static int commandProcessor() {
     while (loop) {
         rl_utils::setLineLength(DEFAULT_LINE_LENGTH);
 
-        string cmdString = readline("pfm > ");
+        std::string cmdString = readline("pfm > ");
 
         if (cmdString.length()) {
             try {
                 loop = command.process(cmdString);
             }
             catch (pfm_fatal & f) {
-                cerr << "Fatal error: " << f.what() << endl;
+                std::cerr << "Fatal error: " << f.what() << std::endl;
                 status = -1;
                 break;
             }
             catch (pfm_field_cancel_error & cancelledError) {
-                cout << endl;
+                std::cout << std::endl;
                 continue;
             }
             catch (pfm_error & e) {
-                cout << "Error running command: " << e.what() << endl;
+                std::cout << "Error running command: " << e.what() << std::endl;
             }
         }
     }
@@ -194,7 +191,7 @@ int main(int argc, char ** argv) {
     CmdArg cmdarg(argc, argv);
 
     while (cmdarg.hasMoreArgs()) {
-        string arg = cmdarg.nextArg();
+        std::string arg = cmdarg.nextArg();
 
         if (arg.compare("-db") == 0) {
             free(pszDatabase);
@@ -231,7 +228,7 @@ int main(int argc, char ** argv) {
             runScratch = true;
         }
         else {
-            cout << "Unknown argument '" << arg << "'" << endl;
+            std::cout << "Unknown argument '" << arg << "'" << std::endl;
             printUsage();
             return 0;
         }

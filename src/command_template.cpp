@@ -18,7 +18,6 @@
 #include "db_public_holiday.h"
 #include "cli_widget.h"
 
-using namespace std;
 
 static DBAccount * createSampleAccount() {
     DBAccount * account = new DBAccount();
@@ -96,24 +95,24 @@ static DBTransaction * createSampleTransaction() {
 }
 
 void Command::saveJsonTemplate() {
-    cout << "For which entity do you want a JSON template:" << endl;
-    cout << "1) Account" << endl;
-    cout << "2) Payee" << endl;
-    cout << "3) Category" << endl;
-    cout << "4) Public Holiday" << endl;
-    cout << "5) Recurring Charge" << endl;
-    cout << "6) Transaction" << endl;
+    std::cout << "For which entity do you want a JSON template:" << std::endl;
+    std::cout << "1) Account" << std::endl;
+    std::cout << "2) Payee" << std::endl;
+    std::cout << "3) Category" << std::endl;
+    std::cout << "4) Public Holiday" << std::endl;
+    std::cout << "5) Recurring Charge" << std::endl;
+    std::cout << "6) Transaction" << std::endl;
 
     CLITextField optionField = CLITextField("Enter option: ");
     optionField.show();
 
     int option = (int)optionField.getIntegerValue();
 
-    cout << "Option = " << option << endl;
+    std::cout << "Option = " << option << std::endl;
 
     DBEntity * entity;
-    string name;
-    string className;
+    std::string name;
+    std::string className;
 
     switch (option) {
         case 1:
@@ -155,10 +154,10 @@ void Command::saveJsonTemplate() {
                         __LINE__);
     }
 
-    string filename = name + "_template.json";
+    std::string filename = name + "_template.json";
     JFileWriter writer(filename, entity->getClassName());
 
-    vector<JRecord> records;
+    std::vector<JRecord> records;
 
     records.push_back(entity->getRecord());
     records.push_back(entity->getRecord());

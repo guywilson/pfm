@@ -13,7 +13,6 @@
 #include "db_payee.h"
 #include "payee_views.h"
 
-using namespace std;
 
 void Command::addPayee() {
     AddPayeeView view;
@@ -34,7 +33,7 @@ void Command::listPayees() {
     view.show();
 }
 
-DBPayee Command::getPayee(string & payeeCode) {
+DBPayee Command::getPayee(std::string & payeeCode) {
     if (payeeCode.length() == 0) {
         ChoosePayeeView view;
         view.show();
@@ -49,7 +48,7 @@ DBPayee Command::getPayee(string & payeeCode) {
 }
 
 void Command::updatePayee() {
-    string payeeCode;
+    std::string payeeCode;
 
     if (hasParameters()) {
         payeeCode = getParameter(SIMPLE_PARAM_NAME);
@@ -66,7 +65,7 @@ void Command::updatePayee() {
 }
 
 void Command::deletePayee() {
-    string payeeCode;
+    std::string payeeCode;
 
     if (hasParameters()) {
         payeeCode = getParameter(SIMPLE_PARAM_NAME);
@@ -79,12 +78,12 @@ void Command::deletePayee() {
 }
 
 void Command::importPayees() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBPayee");
 
-    vector<JRecord> records = jfile.read("payees");
+    std::vector<JRecord> records = jfile.read("payees");
 
     for (JRecord & record : records) {
         DBPayee payee;
@@ -95,12 +94,12 @@ void Command::importPayees() {
 }
 
 void Command::exportPayees() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBPayee> results;
     results.retrieveAll();
 
-    vector<JRecord> records;
+    std::vector<JRecord> records;
 
     for (size_t i = 0;i < results.size();i++) {
         DBPayee payee = results.at(i);

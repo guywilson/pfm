@@ -15,7 +15,6 @@
 #include "db_v_transaction.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 #ifndef __TRANSACTION_VIEW
 #define __TRANSACTION_VIEW
@@ -52,7 +51,7 @@ class AddTransactionView : public CLIView {
             isReconciledField.setLengthLimit(1);
             isReconciledField.setDefaultValue("N");
 
-            string today = StrDate::today();
+            std::string today = StrDate::today();
             dateField.setDefaultValue(today);
         }
 
@@ -198,7 +197,7 @@ class TransactionListView : public CLIListView {
             setTitle(szTitle);
         }
 
-        void addResults(DBResult<DBTransactionView> & result, string & accountCode) {
+        void addResults(DBResult<DBTransactionView> & result, std::string & accountCode) {
             buildResultsTable(result, false);
 
             char szTitle[TITLE_BUFFER_LEN];
@@ -214,7 +213,7 @@ class TransactionListView : public CLIListView {
                 showTotal("Total amount: ", total);
             }
             else {
-                cout << endl;
+                std::cout << std::endl;
             }
         }
 };
@@ -273,7 +272,7 @@ class TransactionDetailsListView : public CLIDetailListView {
                 showTotal("Total amount: ", total, 47);
             }
             else {
-                cout << endl;
+                std::cout << std::endl;
             }
         }
 };
@@ -293,9 +292,9 @@ class TransactionDetailsView : public CLITable {
             DBPayee payee;
             payee.retrieve(transaction.payeeId);
 
-            string accountDetails = "(" + account.code + ") " + account.name;
-            string categoryDetails = "(" + category.code + ") " + category.description;
-            string payeeDetails = "(" + payee.code + ") " + payee.name;
+            std::string accountDetails = "(" + account.code + ") " + account.name;
+            std::string categoryDetails = "(" + category.code + ") " + category.description;
+            std::string payeeDetails = "(" + payee.code + ") " + payee.name;
 
             addCell(CLITableCell("Account", accountDetails, 25), 0, 0);
             addCell(CLITableCell("Category", categoryDetails, 25), 0, 1);
@@ -344,7 +343,7 @@ class TransactionCategoryReportListView : public CLIListView {
 
                 row.addCell(transaction.category);
                 row.addCell(transaction.total);
-                row.addCell(string(percentOfTotal));
+                row.addCell(std::string(percentOfTotal));
 
                 addRow(row);
             }
@@ -368,7 +367,7 @@ class TransactionCategoryReportListView : public CLIListView {
                 15);
         }
 
-        void addResults(DBResult<DBTransactionView> & result, const string & accountCode, StrDate & periodStart, StrDate & periodEnd) {
+        void addResults(DBResult<DBTransactionView> & result, const std::string & accountCode, StrDate & periodStart, StrDate & periodEnd) {
             char szTitle[TITLE_BUFFER_LEN];
 
             snprintf(
@@ -424,7 +423,7 @@ class TransactionPayeeReportListView : public CLIListView {
 
                 row.addCell(transaction.payee);
                 row.addCell(transaction.total);
-                row.addCell(string(percentOfTotal));
+                row.addCell(std::string(percentOfTotal));
 
                 addRow(row);
             }
@@ -448,7 +447,7 @@ class TransactionPayeeReportListView : public CLIListView {
                 15);
         }
 
-        void addResults(DBResult<DBTransactionView> & result, const string & accountCode, StrDate & periodStart, StrDate & periodEnd) {
+        void addResults(DBResult<DBTransactionView> & result, const std::string & accountCode, StrDate & periodStart, StrDate & periodEnd) {
             char szTitle[TITLE_BUFFER_LEN];
 
             snprintf(
@@ -612,7 +611,7 @@ class FindTransactionView : public CLIView {
         FindTransactionView() : FindTransactionView("Find transactions") {}
 
         FindTransactionView(const char * title) : CLIView(title) {
-            string today = StrDate::today();
+            std::string today = StrDate::today();
             beforeDateField.setDefaultValue(today);
             recurringIncludeType.setDefaultValue("no");
         }
@@ -635,7 +634,7 @@ class FindTransactionView : public CLIView {
             DBAccount account = accountField.getAccount();
             DBCategory category = categoryField.getCategory();
             DBPayee payee = payeeField.getPayee();
-            string description = descriptionField.getValue();
+            std::string description = descriptionField.getValue();
             StrDate afterDate = afterDateField.getValue();
             StrDate beforeDate = beforeDateField.getValue();
 
@@ -652,7 +651,7 @@ class FindTransactionView : public CLIView {
             }
 
             if (descriptionField.getValue().length() > 0) {
-                string d = '%' + description + '%';
+                std::string d = '%' + description + '%';
                 criteria.add("description", DBCriteria::like, d);
             }
 

@@ -16,7 +16,6 @@
 #include "db_carried_over.h"
 #include "db_transaction.h"
 
-using namespace std;
 
 #define NUM_PAYEES                      21
 
@@ -68,7 +67,7 @@ static void createPayees() {
 }
 
 pfm_id_t getCategoryId(const char * categoryCode) {
-    string code(categoryCode);
+    std::string code(categoryCode);
 
     DBCategory category;
     category.retrieveByCode(code);
@@ -77,7 +76,7 @@ pfm_id_t getCategoryId(const char * categoryCode) {
 }
 
 pfm_id_t getPayeeId(const char * payeeCode) {
-    string code(payeeCode);
+    std::string code(payeeCode);
 
     DBPayee payee;
     payee.retrieveByCode(code);
@@ -161,7 +160,7 @@ void testAccount() {
 
     Command command;
 
-    string cmdString = "use HSBC";
+    std::string cmdString = "use HSBC";
     command.process(cmdString);
 
     /*

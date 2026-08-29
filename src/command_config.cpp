@@ -13,10 +13,9 @@
 #include "db_config.h"
 #include "config_views.h"
 
-using namespace std;
 
 void Command::addConfig() {
-    string accessKey = System::getKey("Access password: ");
+    std::string accessKey = System::getKey("Access password: ");
 
     if (accessKey.compare(cfg.getValue("access.key")) == 0) {
         AddConfigView view;
@@ -27,7 +26,7 @@ void Command::addConfig() {
         config.save();
     }
     else {
-        cout << "Invalid access password supplied" << endl << endl;
+        std::cout << "Invalid access password supplied" << std::endl << std::endl;
     }
 }
 
@@ -40,7 +39,7 @@ void Command::listConfigItems() {
     view.show();
 }
 
-DBConfig Command::getConfig(string & key) {
+DBConfig Command::getConfig(std::string & key) {
     if (key.length() == 0) {
         ChooseConfigView view;
         view.show();
@@ -55,7 +54,7 @@ DBConfig Command::getConfig(string & key) {
 }
 
 void Command::updateConfig() {
-    string configKey;
+    std::string configKey;
 
     if (hasParameters()) {
         configKey = getParameter(SIMPLE_PARAM_NAME);
@@ -79,7 +78,7 @@ void Command::updateConfig() {
 }
 
 void Command::deleteConfig() {
-    string configKey;
+    std::string configKey;
 
     if (hasParameters()) {
         configKey = getParameter(SIMPLE_PARAM_NAME);
@@ -87,7 +86,7 @@ void Command::deleteConfig() {
 
     DBConfig config = getConfig(configKey);
 
-    string accessKey = System::getKey("Access password: ");
+    std::string accessKey = System::getKey("Access password: ");
 
     if (accessKey.compare(cfg.getValue("access.key")) == 0) {
         if (config.isReadOnly) {
@@ -101,6 +100,6 @@ void Command::deleteConfig() {
         config.clear();
     }
     else {
-        cout << "Invalid access password supplied" << endl << endl;
+        std::cout << "Invalid access password supplied" << std::endl << std::endl;
     }
 }

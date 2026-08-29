@@ -18,7 +18,6 @@
 #include "jfile.h"
 #include "strdate.h"
 
-using namespace std;
 
 #define CHARGE_OK                   0
 #define CHARGE_NOT_DUE              -1
@@ -26,7 +25,7 @@ using namespace std;
 enum class FrequencyUnit { Days, Weeks, Months, Years };
 
 struct Frequency {
-    string _fstr;
+    std::string _fstr;
 
     int count;
     FrequencyUnit unit;
@@ -35,15 +34,15 @@ struct Frequency {
         return _fstr.c_str();
     }
 
-    string toString() {
+    std::string toString() {
         return _fstr;
     }
 
-    void set(const string & freqStr) {
+    void set(const std::string & freqStr) {
         _fstr = freqStr;
     }
 
-    static Frequency parse(const string & freqStr) {
+    static Frequency parse(const std::string & freqStr) {
         if (freqStr.empty()) {
             throw std::invalid_argument("Empty frequency string");
         }
@@ -120,14 +119,14 @@ class DBRecurringCharge : public DBPayment {
             return x;
         }
 
-        const string getInsertStatementForRestore() {
+        const std::string getInsertStatementForRestore() {
             account.retrieve(accountId);
 
-            string accountSubSelect = account.getIDByCodeSubSelect();
-            string categorySubSelect = category.getIDByCodeSubSelect();
-            string payeeSubSelect = payee.getIDByCodeSubSelect();
+            std::string accountSubSelect = account.getIDByCodeSubSelect();
+            std::string categorySubSelect = category.getIDByCodeSubSelect();
+            std::string payeeSubSelect = payee.getIDByCodeSubSelect();
 
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{DBPayment::Columns::accountId, DBPayment::Columns::accountId_type}, accountSubSelect},
                 {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categorySubSelect},
                 {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeSubSelect},
@@ -158,7 +157,7 @@ class DBRecurringCharge : public DBPayment {
             static constexpr ColumnType endDate_type = ColumnType::DATE;
         };
 
-        string transferTo;
+        std::string transferTo;
 
     public:
         StrDate lastPaymentDate;
@@ -177,12 +176,12 @@ class DBRecurringCharge : public DBPayment {
             clear();
         }
 
-        static const string getCSVHeader() {
+        static const std::string getCSVHeader() {
             return "accountCode,categoryCode,payeeCode,date,endDate,description,frequency,amount\n";
         }
 
-        string getCSVRecord() {
-            string record = 
+        std::string getCSVRecord() {
+            std::string record =
                     "\"" + getAccountCode() + "\"," + 
                     "\"" + category.code + "\"," +
                     "\"" + payee.code + "\"," +
@@ -246,12 +245,12 @@ class DBRecurringCharge : public DBPayment {
         void print() {
             DBPayment::print();
 
-            cout << "LastPaymentDate: '" << lastPaymentDate.shortDate() << "'" << endl;
-            cout << "Frequency: '" << frequency.toString() << "'" << endl;
-            cout << "EndDate: '" << endDate.shortDate() << "'" << endl;
+            std::cout << "LastPaymentDate: '" << lastPaymentDate.shortDate() << "'" << std::endl;
+            std::cout << "Frequency: '" << frequency.toString() << "'" << std::endl;
+            std::cout << "EndDate: '" << endDate.shortDate() << "'" << std::endl;
         }
 
-        string getIDByCriteriaSubSelect() {
+        std::string getIDByCriteriaSubSelect() {
             account.retrieve(accountId);
 
             DBCriteria criteria;
@@ -261,22 +260,22 @@ class DBRecurringCharge : public DBPayment {
             criteria.add(DBPayment::Columns::description, DBCriteria::equal_to, description);
             criteria.add(DBPayment::Columns::amount, DBCriteria::equal_to, amount);
 
-            const string idName = DBEntity::Columns::id;
-            string statement = "(SELECT " + idName + " FROM " + getTableName() + criteria.getWhereClause() + ")";
+            const std::string idName = DBEntity::Columns::id;
+            std::string statement = "(SELECT " + idName + " FROM " + getTableName() + criteria.getWhereClause() + ")";
 
             return statement;
         }
 
-        void backup(ofstream & os) override {
+        void backup(std::ofstream & os) override {
             DBResult<DBRecurringCharge> results;
             results.retrieveAll();
 
-            os << getDeleteAllStatement() << endl;
+            os << getDeleteAllStatement() << std::endl;
 
             for (size_t i = 0;i < results.size();i++) {
                 DBRecurringCharge charge = results[i];
 
-                os << charge.getInsertStatementForRestore() << endl;
+                os << charge.getInsertStatementForRestore() << std::endl;
             }
 
             os.flush();
@@ -310,7 +309,7 @@ class DBRecurringCharge : public DBPayment {
             rc.save();
         }
 
-        void inline setTransferToAccount(string & accountCode) {
+        void inline setTransferToAccount(std::string & accountCode) {
             transferTo = accountCode;
         }
 
@@ -329,20 +328,20 @@ class DBRecurringCharge : public DBPayment {
 
         void migrateToTransferCharge(pfm_id_t & accountToId);
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "recurring_charge";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBRecurringCharge";
         }
 
-        const string getJSONArrayName() const override {
+        const std::string getJSONArrayName() const override {
             return "charges";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{DBPayment::Columns::accountId, DBPayment::Columns::accountId_type}, accountId.getValue()},
                 {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categoryId.getValue()},
                 {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeId.getValue()},
@@ -358,8 +357,8 @@ class DBRecurringCharge : public DBPayment {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categoryId.getValue()},
                 {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeId.getValue()},
                 {{DBPayment::Columns::date, DBPayment::Columns::date_type}, date.shortDate()},

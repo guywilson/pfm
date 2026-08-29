@@ -5,9 +5,9 @@
 
 #include "logger.h"
 
-class thread_error : public exception {
+class thread_error : public std::exception {
     private:
-        string message;
+        std::string message;
 
     public:
         const char * getTitle() {

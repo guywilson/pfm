@@ -9,7 +9,6 @@
 #include "db_category.h"
 #include "db_payee.h"
 
-using namespace std;
 
 #define DATE_FIELD_LENGTH                       10
 #define TIMESTAMP_FIELD_LENGTH                  19
@@ -20,7 +19,7 @@ class CategorySpinField : public CLISpinTextField {
 
     public:
         CategorySpinField() : CLISpinTextField() {}
-        CategorySpinField(string & label) : CLISpinTextField(label) {}
+        CategorySpinField(std::string & label) : CLISpinTextField(label) {}
         CategorySpinField(const char * label) : CLISpinTextField(label) {}
 
         void show() override {
@@ -36,7 +35,7 @@ class CategorySpinField : public CLISpinTextField {
 
             populate();
 
-            string code = readLine();
+            std::string code = readLine();
             _setValue(code);
 
             category.retrieveByCode(code);
@@ -66,7 +65,7 @@ class PayeeSpinField : public CLISpinTextField {
 
     public:
         PayeeSpinField() : CLISpinTextField() {}
-        PayeeSpinField(string & label) : CLISpinTextField(label) {}
+        PayeeSpinField(std::string & label) : CLISpinTextField(label) {}
         PayeeSpinField(const char * label) : CLISpinTextField(label) {}
 
         void show() override {
@@ -80,7 +79,7 @@ class PayeeSpinField : public CLISpinTextField {
 
             populate();
 
-            string code = readLine();
+            std::string code = readLine();
             _setValue(code);
 
             payee.retrieveByCode(code);
@@ -110,7 +109,7 @@ class AccountSpinField : public CLISpinTextField {
 
     public:
         AccountSpinField() : CLISpinTextField() {}
-        AccountSpinField(string & label) : CLISpinTextField(label) {}
+        AccountSpinField(std::string & label) : CLISpinTextField(label) {}
         AccountSpinField(const char * label) : CLISpinTextField(label) {}
 
         void show() override {
@@ -124,7 +123,7 @@ class AccountSpinField : public CLISpinTextField {
 
             populate();
 
-            string code = readLine();
+            std::string code = readLine();
 
             if (code.length() > 0) {
                 _setValue(code);
@@ -176,7 +175,7 @@ class DateField : public CLITextField {
             setLengthLimit(DATE_FIELD_LENGTH);
         }
 
-        DateField(string & label) : CLITextField(label) {
+        DateField(std::string & label) : CLITextField(label) {
             setLengthLimit(DATE_FIELD_LENGTH);
         }
 
@@ -191,7 +190,7 @@ class DateField : public CLITextField {
             
             bool isDateValid = false;
             int attempts = 0;
-            string line;
+            std::string line;
 
             while (!isDateValid && attempts < maxAttemps) {
                 line = readLine();
@@ -219,7 +218,7 @@ class FrequencyField : public CLITextField {
     private:
         const int maxAttemps = 5;
 
-        bool validate(string & frequency) {
+        bool validate(std::string & frequency) {
             if (!isLengthValid(frequency) || !isFirstCharValid(frequency) || !isLastCharValid(frequency)) {
                 return false;
             }
@@ -227,15 +226,15 @@ class FrequencyField : public CLITextField {
             return true;
         }
 
-        bool isLengthValid(string & frequency) {
+        bool isLengthValid(std::string & frequency) {
             return (frequency.length() >= 2);
         }
 
-        bool isFirstCharValid(string & frequency) {
+        bool isFirstCharValid(std::string & frequency) {
             return (isdigit(frequency.at(0)));
         }
 
-        bool isLastCharValid(string & frequency) {
+        bool isLastCharValid(std::string & frequency) {
             if (frequency.back() != 'w' && 
                 frequency.back() != 'm' && 
                 frequency.back() != 'y' &&
@@ -250,7 +249,7 @@ class FrequencyField : public CLITextField {
 
     public:
         FrequencyField() : CLITextField() {}
-        FrequencyField(string & label) : CLITextField(label) {}
+        FrequencyField(std::string & label) : CLITextField(label) {}
         FrequencyField(const char * label) : CLITextField(label) {}
 
         void show() override {
@@ -258,7 +257,7 @@ class FrequencyField : public CLITextField {
 
             bool isFrequencyValid = false;
             int attempts = 0;
-            string line;
+            std::string line;
 
             while (!isFrequencyValid && attempts < maxAttemps) {
                 line = readLine();

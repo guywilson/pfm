@@ -15,17 +15,16 @@
 #include "money.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 class DBCarriedOver : public DBEntity {
     private:
-        const string getInsertStatementForRestore() {
+        const std::string getInsertStatementForRestore() {
             DBAccount account;
             account.retrieve(accountId);
 
-            string accountSubSelect = account.getIDByCodeSubSelect();
+            std::string accountSubSelect = account.getIDByCodeSubSelect();
 
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::accountId, Columns::accountId_type}, accountSubSelect},
                 {{Columns::date, Columns::date_type}, date.shortDate()},
                 {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
@@ -53,7 +52,7 @@ class DBCarriedOver : public DBEntity {
     public:
         pfm_id_t accountId;
         StrDate date;
-        string description;
+        std::string description;
         Money balance;
 
         DBCarriedOver() : DBEntity() {
@@ -85,24 +84,24 @@ class DBCarriedOver : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "AccountId: " << accountId.getValue() << endl;
-            cout << "Date: '" << date.shortDate() << "'" << endl;
-            cout << "Description: '" << description << "'" << endl;
+            std::cout << "AccountId: " << accountId.getValue() << std::endl;
+            std::cout << "Date: '" << date.shortDate() << "'" << std::endl;
+            std::cout << "Description: '" << description << "'" << std::endl;
 
-            cout << fixed << setprecision(2);
-            cout << "Balance: " << balance.localeFormattedStringValue() << endl;
+            std::cout << std::fixed << std::setprecision(2);
+            std::cout << "Balance: " << balance.localeFormattedStringValue() << std::endl;
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "carried_over_log";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBCarriedOver";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::accountId, Columns::accountId_type}, accountId.getValue()},
                 {{Columns::date, Columns::date_type}, date.shortDate()},
                 {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
@@ -112,8 +111,8 @@ class DBCarriedOver : public DBEntity {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::accountId, Columns::accountId_type}, accountId.getValue()},
                 {{Columns::date, Columns::date_type}, date.shortDate()},
                 {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
@@ -123,14 +122,14 @@ class DBCarriedOver : public DBEntity {
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
-        void backup(ofstream & os) override {
+        void backup(std::ofstream & os) override {
             DBResult<DBCarriedOver> results;
             results.retrieveAll();
 
-            os << getDeleteAllStatement() << endl;
+            os << getDeleteAllStatement() << std::endl;
 
             for (size_t i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatementForRestore() << endl;
+                os << results[i].getInsertStatementForRestore() << std::endl;
             }
 
             os.flush();

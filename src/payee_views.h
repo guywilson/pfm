@@ -11,7 +11,6 @@
 #include "custom_widgets.h"
 #include "db_payee.h"
 
-using namespace std;
 
 class AddPayeeView : public CLIView {
     private:
@@ -60,7 +59,7 @@ class ChoosePayeeView : public CLIView {
             codeField.show();
         }
 
-        string getCode() {
+        std::string getCode() {
             return codeField.getValue();
         }
 };

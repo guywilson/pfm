@@ -6,13 +6,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-using namespace std;
 
 #define MESSAGE_BUFFER_LEN                  4096
 
-class pfm_error : public exception {
+class pfm_error : public std::exception {
     private:
-        string          message;
+        std::string          message;
 
     public:
         const char * getTitle() {
@@ -91,10 +90,10 @@ class pfm_field_cancel_error : public pfm_error {
 };
 
 
-class calc_error : public exception
+class calc_error : public std::exception
 {
     private:
-        string          message;
+        std::string          message;
 
     public:
         const char * getTitle() {

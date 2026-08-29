@@ -12,7 +12,6 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
 DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t & accountId) {
     Logger & log = Logger::getInstance();
@@ -21,7 +20,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t & ac
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransactionView> result;
 
     result.retrieve(statement);
@@ -43,7 +42,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountID(pfm_id_t & ac
         criteria.setRowLimit(rowLimit);
     }
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
     DBResult<DBTransactionView> result;
 
@@ -79,7 +78,7 @@ DBResult<DBTransactionView> DBTransactionView::listByAccountID(pfm_id_t & accoun
         criteria.setRowLimit(rowLimit);
     }
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
     DBResult<DBTransactionView> result;
 
@@ -98,7 +97,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, accountId);
     criteria.add(Columns::isReconciled, true);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransactionView> result;
 
     result.retrieve(statement);
@@ -108,10 +107,10 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountID(pfm
     return result;
 }
 
-DBResult<DBTransactionView> DBTransactionView::findTransactions(const string & sql) {
+DBResult<DBTransactionView> DBTransactionView::findTransactions(const std::string & sql) {
     DBResult<DBTransactionView> result;
 
-    string statement = getSelectStatement() + " WHERE " + sql;
+    std::string statement = getSelectStatement() + " WHERE " + sql;
 
     result.retrieve(statement);
 
@@ -124,7 +123,7 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForCriteria(DBCri
     criteria.addOrderBy(DBPayment::Columns::date, DBCriteria::descending);
     criteria.setRowLimit(SQL_ROW_LIMIT);
 
-    string statement = getSelectStatement() + criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() + criteria.getStatementCriteria();
 
     result.retrieve(statement);
 
@@ -139,7 +138,7 @@ DBResult<DBTransactionView> DBTransactionView::findTransactionsForAccountID(pfm_
     criteria.addOrderBy(DBPayment::Columns::date, DBCriteria::descending);
     criteria.setRowLimit(SQL_ROW_LIMIT);
 
-    string statement = getSelectStatement() + criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() + criteria.getStatementCriteria();
 
     DBResult<DBTransactionView> result;
     result.retrieve(statement);
@@ -159,7 +158,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveByAccountIDForPeriod(pfm_
     criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, secondDate);
     criteria.addOrderBy(DBPayment::Columns::date, dateSortDirection);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
     DBResult<DBTransactionView> result;
 
@@ -180,7 +179,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveReconciledByAccountIDForP
     criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, firstDate);
     criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, secondDate);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
     DBResult<DBTransactionView> result;
 
@@ -201,7 +200,7 @@ DBResult<DBTransactionView> DBTransactionView::retrieveNonRecurringByAccountIDFo
     criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, firstDate);
     criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, secondDate);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     
     DBResult<DBTransactionView> result;
 
@@ -216,7 +215,7 @@ DBResult<DBTransactionView> DBTransactionView::reportByCategory(DBAccount & acco
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::reportByCategory()");
 
-    string statement = "SELECT ";
+    std::string statement = "SELECT ";
 
     statement.append(Columns::category);
     statement.append(", ");
@@ -229,7 +228,7 @@ DBResult<DBTransactionView> DBTransactionView::reportByCategory(DBAccount & acco
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, account.id);
     criteria.add(Columns::recurring, false);
-    criteria.add(Columns::type, DBCriteria::equal_to, string(TYPE_DEBIT));
+    criteria.add(Columns::type, DBCriteria::equal_to, std::string(TYPE_DEBIT));
     criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, periodStart);
     criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, periodEnd);
     criteria.addGroupBy(Columns::category);
@@ -248,7 +247,7 @@ DBResult<DBTransactionView> DBTransactionView::reportByPayee(DBAccount & account
     Logger & log = Logger::getInstance();
     log.entry("DBTransactionView::reportByPayee()");
 
-    string statement = "SELECT ";
+    std::string statement = "SELECT ";
 
     statement.append(Columns::payee);
     statement.append(", ");
@@ -261,7 +260,7 @@ DBResult<DBTransactionView> DBTransactionView::reportByPayee(DBAccount & account
     DBCriteria criteria;
     criteria.add(DBPayment::Columns::accountId, DBCriteria::equal_to, account.id);
     criteria.add(Columns::recurring, false);
-    criteria.add(Columns::type, DBCriteria::equal_to, string(TYPE_DEBIT));
+    criteria.add(Columns::type, DBCriteria::equal_to, std::string(TYPE_DEBIT));
     criteria.add(DBPayment::Columns::date, DBCriteria::greater_than_or_equal, periodStart);
     criteria.add(DBPayment::Columns::date, DBCriteria::less_than_or_equal, periodEnd);
     criteria.addGroupBy(Columns::payee);

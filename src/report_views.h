@@ -17,7 +17,6 @@
 #include "db_transaction_report.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 #define CRITERIA_BUFFER_LENGTH                      64
 #define REPORT_PROMPT_LENGTH                       256
@@ -82,7 +81,7 @@ class ReportDetailsListView : public CLIDetailListView {
 
         void show() override {
             CLIDetailListView::show();
-            cout << endl;
+            std::cout << std::endl;
         }
 };
 
@@ -145,7 +144,7 @@ class ReportListView : public CLIListView {
 class UpdateReportView : public CLIView {
     private:
         pfm_id_t reportId;
-        string sql;
+        std::string sql;
 
         CLITextField descriptionField;
         CLITextField sqlField;

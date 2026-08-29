@@ -11,9 +11,8 @@
 #include "db_base.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
-static bool inline isStringHexadecimal(string & value) {
+static bool inline isStringHexadecimal(std::string & value) {
     if (value[0] == '0' && (value[1] == 'x' || value[1] == 'X')) {
         return true;
     }
@@ -21,12 +20,12 @@ static bool inline isStringHexadecimal(string & value) {
     return false;
 }
 
-static const char * getHexadecimalValue(string & value) {
-    static string hexValue = value.substr(2);
+static const char * getHexadecimalValue(std::string & value) {
+    static std::string hexValue = value.substr(2);
     return hexValue.c_str();
 }
 
-static const char * getDecimalValue(string & value) {
+static const char * getDecimalValue(std::string & value) {
     return value.c_str();
 }
 
@@ -44,8 +43,8 @@ void cfgmgr::initialise() {
     for (size_t i = 0;i < results.size();i++) {
         DBConfig item = results.at(i);
 
-        string key = item.key;
-        string value = item.value;
+        std::string key = item.key;
+        std::string value = item.value;
 
         this->values[key] = value;
     }
@@ -53,7 +52,7 @@ void cfgmgr::initialise() {
     isConfigured = true;
 }
 
-string cfgmgr::getValue(const string & key) {
+std::string cfgmgr::getValue(const std::string & key) {
     if (values.count(key) == 0) {
         return "";
     }
@@ -61,20 +60,20 @@ string cfgmgr::getValue(const string & key) {
     return values[key];
 }
 
-bool cfgmgr::getValueAsBoolean(const string & key) {
-    string value = getValue(key);
+bool cfgmgr::getValueAsBoolean(const std::string & key) {
+    std::string value = getValue(key);
 
     return ((value.compare("yes") == 0  || value.compare("true") == 0 || value.compare("on") == 0) ? true : false);
 }
 
-int cfgmgr::getValueAsInteger(const string & key) {
-    string value = getValue(key);
+int cfgmgr::getValueAsInteger(const std::string & key) {
+    std::string value = getValue(key);
 
     return atoi(getDecimalValue(value));
 }
 
-int32_t cfgmgr::getValueAsLongInteger(const string & key) {
-    string value = getValue(key);
+int32_t cfgmgr::getValueAsLongInteger(const std::string & key) {
+    std::string value = getValue(key);
 
     if (isStringHexadecimal(value)) {
         return strtol(getHexadecimalValue(value), NULL, 16);
@@ -84,8 +83,8 @@ int32_t cfgmgr::getValueAsLongInteger(const string & key) {
     }
 }
 
-uint32_t cfgmgr::getValueAsLongUnsignedInteger(const string & key) {
-    string value = getValue(key);
+uint32_t cfgmgr::getValueAsLongUnsignedInteger(const std::string & key) {
+    std::string value = getValue(key);
 
     if (isStringHexadecimal(value)) {
         return strtoul(getHexadecimalValue(value), NULL, 16);
@@ -95,8 +94,8 @@ uint32_t cfgmgr::getValueAsLongUnsignedInteger(const string & key) {
     }
 }
 
-double cfgmgr::getValueAsDouble(const string & key) {
-    string value = getValue(key);
+double cfgmgr::getValueAsDouble(const std::string & key) {
+    std::string value = getValue(key);
 
     return strtod(getDecimalValue(value), NULL);
 }
@@ -104,10 +103,10 @@ double cfgmgr::getValueAsDouble(const string & key) {
 void cfgmgr::dumpConfig() {
     if (isConfigured) {
         for (auto& i : values) {
-            string key = i.first;
-            string value = i.second;
+            std::string key = i.first;
+            std::string value = i.second;
 
-            cout << "'" << key << "' = '" << value << "'" << endl;
+            std::cout << "'" << key << "' = '" << value << "'" << std::endl;
         }
     }
 }

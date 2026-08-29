@@ -15,7 +15,6 @@
 #include "money.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 class DBTransferTransactionRecord : public DBEntity {
     protected:
@@ -62,21 +61,21 @@ class DBTransferTransactionRecord : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "TransactionFromId: " << transactionFromId.getValue() << endl;
-            cout << "TransactionToId: " << transactionToId.getValue() << endl;
-            cout << "TransactionDate: " << transactionDate.shortDate() << endl;
+            std::cout << "TransactionFromId: " << transactionFromId.getValue() << std::endl;
+            std::cout << "TransactionToId: " << transactionToId.getValue() << std::endl;
+            std::cout << "TransactionDate: " << transactionDate.shortDate() << std::endl;
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "transfer_transaction_record";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBTransferTransactionRecord";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::transactionToId, Columns::transactionToId_type}, transactionToId.getValue()},
                 {{Columns::transactionFromId, Columns::transactionFromId_type}, transactionFromId.getValue()},
                 {{Columns::transactionDate, Columns::transactionDate_type}, transactionDate.shortDate()}
@@ -85,8 +84,8 @@ class DBTransferTransactionRecord : public DBEntity {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::transactionToId, Columns::transactionToId_type}, transactionToId.getValue()},
                 {{Columns::transactionFromId, Columns::transactionFromId_type}, transactionFromId.getValue()},
                 {{Columns::transactionDate, Columns::transactionDate_type}, transactionDate.shortDate()}

@@ -55,7 +55,7 @@ class CLIListColumn : public CLIField {
         }
 
         int getColumnWidth() {
-            string columnName = getName();
+            std::string columnName = getName();
 
             return (columnName.length() + getNumPaddingChars(columnName) + 3);
         }
@@ -68,7 +68,7 @@ class CLIListColumn : public CLIField {
             std::cout << " | ";
         }
 
-        void printCell(string & value) {
+        void printCell(std::string & value) {
             int width = getWidth();
             std::string v = value;
 
@@ -92,7 +92,7 @@ class CLIListColumn : public CLIField {
             std::cout << " | ";
         }
 
-        string getName() {
+        std::string getName() {
             return _getLabel();
         }
 
@@ -198,7 +198,7 @@ class CLIListView : public CLIView {
 
             for (auto & c : columns) {
                 for (int i = 0;i < c.getColumnWidth() - 1;i++) {
-                    cout << '-';
+                    std::cout << '-';
                 }
 
                 std::cout << '+';

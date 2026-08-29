@@ -23,7 +23,6 @@
 #include "web_api.h"
 #include "posixthread.h"
 
-using namespace std;
 
 #define DEFAULT_BACKUP_FILE_NAME                    "pfm_backup.sql"
 #define LINE_BUFFER_LENGTH                          4096
@@ -35,14 +34,14 @@ void Command::changePassword() {
 }
 
 void Command::getDBKey() {
-    string accessKey = System::getKey("Access password: ");
+    std::string accessKey = System::getKey("Access password: ");
 
     if (accessKey.compare(cfg.getValue("access.key")) == 0) {
-        string dbKey = System::getKey("Database password: ");
-        cout << "Key: " << dbKey << endl;
+        std::string dbKey = System::getKey("Database password: ");
+        std::cout << "Key: " << dbKey << std::endl;
     }
     else {
-        cout << "Invalid access password supplied" << endl << endl;
+        std::cout << "Invalid access password supplied" << std::endl << std::endl;
     }
 }
 
@@ -51,14 +50,14 @@ void Command::saveDBKey() {
         throw pfm_error("Sorry, passwordless login is not supported on headless (server) systems.");
     }
     
-    string accessKey = System::getKey("Access password: ");
+    std::string accessKey = System::getKey("Access password: ");
 
     if (accessKey.compare(cfg.getValue("access.key")) == 0) {
-        string dbKey = System::getKey("Database password: ");
+        std::string dbKey = System::getKey("Database password: ");
         System::saveKeyToCredentialStore(dbKey);
     }
     else {
-        cout << "Invalid access password supplied" << endl << endl;
+        std::cout << "Invalid access password supplied" << std::endl << std::endl;
     }
 }
 
@@ -67,7 +66,7 @@ void Command::startAPIServer() {
     PosixThread::sleep(1UL);
 }
 
-int Command::getLogLevelParameter(string & level) {
+int Command::getLogLevelParameter(std::string & level) {
     int levelID = 0;
 
     if (level.compare("entry") == 0) {
@@ -107,12 +106,12 @@ int Command::getLogLevelParameter(string & level) {
 }
 
 void Command::setLoggingLevel() {
-    string level = getParameter(SIMPLE_PARAM_NAME);
+    std::string level = getParameter(SIMPLE_PARAM_NAME);
     log.addLogLevel(getLogLevelParameter(level));
 }
 
 void Command::clearLoggingLevel() {
-    string level = getParameter(SIMPLE_PARAM_NAME);
+    std::string level = getParameter(SIMPLE_PARAM_NAME);
     log.clearLogLevel(getLogLevelParameter(level));
 }
 
@@ -121,10 +120,10 @@ void Command::enterSQLMode() {
     cfgmgr & cfg = cfgmgr::getInstance();
     Logger & log = Logger::getInstance();
 
-    string key = System::getKey("Access password: ");
+    std::string key = System::getKey("Access password: ");
 
     if (key.compare(cfg.getValue("access.key")) != 0) {
-        cerr << "Access denied!" << endl;
+        std::cerr << "Access denied!" << std::endl;
         return;
     }
 
@@ -135,7 +134,7 @@ void Command::enterSQLMode() {
     while (loop) {
         rl_utils::setLineLength(512);
 
-        string statement = readline("sql > ");
+        std::string statement = readline("sql > ");
 
         if (statement == ".quit") {
             loop = false;
@@ -144,7 +143,7 @@ void Command::enterSQLMode() {
 
         add_history(statement.c_str());
 
-        string command = statement.substr(0, 6);
+        std::string command = statement.substr(0, 6);
 
         int i = 0;
         for (char & c : command) {
@@ -154,7 +153,7 @@ void Command::enterSQLMode() {
 
         try {
             if (command == "SELECT") {
-                vector<DBRow> rows;
+                std::vector<DBRow> rows;
 
                 db.executeRead(statement, &rows);
 
@@ -165,7 +164,7 @@ void Command::enterSQLMode() {
                     view.show();
                 }
                 else {
-                    cout << "SELECT statement returned 0 rows" << endl << endl;
+                    std::cout << "SELECT statement returned 0 rows" << std::endl << std::endl;
                 }
             }
             else {
@@ -174,7 +173,7 @@ void Command::enterSQLMode() {
         }
         catch (pfm_error & e) {
             log.error("SQL mode: Failed to execute statement: %s", e.what());
-            cout << "Error: " << e.what() << endl << endl;
+            std::cout << "Error: " << e.what() << std::endl << std::endl;
         }
     }
 }
@@ -187,7 +186,7 @@ void Command::enterCalcMode() {
     while (loop) {
         rl_utils::setLineLength(256);
 
-        string calculation = readline("calc > ");
+        std::string calculation = readline("calc > ");
 
         if (calculation == "q") {
             loop = false;
@@ -199,19 +198,19 @@ void Command::enterCalcMode() {
         if (calculation.length() > 0) {
             try {
                 Expression expression;
-                string answer = expression.evaluate(calculation);
+                std::string answer = expression.evaluate(calculation);
                 Money result(answer);
-                cout << "\t" << calculation << " = " << result.localeFormattedStringValue() << endl << endl;
+                std::cout << "\t" << calculation << " = " << result.localeFormattedStringValue() << std::endl << std::endl;
             }
             catch (calc_error & e) {
-                cout << "Error: " << e.what() << endl << endl;
+                std::cout << "Error: " << e.what() << std::endl << std::endl;
             }
         }
     }
 }
 
 void Command::backup() {
-    string filename;
+    std::string filename;
 
     if (hasParameters()) {
         filename = getParameter(SIMPLE_PARAM_NAME);
@@ -220,7 +219,7 @@ void Command::backup() {
         filename = DEFAULT_BACKUP_FILE_NAME;
     }
 
-    ofstream os;
+    std::ofstream os;
     os.open(filename);
 
     DBConfig config;
@@ -260,7 +259,7 @@ void Command::backup() {
 }
 
 void Command::restore() {
-    string filename;
+    std::string filename;
 
     if (hasParameters()) {
         filename = getParameter(SIMPLE_PARAM_NAME);
@@ -269,7 +268,7 @@ void Command::restore() {
         filename = DEFAULT_BACKUP_FILE_NAME;
     }
 
-    ifstream is;
+    std::ifstream is;
     is.open(filename);
 
     PFM_DB & db = PFM_DB::getInstance();
@@ -296,9 +295,9 @@ void Command::restore() {
         
         db.commit();
     }
-    catch (exception & e) {
+    catch (std::exception & e) {
         db.rollback();
-        cout << "Error at line " << to_string(line) << " in file " << filename << " : " << e.what() << endl << endl;
+        std::cout << "Error at line " << std::to_string(line) << " in file " << filename << " : " << e.what() << std::endl << std::endl;
     }
 
     free(lineBuffer);

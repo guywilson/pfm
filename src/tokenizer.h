@@ -6,7 +6,6 @@
 #include "container.h"
 #include "token.h"
 
-using namespace std;
 
 #ifndef __INCL_TOKENIZER
 #define __INCL_TOKENIZER
@@ -16,13 +15,13 @@ class Tokenizer {
         uint32_t startIndex;
         uint32_t endIndex;
 
-        string expression;
+        std::string expression;
         
         int findNextTokenPos();
         int getTokenLength();
 
     public:
-        Tokenizer(const string & expression);
+        Tokenizer(const std::string & expression);
 
         TokenArray tokenize();
 };

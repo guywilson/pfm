@@ -40,7 +40,7 @@ struct os_format {
 };
 
 inline std::string getSequence(const uint8_t ts, const Colour & c) {
-    string sequence = "";
+    std::string sequence = "";
     bool isFirstSequence = true;
 
     if (ts & static_cast<uint8_t>(TextStyle::Bold)) {
@@ -72,7 +72,7 @@ inline std::string getSequence(const uint8_t ts, const Colour & c) {
         sequence += ";";
     }
 
-    return sequence + to_string(static_cast<int>(c));
+    return sequence + std::to_string(static_cast<int>(c));
 }
 
 /*
@@ -97,8 +97,8 @@ class CustomModifier {
         }
 
         template <class _CharT, class _Traits>
-        friend basic_ostream<_CharT, _Traits>&
-        operator<<(basic_ostream<_CharT, _Traits> & os, const CustomModifier & cm) {
+        friend std::basic_ostream<_CharT, _Traits>&
+        operator<<(std::basic_ostream<_CharT, _Traits> & os, const CustomModifier & cm) {
 #if defined(__APPLE__) || defined(__unix__)
             return os << ESC_CHAR << SEQ_OPEN << getSequence(cm.ts, cm.c) << "m";
 #else

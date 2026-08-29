@@ -12,7 +12,6 @@
 #include "pfm_error.h"
 #include "jfile.h"
 
-using namespace std;
 using json = nlohmann::json;
 
 using object_t = std::map<std::string, std::string>;
@@ -25,7 +24,7 @@ JRecord::JRecord(object_t & o) {
     this->record = o;
 }
 
-string JRecord::get(const char * name) {
+std::string JRecord::get(const char * name) {
     if (record.count(name) == 0) {
         throw pfm_validation_error(
                         pfm_error::buildMsg(
@@ -37,7 +36,7 @@ string JRecord::get(const char * name) {
 }
 
 bool JRecord::getBoolValue(const char * name) {
-    string value = get(name);
+    std::string value = get(name);
 
     return (value == "Y" ? true : false);
 }
@@ -46,7 +45,7 @@ object_t JRecord::getObject() {
     return this->record;
 }
 
-void JRecord::add(const char * name, const string & value) {
+void JRecord::add(const char * name, const std::string & value) {
     record[name] = value;
 }
 
@@ -54,11 +53,11 @@ void JRecord::add(const char * name, const bool value) {
     record[name] = (value ? "Y" : "N");
 }
 
-void JFileReader::validate(const string & className) {
-    unordered_map<string, json> elements = j.template get<unordered_map<string, json>>();
+void JFileReader::validate(const std::string & className) {
+    std::unordered_map<std::string, json> elements = j.template get<std::unordered_map<std::string, json>>();
 
     bool foundClassName = false;
-    string fileClassName;
+    std::string fileClassName;
 
     for (auto& i : elements) {
         if (i.first.compare("className") == 0) {
@@ -80,14 +79,14 @@ void JFileReader::validate(const string & className) {
     }
 }
 
-JFileReader::JFileReader(const string & filename) {
-    ifstream fstream(filename);
+JFileReader::JFileReader(const std::string & filename) {
+    std::ifstream fstream(filename);
     this->j = json::parse(fstream);
     fstream.close();
 }
 
-vector<JRecord> JFileReader::read(const string & name) {
-    vector<JRecord> records;
+std::vector<JRecord> JFileReader::read(const std::string & name) {
+    std::vector<JRecord> records;
 
     objects_t rows = j.at(name).get<objects_t>();
 
@@ -99,11 +98,11 @@ vector<JRecord> JFileReader::read(const string & name) {
     return records;
 }
 
-JFileWriter::JFileWriter(const string & filename) {
+JFileWriter::JFileWriter(const std::string & filename) {
     this->fstream.open(filename);
 }
 
-JFileWriter::JFileWriter(const string & filename, const string & className) {
+JFileWriter::JFileWriter(const std::string & filename, const std::string & className) {
     this->className = className;
     this->fstream.open(filename);
 }
@@ -112,7 +111,7 @@ JFileWriter::~JFileWriter() {
     this->fstream.close();
 }
 
-void JFileWriter::write(vector<JRecord> & records, const string & name) {
+void JFileWriter::write(std::vector<JRecord> & records, const std::string & name) {
     auto jsonEntities = json::array();
 
     for (JRecord record : records) {
@@ -130,10 +129,10 @@ void JFileWriter::write(vector<JRecord> & records, const string & name) {
     entity["className"] = this->className;
     entity[name] = {jsonEntities};
 
-    this->fstream << entity.dump(4) << endl;
+    this->fstream << entity.dump(4) << std::endl;
 }
 
-void JFileWriter::write(vector<JRecord> & records, const string & name, const string & className) {
+void JFileWriter::write(std::vector<JRecord> & records, const std::string & name, const std::string & className) {
     auto jsonEntities = json::array();
 
     for (JRecord record : records) {
@@ -151,5 +150,5 @@ void JFileWriter::write(vector<JRecord> & records, const string & name, const st
     entity["className"] = className;
     entity[name] = {jsonEntities};
 
-    this->fstream << entity.dump(4) << endl;
+    this->fstream << entity.dump(4) << std::endl;
 }

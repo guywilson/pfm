@@ -11,7 +11,6 @@
 #include "custom_widgets.h"
 #include "db_config.h"
 
-using namespace std;
 
 class AddConfigView : public CLIView {
     private:
@@ -64,7 +63,7 @@ class ChooseConfigView : public CLIView {
             keyField.show();
         }
 
-        string getKey() {
+        std::string getKey() {
             return keyField.getValue();
         }
 };
@@ -114,7 +113,7 @@ class ConfigListView : public CLIListView {
                 row.addCell(config.key);
                 row.addCell(config.value);
                 row.addCell(config.description);
-                row.addCell((config.isReadOnly ? string("RO") : string("RW")));
+                row.addCell((config.isReadOnly ? std::string("RO") : std::string("RW")));
 
                 addRow(row);
             }
@@ -146,7 +145,7 @@ class ConfigDetailsListView : public CLIDetailListView {
 
         void show() override {
             CLIDetailListView::show();
-            cout << endl;
+            std::cout << std::endl;
         }
 };
 

@@ -17,7 +17,6 @@
 #include "db_v_transfer_record.h"
 #include "transfer_transaction_views.h"
 
-using namespace std;
 
 void Command::addTransferTransaction() {
     checkAccountSelected();
@@ -26,7 +25,7 @@ void Command::addTransferTransaction() {
         DBTransaction transaction;
         DBAccount accountTo;
 
-        string accountToCode = getParameter("to");
+        std::string accountToCode = getParameter("to");
 
         if (accountToCode.empty()) {
             throw pfm_error("addTransferTransaction: The account to transfer to must be supplied");
@@ -36,7 +35,7 @@ void Command::addTransferTransaction() {
 
         try {
             DBCategory category;
-            string code = getParameter("c");
+            std::string code = getParameter("c");
             category.retrieveByCode(code);
             transaction.categoryId = category.id;
         }
@@ -44,14 +43,14 @@ void Command::addTransferTransaction() {
             transaction.categoryId.clear();
         }
 
-        string date = getParameter("date");
+        std::string date = getParameter("date");
         transaction.date = date.empty() ? StrDate::today() : date;
         
         transaction.description = getParameter("desc");
         transaction.amount = getParameter("amnt");
         transaction.accountId = selectedAccount.id;
 
-        string reconciled = getParameter("rec");
+        std::string reconciled = getParameter("rec");
         transaction.isReconciled = (reconciled == "Y" ? true : false);
 
         DBTransaction::createTransferPairFromSource(transaction, accountTo);
@@ -118,7 +117,7 @@ void Command::deleteTransferRecord() {
     Logger & log = Logger::getInstance();
     log.entry("Command::deleteTransferRecord()");
 
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransferTransactionRecord transfer = getTransferRecord(atoi(sequence.c_str()));
 

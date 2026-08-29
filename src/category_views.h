@@ -11,7 +11,6 @@
 #include "custom_widgets.h"
 #include "db_category.h"
 
-using namespace std;
 
 class AddCategoryView : public CLIView {
     private:
@@ -60,7 +59,7 @@ class ChooseCategoryView : public CLIView {
             codeField.show();
         }
 
-        string getCode() {
+        std::string getCode() {
             return codeField.getValue();
         }
 };

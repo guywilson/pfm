@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <pthread.h>
 
-using namespace std;
 
 /*
 ** Supported log levels...
@@ -43,9 +42,9 @@ class Logger {
     public:
         ~Logger() {}
 
-        static int getLogLevelFromString(const string & logLevel);
+        static int getLogLevelFromString(const std::string & logLevel);
 
-        void init(const string & filename, int logLevel);
+        void init(const std::string & filename, int logLevel);
         void init(int logLevel);
         
         void close();
@@ -65,4 +64,3 @@ class Logger {
         int error(const char * fmt, ...);
         int fatal(const char * fmt, ...);
 };
-

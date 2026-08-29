@@ -16,7 +16,6 @@
 #include "money.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 class AddRecurringChargeView : public CLIView {
     private:
@@ -33,7 +32,7 @@ class AddRecurringChargeView : public CLIView {
         AddRecurringChargeView() : AddRecurringChargeView("Add recurring charge") {}
 
         AddRecurringChargeView(const char * title) : CLIView(title) {
-            string today = StrDate::today();
+            std::string today = StrDate::today();
             startDateField.setDefaultValue(today);
         }
 
@@ -105,7 +104,7 @@ class ChooseRecurringChargeView : public CLIView {
 class RecurringChargeListView : public CLIListView {
     private:
         Money total;
-        string title;
+        std::string title;
 
     public:
         RecurringChargeListView(DBAccount & account) : CLIListView() {
@@ -120,7 +119,7 @@ class RecurringChargeListView : public CLIListView {
             }
         }
 
-        RecurringChargeListView(const string & title) : CLIListView() {
+        RecurringChargeListView(const std::string & title) : CLIListView() {
             this->title = title;
 
             if (Terminal::getWidth() < getMinimumWidth()) {
@@ -160,7 +159,7 @@ class RecurringChargeListView : public CLIListView {
                 CLIListColumn("T", LIST_VIEW_TRANSFER_WIDTH, CLIListColumn::leftAligned)
             });
 
-            title += " (" + to_string(result.size()) + ')' + '[' + to_string(getTotalWidth()) + ']';
+            title += " (" + std::to_string(result.size()) + ')' + '[' + std::to_string(getTotalWidth()) + ']';
 
             setTitle(title);
 
@@ -179,7 +178,7 @@ class RecurringChargeListView : public CLIListView {
                 row.addCell(charge.payeeCode);
                 row.addCell(charge.frequency.toString());
                 row.addCell(charge.amount);
-                row.addCell(string(charge.getIsTransferValue()));
+                row.addCell(std::string(charge.getIsTransferValue()));
 
                 total += charge.amount;
                 addRow(row);
@@ -195,7 +194,7 @@ class RecurringChargeListView : public CLIListView {
 
 class RecurringChargeDetailsListView : public CLIDetailListView {
     private:
-        string accountCode;
+        std::string accountCode;
         Money total = 0.0;
 
         std::string formatSequence(uint32_t sequence) {
@@ -245,7 +244,7 @@ class RecurringChargeDetailsListView : public CLIDetailListView {
 
 class MigrateChargeView : public CLIView {
     private:
-        string sourceAccountCode;
+        std::string sourceAccountCode;
         DBRecurringCharge charge;
 
         AccountSpinField accountField = AccountSpinField("Account to transfer to (max. 5 chars): ");

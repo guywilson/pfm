@@ -13,7 +13,6 @@
 #include "cfgmgr.h"
 #include "money.h"
 
-using namespace std;
 
 Money::Money() {
     this->representedValue = 0;
@@ -23,7 +22,7 @@ Money::Money(money_t amount) {
     _setValue(amount);
 }
 
-Money::Money(string & amount) {
+Money::Money(std::string & amount) {
     _setValue(amount.c_str());
 }
 
@@ -160,7 +159,7 @@ void Money::_setValue(const char * amount) {
     _setValue(result);
 }
 
-void Money::_setValue(const string & amount) {
+void Money::_setValue(const std::string & amount) {
     _setValue(amount.c_str());
 }
 
@@ -177,7 +176,7 @@ double Money::doubleValue() {
     return value;
 }
 
-string Money::rawStringValue() const {
+std::string Money::rawStringValue() const {
     money_t whole = this->representedValue / 100;
     money_t decimal = this->representedValue - (whole * 100);
 
@@ -187,40 +186,40 @@ string Money::rawStringValue() const {
 
     char buffer[AMOUNT_BUFFER_LENGTH];
     snprintf(buffer, AMOUNT_BUFFER_LENGTH, "%d.%02d", whole, decimal);
-    string raw = buffer;
+    std::string raw = buffer;
 
     return raw;
 }
 
-string Money::rawStringValue(string & currencySymbol) const {
+std::string Money::rawStringValue(std::string & currencySymbol) const {
     return currencySymbol + rawStringValue();
 }
 
-string Money::localeFormattedStringValue() const {
+std::string Money::localeFormattedStringValue() const {
     return localeFormattedStringValue(cfg.getValue(CONFIG_LOCALE_KEY));
 }
 
-string Money::localeFormattedStringValue(const string & localeString) const {    
-    string raw = to_string(this->representedValue);
+std::string Money::localeFormattedStringValue(const std::string & localeString) const {
+    std::string raw = std::to_string(this->representedValue);
 
-    stringstream s;
+    std::stringstream s;
 
     try {
-        s.imbue(locale(localeString));
-        s << showbase << put_money(raw);
+        s.imbue(std::locale(localeString));
+        s << std::showbase << std::put_money(raw);
     }
-    catch (exception & e) {
+    catch (std::exception & e) {
         log.error(
             "Money::localeFormattedStringValue(): Failed to apply locale '%s', reverting to default system locale", 
             localeString.c_str());
 
         s.clear();
-        s.imbue(locale(""));
-        s << showbase << put_money(raw);
+        s.imbue(std::locale(""));
+        s << std::showbase << std::put_money(raw);
     }
 
 #ifndef RUN_IN_DEBUGGER
-    if (abs(this->representedValue) < 100) {
+    if (std::abs(this->representedValue) < 100) {
         /*
         ** The locale formatted string should have a leading zero before
         ** the decimal point if the value is less than 100, e.g. $0.71
@@ -233,7 +232,7 @@ string Money::localeFormattedStringValue(const string & localeString) const {
         **
         ** Here we will check for the bug, and fix it if it exists...
         */
-        string value = s.str();
+        std::string value = s.str();
 
         for (size_t i = (value.length() - 1);i >= 0;i--) {
             char c = value[i];
@@ -264,7 +263,7 @@ Money & Money::operator=(const Money & rhs) {
     return *this;
 }
 
-Money & Money::operator=(const string & rhs) {
+Money & Money::operator=(const std::string & rhs) {
     this->_setValue(rhs);
     return *this;
 }

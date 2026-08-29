@@ -8,7 +8,6 @@
 #include "cfgmgr.h"
 #include "pfm_error.h"
 
-using namespace std;
 
 #define DECIMAL_POINT_NOT_FOUND_VALUE               -1
 #define AMOUNT_BUFFER_LENGTH                        64
@@ -37,7 +36,7 @@ class Money {
         money_t makeRepresentedValue(money_t whole, money_t decimal);
 
         void _setValue(const char * amount);
-        void _setValue(const string & amount);
+        void _setValue(const std::string & amount);
         void _setValue(double amount);
         void _setValue(money_t amount);
 
@@ -48,20 +47,20 @@ class Money {
 
     public:
         Money();
-        Money(string & amount);
+        Money(std::string & amount);
         Money(const char * amount);
         Money(double amount);
 
         Money(const Money & src);
 
         double doubleValue();
-        string rawStringValue() const;
-        string rawStringValue(string & currencySymbol) const;
-        string localeFormattedStringValue() const;
-        string localeFormattedStringValue(const string & localeString) const;
+        std::string rawStringValue() const;
+        std::string rawStringValue(std::string & currencySymbol) const;
+        std::string localeFormattedStringValue() const;
+        std::string localeFormattedStringValue(const std::string & localeString) const;
 
         Money & operator=(const Money & rhs);
-        Money & operator=(const string & rhs);
+        Money & operator=(const std::string & rhs);
         Money & operator=(const char * rhs);
         Money & operator=(const double rhs);
 
@@ -89,14 +88,14 @@ class Money {
 class MoneyTest {
     private:
         static void testCreateString() {
-            string amount = "137.47";
+            std::string amount = "137.47";
             Money m(amount);
 
             if (m._getValue() != 13747L) {
                 throw pfm_error("testCreateString(): Test failed");
             }
             else {
-                cout << "testCreateString(): Test passed" << endl;
+                std::cout << "testCreateString(): Test passed" << std::endl;
             }
         }
 
@@ -108,7 +107,7 @@ class MoneyTest {
                 throw pfm_error("testCreateChar1(): Test failed");
             }
             else {
-                cout << "testCreateChar1(): Test passed" << endl;
+                std::cout << "testCreateChar1(): Test passed" << std::endl;
             }
         }
 
@@ -120,7 +119,7 @@ class MoneyTest {
                 throw pfm_error("testCreateChar2(): Test failed");
             }
             else {
-                cout << "testCreateChar2(): Test passed" << endl;
+                std::cout << "testCreateChar2(): Test passed" << std::endl;
             }
         }
 
@@ -132,7 +131,7 @@ class MoneyTest {
                 throw pfm_error("testCreateChar3(): Test failed");
             }
             else {
-                cout << "testCreateChar3(): Test passed" << endl;
+                std::cout << "testCreateChar3(): Test passed" << std::endl;
             }
         }
 
@@ -144,7 +143,7 @@ class MoneyTest {
                 throw pfm_error("testCreateChar4(): Test failed");
             }
             else {
-                cout << "testCreateChar4(): Test passed" << endl;
+                std::cout << "testCreateChar4(): Test passed" << std::endl;
             }
         }
 
@@ -156,7 +155,7 @@ class MoneyTest {
                 throw pfm_error("testCreateDouble1(): Test failed");
             }
             else {
-                cout << "testCreateDouble1(): Test passed" << endl;
+                std::cout << "testCreateDouble1(): Test passed" << std::endl;
             }
         }
 
@@ -168,7 +167,7 @@ class MoneyTest {
                 throw pfm_error("testCreateDouble2(): Test failed");
             }
             else {
-                cout << "testCreateDouble2(): Test passed" << endl;
+                std::cout << "testCreateDouble2(): Test passed" << std::endl;
             }
         }
 
@@ -180,7 +179,7 @@ class MoneyTest {
                 throw pfm_error("testCreateDouble3(): Test failed");
             }
             else {
-                cout << "testCreateDouble3(): Test passed" << endl;
+                std::cout << "testCreateDouble3(): Test passed" << std::endl;
             }
         }
 
@@ -193,7 +192,7 @@ class MoneyTest {
                 throw pfm_error("testCopyConstructor(): Test failed");
             }
             else {
-                cout << "testCopyConstructor(): Test passed" << endl;
+                std::cout << "testCopyConstructor(): Test passed" << std::endl;
             }
         }
 
@@ -207,7 +206,7 @@ class MoneyTest {
                 throw pfm_error("testGetDoubleValue1(): Test failed");
             }
             else {
-                cout << "testGetDoubleValue1(): Test passed" << endl;
+                std::cout << "testGetDoubleValue1(): Test passed" << std::endl;
             }
         }
 
@@ -221,7 +220,7 @@ class MoneyTest {
                 throw pfm_error("testGetDoubleValue2(): Test failed");
             }
             else {
-                cout << "testGetDoubleValue2(): Test passed" << endl;
+                std::cout << "testGetDoubleValue2(): Test passed" << std::endl;
             }
         }
 
@@ -233,7 +232,7 @@ class MoneyTest {
                 throw pfm_error("testGetRawStringValue1(): Test failed");
             }
             else {
-                cout << "testGetRawStringValue1(): Test passed" << endl;
+                std::cout << "testGetRawStringValue1(): Test passed" << std::endl;
             }
         }
 
@@ -245,7 +244,7 @@ class MoneyTest {
                 throw pfm_error("testGetRawStringValue2(): Test failed");
             }
             else {
-                cout << "testGetRawStringValue2(): Test passed" << endl;
+                std::cout << "testGetRawStringValue2(): Test passed" << std::endl;
             }
         }
 
@@ -257,7 +256,7 @@ class MoneyTest {
                 throw pfm_error("testGetRawStringValue3(): Test failed");
             }
             else {
-                cout << "testGetRawStringValue3(): Test passed" << endl;
+                std::cout << "testGetRawStringValue3(): Test passed" << std::endl;
             }
         }
 
@@ -269,7 +268,7 @@ class MoneyTest {
                 throw pfm_error("testGetRawStringValue4(): Test failed");
             }
             else {
-                cout << "testGetRawStringValue4(): Test passed" << endl;
+                std::cout << "testGetRawStringValue4(): Test passed" << std::endl;
             }
         }
 
@@ -284,12 +283,12 @@ class MoneyTest {
                 throw pfm_error("testAssignment1(): Test failed");
             }
             else {
-                cout << "testAssignment1(): Test passed" << endl;
+                std::cout << "testAssignment1(): Test passed" << std::endl;
             }
         }
 
         static void testAssignment2() {
-            string amount = "137.47";
+            std::string amount = "137.47";
             Money m2;
 
             m2 = amount;
@@ -298,7 +297,7 @@ class MoneyTest {
                 throw pfm_error("testAssignment2(): Test failed");
             }
             else {
-                cout << "testAssignment2(): Test passed" << endl;
+                std::cout << "testAssignment2(): Test passed" << std::endl;
             }
         }
 
@@ -312,7 +311,7 @@ class MoneyTest {
                 throw pfm_error("testAssignment3(): Test failed");
             }
             else {
-                cout << "testAssignment3(): Test passed" << endl;
+                std::cout << "testAssignment3(): Test passed" << std::endl;
             }
         }
 
@@ -325,7 +324,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorPlus(): Test failed");
             }
             else {
-                cout << "testOperatorPlus(): Test passed" << endl;
+                std::cout << "testOperatorPlus(): Test passed" << std::endl;
             }
         }
 
@@ -338,7 +337,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorPlusEquals(): Test failed");
             }
             else {
-                cout << "testOperatorPlusEquals(): Test passed" << endl;
+                std::cout << "testOperatorPlusEquals(): Test passed" << std::endl;
             }
         }
 
@@ -351,7 +350,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorMinus(): Test failed");
             }
             else {
-                cout << "testOperatorMinus(): Test passed" << endl;
+                std::cout << "testOperatorMinus(): Test passed" << std::endl;
             }
         }
 
@@ -364,7 +363,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorMinusEquals(): Test failed");
             }
             else {
-                cout << "testOperatorMinusEquals(): Test passed" << endl;
+                std::cout << "testOperatorMinusEquals(): Test passed" << std::endl;
             }
         }
 
@@ -376,7 +375,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorTimes(): Test failed");
             }
             else {
-                cout << "testOperatorTimes(): Test passed" << endl;
+                std::cout << "testOperatorTimes(): Test passed" << std::endl;
             }
         }
 
@@ -388,7 +387,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorTimesEquals(): Test failed");
             }
             else {
-                cout << "testOperatorTimesEquals(): Test passed" << endl;
+                std::cout << "testOperatorTimesEquals(): Test passed" << std::endl;
             }
         }
 
@@ -400,7 +399,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorDivide(): Test failed");
             }
             else {
-                cout << "testOperatorDivide(): Test passed" << endl;
+                std::cout << "testOperatorDivide(): Test passed" << std::endl;
             }
         }
 
@@ -412,7 +411,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorDivideEquals(): Test failed");
             }
             else {
-                cout << "testOperatorDivideEquals(): Test passed" << endl;
+                std::cout << "testOperatorDivideEquals(): Test passed" << std::endl;
             }
         }
 
@@ -424,7 +423,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorEquality1(): Test failed");
             }
             else {
-                cout << "testOperatorEquality1(): Test passed" << endl;
+                std::cout << "testOperatorEquality1(): Test passed" << std::endl;
             }
         }
 
@@ -436,7 +435,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorEquality2(): Test failed");
             }
             else {
-                cout << "testOperatorEquality2(): Test passed" << endl;
+                std::cout << "testOperatorEquality2(): Test passed" << std::endl;
             }
         }
 
@@ -448,7 +447,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorInequality1(): Test failed");
             }
             else {
-                cout << "testOperatorInequality1(): Test passed" << endl;
+                std::cout << "testOperatorInequality1(): Test passed" << std::endl;
             }
         }
 
@@ -460,7 +459,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorInequality2(): Test failed");
             }
             else {
-                cout << "testOperatorInequality2(): Test passed" << endl;
+                std::cout << "testOperatorInequality2(): Test passed" << std::endl;
             }
         }
 
@@ -472,7 +471,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorLessThan1(): Test failed");
             }
             else {
-                cout << "testOperatorLessThan1(): Test passed" << endl;
+                std::cout << "testOperatorLessThan1(): Test passed" << std::endl;
             }
         }
 
@@ -484,7 +483,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorLessThan2(): Test failed");
             }
             else {
-                cout << "testOperatorLessThan2(): Test passed" << endl;
+                std::cout << "testOperatorLessThan2(): Test passed" << std::endl;
             }
         }
 
@@ -496,7 +495,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorLessThanOrEquals(): Test failed");
             }
             else {
-                cout << "testOperatorLessThanOrEquals(): Test passed" << endl;
+                std::cout << "testOperatorLessThanOrEquals(): Test passed" << std::endl;
             }
         }
 
@@ -508,7 +507,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorGreaterThan1(): Test failed");
             }
             else {
-                cout << "testOperatorGreaterThan1(): Test passed" << endl;
+                std::cout << "testOperatorGreaterThan1(): Test passed" << std::endl;
             }
         }
 
@@ -520,7 +519,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorGreaterThan2(): Test failed");
             }
             else {
-                cout << "testOperatorGreaterThan2(): Test passed" << endl;
+                std::cout << "testOperatorGreaterThan2(): Test passed" << std::endl;
             }
         }
 
@@ -532,7 +531,7 @@ class MoneyTest {
                 throw pfm_error("testOperatorGreaterThanOrEquals(): Test failed");
             }
             else {
-                cout << "testOperatorGreaterThanOrEquals(): Test passed" << endl;
+                std::cout << "testOperatorGreaterThanOrEquals(): Test passed" << std::endl;
             }
         }
 
@@ -546,7 +545,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -555,7 +554,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -564,7 +563,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -573,7 +572,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -582,7 +581,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -591,7 +590,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -600,7 +599,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -609,7 +608,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -618,7 +617,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -627,7 +626,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -636,7 +635,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -645,7 +644,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -654,7 +653,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -663,7 +662,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -672,7 +671,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -681,7 +680,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -690,7 +689,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -699,7 +698,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -708,7 +707,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -717,7 +716,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -726,7 +725,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -735,7 +734,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -744,7 +743,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -753,7 +752,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -762,7 +761,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -771,7 +770,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -780,7 +779,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -789,7 +788,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -798,7 +797,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -807,7 +806,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -816,7 +815,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -825,7 +824,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -834,7 +833,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -843,7 +842,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -852,7 +851,7 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
@@ -861,11 +860,11 @@ class MoneyTest {
                 numTestsPassed++;
             }
             catch (pfm_error & e) {
-                cout << e.what() << endl;
+                std::cout << e.what() << std::endl;
                 numTestsFailed++;
             }
 
-            cout << "Tests passed: " << numTestsPassed << ", tests failed: " << numTestsFailed << endl;
+            std::cout << "Tests passed: " << numTestsPassed << ", tests failed: " << numTestsFailed << std::endl;
         }
 };
 #endif

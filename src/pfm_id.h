@@ -10,11 +10,10 @@
 #include "pfm_error.h"
 #include "logger.h"
 
-using namespace std;
 
 class pfm_id_t {
     private:
-        string _value;
+        std::string _value;
         bool _isNull;
 
         void inline checkForNumericChar(char c) {
@@ -25,7 +24,7 @@ class pfm_id_t {
             }
         }
 
-        void checkForNumericString(const string & s) {
+        void checkForNumericString(const std::string & s) {
             for (char c : s) {
                 checkForNumericChar(c);
             }
@@ -49,7 +48,7 @@ class pfm_id_t {
             _isNull = false;
         }
 
-        void set(const string & s) {
+        void set(const std::string & s) {
             if (s.compare("NULL") == 0) {
                 clear();
                 return;
@@ -78,7 +77,7 @@ class pfm_id_t {
             _isNull = true;
         }
 
-        string getValue() const {
+        std::string getValue() const {
             if (isNull()) {
                 return "NULL";
             }
@@ -103,7 +102,7 @@ class pfm_id_t {
             set(id);
         }
 
-        pfm_id_t(const string & s) {
+        pfm_id_t(const std::string & s) {
             set(s);
         }
 
@@ -126,7 +125,7 @@ class pfm_id_t {
             return *this;
         }
 
-        pfm_id_t & operator=(const string & rhs) {
+        pfm_id_t & operator=(const std::string & rhs) {
             this->set(rhs);
             return *this;
         }
@@ -149,7 +148,7 @@ class pfm_id_t {
             return (this->_value.compare(rhs.getValue()) == 0);
         }
 
-        bool operator==(const string & rhs) {
+        bool operator==(const std::string & rhs) {
             return (this->_value.compare(rhs) == 0);
         }
 
@@ -162,7 +161,7 @@ class pfm_id_t {
             return (this->_value.compare(rhs.getValue()) != 0);
         }
 
-        bool operator!=(const string & rhs) {
+        bool operator!=(const std::string & rhs) {
             return (this->_value.compare(rhs) != 0);
         }
 

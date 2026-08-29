@@ -27,27 +27,26 @@
 #include "db_public_holiday.h"
 #include "web_api.h"
 
-using namespace std;
 
 #define SIMPLE_PARAM_NAME                   "param"
 #define SEQUENCE_PARAM_NAME                 "sequence"
 
 class Command {
     private:
-        unordered_map<std::string, std::vector<std::string>> parameters;
+        std::unordered_map<std::string, std::vector<std::string>> parameters;
 
-        vector<string> commandHistory;
+        std::vector<std::string> commandHistory;
         DBAccount selectedAccount;
         APIListener listener;
 
         Logger & log = Logger::getInstance();
         cfgmgr & cfg = cfgmgr::getInstance();
 
-        bool isStringNumeric(const string & s);
+        bool isStringNumeric(const std::string & s);
 
-        string parse(const string & commandLine);
-        string parse(const httpserver::http_request & request);
-        void handleExceptions(const string & command, const string & token);
+        std::string parse(const std::string & commandLine);
+        std::string parse(const httpserver::http_request & request);
+        void handleExceptions(const std::string & command, const std::string & token);
  
         bool hasParameters() {
             return (this->parameters.size() > 0);
@@ -57,35 +56,35 @@ class Command {
             return this->parameters.size();
         }
 
-        vector<string> getParameters(const string & key) const {
+        std::vector<std::string> getParameters(const std::string & key) const {
             if (parameters.size() == 0) {
                 throw pfm_error("Expected parameters but none were supplied");
             }
 
             try {
-                vector<string> values = parameters.at(key);
+                std::vector<std::string> values = parameters.at(key);
                 return values;
             }
-            catch (out_of_range & e) {
+            catch (std::out_of_range & e) {
                 return {};
             }
         }
 
-        string getParameter(const string & key) const {
+        std::string getParameter(const std::string & key) const {
             if (parameters.size() == 0) {
                 throw pfm_error("Expected parameters but none were supplied");
             }
 
-            vector<string> values = getParameters(key);
+            std::vector<std::string> values = getParameters(key);
             return values.empty() ? "" : values[0];
         }
 
-        static string trim(const string & s) {
+        static std::string trim(const std::string & s) {
             const char * whitespace = " \t\n\r\f\v";
 
             const auto start = s.find_first_not_of(whitespace);
 
-            if (start == string::npos) {
+            if (start == std::string::npos) {
                 return "";
             }
 
@@ -109,7 +108,7 @@ class Command {
         
         void addAccount();
         void listAccounts();
-        DBAccount selectAccount(const string & accountCode);
+        DBAccount selectAccount(const std::string & accountCode);
         void chooseAccount();
         void showAccount();
         void setPrimaryAccount();
@@ -120,7 +119,7 @@ class Command {
 
         void addConfig();
         void listConfigItems();
-        DBConfig getConfig(string & key);
+        DBConfig getConfig(std::string & key);
         void updateConfig();
         void deleteConfig();
 
@@ -133,7 +132,7 @@ class Command {
 
         void addCategory();
         void listCategories();
-        DBCategory getCategory(string & categoryCode);
+        DBCategory getCategory(std::string & categoryCode);
         void updateCategory();
         void deleteCategory();
         void importCategories();
@@ -142,7 +141,7 @@ class Command {
 
         void addPayee();
         void listPayees();
-        DBPayee getPayee(string & payeeCode);
+        DBPayee getPayee(std::string & payeeCode);
         void updatePayee();
         void deletePayee();
         void importPayees();
@@ -164,11 +163,11 @@ class Command {
         void copyTransaction();
         void listTransactions();
         void findTransactions();
-        void findTransactions(const string & where);
+        void findTransactions(const std::string & where);
         void findTransactions(DBCriteria & criteria);
         void transactionsByCategory();
         void transactionsByPayee();
-        string buildFindTransactionCriteria();
+        std::string buildFindTransactionCriteria();
         DBTransaction getTransaction(int sequence);
         void updateTransaction();
         void deleteTransaction();
@@ -214,14 +213,14 @@ class Command {
         void enterSQLMode();
         void enterCalcMode();
 
-        int getLogLevelParameter(string & level);
+        int getLogLevelParameter(std::string & level);
         void setLoggingLevel();
         void clearLoggingLevel();
 
         static void help();
         static void version();
 
-        bool process(const string & commandLine);
+        bool process(const std::string & commandLine);
         bool process(const httpserver::http_request & request);
 };
 

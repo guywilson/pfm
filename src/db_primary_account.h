@@ -12,7 +12,6 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
 class DBPrimaryAccount : public DBEntity {
     protected:
@@ -22,7 +21,7 @@ class DBPrimaryAccount : public DBEntity {
         };
 
     public:
-        string code;
+        std::string code;
 
         DBPrimaryAccount() : DBEntity() {
             clear();
@@ -52,14 +51,14 @@ class DBPrimaryAccount : public DBEntity {
             return r;
         }
 
-        void backup(ofstream & os) override {
+        void backup(std::ofstream & os) override {
             DBResult<DBPrimaryAccount> results;
             results.retrieveAll();
 
-            os << getDeleteAllStatement() << endl;
+            os << getDeleteAllStatement() << std::endl;
 
             for (size_t i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatement() << endl;
+                os << results[i].getInsertStatement() << std::endl;
             }
 
             os.flush();
@@ -76,34 +75,34 @@ class DBPrimaryAccount : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "Code: '" << code << "'" << endl;
+            std::cout << "Code: '" << code << "'" << std::endl;
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "primary_account";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBPrimaryAccount";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::code, Columns::code_type}, code}
             };
 
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::code, Columns::code_type}, code}
             };
 
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
-        static string getPrimaryAccountCode();
-        static void setPrimaryAccount(string & accountCode);
+        static std::string getPrimaryAccountCode();
+        static void setPrimaryAccount(std::string & accountCode);
 };
 

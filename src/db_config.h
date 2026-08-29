@@ -10,7 +10,6 @@
 #include "db_base.h"
 #include "strdate.h"
 
-using namespace std;
 
 class DBConfig : public DBEntity {
     protected:
@@ -32,9 +31,9 @@ class DBConfig : public DBEntity {
         };
 
     public:
-        string key;
-        string value;
-        string description;
+        std::string key;
+        std::string value;
+        std::string description;
         bool isReadOnly;
         bool isVisible;
 
@@ -85,19 +84,19 @@ class DBConfig : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "Key: '" << key << "'" << endl;
-            cout << "Value: '" << value << "'" << endl;
-            cout << "Description: '" << description << "'" << endl;
+            std::cout << "Key: '" << key << "'" << std::endl;
+            std::cout << "Value: '" << value << "'" << std::endl;
+            std::cout << "Description: '" << description << "'" << std::endl;
         }
 
-        void backup(ofstream & os) override {
+        void backup(std::ofstream & os) override {
             DBResult<DBConfig> results;
             results.retrieveAll();
 
-            os << getDeleteAllStatement() << endl;
+            os << getDeleteAllStatement() << std::endl;
 
             for (size_t i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatement() << endl;
+                os << results[i].getInsertStatement() << std::endl;
             }
 
             os.flush();
@@ -123,20 +122,20 @@ class DBConfig : public DBEntity {
             }
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "config";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBConfig";
         }
 
-        const string getJSONArrayName() const override {
+        const std::string getJSONArrayName() const override {
             return "config";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::key, Columns::key_type}, key},
                 {{Columns::value, Columns::value_type}, delimitSingleQuotes(value)},
                 {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
@@ -147,8 +146,8 @@ class DBConfig : public DBEntity {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::key, Columns::key_type}, key},
                 {{Columns::value, Columns::value_type}, delimitSingleQuotes(value)},
                 {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
@@ -159,7 +158,7 @@ class DBConfig : public DBEntity {
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
-        void retrieveByKey(const string & key);
+        void retrieveByKey(const std::string & key);
         DBResult<DBConfig> retrieveAllVisible();
 };
 

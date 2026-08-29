@@ -16,8 +16,8 @@ class CLITextField : public CLIField {
     protected:
         int maxLength = FIELD_STRING_LEN;
 
-        std::string readLine(const string & prompt) {
-            string text;
+        std::string readLine(const std::string & prompt) {
+            std::string text;
 
             char * line = readline(prompt.c_str());
 

@@ -12,7 +12,6 @@
 #include "logger.h"
 #include "db_recurring_transfer.h"
 
-using namespace std;
 
 int DBRecurringTransfer::retrieveByRecurringChargeId(pfm_id_t & recurringChargeId) {
     Logger & log = Logger::getInstance();
@@ -21,7 +20,7 @@ int DBRecurringTransfer::retrieveByRecurringChargeId(pfm_id_t & recurringChargeI
     DBCriteria criteria;
     criteria.add(Columns::recurringChargeId, DBCriteria::equal_to, recurringChargeId);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBRecurringTransfer> result;
 
     int rowsRetrievedCount = result.retrieve(statement);

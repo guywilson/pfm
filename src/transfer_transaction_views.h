@@ -12,7 +12,6 @@
 #include "db_v_transfer_record.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 #ifndef __TRANSFER_TRANSACTION_VIEW
 #define __TRANSFER_TRANSACTION_VIEW
@@ -41,7 +40,7 @@ class TransferToAccountView : public CLIView {
         TransferToAccountView() : TransferToAccountView("Transfer to Account") {}
 
         TransferToAccountView(const char * title) : CLIView(title) {
-            string today = StrDate::today();
+            std::string today = StrDate::today();
             dateField.setDefaultValue(today);
         }
 
@@ -154,7 +153,7 @@ class TransferListView : public CLIListView {
                 showTotal("Total amount: ", total);
             }
             else {
-                cout << endl;
+                std::cout << std::endl;
             }
         }
 };

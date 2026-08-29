@@ -6,7 +6,6 @@
 
 #include <sys/ioctl.h>
 
-using namespace std;
 
 #define TERMINAL_MIN_WIDTH                    80U
 #define TERMINAL_MIN_HEIGHT                   17U

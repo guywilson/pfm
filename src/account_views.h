@@ -12,7 +12,6 @@
 #include "db_account.h"
 #include "custom_modifiers.h"
 
-using namespace std;
 
 class AddAccountView : public CLIView {
     private:
@@ -79,7 +78,7 @@ class ChooseAccountView : public CLIView {
             codeField.show();
         }
 
-        string getCode() {
+        std::string getCode() {
             return codeField.getValue();
         }
 };
@@ -89,29 +88,29 @@ class AccountDetailsView : public CLIView {
         DBAccount account;
 
         void printHorizontalLine() {
-            cout << "+--------------------------------+----------------+" << endl;
+            std::cout << "+--------------------------------+----------------+" << std::endl;
         }
 
-        void printRow(const string & label, const Money & amount) {
-            string amountStr = amount.localeFormattedStringValue();
+        void printRow(const std::string & label, const Money & amount) {
+            std::string amountStr = amount.localeFormattedStringValue();
             int amountWidth = cli::text::calculateFieldWidth(amountStr, LIST_VIEW_AMOUNT_WIDTH);
 
-            cout 
-                << left
+            std::cout
+                << std::left
                 << "| "
-                << right 
-                << setw(30) 
+                << std::right
+                << std::setw(30)
                 << label 
-                << left
+                << std::left
                 << " | "
-                << right 
+                << std::right
                 << set_style(TextStyle::Bold, Colour::Green) 
-                << setw(amountWidth) 
+                << std::setw(amountWidth)
                 << amountStr 
                 << set_style(TextStyle::Reset) 
-                << left
+                << std::left
                 << " |"
-                << endl;
+                << std::endl;
         }
 
     public:
@@ -120,21 +119,21 @@ class AccountDetailsView : public CLIView {
         }
 
         void show() override {
-            cout 
-                << endl << endl 
+            std::cout
+                << std::endl << std::endl
                 << set_style(TextStyle::Bold, Colour::Cyan) 
                 << account.name 
                 << set_style(TextStyle::Reset)
                 << " [" << account.code << "]" 
                 << (account.isPrimary() ? " - primary" : "") 
-                << endl
-                << endl
+                << std::endl
+                << std::endl
                 << "Opened on " 
                 << account.openingDate.longDate()
                 << " with balance: " 
                 << account.openingBalance.localeFormattedStringValue() 
-                << endl
-                << endl;
+                << std::endl
+                << std::endl;
 
             account.doBalancePrerequisites();
             
@@ -153,7 +152,7 @@ class AccountDetailsView : public CLIView {
 
             printHorizontalLine();
 
-            cout << endl;
+            std::cout << std::endl;
         }
 };
 
@@ -212,14 +211,14 @@ class AccountListView : public CLIListView {
                     row.addCell(reconciledBalance);
                     row.addCell(balanceAfterBills);
                     row.addCell(remainingBalance);
-                    row.addCell((account.isPrimary() ? string("*") : string("")));
+                    row.addCell((account.isPrimary() ? std::string("*") : std::string("")));
                 }
                 else {
                     row.addCell(account.code);
                     row.addCell(account.name);
                     row.addCell(currentBalance);
                     row.addCell(remainingBalance);
-                    row.addCell((account.isPrimary() ? string("*") : string("")));
+                    row.addCell((account.isPrimary() ? std::string("*") : std::string("")));
                 }
 
                 addRow(row);

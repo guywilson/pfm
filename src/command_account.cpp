@@ -17,10 +17,9 @@
 #include "account_views.h"
 #include "transaction_views.h"
 
-using namespace std;
 
-DBAccount Command::selectAccount(const string & accountCode) {
-    string code = accountCode;
+DBAccount Command::selectAccount(const std::string & accountCode) {
+    std::string code = accountCode;
 
     DBAccount account;
     account.retrieveByCode(code);
@@ -67,7 +66,7 @@ void Command::listAccounts() {
 void Command::chooseAccount() {
     log.entry("Command::chooseAccount()");
 
-    string accountCode = selectedAccount.code;
+    std::string accountCode = selectedAccount.code;
 
     if (hasParameters()) {
         accountCode = getParameter(SIMPLE_PARAM_NAME);
@@ -117,7 +116,7 @@ void Command::chooseAccount() {
 void Command::showAccount() {
     log.entry("Command::showAccount()");
 
-    string accountCode = selectedAccount.code;
+    std::string accountCode = selectedAccount.code;
 
     log.debug("Show account with code '%s'", accountCode.c_str());
 
@@ -134,7 +133,7 @@ void Command::showAccount() {
 void Command::setPrimaryAccount() {
     log.entry("Command::setPrimaryAccount()");
 
-    string accountCode = getParameter(SIMPLE_PARAM_NAME);
+    std::string accountCode = getParameter(SIMPLE_PARAM_NAME);
     
     log.debug("Set primary account to '%s'", accountCode.c_str());
 
@@ -169,12 +168,12 @@ void Command::deleteAccount() {
 }
 
 void Command::importAccounts() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBAccount");
 
-    vector<JRecord> records = jfile.read("accounts");
+    std::vector<JRecord> records = jfile.read("accounts");
 
     for (JRecord & record : records) {
         DBAccount account;
@@ -185,12 +184,12 @@ void Command::importAccounts() {
 }
 
 void Command::exportAccounts() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBAccount> results;
     results.retrieveAll();
 
-    vector<JRecord> records;
+    std::vector<JRecord> records;
 
     for (size_t i = 0;i < results.size();i++) {
         DBAccount account = results.at(i);

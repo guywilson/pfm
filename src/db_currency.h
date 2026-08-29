@@ -10,7 +10,6 @@
 #include "db_base.h"
 #include "strdate.h"
 
-using namespace std;
 
 class DBCurrency : public DBEntity {
     protected:
@@ -26,9 +25,9 @@ class DBCurrency : public DBEntity {
         };
 
     public:
-        string code;
-        string name;
-        string symbol;
+        std::string code;
+        std::string name;
+        std::string symbol;
 
         DBCurrency() : DBEntity() {
             clear();
@@ -53,9 +52,9 @@ class DBCurrency : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "Code: '" << code << "'" << endl;
-            cout << "Name: '" << name << "'" << endl;
-            cout << "Symbol: '" << symbol << "'" << endl;
+            std::cout << "Code: '" << code << "'" << std::endl;
+            std::cout << "Name: '" << name << "'" << std::endl;
+            std::cout << "Symbol: '" << symbol << "'" << std::endl;
         }
 
         void assignColumn(DBColumn & column) override {
@@ -72,16 +71,16 @@ class DBCurrency : public DBEntity {
             }
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "currency";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBCurrency";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::code, Columns::code_type}, code},
                 {{Columns::name, Columns::name_type}, delimitSingleQuotes(name)},
                 {{Columns::symbol, Columns::symbol_type}, symbol}
@@ -90,8 +89,8 @@ class DBCurrency : public DBEntity {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::code, Columns::code_type}, code},
                 {{Columns::name, Columns::name_type}, delimitSingleQuotes(name)},
                 {{Columns::symbol, Columns::symbol_type}, symbol}
@@ -100,6 +99,6 @@ class DBCurrency : public DBEntity {
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
-        void retrieveByCode(string & code);
+        void retrieveByCode(std::string & code);
 };
 

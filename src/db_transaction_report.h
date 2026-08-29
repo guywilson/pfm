@@ -13,7 +13,6 @@
 #include "strdate.h"
 #include "cfgmgr.h"
 
-using namespace std;
 
 class DBTransactionReport : public DBEntity {
     protected:
@@ -26,8 +25,8 @@ class DBTransactionReport : public DBEntity {
         };
 
     public:
-        string description;
-        string sqlWhereClause;
+        std::string description;
+        std::string sqlWhereClause;
 
         DBTransactionReport() : DBEntity() {
             clear();
@@ -68,19 +67,19 @@ class DBTransactionReport : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "Description: '" << description << "'" << endl;
-            cout << "SQL: '" << sqlWhereClause << "'" << endl;
+            std::cout << "Description: '" << description << "'" << std::endl;
+            std::cout << "SQL: '" << sqlWhereClause << "'" << std::endl;
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "transaction_report";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBTransactionReport";
         }
 
-        const string getJSONArrayName() const override {
+        const std::string getJSONArrayName() const override {
             return "reports";
         }
 
@@ -88,8 +87,8 @@ class DBTransactionReport : public DBEntity {
             this->sequence = sequence;
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
                 {{Columns::sqlWhereClause, Columns::sqlWhereClause_type}, delimitSingleQuotes(sqlWhereClause)}
             };
@@ -97,8 +96,8 @@ class DBTransactionReport : public DBEntity {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{Columns::description, Columns::description_type}, delimitSingleQuotes(description)},
                 {{Columns::sqlWhereClause, Columns::sqlWhereClause_type}, delimitSingleQuotes(sqlWhereClause)}
             };
@@ -106,14 +105,14 @@ class DBTransactionReport : public DBEntity {
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
-        void backup(ofstream & os) override {
+        void backup(std::ofstream & os) override {
             DBResult<DBTransactionReport> results;
             results.retrieveAll();
 
-            os << getDeleteAllStatement() << endl;
+            os << getDeleteAllStatement() << std::endl;
 
             for (size_t i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatement() << endl;
+                os << results[i].getInsertStatement() << std::endl;
             }
 
             os.flush();

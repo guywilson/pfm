@@ -9,7 +9,6 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-using namespace std;
 
 class cfgmgr {
     public:
@@ -19,7 +18,7 @@ class cfgmgr {
         }
 
     private:
-        unordered_map<string, string> values;
+        std::unordered_map<std::string, std::string> values;
         bool isConfigured = false;
 
         cfgmgr() {}
@@ -30,12 +29,12 @@ class cfgmgr {
         void clear();
         void initialise();
 
-        string getValue(const string & key);
-        bool getValueAsBoolean(const string & key);
-        int getValueAsInteger(const string & key);
-        int32_t getValueAsLongInteger(const string & key);
-        uint32_t getValueAsLongUnsignedInteger(const string & key);
-        double getValueAsDouble(const string & key);
+        std::string getValue(const std::string & key);
+        bool getValueAsBoolean(const std::string & key);
+        int getValueAsInteger(const std::string & key);
+        int32_t getValueAsLongInteger(const std::string & key);
+        uint32_t getValueAsLongUnsignedInteger(const std::string & key);
+        double getValueAsDouble(const std::string & key);
 
         void dumpConfig();
 };

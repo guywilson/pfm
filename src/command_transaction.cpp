@@ -20,7 +20,6 @@
 #include "debug_views.h"
 #include "cli_widget.h"
 
-using namespace std;
 
 void Command::listCarriedOverLogs() {
     DBResult<DBCarriedOverView> result;
@@ -46,7 +45,7 @@ void Command::addTransaction() {
 
         try {
             DBCategory category;
-            string code = getParameter("c");
+            std::string code = getParameter("c");
             category.retrieveByCode(code);
             transaction.categoryId = category.id;
         }
@@ -56,7 +55,7 @@ void Command::addTransaction() {
 
         try {
             DBPayee payee;
-            string code = getParameter("p");
+            std::string code = getParameter("p");
             payee.retrieveByCode(code);
             transaction.payeeId = payee.id;
         }
@@ -64,7 +63,7 @@ void Command::addTransaction() {
             transaction.payeeId.clear();
         }
 
-        string accountCode = getParameter("acc");
+        std::string accountCode = getParameter("acc");
 
         if (accountCode.length() == 0) {
             transaction.accountId = selectedAccount.id;
@@ -76,14 +75,14 @@ void Command::addTransaction() {
             transaction.accountId = account.id;
         }
 
-        string date = getParameter("date");
+        std::string date = getParameter("date");
         transaction.date = date.empty() ? StrDate::today() : date;
 
-        string type = getParameter("type");
+        std::string type = getParameter("type");
         transform(type.begin(), type.end(), type.begin(), ::toupper);
         transaction.type = type.empty() ? TYPE_DEBIT : type;
 
-        string reconciled = getParameter("rec");
+        std::string reconciled = getParameter("rec");
         transaction.isReconciled = reconciled == "Y" ? true : false;
         
         transaction.description = getParameter("desc");
@@ -106,7 +105,7 @@ void Command::copyTransaction() {
     DBTransaction transaction;
 
     if (hasParameters()) {
-        string sequence = getParameter(SEQUENCE_PARAM_NAME);
+        std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
         transaction = getTransaction(atoi(sequence.c_str()));
         transaction.recurringChargeId.clear();
@@ -130,12 +129,12 @@ void Command::listTransactions() {
     DBCriteria::sql_order sortDirection = DBCriteria::descending;
 
     if (hasParameters()) {
-        string rows = getParameter("rows");
+        std::string rows = getParameter("rows");
         if (!rows.empty()) {
             rowLimit = strtoul(rows.c_str(), NULL, 10);
         }
         
-        string timeframe = getParameter("timeframe");
+        std::string timeframe = getParameter("timeframe");
         if (!timeframe.empty()) {
             if (timeframe.compare("period") == 0) {
                 thisPeriod = true;
@@ -145,7 +144,7 @@ void Command::listTransactions() {
             }
         }
 
-        string recurring = getParameter("recurring");
+        std::string recurring = getParameter("recurring");
         if (!recurring.empty()) {
             if (recurring.compare("all") == 0) {
                 recurringType = DBTransactionView::all;
@@ -158,7 +157,7 @@ void Command::listTransactions() {
             }
         }
 
-        string sort = getParameter("sort");
+        std::string sort = getParameter("sort");
         if (!sort.empty()) {
             if (sort.compare("asc") == 0) {
                 sortDirection = DBCriteria::ascending;
@@ -168,7 +167,7 @@ void Command::listTransactions() {
             }
         }
 
-        string total = getParameter("total");
+        std::string total = getParameter("total");
         if (!total.empty()) {
             showTotal = true;
         }
@@ -216,7 +215,7 @@ void Command::listTransactions() {
 
 void Command::findTransactions() {
     if (hasParameters()) {
-        string sql = getParameter("sql");
+        std::string sql = getParameter("sql");
 
         if (!sql.empty()) {
             findTransactions(sql);
@@ -224,52 +223,52 @@ void Command::findTransactions() {
         else {
             DBCriteria criteria;
             
-            string dateAfter = getParameter("date>");
+            std::string dateAfter = getParameter("date>");
             if (!dateAfter.empty()) {
                 criteria = DBTransactionView::FindCriteriaHelper::handleGreaterThanThisDate(criteria, dateAfter);
             }
 
-            string dateBefore = getParameter("date<");
+            std::string dateBefore = getParameter("date<");
             if (!dateBefore.empty()) {
                 criteria = DBTransactionView::FindCriteriaHelper::handleLessThanThisDate(criteria, dateBefore);
             }
 
-            vector<string> dates = getParameters("date");
-            vector<StrDate> onTheseDates;
-            for (string & s : dates) {
+            std::vector<std::string> dates = getParameters("date");
+            std::vector<StrDate> onTheseDates;
+            for (std::string & s : dates) {
                 onTheseDates.push_back(s);
             }
             criteria = DBTransactionView::FindCriteriaHelper::handleOnTheseDates(criteria, onTheseDates);
 
-            vector<string> withTheseAccountsList = getParameters("acc");
+            std::vector<std::string> withTheseAccountsList = getParameters("acc");
             criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseAccounts(criteria, withTheseAccountsList);
 
-            vector<string> withTheseCategoriesList = getParameters("c");
+            std::vector<std::string> withTheseCategoriesList = getParameters("c");
             criteria = DBTransactionView::FindCriteriaHelper::handleWithTheseCategories(criteria, withTheseCategoriesList);
 
-            vector<string> withThesePayeesList = getParameters("p");
+            std::vector<std::string> withThesePayeesList = getParameters("p");
             criteria = DBTransactionView::FindCriteriaHelper::handleWithThesePayees(criteria, withThesePayeesList);
             
-            string amountGreater = getParameter("amnt>");
+            std::string amountGreater = getParameter("amnt>");
             if (!amountGreater.empty()) {
                 criteria = DBTransactionView::FindCriteriaHelper::handleGreaterThanThisAmount(criteria, amountGreater);
             }
             
-            string amountLess = getParameter("amnt<");
+            std::string amountLess = getParameter("amnt<");
             if (!amountLess.empty()) {
                 criteria = DBTransactionView::FindCriteriaHelper::handleLessThanThisAmount(criteria, amountLess);
             }
 
-            string type = getParameter("type");
+            std::string type = getParameter("type");
             transform(type.begin(), type.end(), type.begin(), ::toupper);
             criteria = DBTransactionView::FindCriteriaHelper::handleWithThisType(criteria, type);
 
-            string recurring = getParameter("rec");
+            std::string recurring = getParameter("rec");
             if (!recurring.empty()) {
                 criteria = DBTransactionView::FindCriteriaHelper::handleIsRecurring(criteria, recurring.compare("r") == 0 ? true : false);
             }
 
-            auto replaceWildcards = [](string & s) {
+            auto replaceWildcards = [](std::string & s) {
                 for (size_t i = 0;i < s.length();i++) {
                     if (s[i] == '*') {
                         s[i] = '%';
@@ -282,12 +281,12 @@ void Command::findTransactions() {
                 return s;
             };
 
-            string description = getParameter("desc");
+            std::string description = getParameter("desc");
             if (!description.empty()) {
                 criteria = DBTransactionView::FindCriteriaHelper::handleWithThisDescription(criteria, replaceWildcards(description));
             }
 
-            string reference = getParameter("ref");
+            std::string reference = getParameter("ref");
             if (!reference.empty()) {
                 criteria = DBTransactionView::FindCriteriaHelper::handleWithThisReference(criteria, replaceWildcards(reference));
             }
@@ -306,7 +305,7 @@ void Command::findTransactions() {
     findTransactions(criteria);
 }
 
-void Command::findTransactions(const string & where) {
+void Command::findTransactions(const std::string & where) {
     DBTransactionView tr;
     DBResult<DBTransactionView> result = tr.findTransactions(where);
 
@@ -441,7 +440,7 @@ DBTransaction Command::getTransaction(int sequence) {
 }
 
 void Command::updateTransaction() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
 
@@ -471,7 +470,7 @@ void Command::updateTransaction() {
 }
 
 void Command::deleteTransaction() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
 
@@ -479,7 +478,7 @@ void Command::deleteTransaction() {
 }
 
 void Command::reconcileTransaction() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
 
     DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
 
@@ -496,7 +495,7 @@ void Command::reconcileTransaction() {
 }
 
 void Command::showTransaction() {
-    string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
     DBTransaction transaction = getTransaction(atoi(sequence.c_str()));
 
     DBTransactionView v;
@@ -519,21 +518,21 @@ bool Command::matchExistingTransactions(DBTransactionView & matchTransaction) {
     if (matches.size() == 1) {
         DBTransactionView tr = matches[0];
 
-        cout << "Matched transaction:" << endl;
+        std::cout << "Matched transaction:" << std::endl;
         matchTransaction.print();
-        cout << "With:" << endl;
+        std::cout << "With:" << std::endl;
         tr.print();
 
         isMatched = true;
     }
     else if (matches.size() > 1) {
-        cout << "Matched transaction:" << endl;
+        std::cout << "Matched transaction:" << std::endl;
         matchTransaction.print();
 
         for (size_t i = 0;i < matches.size();i++) {
             DBTransactionView tr = matches[i];
 
-            cout << "With:" << endl;
+            std::cout << "With:" << std::endl;
             tr.print();
         }
 
@@ -547,12 +546,12 @@ bool Command::matchExistingTransactions(DBTransactionView & matchTransaction) {
 }
 
 void Command::importTransactions() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBTransaction");
 
-    vector<JRecord> records = jfile.read("transactions");
+    std::vector<JRecord> records = jfile.read("transactions");
 
     for (JRecord & record : records) {
         DBTransaction transaction;
@@ -568,12 +567,12 @@ void Command::importTransactions() {
 }
 
 void Command::exportTransactions() {
-    string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string jsonFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBTransaction> results;
     results.retrieveAll();
 
-    vector<JRecord> records;
+    std::vector<JRecord> records;
 
     for (size_t i = 0;i < results.size();i++) {
         DBTransaction transaction = results.at(i);
@@ -587,19 +586,19 @@ void Command::exportTransactions() {
 }
 
 void Command::exportTransactionsAsCSV() {
-    string csvFileName = getParameter(SIMPLE_PARAM_NAME);
+    std::string csvFileName = getParameter(SIMPLE_PARAM_NAME);
 
     DBResult<DBTransaction> results;
     results.retrieveAll();
 
-    ofstream out(csvFileName);
+    std::ofstream out(csvFileName);
 
     out << DBTransaction::getCSVHeader();
 
     for (size_t i = 0;i < results.size();i++) {
         DBTransaction transaction = results.at(i);
 
-        string record = transaction.getCSVRecord();
+        std::string record = transaction.getCSVRecord();
         out << record;
     }
     

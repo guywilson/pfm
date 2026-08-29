@@ -14,7 +14,6 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
 int DBTransferTransactionRecord::retrieveByTransactionToId(pfm_id_t & transactionToId) {
     Logger & log = Logger::getInstance();
@@ -23,7 +22,7 @@ int DBTransferTransactionRecord::retrieveByTransactionToId(pfm_id_t & transactio
     DBCriteria criteria;
     criteria.add(Columns::transactionToId, DBCriteria::equal_to, transactionToId);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransferTransactionRecord> result;
 
     int rowsRetrievedCount = result.retrieve(statement);
@@ -44,7 +43,7 @@ int DBTransferTransactionRecord::retrieveByTransactionFromId(pfm_id_t & transact
     DBCriteria criteria;
     criteria.add(Columns::transactionFromId, DBCriteria::equal_to, transactionFromId);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBTransferTransactionRecord> result;
 
     int rowsRetrievedCount = result.retrieve(statement);
@@ -76,7 +75,7 @@ DBTransferTransactionRecord DBTransferTransactionRecord::createFromTransactions(
 
         db.commit();
     }
-    catch (exception & e) {
+    catch (std::exception & e) {
         log.error(
             "Failed to create transfer record from transactions to:%s, from:%s", 
             transactionTo.id.c_str(), 
@@ -98,7 +97,7 @@ int DBTransferTransactionRecord::retrieveByTransactionIds(pfm_id_t & sourceTrans
     criteria.add(Columns::transactionFromId, DBCriteria::equal_to, sourceTransactionId);
     criteria.add(Columns::transactionToId, DBCriteria::equal_to, targetTransactionId);
 
-    string statement = getSelectStatement() + criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() + criteria.getStatementCriteria();
 
     DBResult<DBTransferTransactionRecord> result;
 

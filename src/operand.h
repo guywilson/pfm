@@ -8,7 +8,6 @@
 
 #include "token.h"
 
-using namespace std;
 
 #ifndef __INCL_OPERAND
 #define __INCL_OPERAND
@@ -43,7 +42,7 @@ class Operand : public Token {
             initialiseValue();
         }
 
-        Operand(const string & token) : Token(token) {
+        Operand(const std::string & token) : Token(token) {
             initialiseValue();
             mpfr_strtofr(value, token.c_str(), NULL, DECIMAL, MPFR_RNDA);
         }
@@ -57,7 +56,7 @@ class Operand : public Token {
             mpfr_clear(value);
         }
 
-        static bool isOperand(const string & token) {
+        static bool isOperand(const std::string & token) {
             for (size_t i = 0;i < token.length();i++) {
                 char ch = token[i];
 
@@ -69,10 +68,10 @@ class Operand : public Token {
             return true;
         }
 
-        string toString(long precision = 2) {
+        std::string toString(long precision = 2) {
             char szOutputString[OUTPUT_MAX_STRING_LENGTH];
             char szFormatString[32];
-            string output;
+            std::string output;
 
             snprintf(szFormatString, 32, "%%.%ldRf", precision);
             mpfr_snprintf(szOutputString, OUTPUT_MAX_STRING_LENGTH, szFormatString, value);
@@ -81,15 +80,15 @@ class Operand : public Token {
             return output;
         }
 
-        virtual string evaluate() override {
+        virtual std::string evaluate() override {
             return toString(INTERMEDIATE_PRECISION);
         }
 
-        static const string CLASS_NAME() {
+        static const std::string CLASS_NAME() {
             return "Operand";
         }
 
-        virtual const string className() override {
+        virtual const std::string className() override {
             return Operand::CLASS_NAME();
         }
 

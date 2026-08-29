@@ -2,7 +2,6 @@
 
 #include "token.h"
 
-using namespace std;
 
 #ifndef __INCL_BRACE
 #define __INCL_BRACE
@@ -12,7 +11,7 @@ class Brace : public Token {
         bool isLeft;
 
     public:
-        Brace(const string & token) : Token(token) {
+        Brace(const std::string & token) : Token(token) {
             if (Brace::isLeftBrace(token[0])) {
                 isLeft = true;
             }
@@ -21,11 +20,11 @@ class Brace : public Token {
             }
         }
 
-        static const string CLASS_NAME() {
+        static const std::string CLASS_NAME() {
             return "Brace";
         }
 
-        virtual const string className() override {
+        virtual const std::string className() override {
             return Brace::CLASS_NAME();
         }
 
@@ -41,7 +40,7 @@ class Brace : public Token {
             return (isLeftBrace(ch) || isRightBrace(ch));
         }
 
-        static bool isBrace(const string & token) {
+        static bool isBrace(const std::string & token) {
             return isBrace(token[0]);
         }
 

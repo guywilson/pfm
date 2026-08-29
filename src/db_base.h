@@ -20,7 +20,6 @@
 #include "logger.h"
 #include "pfm_error.h"
 
-using namespace std;
 
 #define SQL_STATEMENT_LENGTH                   256
 #define LIMIT_CLAUSE_BUFFER_LEN                 32
@@ -31,13 +30,13 @@ template <class T> class DBResult;
 
 class DBCriteria {
     private:
-        deque<string> whereClauses;
-        deque<string> orderClauses;
-        deque<string> groupClauses;
-        multimap<string, string> inClauses;
+        std::deque<std::string> whereClauses;
+        std::deque<std::string> orderClauses;
+        std::deque<std::string> groupClauses;
+        std::multimap<std::string, std::string> inClauses;
         int rowLimit;
 
-        string appendString(string & clause, const string & value) {
+        std::string appendString(std::string & clause, const std::string & value) {
             clause.append("'");
             clause.append(value);
             clause.append("'");
@@ -45,7 +44,7 @@ class DBCriteria {
             return clause;
         }
 
-        string appendBoolean(string & clause, const bool value) {
+        std::string appendBoolean(std::string & clause, const bool value) {
             clause.append("'");
             clause.append(value ? "Y" : "N");
             clause.append("'");
@@ -84,8 +83,8 @@ class DBCriteria {
             rowLimit = NULL_ROW_LIMIT;
         }
 
-        void add(const string & columnName, enum sql_operator op) {
-            string clause = columnName;
+        void add(const std::string & columnName, enum sql_operator op) {
+            std::string clause = columnName;
 
             switch (op) {
                 case is_null:
@@ -103,8 +102,8 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
-        void add(const string & columnName, enum sql_operator op, const string & value) {
-            string clause = columnName;
+        void add(const std::string & columnName, enum sql_operator op, const std::string & value) {
+            std::string clause = columnName;
 
             switch (op) {
                 case less_than:
@@ -159,8 +158,8 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
-        void addIgnoreSQ(const string & columnName, enum sql_operator op, const string & value) {
-            string clause = columnName;
+        void addIgnoreSQ(const std::string & columnName, enum sql_operator op, const std::string & value) {
+            std::string clause = columnName;
 
             switch (op) {
                 case less_than:
@@ -215,12 +214,12 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
-        void add(const string & columnName, enum sql_operator op, const StrDate & value) {
+        void add(const std::string & columnName, enum sql_operator op, const StrDate & value) {
             add(columnName, op, value.shortDate());
         }
 
-        void add(const string & columnName, enum sql_operator op, const Money & value) {
-            string clause = columnName;
+        void add(const std::string & columnName, enum sql_operator op, const Money & value) {
+            std::string clause = columnName;
 
             switch (op) {
                 case less_than:
@@ -268,8 +267,8 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
-        void add(const string & columnName, enum sql_operator op, const pfm_id_t & id) {
-            string clause = columnName;
+        void add(const std::string & columnName, enum sql_operator op, const pfm_id_t & id) {
+            std::string clause = columnName;
 
             switch (op) {
                 case equal_to:
@@ -297,8 +296,8 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
-        void addFirst(const string & columnName, enum sql_operator op, const pfm_id_t & id) {
-            string clause = columnName;
+        void addFirst(const std::string & columnName, enum sql_operator op, const pfm_id_t & id) {
+            std::string clause = columnName;
 
             switch (op) {
                 case equal_to:
@@ -326,8 +325,8 @@ class DBCriteria {
             whereClauses.push_front(clause);
         }
 
-        void add(const string & columnName, const bool value) {
-            string clause = columnName;
+        void add(const std::string & columnName, const bool value) {
+            std::string clause = columnName;
 
             clause.append(" = ");
             clause = appendBoolean(clause, value);
@@ -335,20 +334,20 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
-        void addToInClause(const string & columnName, const string & value) {
-            inClauses.insert(pair<string, string>{columnName, value});
+        void addToInClause(const std::string & columnName, const std::string & value) {
+            inClauses.insert(std::pair<std::string, std::string>{columnName, value});
         }
 
-        void addToInClause(const string & columnName, const StrDate & value) {
+        void addToInClause(const std::string & columnName, const StrDate & value) {
             addToInClause(columnName, value.shortDate());
         }
 
-        void addToInClause(const string & columnName, const pfm_id_t & value) {
+        void addToInClause(const std::string & columnName, const pfm_id_t & value) {
             addToInClause(columnName, value.getValue());
         }
 
-        void endInClause_string(const string & columnName) {
-            string clause = columnName + " IN (";
+        void endInClause_string(const std::string & columnName) {
+            std::string clause = columnName + " IN (";
 
             auto range = inClauses.equal_range(columnName);
 
@@ -366,12 +365,12 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
-        void endInClause_StrDate(const string & columnName) {
+        void endInClause_StrDate(const std::string & columnName) {
             endInClause_string(columnName);
         }
 
-        void endInClause_id(const string & columnName) {
-            string clause = columnName + " IN (";
+        void endInClause_id(const std::string & columnName) {
+            std::string clause = columnName + " IN (";
 
             auto range = inClauses.equal_range(columnName);
 
@@ -389,8 +388,8 @@ class DBCriteria {
             whereClauses.push_back(clause);
         }
 
-        void addOrderBy(const string & columnName, enum sql_order order) {
-            string clause = columnName + ' ';
+        void addOrderBy(const std::string & columnName, enum sql_order order) {
+            std::string clause = columnName + ' ';
 
             switch (order) {
                 case descending:
@@ -405,7 +404,7 @@ class DBCriteria {
             orderClauses.push_back(clause);
         }
 
-        void addGroupBy(const string & columnName) {
+        void addGroupBy(const std::string & columnName) {
             groupClauses.push_back(columnName);
         }
 
@@ -413,12 +412,12 @@ class DBCriteria {
             rowLimit = numRows;
         }
 
-        const string getWhereCriteria() const {
+        const std::string getWhereCriteria() const {
             if (whereClauses.empty()) {
                 return "";
             }
 
-            string where;
+            std::string where;
             for (size_t i = 0; i < whereClauses.size(); i++) {
                 where += whereClauses[i];
 
@@ -430,16 +429,16 @@ class DBCriteria {
             return where;
         }
 
-        const string getWhereClause() const {
+        const std::string getWhereClause() const {
             return " WHERE " + getWhereCriteria();
         }
 
-        const string getOrderBy() const {
+        const std::string getOrderBy() const {
             if (orderClauses.empty()) {
                 return "";
             }
 
-            string orderBy = " ORDER BY ";
+            std::string orderBy = " ORDER BY ";
             for (size_t i = 0; i < orderClauses.size(); i++) {
                 orderBy += orderClauses[i];
 
@@ -451,12 +450,12 @@ class DBCriteria {
             return orderBy;
         }
 
-        const string getGroupBy() const {
+        const std::string getGroupBy() const {
             if (groupClauses.empty()) {
                 return "";
             }
 
-            string groupBy = " GROUP BY ";
+            std::string groupBy = " GROUP BY ";
             for (size_t i = 0; i < groupClauses.size(); i++) {
                 groupBy += groupClauses[i];
 
@@ -468,7 +467,7 @@ class DBCriteria {
             return groupBy;
         }
 
-        const string getLimitClause() const {
+        const std::string getLimitClause() const {
             if (rowLimit == NULL_ROW_LIMIT) {
                 return "";
             }
@@ -476,11 +475,11 @@ class DBCriteria {
             char limitString[16];
             snprintf(limitString, 16, " LIMIT %d", rowLimit);
 
-            return string(limitString);
+            return std::string(limitString);
         }
 
-        const string getStatementCriteria() const {
-            string criteria =
+        const std::string getStatementCriteria() const {
+            std::string criteria =
                 getWhereClause() + 
                 getOrderBy() + 
                 getGroupBy() +
@@ -496,7 +495,7 @@ class DBEntity {
         pfm_id_t insert();
         void update();
 
-        uint64_t findSingleQuotePos(string & s, int startingPos) const;
+        uint64_t findSingleQuotePos(std::string & s, int startingPos) const;
 
     protected:
         virtual void beforeSave() {
@@ -531,27 +530,27 @@ class DBEntity {
             return;
         }
 
-        const string getFromClause() {
-            string from = "FROM ";
+        const std::string getFromClause() {
+            std::string from = "FROM ";
             from.append(getTableName());
 
             return from;
         }
 
-        const string delimitSingleQuotes(string & s) const;
+        const std::string delimitSingleQuotes(std::string & s) const;
         
-        virtual string buildInsertStatement(const string & tableName, vector<pair<ColumnDef, string>> & columnValuePairs) const {
-            string now = StrDate::getTimestamp();
+        virtual std::string buildInsertStatement(const std::string & tableName, std::vector<std::pair<ColumnDef, std::string>> & columnValuePairs) const {
+            std::string now = StrDate::getTimestamp();
 
             columnValuePairs.push_back({{Columns::createdDate, Columns::createdDate_type}, now});
             columnValuePairs.push_back({{Columns::updatedDate, Columns::updatedDate_type}, now});
 
-            string cols = "(";
-            string vals = "(";
+            std::string cols = "(";
+            std::string vals = "(";
 
             for (size_t i = 0;i < columnValuePairs.size();i++) {
                 ColumnDef column = columnValuePairs[i].first;
-                string value = columnValuePairs[i].second;
+                std::string value = columnValuePairs[i].second;
 
                 cols.append(column.name);
 
@@ -573,21 +572,21 @@ class DBEntity {
             cols.append(")");
             vals.append(")");
 
-            string statement = "INSERT INTO " + tableName + " " + cols + " VALUES " + vals + ";";
+            std::string statement = "INSERT INTO " + tableName + " " + cols + " VALUES " + vals + ";";
 
             return statement;
         }
         
-        virtual string buildUpdateStatement(const string & tableName, vector<pair<ColumnDef, string>> & columnValuePairs) const {
-            string now = StrDate::getTimestamp();
+        virtual std::string buildUpdateStatement(const std::string & tableName, std::vector<std::pair<ColumnDef, std::string>> & columnValuePairs) const {
+            std::string now = StrDate::getTimestamp();
 
             columnValuePairs.push_back({{Columns::updatedDate, Columns::updatedDate_type}, now});
  
-            string statement = "UPDATE " + tableName + " SET ";
+            std::string statement = "UPDATE " + tableName + " SET ";
 
             for (size_t i = 0;i < columnValuePairs.size();i++) {
                 ColumnDef column = columnValuePairs[i].first;
-                string value = columnValuePairs[i].second;
+                std::string value = columnValuePairs[i].second;
 
                 statement.append(column.name);
                 statement.append(" = ");
@@ -629,8 +628,8 @@ class DBEntity {
     public:
         pfm_id_t id;
 
-        string createdDate;
-        string updatedDate;
+        std::string createdDate;
+        std::string updatedDate;
         
         /*
         ** Not persistent...
@@ -653,70 +652,70 @@ class DBEntity {
             return r;
         }
 
-        virtual void backup(ofstream & os) {
+        virtual void backup(std::ofstream & os) {
             return;
         }
         
-        virtual const string getTableName() const {
+        virtual const std::string getTableName() const {
             return "";
         }
 
-        virtual const string getClassName() const {
+        virtual const std::string getClassName() const {
             return "DBEntity";
         }
 
-        virtual const string getJSONArrayName() const {
+        virtual const std::string getJSONArrayName() const {
             return "";
         }
 
-        virtual const string getSelectStatement() {
-            string statement = "SELECT * " + getFromClause();
+        virtual const std::string getSelectStatement() {
+            std::string statement = "SELECT * " + getFromClause();
             return statement;
         }
 
-        virtual const string getSelectByIDStatement(const pfm_id_t & key) {
+        virtual const std::string getSelectByIDStatement(const pfm_id_t & key) {
             DBCriteria criteria;
             criteria.add(Columns::id, DBCriteria::equal_to, key);
 
-            string statement = getSelectStatement() + criteria.getStatementCriteria();
+            std::string statement = getSelectStatement() + criteria.getStatementCriteria();
 
             return statement;
         }
 
-        virtual const string getSelectAllStatement() {
-            string statement = getSelectStatement() + ';';
+        virtual const std::string getSelectAllStatement() {
+            std::string statement = getSelectStatement() + ';';
             return statement;
         }
 
-        virtual const string getDeleteByIDStatement(pfm_id_t & key) {
+        virtual const std::string getDeleteByIDStatement(pfm_id_t & key) {
             DBCriteria criteria;
             criteria.add(Columns::id, DBCriteria::equal_to, key);
 
-            string statement = "DELETE " + getFromClause() + criteria.getStatementCriteria();
+            std::string statement = "DELETE " + getFromClause() + criteria.getStatementCriteria();
 
             return statement;
         }
 
-        virtual const string getDeleteAllStatement() {
+        virtual const std::string getDeleteAllStatement() {
             return getDeleteStatement();
         }
 
-        virtual const string getInsertStatement() {
+        virtual const std::string getInsertStatement() {
             return "";
         }
 
-        virtual const string getUpdateStatement() {
+        virtual const std::string getUpdateStatement() {
             return "";
         }
 
-        virtual const string getDeleteStatement() {
-            string statement = "DELETE " + getFromClause() + ';';
+        virtual const std::string getDeleteStatement() {
+            std::string statement = "DELETE " + getFromClause() + ';';
 
             return statement;
         }
 
         void remove();
-        void remove(const string & statement);
+        void remove(const std::string & statement);
         void removeAll();
 
         void save();
@@ -756,14 +755,14 @@ class DBEntity {
         }
 
         void print() {
-            cout << "ID: " << id.getValue() << endl;
-            cout << "Sequence: " << sequence << endl;
+            std::cout << "ID: " << id.getValue() << std::endl;
+            std::cout << "Sequence: " << sequence << std::endl;
 
-            cout << "Created: " << createdDate << endl;
-            cout << "Updated: " << updatedDate << endl;
+            std::cout << "Created: " << createdDate << std::endl;
+            std::cout << "Updated: " << updatedDate << std::endl;
         }
 
-        static bool isYesNoBooleanValid(string & ynValue) {
+        static bool isYesNoBooleanValid(std::string & ynValue) {
             if (ynValue == "Y" || ynValue == "N") {
                 return true;
             }
@@ -807,7 +806,7 @@ class Result {
 template <class T>
 class DBResult : public Result {
     private:
-        vector<T> results;
+        std::vector<T> results;
 
     public:
         DBResult() : Result() {
@@ -823,7 +822,7 @@ class DBResult : public Result {
             Logger & log = Logger::getInstance();
             log.entry("DBResult::reverse()");
 
-            list<T> l;
+            std::list<T> l;
 
             for (int i = results.size() - 1;i >= 0;i--) {
                 l.push_back(results[i]);
@@ -836,7 +835,7 @@ class DBResult : public Result {
             log.exit("DBResult::reverse()");
         }
         
-        int retrieve(const string & sqlStatement);
+        int retrieve(const std::string & sqlStatement);
         int retrieveAll();
 
         T & at(unsigned int i) {
@@ -887,7 +886,7 @@ int DBResult<T>::retrieveAll() {
     log.entry("DBResult::retrieveAll()");
 
     T entity;
-    vector<DBRow> rows;
+    std::vector<DBRow> rows;
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -903,11 +902,11 @@ int DBResult<T>::retrieveAll() {
 }
 
 template <class T>
-int DBResult<T>::retrieve(const string & sqlStatement) {
+int DBResult<T>::retrieve(const std::string & sqlStatement) {
     Logger & log = Logger::getInstance();
     log.entry("DBResult::retrieve()");
 
-    vector<DBRow> rows;
+    std::vector<DBRow> rows;
 
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -921,4 +920,3 @@ int DBResult<T>::retrieve(const string & sqlStatement) {
 
     return rowsRetrievedCount;
 }
-

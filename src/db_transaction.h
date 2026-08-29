@@ -18,21 +18,20 @@
 #include "jfile.h"
 #include "strdate.h"
 
-using namespace std;
 
 #define TYPE_CREDIT         "CR"
 #define TYPE_DEBIT          "DB"
 
 class DBTransaction : public DBPayment {
     private:
-        const string getInsertStatementForRestore() {
+        const std::string getInsertStatementForRestore() {
             account.retrieve(accountId);
 
-            string accountSubSelect = account.getIDByCodeSubSelect();
-            string categorySubSelect = category.getIDByCodeSubSelect();
-            string payeeSubSelect = payee.getIDByCodeSubSelect();
+            std::string accountSubSelect = account.getIDByCodeSubSelect();
+            std::string categorySubSelect = category.getIDByCodeSubSelect();
+            std::string payeeSubSelect = payee.getIDByCodeSubSelect();
 
-            string recurringChargeSubSelect;
+            std::string recurringChargeSubSelect;
             if (recurringChargeId.isNull()) {
                 recurringChargeSubSelect = recurringChargeId.getValue();
             }
@@ -43,7 +42,7 @@ class DBTransaction : public DBPayment {
                 recurringChargeSubSelect = charge.getIDByCriteriaSubSelect();
             }
 
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{DBPayment::Columns::accountId, DBPayment::Columns::accountId_type}, accountSubSelect},
                 {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categorySubSelect},
                 {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeSubSelect},
@@ -77,8 +76,8 @@ class DBTransaction : public DBPayment {
 
     public:
         pfm_id_t recurringChargeId;
-        string reference;
-        string type;
+        std::string reference;
+        std::string type;
         bool isReconciled;
 
         DBTransaction() : DBPayment() {
@@ -89,12 +88,12 @@ class DBTransaction : public DBPayment {
             set(src);
         }
         
-        static const string getCSVHeader() {
+        static const std::string getCSVHeader() {
             return "accountCode,categoryCode,payeeCode,date,description,reference,creditDebit,isReconciled,isTransfer,amount\n";
         }
 
-        string getCSVRecord() {
-            string record = 
+        std::string getCSVRecord() {
+            std::string record =
                     "\"" + getAccountCode() + "\"," + 
                     "\"" + category.code + "\"," +
                     "\"" + payee.code + "\"," +
@@ -155,20 +154,20 @@ class DBTransaction : public DBPayment {
         void print() {
             DBPayment::print();
 
-            cout << "RecurringChargeId: " << recurringChargeId.getValue() << endl;
-            cout << "Reference: '" << reference << "'" << endl;
-            cout << "Type: '" << type << "'" << endl;
-            cout << "isReconciled: " << isReconciled << endl;
+            std::cout << "RecurringChargeId: " << recurringChargeId.getValue() << std::endl;
+            std::cout << "Reference: '" << reference << "'" << std::endl;
+            std::cout << "Type: '" << type << "'" << std::endl;
+            std::cout << "isReconciled: " << isReconciled << std::endl;
         }
 
-        void backup(ofstream & os) override {
+        void backup(std::ofstream & os) override {
             DBResult<DBTransaction> results;
             results.retrieveAll();
 
-            os << getDeleteAllStatement() << endl;
+            os << getDeleteAllStatement() << std::endl;
 
             for (size_t i = 0;i < results.size();i++) {
-                os << results[i].getInsertStatementForRestore() << endl;
+                os << results[i].getInsertStatementForRestore() << std::endl;
             }
 
             os.flush();
@@ -211,20 +210,20 @@ class DBTransaction : public DBPayment {
             return (isReconciled ? "Y" : "N");
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "account_transaction";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBTransaction";
         }
 
-        const string getJSONArrayName() const override {
+        const std::string getJSONArrayName() const override {
             return "transactions";
         }
 
-        const string getInsertStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getInsertStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{DBPayment::Columns::accountId, DBPayment::Columns::accountId_type}, accountId.getValue()},
                 {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categoryId.getValue()},
                 {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeId.getValue()},
@@ -241,8 +240,8 @@ class DBTransaction : public DBPayment {
             return buildInsertStatement(getTableName(), columnValuePairs);
         }
 
-        const string getUpdateStatement() override {
-            vector<pair<ColumnDef, string>> columnValuePairs = {
+        const std::string getUpdateStatement() override {
+            std::vector<std::pair<ColumnDef, std::string>> columnValuePairs = {
                 {{DBPayment::Columns::categoryId, DBPayment::Columns::categoryId_type}, categoryId.getValue()},
                 {{DBPayment::Columns::payeeId, DBPayment::Columns::payeeId_type}, payeeId.getValue()},
                 {{DBPayment::Columns::date, DBPayment::Columns::date_type}, date.shortDate()},
@@ -285,6 +284,6 @@ class DBTransaction : public DBPayment {
         DBResult<DBTransaction> retrieveByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransaction> retrieveReconciledByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
         DBResult<DBTransaction> retrieveNonRecurringByAccountIDForPeriod(pfm_id_t & accountId, StrDate & firstDate, StrDate & secondDate);
-        DBResult<DBTransaction> findTransactionsForAccountID(pfm_id_t & accountId, string & criteria);
+        DBResult<DBTransaction> findTransactionsForAccountID(pfm_id_t & accountId, std::string & criteria);
 };
 

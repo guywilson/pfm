@@ -14,7 +14,6 @@
 #include "strdate.h"
 #include "pfm_error.h"
 
-using namespace std;
 
 class DBTransferRecordView : public DBEntity {
     protected:
@@ -50,12 +49,12 @@ class DBTransferRecordView : public DBEntity {
     public:
         pfm_id_t transactionFromID;
         pfm_id_t transactionToID;
-        string accountFromCode;
-        string accountToCode;
-        string payeeCode;
-        string categoryCode;
+        std::string accountFromCode;
+        std::string accountToCode;
+        std::string payeeCode;
+        std::string categoryCode;
         StrDate date;
-        string description;
+        std::string description;
         Money amount;
 
         DBTransferRecordView() : DBEntity() {
@@ -93,13 +92,13 @@ class DBTransferRecordView : public DBEntity {
         void print() {
             DBEntity::print();
 
-            cout << "AccountFromCode: '" << accountFromCode << "'" << endl;
-            cout << "AccountToCode: '" << accountToCode << "'" << endl;
-            cout << "PayeeCode: '" << payeeCode << "'" << endl;
-            cout << "CategoryCode: '" << categoryCode << "'" << endl;
-            cout << "Date: '" << date.shortDate() << "'" << endl;
-            cout << "Description: '" << description << "'" << endl;
-            cout << "Amount: '" << amount.rawStringValue() << "'" << endl;
+            std::cout << "AccountFromCode: '" << accountFromCode << "'" << std::endl;
+            std::cout << "AccountToCode: '" << accountToCode << "'" << std::endl;
+            std::cout << "PayeeCode: '" << payeeCode << "'" << std::endl;
+            std::cout << "CategoryCode: '" << categoryCode << "'" << std::endl;
+            std::cout << "Date: '" << date.shortDate() << "'" << std::endl;
+            std::cout << "Description: '" << description << "'" << std::endl;
+            std::cout << "Amount: '" << amount.rawStringValue() << "'" << std::endl;
         }
 
         void onRowComplete(int sequence) override {
@@ -138,11 +137,11 @@ class DBTransferRecordView : public DBEntity {
             }
         }
 
-        const string getTableName() const override {
+        const std::string getTableName() const override {
             return "v_transfer_record";
         }
 
-        const string getClassName() const override {
+        const std::string getClassName() const override {
             return "DBTransferRecordView";
         }
 };

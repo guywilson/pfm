@@ -11,16 +11,15 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
-void DBCategory::retrieveByCode(string & code) {
+void DBCategory::retrieveByCode(std::string & code) {
     Logger & log = Logger::getInstance();
     log.entry("DBCategory::retrieveByCode()");
 
     DBCriteria criteria;
     criteria.add(Columns::code, DBCriteria::equal_to, code);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBCategory> result;
 
     int rowsRetrievedCount = result.retrieve(statement);
@@ -42,7 +41,7 @@ DBResult<DBCategory> DBCategory::retrieveOrderedByCode() {
     DBCriteria criteria;
     criteria.addOrderBy(Columns::code, DBCriteria::ascending);
 
-    string statement = getSelectStatement() + criteria.getOrderBy();
+    std::string statement = getSelectStatement() + criteria.getOrderBy();
     DBResult<DBCategory> result;
 
     result.retrieve(statement);

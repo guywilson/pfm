@@ -11,16 +11,15 @@
 #include "db.h"
 #include "strdate.h"
 
-using namespace std;
 
-void DBPayee::retrieveByCode(string & code) {
+void DBPayee::retrieveByCode(std::string & code) {
     Logger & log = Logger::getInstance();
     log.entry("DBPayee::retrieveByCode()");
 
     DBCriteria criteria;
     criteria.add(Columns::code, DBCriteria::equal_to, code);
 
-    string statement = getSelectStatement() +  criteria.getStatementCriteria();
+    std::string statement = getSelectStatement() +  criteria.getStatementCriteria();
     DBResult<DBPayee> result;
 
     int rowsRetrievedCount = result.retrieve(statement);
@@ -42,7 +41,7 @@ DBResult<DBPayee> DBPayee::retrieveOrderedByCode() {
     DBCriteria criteria;
     criteria.addOrderBy(Columns::code, DBCriteria::ascending);
 
-    string statement = getSelectStatement() + criteria.getOrderBy();
+    std::string statement = getSelectStatement() + criteria.getOrderBy();
     DBResult<DBPayee> result;
 
     result.retrieve(statement);
