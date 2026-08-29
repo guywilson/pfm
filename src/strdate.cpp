@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include <sstream>
 #include <iomanip>
 #include <string>
@@ -105,12 +106,12 @@ static bool isNumeric(string & cfgDate) {
 
 static void checkForInvalidChars(const string & date) {
     for (size_t i = 0;i < date.length();i++) {
-        char c = date[i];
+        unsigned char c = static_cast<unsigned char>(date[i]);
 
-        if (!isdigit(c) && c != '-' && c != '/') {
+        if (!isdigit(c) && !isalpha(c) && c != '-' && c != '/') {
             throw pfm_validation_error(
                         pfm_error::buildMsg(
-                            "\nInvalid date string '%s': Date must be in the format 'dd-mm-yyyy' or 'yyyy-mm-dd'",
+                            "\nInvalid date string '%s': Date must be in the format 'dd-mm-yyyy', 'yyyy-mm-dd', 'dd-Mmm-yyyy' or 'yyyy-Mmm-dd'",
                             date.c_str()),
                         __FILE__,
                         __LINE__);
@@ -213,8 +214,6 @@ StrDate::StrDate(int year, int month, int day) {
 }
 
 bool StrDate::isYear(string & part) {
-    StrDate today;
-
     if (part.length() == 4) {
         for (int i = 0;i < (int)part.length();i++) {
             if (!isdigit(part[i])) {
@@ -235,69 +234,89 @@ bool StrDate::isYear(string & part) {
 }
 
 bool StrDate::isMonth(string & part) {
-    long monthCandidate = strtol(part.c_str(), NULL, 10);
-
-    if (monthCandidate > 12) {
-        return false;
+    if (part.length() == 2 &&
+        isdigit(static_cast<unsigned char>(part[0])) &&
+        isdigit(static_cast<unsigned char>(part[1]))) {
+        int monthCandidate = stoi(part);
+        return monthCandidate >= 1 && monthCandidate <= 12;
     }
 
-    return true;
+    static const string monthMmm[] = {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+
+    return part.length() == 3 &&
+           find(begin(monthMmm), end(monthMmm), part) != end(monthMmm);
+}
+
+static int monthNumber(const string & part) {
+    if (part.length() == 2 &&
+        isdigit(static_cast<unsigned char>(part[0])) &&
+        isdigit(static_cast<unsigned char>(part[1]))) {
+        return stoi(part);
+    }
+
+    static const string monthMmm[] = {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+
+    auto month = find(begin(monthMmm), end(monthMmm), part);
+    return month == end(monthMmm) ? 0 : distance(begin(monthMmm), month) + 1;
+}
+
+static bool isTwoDigitNumber(const string & part) {
+    return part.length() == 2 &&
+           isdigit(static_cast<unsigned char>(part[0])) &&
+           isdigit(static_cast<unsigned char>(part[1]));
 }
 
 /*
 ** Accepted formats:
 **
-** yyyy-mm-dd
-** dd-mm-yyyy
+** yyyy-mm-dd or yyyy-Mmm-dd
+** dd-mm-yyyy or dd-Mmm-yyyy
 ** As above but with / rather than -
 */
 StrDate::YMD StrDate::splitDate(const string & date) {
-    if (date.length() != DATE_STRING_LENGTH) {
+    auto invalidFormat = [&date]() {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
-                    "Invalid date '%s': Invalid date length, date must be in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'",
+                    "Invalid date '%s': Date must be in the format 'yyyy-mm-dd', 'dd-mm-yyyy', 'yyyy-Mmm-dd' or 'dd-Mmm-yyyy'",
                     date.c_str()),
                 __FILE__,
                 __LINE__);
+    };
+
+    size_t firstSeparator = date.find_first_of("-/");
+    size_t secondSeparator = firstSeparator == string::npos
+            ? string::npos
+            : date.find_first_of("-/", firstSeparator + 1);
+
+    if (firstSeparator == string::npos ||
+        secondSeparator == string::npos ||
+        date.find_first_of("-/", secondSeparator + 1) != string::npos ||
+        date[firstSeparator] != date[secondSeparator]) {
+        invalidFormat();
     }
 
-    char dateBuffer[DATE_STAMP_BUFFER_LEN];
-    char * pszDate = dateBuffer;
+    string part1 = date.substr(0, firstSeparator);
+    string part2 = date.substr(firstSeparator + 1, secondSeparator - firstSeparator - 1);
+    string part3 = date.substr(secondSeparator + 1);
 
-    strncpy(dateBuffer, date.c_str(), DATE_STRING_LENGTH);
-    dateBuffer[DATE_STRING_LENGTH] = 0;
+    bool isYearFirst = part1.length() == 4;
+    string & yearPart = isYearFirst ? part1 : part3;
+    string & dayPart = isYearFirst ? part3 : part1;
 
-    string part1 = strtok_r(dateBuffer, "-/", &pszDate);
-    string part2 = strtok_r(NULL, "-/", &pszDate);
-    string part3 = strtok_r(NULL, "-/", &pszDate);
+    if (!isTwoDigitNumber(dayPart) || !isMonth(part2) || !isYear(yearPart)) {
+        invalidFormat();
+    }
 
     StrDate::YMD dateComponents;
-
-    if (isYear(part1)) {
-        dateComponents.year = (unsigned int)atoi(part1.c_str());
-    }
-    else {
-        dateComponents.day = (unsigned int)atoi(part1.c_str());
-    }
-
-    if (isMonth(part2)) {
-        dateComponents.month = (unsigned int)atoi(part2.c_str());
-    }
-    else {
-        throw pfm_validation_error(
-                pfm_error::buildMsg(
-                    "Invalid date '%s': Invalid date length, date must be in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'",
-                    date.c_str()),
-                __FILE__,
-                __LINE__);
-    }
-
-    if (dateComponents.year != 0) {
-        dateComponents.day = (unsigned int)atoi(part3.c_str());
-    }
-    else if (isYear(part3)) {
-        dateComponents.year = (unsigned int)atoi(part3.c_str());
-    }
+    dateComponents.year = (unsigned int)stoi(yearPart);
+    dateComponents.month = (unsigned int)monthNumber(part2);
+    dateComponents.day = (unsigned int)stoi(dayPart);
 
     return dateComponents;
 }
@@ -366,14 +385,10 @@ void StrDate::validateDateString(const string & date) {
 
     StrDate::YMD dateComponents = splitDate(date);
 
-    /*
-    ** Valid date in the format 'yyyy-mm-dd' or 'dd-mm-yyyy'
-    ** e.g. 2024-07-04 or 04-07-2024
-    */
     if (dateComponents.year < EPOCH_YEAR) {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
-                    "Invalid date '%s': Date must be greater than '1970-01-01'",
+                    "Invalid date '%s': Date must be on or after '1970-01-01'",
                     date.c_str()),
                 __FILE__,
                 __LINE__);
@@ -386,43 +401,14 @@ void StrDate::validateDateString(const string & date) {
                 __FILE__,
                 __LINE__);
     }
-    if (dateComponents.day < 0 || dateComponents.day > 31) {
+    if (dateComponents.day < 1 ||
+        dateComponents.day > (unsigned int)daysInMonth(dateComponents.year, dateComponents.month)) {
         throw pfm_validation_error(
                 pfm_error::buildMsg(
-                    "Invalid date '%s': Invalid day, must be between 1 and 31",
+                    "Invalid date '%s': Invalid day for the supplied month and year",
                     date.c_str()),
                 __FILE__,
                 __LINE__);
-    }
-    if ((dateComponents.month == 4 || dateComponents.month == 6 || dateComponents.month == 9 || dateComponents.month == 11) && dateComponents.day > 30) {
-        throw pfm_validation_error(
-                pfm_error::buildMsg(
-                    "Invalid date '%s': Supplied month has 30 days",
-                    date.c_str()),
-                __FILE__,
-                __LINE__);
-    }
-    if (dateComponents.month == 2) {
-        if (isLeapYear(dateComponents.year)) {
-            if (dateComponents.day > 29) {
-                throw pfm_validation_error(
-                        pfm_error::buildMsg(
-                            "Invalid date '%s': February has max 29 days in a leap year",
-                            date.c_str()),
-                        __FILE__,
-                        __LINE__);
-            }
-        }
-        else {
-            if (dateComponents.day > 28) {
-                throw pfm_validation_error(
-                        pfm_error::buildMsg(
-                            "Invalid date '%s': February has max 28 days in a non-leap year",
-                            date.c_str()),
-                        __FILE__,
-                        __LINE__);
-            }
-        }
     }
 }
 
@@ -454,7 +440,7 @@ void StrDate::set(const string & date) {
 }
 
 void StrDate::set(const char * date) {
-    if (strncmp(date, _nullDate.c_str(), 3) == 0) {
+    if (strcmp(date, _nullDate.c_str()) == 0) {
         clear();
     }
     else if (strlen(date) > 0) {
@@ -770,19 +756,17 @@ bool StrDate::isEpoch() const {
 }
 
 StrDate StrDate::addYears(int years) {
-    int y = year();
+    int y = year() + years;
     int m = month();
     int d = day();
-    
-    int newYear = y + years;
-    
-    if (m == 2 && d == 29 && !isLeapYear()) {
+
+    if (m == 2 && d == 29 && !StrDate::isLeapYear(y)) {
         d = 28;
     }
-    
-    StrDate newDate(newYear, m, d);
 
-    return newDate;
+    StrDate newDate(y, m, d);
+    set(newDate);
+    return *this;
 }
 
 StrDate StrDate::addMonths(int months) {
@@ -815,8 +799,8 @@ StrDate StrDate::addMonths(int months) {
     }
     
     StrDate newDate(y, m, d);
-
-    return newDate;
+    set(newDate);
+    return *this;
 }
 
 StrDate StrDate::addWeeks(int weeks) {
@@ -859,8 +843,8 @@ StrDate StrDate::addDays(int days) {
     }
     
     StrDate newDate(y, m, d);
-
-    return newDate;
+    set(newDate);
+    return *this;
 }
 
 StrDate & StrDate::operator=(const StrDate & rhs) {

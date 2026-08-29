@@ -96,7 +96,7 @@ static pfm_id_t createAccount() {
 }
 
 #ifdef PFM_TEST_SUITE_ENABLED
-extern void setTodayTestDate(const char * date);
+extern void setOverrideDate(const std::string & date);
 #endif
 
 void testAccount() {
@@ -104,7 +104,7 @@ void testAccount() {
     pfm_id_t accountId = createAccount();
 
 #ifdef PFM_TEST_SUITE_ENABLED
-    setTodayTestDate("2024-08-16");
+    setOverrideDate("2024-08-16");
 #endif
     StrDate today;
 

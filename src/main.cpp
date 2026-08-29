@@ -72,10 +72,6 @@ using namespace std;
 #define DEFAULT_LOG_LEVEL                       LOG_LEVEL_ALL
 #endif
 
-#ifdef PFM_TEST_SUITE_ENABLED
-extern void testAccount();
-#endif
-
 static void printUsage(void) {
     cout << "pfm [options]" << endl;
     cout << "Options:" << endl;
@@ -88,16 +84,6 @@ static void printUsage(void) {
 static void printLicense(void) {
     cout << licenseText << endl << endl;
 }
-
-#ifdef PFM_TEST_SUITE_ENABLED
-void test() {
-    MoneyTest::run();
-    cout << endl << endl;
-    StrDateTest::run();
-    cout << endl << endl;
-    testAccount();
-}
-#endif
 
 static void checkTerminalSize(void) {
     Logger & log = Logger::getInstance();
@@ -135,8 +121,7 @@ static void checkTerminalSize(void) {
 }
 
 void unitTestCodeFragment() {
-    Command command;
-    command.process("start");
+    StrDateTest::run();
 }
 
 static void initialiseReferenceData() {
