@@ -59,6 +59,7 @@
 #include "rlcustom.h"
 #include "license.h"
 #include "version.h"
+#include "reconcile.h"
 
 //#define RUN_IN_DEBUGGER
 
@@ -119,6 +120,8 @@ static void checkTerminalSize(void) {
 }
 
 void unitTestCodeFragment() {
+    TransactionReconciler r;
+    r.reconcileTransactions("HSBC", "/Users/guy/Downloads/TransactionHistory.csv", "/Users/guy/mapping.json");
 }
 
 static void initialiseReferenceData() {

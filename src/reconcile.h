@@ -1,35 +1,16 @@
 #pragma once
 
-#include <istream>
-#include <iostream>
-#include <fstream>
 #include <string>
 
-#include <nlohmann/json.hpp>
-
-#include <cstring>
-
-#define CSV_MAX_LINE_LENGTH         256
-
-using json = nlohmann::json;
-
-using object_t = std::map<std::string, std::string>;
-using objects_t = std::vector<object_t>;
+#include "csv.h"
 
 class TransactionReconciler {
+    private:
+        uint64_t findSingleQuotePos(std::string & s, int startingPos) const;
+        const std::string delimitSingleQuotes(std::string & s) const;
+
+        void populateCSVTempTable(const std::string & accountCode, CSV & csv);
+
     public:
-        void reconcileTransactions(std::string & bankCSVName, std::string & csvMappingName) {
-            std::ifstream mappingFile(csvMappingName);
-            json j = json::parse(mappingFile);
-            mappingFile.close();
-
-            std::ifstream csv(bankCSVName);
-
-            char csvLine[CSV_MAX_LINE_LENGTH];
-
-            while (!csv.eof()) {
-                csv.getline(csvLine, CSV_MAX_LINE_LENGTH);
-
-            }
-        }
+        void reconcileTransactions(const std::string & accountCode, const std::string & bankCSVName, const std::string & csvMappingName);
 };

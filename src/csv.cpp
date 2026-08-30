@@ -56,6 +56,8 @@ CSV::CSV(const std::string & csvFilename, const std::string & mappingFilename) {
     if (hasHeader) {
         readAndValidateHeader();
     }
+
+    this->csvSourceFile = csvFilename;
 }
 
 void CSV::loadMapping(const std::string & mappingFilename) {

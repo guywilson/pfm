@@ -147,6 +147,21 @@ class MoneyTest {
             }
         }
 
+        static void testCreateWithThousandsSeparator() {
+            Money decimalAmount("1,200.00");
+            Money wholeAmount("1,200");
+            Money negativeAmount("-12,345.67");
+
+            if (decimalAmount._getValue() != 120000L ||
+                wholeAmount._getValue() != 120000L ||
+                negativeAmount._getValue() != -1234567L) {
+                throw pfm_error("testCreateWithThousandsSeparator(): Test failed");
+            }
+            else {
+                std::cout << "testCreateWithThousandsSeparator(): Test passed" << std::endl;
+            }
+        }
+
         static void testCreateDouble1() {
             double amount = 137.47f;
             Money m(amount);
@@ -578,6 +593,15 @@ class MoneyTest {
 
             try {
                 testCreateChar4();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                std::cout << e.what() << std::endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testCreateWithThousandsSeparator();
                 numTestsPassed++;
             }
             catch (pfm_error & e) {

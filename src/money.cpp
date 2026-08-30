@@ -98,19 +98,20 @@ money_t Money::getWholeValueFromString(const char * amount) {
     int decimalPointPos = findDecimalPointPos(amount);
 
     log.info("Money::getWholeValue(%s), decimal index %d", amount, decimalPointPos);
+
+    char buffer[AMOUNT_BUFFER_LENGTH];
+    int bufferPos = 0;
+
+    for (int i = 0;amount[i] != 0 && amount[i] != '.' && bufferPos < (AMOUNT_BUFFER_LENGTH - 1);i++) {
+        if (amount[i] != ',') {
+            buffer[bufferPos++] = amount[i];
+        }
+    }
     
-    money_t whole;
+    buffer[bufferPos] = 0;
 
-    if (decimalPointPos == DECIMAL_POINT_NOT_FOUND_VALUE) {
-        whole = (money_t)strtol(amount, NULL, 10);
-    }
-    else {
-        char buffer[AMOUNT_BUFFER_LENGTH];
-
-        copyToDecimalPoint(buffer, amount, AMOUNT_BUFFER_LENGTH);
-        log.info("Got whole number buffer '%s'", buffer);
-        whole = (money_t)strtol(buffer, NULL, 10);
-    }
+    log.info("Got whole number buffer '%s'", buffer);
+    money_t whole = (money_t)strtol(buffer, NULL, 10);
 
     log.info("Money::getWholeValue() = %u", whole);
 

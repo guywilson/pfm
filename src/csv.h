@@ -48,6 +48,8 @@ class CSV {
 
         using Row = std::map<std::string, Column>;
 
+        std::string csvSourceFile;
+        
         CSV(const std::string & csvFilename, const std::string & mappingFilename);
 
         bool hasMoreRows();
