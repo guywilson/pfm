@@ -6,6 +6,7 @@
 #include "db.h"
 #include "db_base.h"
 #include "csv.h"
+#include "db_temp_csv.h"
 #include "reconcile.h"
 
 #define CSV_TEMP_TABLENAME                  "csv_temp_transaction"
@@ -20,49 +21,12 @@ static const char * tempCSVTable =
     "reference TEXT," \
     "description TEXT," \
     "type TEXT NOT NULL," \
-    "amount NUMERIC NOT NULL" \
+    "amount NUMERIC NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL" \
     ");";
 
-
-uint64_t TransactionReconciler::findSingleQuotePos(std::string & s, int startingPos = 0) const {
-    uint64_t pos = s.find(SINGLE_QUOTE_CHAR, startingPos);
-
-    if (pos != std::string::npos) {
-        /*
-        ** If the single quote is before the end of the string, check that 
-        ** we haven't already got a double single quote. Otherwise, if the 
-        ** single quote is at the end of the string, return the position. 
-        ** This avoids out-of-range run-time exceptions...
-        */
-        if (pos < s.length() - 1) {
-            if (s.at(pos + 1) != SINGLE_QUOTE_CHAR) {
-                return pos;
-            }
-        }
-        else {
-            return pos;
-        }
-    }
-
-    return std::string::npos;
-}
-
-const std::string TransactionReconciler::delimitSingleQuotes(std::string & s) const {
-    std::string delimited = s;
-
-    uint64_t searchPos = findSingleQuotePos(delimited);
-
-    while (searchPos != std::string::npos) {
-        delimited.insert(searchPos, 1, SINGLE_QUOTE_CHAR);
-        searchPos = findSingleQuotePos(delimited, searchPos + 2);
-    }
-
-    return delimited;
-}
-
 void TransactionReconciler::populateCSVTempTable(const std::string & accountCode, CSV & csv) {
-    PFM_DB & db = PFM_DB::getInstance();
-
     while (csv.hasMoreRows()) {
         CSV::Row row = csv.readRow();
 
@@ -73,41 +37,34 @@ void TransactionReconciler::populateCSVTempTable(const std::string & accountCode
                             csv.csvSourceFile.c_str()));
         }
 
-        StrDate date = row["date"].value;
-        Money amount = row["amount"].value;
-        std::string type = amount.doubleValue() > 0 ? "CR" : "DB";
+        DBTempCSV temp;
 
-        if (amount < 0.00) {
-            amount = amount * -1;
+        temp.accountCode = accountCode;
+        temp.date = row["date"].value;
+        temp.amount = row["amount"].value;
+        temp.type = temp.amount.doubleValue() > 0 ? "CR" : "DB";
+
+        if (temp.amount < 0.00) {
+            temp.amount = temp.amount * -1;
         }
 
-        std::string description;
         if (row.contains("description")) {
-            description = row["description"].value;
+            temp.description = row["description"].value;
         }
         
-        std::string reference;
         if (row.contains("reference")) {
-            reference = row["reference"].value;
+            temp.reference = row["reference"].value;
         }
 
-        std::string insertStatement = 
-            "INSERT INTO " + std::string(CSV_TEMP_TABLENAME) + " (account_code, date, description, reference, type, amount) VALUES ('" +
-            accountCode + "', '" +
-            date.shortDate() + "', '" +
-            delimitSingleQuotes(description) + "', '" +
-            delimitSingleQuotes(reference) + "', '" +
-            type + "', " +
-            amount.rawStringValue() +
-            ");";
-
-        db.executeInsert(insertStatement);
+        temp.save();
     }
 }
 
 void TransactionReconciler::reconcileTransactions(const std::string & accountCode, const std::string & bankCSVName, const std::string & csvMappingName) {
     PFM_DB & db = PFM_DB::getInstance();
     Logger & log = Logger::getInstance();
+
+    log.entry("TransactionReconciler::reconcileTransactions()");
 
     db.begin();
 
@@ -124,4 +81,19 @@ void TransactionReconciler::reconcileTransactions(const std::string & accountCod
     }
 
     db.commit();
+
+    /*
+    ** Build reconciliation report with the following details:
+    **
+    ** 1) Transactions that are within +- 2 days and with the same amount that exist in
+    ** the source CSV file but not in the PFM transation table.
+    **
+    ** 2) Transactions that are within +- 2 days and with the same amount that exist in
+    ** the PFM transation table but not in the source CSV file.
+    **
+    ** 3) Transactions that are within +- 2 days and with the +- 10% amount that exist in
+    ** both the PFM transation table and in the source CSV file.
+    */
+
+    log.exit("TransactionReconciler::reconcileTransactions()");
 }
