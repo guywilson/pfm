@@ -6,6 +6,7 @@
 
 class TransactionReconciler {
     private:
+        void dropCSVTempTable();
         void populateCSVTempTable(const std::string & accountCode, CSV & csv);
 
     public:

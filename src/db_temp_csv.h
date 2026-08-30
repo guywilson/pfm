@@ -1,9 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <iomanip>
 #include <string>
-#include <vector>
 #include <stdint.h>
 
 #include <sqlcipher/sqlite3.h>
@@ -169,4 +166,6 @@ class DBTempCSV : public DBEntity {
 
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
+
+        DBResult<DBTempCSV> retrieveByDateRangeAndAmount(const StrDate & lower, const StrDate & upper, const Money & amount);
 };

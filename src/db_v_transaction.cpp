@@ -274,3 +274,24 @@ DBResult<DBTransactionView> DBTransactionView::reportByPayee(DBAccount & account
 
     return result;
 }
+
+DBResult<DBTransactionView> DBTransactionView::retrieveByDateRangeAndAmount(const StrDate & lower, const StrDate & upper, const Money & amount) {
+    Logger & log = Logger::getInstance();
+    log.entry("DBTransactionView::retrieveByDateRangeAndAmount()");
+
+    DBCriteria criteria;
+
+    criteria.add(DBPayment::Columns::date, DBCriteria::sql_operator::greater_than_or_equal, lower);
+    criteria.add(DBPayment::Columns::date, DBCriteria::sql_operator::less_than_or_equal, upper);
+    criteria.add(DBPayment::Columns::amount, DBCriteria::sql_operator::equal_to, amount);
+    criteria.addOrderBy(DBPayment::Columns::date, DBCriteria::sql_order::descending);
+
+    std::string statement = getSelectStatement() + criteria.getStatementCriteria();
+
+    DBResult<DBTransactionView> result;
+    result.retrieve(statement);
+
+    log.exit("DBTransactionView::retrieveByDateRangeAndAmount()");
+
+    return result;
+}

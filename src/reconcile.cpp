@@ -7,11 +7,12 @@
 #include "db_base.h"
 #include "csv.h"
 #include "db_temp_csv.h"
+#include "db_v_transaction.h"
 #include "reconcile.h"
 
 #define CSV_TEMP_TABLENAME                  "csv_temp_transaction"
 
-static const char * tempCSVTable = 
+static const char * createTempCSVTable = 
     "CREATE TABLE " \
     CSV_TEMP_TABLENAME \
     " (" \
@@ -25,6 +26,16 @@ static const char * tempCSVTable =
     "created TEXT NOT NULL," \
     "updated TEXT NOT NULL" \
     ");";
+
+static const char * dropTempCSVTable =
+    "DROP TABLE " \
+    CSV_TEMP_TABLENAME \
+    ";";
+
+void TransactionReconciler::dropCSVTempTable() {
+    PFM_DB & db = PFM_DB::getInstance();
+    db.executeWrite(dropTempCSVTable);
+}
 
 void TransactionReconciler::populateCSVTempTable(const std::string & accountCode, CSV & csv) {
     while (csv.hasMoreRows()) {
@@ -69,7 +80,7 @@ void TransactionReconciler::reconcileTransactions(const std::string & accountCod
     db.begin();
 
     try {
-        db.createTable(tempCSVTable);
+        db.createTable(createTempCSVTable);
 
         CSV csv = CSV(bankCSVName, csvMappingName);
         populateCSVTempTable(accountCode, csv);
@@ -94,6 +105,29 @@ void TransactionReconciler::reconcileTransactions(const std::string & accountCod
     ** 3) Transactions that are within +- 2 days and with the +- 10% amount that exist in
     ** both the PFM transation table and in the source CSV file.
     */
+
+    DBResult<DBTempCSV> csvRecords;
+    csvRecords.retrieveAll();
+
+    DBTransactionView transaction;
+
+    DBResult<DBTempCSV> reportPart1Records;
+
+    for (size_t i = 0;i < csvRecords.size();i++) {
+        DBTempCSV temp = csvRecords[i];
+
+        DBResult<DBTransactionView> transactions = 
+            transaction.retrieveByDateRangeAndAmount(
+                temp.date.addDays(-2), 
+                temp.date.addDays(2), 
+                temp.amount);
+
+        if (transactions.size() == 0) {
+            reportPart1Records.addRow(temp);
+        }
+    }
+
+    dropCSVTempTable();
 
     log.exit("TransactionReconciler::reconcileTransactions()");
 }
