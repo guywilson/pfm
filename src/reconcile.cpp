@@ -77,7 +77,7 @@ void TransactionReconciler::populateCSVTempTable(const std::string & accountCode
         Money amount = row["amount"].value;
         std::string type = amount.doubleValue() > 0 ? "CR" : "DB";
 
-        if (type == "DB") {
+        if (amount < 0.00) {
             amount = amount * -1;
         }
 
