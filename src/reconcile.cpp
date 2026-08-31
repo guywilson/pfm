@@ -1,5 +1,7 @@
 #include <string>
 #include <exception>
+#include <vector>
+#include <utility>
 
 #include "strdate.h"
 #include "money.h"
@@ -11,7 +13,11 @@
 #include "debug_views.h"
 #include "reconcile.h"
 
+using Rows = std::vector<DBRow>;
+using Columns = std::vector<DBColumn>;
+
 #define CSV_TEMP_TABLENAME                  "csv_temp_transaction"
+#define DATE_SEARCH_WINDOW                  5
 
 static const char * createTempCSVTable = 
     "CREATE TABLE " \
@@ -35,55 +41,172 @@ static const char * dropTempCSVTable =
 
 void TransactionReconciler::dropCSVTempTable() {
     PFM_DB & db = PFM_DB::getInstance();
-    db.executeWrite(dropTempCSVTable);
+
+    try {
+        db.executeWrite(dropTempCSVTable);
+    }
+    catch (pfm_error & e) {
+
+    }
 }
 
-DBResult<DBTempCSV> TransactionReconciler::reportPart1() {
-    DBResult<DBTempCSV> csvRecords;
-    csvRecords.retrieveAll();
+std::vector<DBRow> TransactionReconciler::reportPart1(const std::string & accountCode) {
+    Logger & log = Logger::getInstance();
+    PFM_DB & db = PFM_DB::getInstance();
+
+    log.entry("TransactionReconciler::reportPart1()");
+
+    DBTempCSV t;
+    std::string statement = t.getSelectAllStatement();
+
+    Rows csvRecords;
+    db.executeRead(statement, &csvRecords);
 
     DBTransactionView transaction;
 
-    DBResult<DBTempCSV> reportPart1Records;
+    Rows reportPart1Records;
+
+    StrDate date;
+    StrDate lower;
+    StrDate upper;
+    std::string description;
+    Money amount;
 
     for (size_t i = 0;i < csvRecords.size();i++) {
-        DBTempCSV temp = csvRecords[i];
+        DBRow temp = csvRecords[i];
+
+        for (size_t j = 0;j < temp.getNumColumns();j++) {
+            DBColumn c = temp.getColumnAt((int)j);
+
+            if (c.getName() == "date") {
+                date = c.getValue();
+
+                lower = date;
+                lower.addDays(-DATE_SEARCH_WINDOW);
+
+                upper = date;
+                upper.addDays(DATE_SEARCH_WINDOW);
+            }
+            else if (c.getName() == "description") {
+                description = c.getValue();
+            }
+            else if (c.getName() == "amount") {
+                amount = c.doubleValue();
+            }
+        }
 
         DBResult<DBTransactionView> transactions = 
-            transaction.retrieveByDateRangeAndAmount(
-                temp.date.addDays(-2), 
-                temp.date.addDays(2), 
-                temp.amount);
+            transaction.retrieveByDateRangeAndAmountForAccount(
+                accountCode,
+                lower, 
+                upper, 
+                amount);
 
         if (transactions.size() == 0) {
-            reportPart1Records.addRow(temp);
+            log.info(
+                "No matching transaction found in PFM transaction table for record %s | %s | %s", 
+                date.shortDate().c_str(),
+                description.c_str(),
+                amount.localeFormattedStringValue().c_str());
+
+            DBColumn dateColumn("date", date.shortDate().c_str());
+            DBColumn descColumn("description", description.c_str());
+            DBColumn amountColumn("amount", amount.rawStringValue().c_str());
+
+            DBRow r({dateColumn, descColumn, amountColumn});
+            reportPart1Records.push_back(r);
+        }
+        else {
+            log.info(
+                "Found matching transaction(s) in PFM transaction table for record %s | %s | %s",
+                date.shortDate().c_str(),
+                description.c_str(),
+                amount.localeFormattedStringValue().c_str());
         }
     }
+
+    log.exit("TransactionReconciler::reportPart1()");
 
     return reportPart1Records;
 }
 
-DBResult<DBTransactionView> TransactionReconciler::reportPart2() {
-    DBResult<DBTransactionView> pfmRecords;
-    pfmRecords.retrieveAll();
+std::vector<DBRow> TransactionReconciler::reportPart2(const std::string & accountCode, const StrDate & startDate, const StrDate & endDate) {
+    Logger & log = Logger::getInstance();
 
-    DBTempCSV tempCSV;
+    log.entry("TransactionReconciler::reportPart2");
 
-    DBResult<DBTransactionView> reportPart2Records;
+    PFM_DB & db = PFM_DB::getInstance();
+
+    DBTransactionView t;
+    std::string statement = t.getSelectStatement() + " WHERE account = '" + accountCode + "' AND date >= '" + startDate.shortDate() + "' AND date <= '" + endDate.shortDate() + "' ORDER BY date DESC;";
+
+    Rows pfmRecords;
+    db.executeRead(statement, &pfmRecords);
+
+    DBTempCSV temp;
+
+    Rows reportPart2Records;
+
+    StrDate date;
+    StrDate lower;
+    StrDate upper;
+    std::string description;
+    Money amount;
 
     for (size_t i = 0;i < pfmRecords.size();i++) {
-        DBTransactionView transaction = pfmRecords[i];
+        DBRow transaction = pfmRecords[i];
+
+        for (size_t j = 0;j < transaction.getNumColumns();j++) {
+            DBColumn c = transaction.getColumnAt((int)j);
+
+            if (c.getName() == "date") {
+                date = c.getValue();
+
+                lower = date;
+                lower.addDays(-DATE_SEARCH_WINDOW);
+
+                upper = date;
+                upper.addDays(DATE_SEARCH_WINDOW);
+            }
+            else if (c.getName() == "description") {
+                description = c.getValue();
+            }
+            else if (c.getName() == "amount") {
+                amount = c.doubleValue();
+            }
+        }
 
         DBResult<DBTempCSV> transactions = 
-            tempCSV.retrieveByDateRangeAndAmount(
-                transaction.date.addDays(-2), 
-                transaction.date.addDays(2), 
-                transaction.amount);
+            temp.retrieveByDateRangeAndAmountForAccount(
+                accountCode,
+                lower, 
+                upper, 
+                amount);
 
         if (transactions.size() == 0) {
-            reportPart2Records.addRow(transaction);
+            log.info(
+                "No matching transaction found in temp CSV table for record %s | %s | %s", 
+                date.shortDate().c_str(),
+                description.c_str(),
+                amount.localeFormattedStringValue().c_str());
+
+            DBColumn dateColumn("date", date.shortDate().c_str());
+            DBColumn descColumn("description", description.c_str());
+            DBColumn amountColumn("amount", amount.rawStringValue().c_str());
+
+            DBRow r({dateColumn, descColumn, amountColumn});
+            reportPart2Records.push_back(r);
+        }
+        else {
+            log.info(
+                "Found matching transaction(s) in temp CSV table for record %s | %s | %s",
+                date.shortDate().c_str(),
+                description.c_str(),
+                amount.localeFormattedStringValue().c_str());
         }
     }
+
+    log.exit("TransactionReconciler::reportPart2");
 
     return reportPart2Records;
 }
@@ -128,6 +251,8 @@ void TransactionReconciler::reconcileTransactions(const std::string & accountCod
 
     log.entry("TransactionReconciler::reconcileTransactions()");
 
+    dropCSVTempTable();
+
     db.begin();
 
     try {
@@ -160,17 +285,29 @@ void TransactionReconciler::reconcileTransactions(const std::string & accountCod
     ** that we have the amount wrong in PFM.
     */
 
-    DBResult<DBTempCSV> reportPart1Records = reportPart1();
-    DBResult<DBTransactionView> reportPart2Records = reportPart2();
+    std::vector<DBRow> reportPart1Records = reportPart1(accountCode);
 
-    // if (reportPart1Records.size() > 0) {
-    //     GenericListView view;
-    //     view.addRows(reportPart1Records.);
+    DBTempCSV temp;
+    std::pair<StrDate, StrDate> dateRange = temp.getDateRangeForAccount(accountCode);
 
-    //     view.show();
-    // }
+    std::vector<DBRow> reportPart2Records = reportPart2(accountCode, dateRange.first, dateRange.second);
 
-    dropCSVTempTable();
+    if (reportPart1Records.size() > 0) {
+        std::cout << "Transactions in " << bankCSVName << " but not in the PFM database :" << std::endl << std::endl;
+
+        GenericListView view;
+        view.addRows(reportPart1Records);
+
+        view.show();
+    }
+    if (reportPart2Records.size() > 0) {
+        std::cout << "Transactions in the PFM database but not in " << bankCSVName << " :" << std::endl << std::endl;
+        
+        GenericListView view;
+        view.addRows(reportPart2Records);
+
+        view.show();
+    }
 
     log.exit("TransactionReconciler::reconcileTransactions()");
 }

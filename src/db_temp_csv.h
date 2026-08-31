@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <stdint.h>
 
 #include <sqlcipher/sqlite3.h>
@@ -41,6 +42,9 @@ class DBTempCSV : public DBEntity {
         std::string type;
         Money amount;
 
+        StrDate startDate;
+        StrDate endDate;
+
         DBTempCSV() : DBEntity() {
             clear();
         }
@@ -58,6 +62,9 @@ class DBTempCSV : public DBEntity {
             this->description.clear();
             this->type.clear();
             this->amount = 0.0;
+
+            this->startDate.clear();
+            this->endDate.clear();
         }
 
         void set(const DBTempCSV & src) {
@@ -69,6 +76,9 @@ class DBTempCSV : public DBEntity {
             this->description = src.description;
             this->type = src.type;
             this->amount = src.amount;
+
+            this->startDate = src.startDate;
+            this->endDate = src.endDate;
         }
 
         void set(JRecord & record) {
@@ -127,6 +137,12 @@ class DBTempCSV : public DBEntity {
             else if (column.getName() == Columns::amount) {
                 amount = column.doubleValue();
             }
+            else if (column.getName() == "start_date") {
+                startDate = column.getValue();
+            }
+            else if (column.getName() == "end_date") {
+                endDate = column.getValue();
+            }
         }
 
         const std::string getTableName() const override {
@@ -167,5 +183,11 @@ class DBTempCSV : public DBEntity {
             return buildUpdateStatement(getTableName(), columnValuePairs);
         }
 
-        DBResult<DBTempCSV> retrieveByDateRangeAndAmount(const StrDate & lower, const StrDate & upper, const Money & amount);
+        DBResult<DBTempCSV> retrieveByDateRangeAndAmountForAccount(
+                                const std::string & accountCode, 
+                                const StrDate & lower, 
+                                const StrDate & upper, 
+                                const Money & amount);
+
+        std::pair<StrDate, StrDate> getDateRangeForAccount(const std::string & accountCode);
 };

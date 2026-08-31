@@ -120,6 +120,9 @@ static void checkTerminalSize(void) {
 }
 
 void unitTestCodeFragment() {
+    Logger & log = Logger::getInstance();
+    log.setLogLevel(LOG_LEVEL_ENTRYEXIT | LOG_LEVEL_SQL | LOG_LEVEL_INFO);
+    
     TransactionReconciler r;
     r.reconcileTransactions("HSBC", "/Users/guy/Downloads/TransactionHistory.csv", "/Users/guy/mapping.json");
 }

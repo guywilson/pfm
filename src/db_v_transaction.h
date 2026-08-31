@@ -163,7 +163,7 @@ class DBTransactionView : public DBTransaction {
         DBResult<DBTransactionView> reportByCategory(DBAccount & account, StrDate & periodStart, StrDate & periodEnd);
         DBResult<DBTransactionView> reportByPayee(DBAccount & account, StrDate & periodStart, StrDate & periodEnd);
 
-        DBResult<DBTransactionView> retrieveByDateRangeAndAmount(const StrDate & lower, const StrDate & upper, const Money & amount);
+        DBResult<DBTransactionView> retrieveByDateRangeAndAmountForAccount(const std::string & accountCode, const StrDate & lower, const StrDate & upper, const Money & amount);
 
         class FindCriteriaHelper {
             public:
