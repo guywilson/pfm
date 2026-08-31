@@ -178,6 +178,8 @@ class Command {
         void exportTransactions();
         void exportTransactionsAsCSV();
 
+        void reconciliationReport();
+
         void addTransferTransaction();
         void listTransferRecords();
         DBTransferTransactionRecord getTransferRecord(int sequence);
@@ -198,7 +200,7 @@ class Command {
         DBShortcut getShortcut(int sequence);
         void updateShortcut();
         void deleteShortcut();
-
+        
         void backup();
         void restore();
         

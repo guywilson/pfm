@@ -19,7 +19,7 @@
 #include "transaction_views.h"
 #include "debug_views.h"
 #include "cli_widget.h"
-
+#include "reconcile.h"
 
 void Command::listCarriedOverLogs() {
     DBResult<DBCarriedOverView> result;
@@ -603,4 +603,13 @@ void Command::exportTransactionsAsCSV() {
     }
     
     out.close();
+}
+
+void Command::reconciliationReport() {
+    std::string accountCode = getParameter("acc");
+    std::string csvFile = getParameter("csv");
+    std::string mapFile = getParameter("map");
+
+    TransactionReconciler r;
+    r.reconcileTransactions(accountCode, csvFile, mapFile);
 }

@@ -232,6 +232,10 @@ const std::vector<CommandEntry> commandTable = {
         "Export all transactions to the specified file in CSV format", 
         [](Command& c){ c.exportTransactionsAsCSV(); }},
 
+    {"reconciliation-report", {"rr"}, 
+        "Run a reconciliation report using the supplied bank CSV file and mapping file", 
+        [](Command& c){ c.reconciliationReport(); }},
+
     {"transfer-transaction", {"tr", "transfer"}, 
         "Add a new transfer transaction for the currently selected account", 
         [](Command& c){ c.addTransferTransaction(); }},
