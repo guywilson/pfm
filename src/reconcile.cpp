@@ -8,6 +8,7 @@
 #include "csv.h"
 #include "db_temp_csv.h"
 #include "db_v_transaction.h"
+#include "debug_views.h"
 #include "reconcile.h"
 
 #define CSV_TEMP_TABLENAME                  "csv_temp_transaction"
@@ -35,6 +36,56 @@ static const char * dropTempCSVTable =
 void TransactionReconciler::dropCSVTempTable() {
     PFM_DB & db = PFM_DB::getInstance();
     db.executeWrite(dropTempCSVTable);
+}
+
+DBResult<DBTempCSV> TransactionReconciler::reportPart1() {
+    DBResult<DBTempCSV> csvRecords;
+    csvRecords.retrieveAll();
+
+    DBTransactionView transaction;
+
+    DBResult<DBTempCSV> reportPart1Records;
+
+    for (size_t i = 0;i < csvRecords.size();i++) {
+        DBTempCSV temp = csvRecords[i];
+
+        DBResult<DBTransactionView> transactions = 
+            transaction.retrieveByDateRangeAndAmount(
+                temp.date.addDays(-2), 
+                temp.date.addDays(2), 
+                temp.amount);
+
+        if (transactions.size() == 0) {
+            reportPart1Records.addRow(temp);
+        }
+    }
+
+    return reportPart1Records;
+}
+
+DBResult<DBTransactionView> TransactionReconciler::reportPart2() {
+    DBResult<DBTransactionView> pfmRecords;
+    pfmRecords.retrieveAll();
+
+    DBTempCSV tempCSV;
+
+    DBResult<DBTransactionView> reportPart2Records;
+
+    for (size_t i = 0;i < pfmRecords.size();i++) {
+        DBTransactionView transaction = pfmRecords[i];
+
+        DBResult<DBTempCSV> transactions = 
+            tempCSV.retrieveByDateRangeAndAmount(
+                transaction.date.addDays(-2), 
+                transaction.date.addDays(2), 
+                transaction.amount);
+
+        if (transactions.size() == 0) {
+            reportPart2Records.addRow(transaction);
+        }
+    }
+
+    return reportPart2Records;
 }
 
 void TransactionReconciler::populateCSVTempTable(const std::string & accountCode, CSV & csv) {
@@ -96,36 +147,28 @@ void TransactionReconciler::reconcileTransactions(const std::string & accountCod
     /*
     ** Build reconciliation report with the following details:
     **
-    ** 1) Transactions that are within +- 2 days and with the same amount that exist in
-    ** the source CSV file but not in the PFM transation table.
+    ** 1) Transactions that exist in the source CSV file but not in the PFM transation table.
+    ** Look for transactions in account_transaction that are within +- 2 days and with the same 
+    ** amount as a transaction in csv_temp_transaction. 
     **
-    ** 2) Transactions that are within +- 2 days and with the same amount that exist in
-    ** the PFM transation table but not in the source CSV file.
+    ** 2) Transactions that exist in the PFM transation table but not in the source CSV file.
+    ** Look for transactions in csv_temp_transaction that are within +- 2 days and with the same 
+    ** amount as a transaction in account_transaction. 
     **
     ** 3) Transactions that are within +- 2 days and with the +- 10% amount that exist in
-    ** both the PFM transation table and in the source CSV file.
+    ** both the PFM transation table and in the source CSV file. We're looking for transactions
+    ** that we have the amount wrong in PFM.
     */
 
-    DBResult<DBTempCSV> csvRecords;
-    csvRecords.retrieveAll();
+    DBResult<DBTempCSV> reportPart1Records = reportPart1();
+    DBResult<DBTransactionView> reportPart2Records = reportPart2();
 
-    DBTransactionView transaction;
+    // if (reportPart1Records.size() > 0) {
+    //     GenericListView view;
+    //     view.addRows(reportPart1Records.);
 
-    DBResult<DBTempCSV> reportPart1Records;
-
-    for (size_t i = 0;i < csvRecords.size();i++) {
-        DBTempCSV temp = csvRecords[i];
-
-        DBResult<DBTransactionView> transactions = 
-            transaction.retrieveByDateRangeAndAmount(
-                temp.date.addDays(-2), 
-                temp.date.addDays(2), 
-                temp.amount);
-
-        if (transactions.size() == 0) {
-            reportPart1Records.addRow(temp);
-        }
-    }
+    //     view.show();
+    // }
 
     dropCSVTempTable();
 
