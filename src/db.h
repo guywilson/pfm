@@ -125,6 +125,9 @@ class PFM_DB {
         pthread_mutex_t mutex;
         Logger & log = Logger::getInstance();
 
+        int (*_readHandler)(const std::string & statement) = NULL;
+        int (*_writeHandler)(const std::string & statement) = NULL;
+
         PFM_DB() {
             isTransactionActive = false;
         }
@@ -171,6 +174,17 @@ class PFM_DB {
 
         void executeRead(const std::string & statement, std::vector<DBRow> * rows);
         void executeWrite(const std::string & statement);
+
+        void onReadTrigger(const std::string & statement);
+        void onWriteTrigger(const std::string & statement);
+
+        void registerReadCallback(int (*handler)(const std::string & statement)) {
+            this->_readHandler = handler;
+        }
+
+        void registerWriteCallback(int (*handler)(const std::string & statement)) {
+            this->_writeHandler = handler;
+        }
 
         void begin();
         void commit();

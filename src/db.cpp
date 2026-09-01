@@ -720,13 +720,27 @@ void PFM_DB::executeDelete(const std::string & statement) {
 void PFM_DB::executeRead(const std::string & statement, std::vector<DBRow> * rows) {
     log.entry("PFM_DB::executeRead()");
     _executeSQLCallback(statement, rows);
+    onReadTrigger(statement);
     log.exit("PFM_DB::executeRead()");
 }
 
 void PFM_DB::executeWrite(const std::string & statement) {
     log.entry("PFM_DB::executeWrite()");
     _executeSQLNoCallback(statement);
+    onWriteTrigger(statement);
     log.exit("PFM_DB::executeWrite()");
+}
+
+void PFM_DB::onReadTrigger(const std::string & statement) {
+    if (_readHandler != NULL) {
+        _readHandler(statement);
+    }
+}
+
+void PFM_DB::onWriteTrigger(const std::string & statement) {
+    if (_writeHandler != NULL) {
+        _writeHandler(statement);
+    }
 }
 
 void PFM_DB::begin() {
