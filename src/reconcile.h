@@ -9,9 +9,11 @@
 class TransactionReconciler {
     private:
         void dropCSVTempTable();
+        void dropReconciliationView();
 
         std::vector<DBRow> reportPart1(const std::string & accountCode);
         std::vector<DBRow> reportPart2(const std::string & accountCode, const StrDate & startDate, const StrDate & endDate);
+        std::vector<DBRow> reportPart3(const std::string & accountCode, const StrDate & startDate, const StrDate & endDate);
 
         void populateCSVTempTable(const std::string & accountCode, CSV & csv);
 

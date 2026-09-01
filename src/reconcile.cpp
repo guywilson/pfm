@@ -19,7 +19,7 @@ using Columns = std::vector<DBColumn>;
 #define CSV_TEMP_TABLENAME                  "csv_temp_transaction"
 #define DATE_SEARCH_WINDOW                  5
 
-static const char * createTempCSVTable = 
+static const char * tempCSVTableCreate = 
     "CREATE TABLE " \
     CSV_TEMP_TABLENAME \
     " (" \
@@ -34,23 +34,66 @@ static const char * createTempCSVTable =
     "updated TEXT NOT NULL" \
     ");";
 
-static const char * dropTempCSVTable =
+static const char * reconciliationViewCreate = 
+    "CREATE VIEW v_reconciliation AS SELECT " \
+    "t.id AS transaction_id," \
+    "c.id AS csv_transaction_id," \
+    "a.code AS account_code," \
+    "t.date," \
+    "p.name AS payee_name," \
+    "t.description AS pfm_description," \
+    "c.description AS csv_description," \
+    "t.credit_debit AS type," \
+    "t.amount AS pfm_amount," \
+    "c.amount AS csv_amount," \
+    "ABS(t.amount - c.amount) AS amount_difference " \
+    "FROM account_transaction AS t " \
+    "JOIN account AS a " \
+    "ON a.id = t.account_id " \
+    "JOIN payee AS p " \
+    "ON p.id = t.payee_id " \
+    "JOIN csv_temp_transaction AS c " \
+    "ON c.account_code = a.code " \
+    "AND c.date = t.date " \
+    "AND c.type = t.credit_debit " \
+    "AND p.name IS NOT NULL " \
+    "AND p.name <> '' " \
+    "AND c.description IS NOT NULL " \
+    "AND INSTR(LOWER(c.description), LOWER(p.name)) > 0 " \
+    "AND ABS(t.amount - c.amount) <= ABS(c.amount) * 0.10 " \
+    "WHERE t.amount <> c.amount;";
+
+static const char * tempCSVTableDrop =
     "DROP TABLE " \
     CSV_TEMP_TABLENAME \
     ";";
+
+static const char * reconciliationViewDrop =
+    "DROP VIEW v_reconciliation;";
 
 void TransactionReconciler::dropCSVTempTable() {
     PFM_DB & db = PFM_DB::getInstance();
 
     try {
-        db.executeWrite(dropTempCSVTable);
+        db.executeWrite(tempCSVTableDrop);
     }
     catch (pfm_error & e) {
 
     }
 }
 
-std::vector<DBRow> TransactionReconciler::reportPart1(const std::string & accountCode) {
+void TransactionReconciler::dropReconciliationView() {
+    PFM_DB & db = PFM_DB::getInstance();
+
+    try {
+        db.executeWrite(reconciliationViewDrop);
+    }
+    catch (pfm_error & e) {
+
+    }
+}
+
+Rows TransactionReconciler::reportPart1(const std::string & accountCode) {
     Logger & log = Logger::getInstance();
     PFM_DB & db = PFM_DB::getInstance();
 
@@ -130,7 +173,7 @@ std::vector<DBRow> TransactionReconciler::reportPart1(const std::string & accoun
     return reportPart1Records;
 }
 
-std::vector<DBRow> TransactionReconciler::reportPart2(const std::string & accountCode, const StrDate & startDate, const StrDate & endDate) {
+Rows TransactionReconciler::reportPart2(const std::string & accountCode, const StrDate & startDate, const StrDate & endDate) {
     Logger & log = Logger::getInstance();
 
     log.entry("TransactionReconciler::reportPart2");
@@ -211,6 +254,30 @@ std::vector<DBRow> TransactionReconciler::reportPart2(const std::string & accoun
     return reportPart2Records;
 }
 
+Rows TransactionReconciler::reportPart3(const std::string & accountCode, const StrDate & startDate, const StrDate & endDate) {
+    Logger & log = Logger::getInstance();
+
+    log.entry("TransactionReconciler::reportPart3");
+
+    PFM_DB & db = PFM_DB::getInstance();
+
+    std::string statement = "SELECT date, pfm_description, csv_description, type, pfm_amount, csv_amount FROM v_reconciliation;";
+
+    Rows viewRecords;
+    db.executeRead(statement, &viewRecords);
+
+    Rows reportPart3Records;
+
+    for (size_t i = 0;i < viewRecords.size();i++) {
+        DBRow transaction = viewRecords[i];
+        reportPart3Records.push_back(transaction);
+    }
+
+    log.exit("TransactionReconciler::reportPart3");
+
+    return reportPart3Records;
+}
+
 void TransactionReconciler::populateCSVTempTable(const std::string & accountCode, CSV & csv) {
     while (csv.hasMoreRows()) {
         CSV::Row row = csv.readRow();
@@ -252,11 +319,12 @@ void TransactionReconciler::reconcileTransactions(const std::string & accountCod
     log.entry("TransactionReconciler::reconcileTransactions()");
 
     dropCSVTempTable();
+    dropReconciliationView();
 
     db.begin();
 
     try {
-        db.createTable(createTempCSVTable);
+        db.createTable(tempCSVTableCreate);
 
         CSV csv = CSV(bankCSVName, csvMappingName);
         populateCSVTempTable(accountCode, csv);
@@ -273,27 +341,33 @@ void TransactionReconciler::reconcileTransactions(const std::string & accountCod
     ** Build reconciliation report with the following details:
     **
     ** 1) Transactions that exist in the source CSV file but not in the PFM transation table.
-    ** Look for transactions in account_transaction that are within +- 2 days and with the same 
+    ** Look for transactions in account_transaction that are within +- 5 days and with the same 
     ** amount as a transaction in csv_temp_transaction. 
     **
     ** 2) Transactions that exist in the PFM transation table but not in the source CSV file.
-    ** Look for transactions in csv_temp_transaction that are within +- 2 days and with the same 
+    ** Look for transactions in csv_temp_transaction that are within +- 5 days and with the same 
     ** amount as a transaction in account_transaction. 
     **
-    ** 3) Transactions that are within +- 2 days and with the +- 10% amount that exist in
+    ** 3) Transactions that match on date and with the +- 10% amount that exist in
     ** both the PFM transation table and in the source CSV file. We're looking for transactions
-    ** that we have the amount wrong in PFM.
+    ** where we have the amount wrong in PFM.
     */
 
-    std::vector<DBRow> reportPart1Records = reportPart1(accountCode);
+    Rows reportPart1Records = reportPart1(accountCode);
 
     DBTempCSV temp;
     std::pair<StrDate, StrDate> dateRange = temp.getDateRangeForAccount(accountCode);
 
-    std::vector<DBRow> reportPart2Records = reportPart2(accountCode, dateRange.first, dateRange.second);
+    Rows reportPart2Records = reportPart2(accountCode, dateRange.first, dateRange.second);
 
+    db.createView(reconciliationViewCreate);
+
+    Rows reportPart3Records = reportPart3(accountCode, dateRange.first, dateRange.second);
+    
     if (reportPart1Records.size() > 0) {
-        std::cout << "Transactions in " << bankCSVName << " but not in the PFM database :" << std::endl << std::endl;
+        std::cout << std::endl << "********************************************************************************" << std::endl;
+        std::cout <<"Transactions in " << bankCSVName << " but not in the PFM database :" << std::endl;
+        std::cout << "********************************************************************************" << std::endl;
 
         GenericListView view;
         view.addRows(reportPart1Records);
@@ -301,10 +375,22 @@ void TransactionReconciler::reconcileTransactions(const std::string & accountCod
         view.show();
     }
     if (reportPart2Records.size() > 0) {
-        std::cout << "Transactions in the PFM database but not in " << bankCSVName << " :" << std::endl << std::endl;
+        std::cout << std::endl << "********************************************************************************" << std::endl;
+        std::cout << "Transactions in the PFM database but not in " << bankCSVName << " :" << std::endl;
+        std::cout << "********************************************************************************" << std::endl;
         
         GenericListView view;
         view.addRows(reportPart2Records);
+
+        view.show();
+    }
+    if (reportPart3Records.size() > 0) {
+        std::cout << std::endl << "********************************************************************************" << std::endl;
+        std::cout << "Transactions within 10% of the amount in " << bankCSVName << " :" << std::endl;
+        std::cout << "********************************************************************************" << std::endl;
+        
+        GenericListView view;
+        view.addRows(reportPart3Records);
 
         view.show();
     }
