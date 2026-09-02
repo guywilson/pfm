@@ -261,6 +261,10 @@ int main(int argc, char ** argv) {
 
     free(pszDatabase);
 
+    /*
+    ** Register a callback handler when db writes are performed,
+    ** we use this to populate the audit_interaction table...
+    */
     db.registerWriteCallback(auditOnWriteHandler);
 
     initialiseReferenceData();
