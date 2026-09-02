@@ -48,6 +48,7 @@
 #include "db_transaction.h"
 #include "db_shortcut.h"
 #include "db_public_holiday.h"
+#include "db_audit.h"
 #include "command.h"
 #include "web_api.h"
 #include "posixthread.h"
@@ -122,7 +123,7 @@ static void checkTerminalSize(void) {
 void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ENTRYEXIT | LOG_LEVEL_SQL | LOG_LEVEL_INFO);
-    
+
     TransactionReconciler r;
     r.reconcileTransactions("HSBC", "/Users/guy/Downloads/TransactionHistory.csv", "/Users/guy/mapping.json");
 }
@@ -259,6 +260,8 @@ int main(int argc, char ** argv) {
     }
 
     free(pszDatabase);
+
+    db.registerWriteCallback(auditOnWriteHandler);
 
     initialiseReferenceData();
 

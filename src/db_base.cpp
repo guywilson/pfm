@@ -26,7 +26,11 @@ pfm_id_t DBEntity::insert() {
 
     log.exit("DBEntity::insert()");
 
-    return db.executeInsert(statement);
+    pfm_id_t insertedId = db.executeInsert(statement);
+
+    db.onWriteTrigger("INSERT", getTableName(), statement);
+
+    return insertedId;
 }
 
 void DBEntity::update() {
@@ -42,36 +46,22 @@ void DBEntity::update() {
 
     db.executeUpdate(statement);
 
+    db.onWriteTrigger("UPDATE", getTableName(), statement);
+
     log.exit("DBEntity::update()");
 }
 
-uint64_t DBEntity::findSingleQuotePos(std::string & s, int startingPos = 0) const {
-    uint64_t pos = s.find(SINGLE_QUOTE_CHAR, startingPos);
+std::string::size_type DBEntity::findSingleQuotePos(
+    const std::string & s,
+    std::string::size_type startingPos) const {
 
-    if (pos != std::string::npos) {
-        /*
-        ** If the single quote is before the end of the string, check that 
-        ** we haven't already got a double single quote. Otherwise, if the 
-        ** single quote is at the end of the string, return the position. 
-        ** This avoids out-of-range run-time exceptions...
-        */
-        if (pos < s.length() - 1) {
-            if (s.at(pos + 1) != SINGLE_QUOTE_CHAR) {
-                return pos;
-            }
-        }
-        else {
-            return pos;
-        }
-    }
-
-    return std::string::npos;
+    return s.find(SINGLE_QUOTE_CHAR, startingPos);
 }
 
-const std::string DBEntity::delimitSingleQuotes(std::string & s) const {
+std::string DBEntity::delimitSingleQuotes(const std::string & s) const {
     std::string delimited = s;
 
-    uint64_t searchPos = findSingleQuotePos(delimited);
+    std::string::size_type searchPos = findSingleQuotePos(delimited);
 
     while (searchPos != std::string::npos) {
         delimited.insert(searchPos, 1, SINGLE_QUOTE_CHAR);
@@ -126,6 +116,8 @@ void DBEntity::retrieve(const pfm_id_t & id) {
     */
     onRowComplete(1);
 
+    db.onReadTrigger("SELECT", getTableName(), statement);
+
     log.exit("DBEntity::retrieve()");
 }
 
@@ -140,14 +132,7 @@ void DBEntity::remove() {
 
     try {
         db.begin();
-
-        beforeRemove();
-
-        log.debug("Executing DELETE statement '%s'", statement.c_str());
-        db.executeDelete(statement);
-
-        afterRemove();
-
+        remove(statement);
         db.commit();
     }
     catch (pfm_error & e) {
@@ -170,8 +155,14 @@ void DBEntity::remove(const std::string & statement) {
     try {
         db.begin();
 
+        beforeRemove();
+
         log.debug("Executing DELETE statement '%s'", statement.c_str());
         db.executeDelete(statement);
+
+        db.onWriteTrigger("DELETE", getTableName(), statement);
+
+        afterRemove();
 
         db.commit();
     }
@@ -196,10 +187,7 @@ void DBEntity::removeAll() {
 
     try {
         db.begin();
-
-        log.debug("Executing DELETE statement '%s'", statement.c_str());
-        db.executeDelete(statement);
-
+        remove(statement);
         db.commit();
     }
     catch (pfm_error & e) {

@@ -495,7 +495,9 @@ class DBEntity {
         pfm_id_t insert();
         void update();
 
-        uint64_t findSingleQuotePos(std::string & s, int startingPos) const;
+        std::string::size_type findSingleQuotePos(
+            const std::string & s,
+            std::string::size_type startingPos = 0) const;
 
     protected:
         virtual void beforeSave() {
@@ -537,7 +539,7 @@ class DBEntity {
             return from;
         }
 
-        const std::string delimitSingleQuotes(std::string & s) const;
+        std::string delimitSingleQuotes(const std::string & s) const;
         
         virtual std::string buildInsertStatement(const std::string & tableName, std::vector<std::pair<ColumnDef, std::string>> & columnValuePairs) const {
             std::string now = StrDate::getTimestamp();
@@ -835,7 +837,7 @@ class DBResult : public Result {
             log.exit("DBResult::reverse()");
         }
         
-        int retrieve(const std::string & sqlStatement);
+        int retrieve(const std::string & statement);
         int retrieveAll();
 
         T & at(unsigned int i) {
@@ -890,11 +892,15 @@ int DBResult<T>::retrieveAll() {
 
     PFM_DB & db = PFM_DB::getInstance();
 
-    int rowsRetrievedCount = db.executeSelect(entity.getSelectAllStatement(), &rows);
+    std::string statement = entity.getSelectAllStatement();
+
+    int rowsRetrievedCount = db.executeSelect(statement, &rows);
 
     for (int i = 0;i < rowsRetrievedCount;i++) {
         processRow(rows[i]);
     }
+
+    db.onReadTrigger("SELECT", entity.getTableName(), statement);
 
     log.exit("DBResult::retrieveAll()");
 
@@ -902,19 +908,22 @@ int DBResult<T>::retrieveAll() {
 }
 
 template <class T>
-int DBResult<T>::retrieve(const std::string & sqlStatement) {
+int DBResult<T>::retrieve(const std::string & statement) {
     Logger & log = Logger::getInstance();
     log.entry("DBResult::retrieve()");
 
+    T entity;
     std::vector<DBRow> rows;
 
     PFM_DB & db = PFM_DB::getInstance();
 
-    int rowsRetrievedCount = db.executeSelect(sqlStatement, &rows);
+    int rowsRetrievedCount = db.executeSelect(statement, &rows);
 
     for (int i = 0;i < rowsRetrievedCount;i++) {
         processRow(rows[i]);
     }
+
+    db.onReadTrigger("SELECT", entity.getTableName(), statement);
 
     log.exit("DBResult::retrieve()");
 

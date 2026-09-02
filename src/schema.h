@@ -387,6 +387,16 @@ static const char * pszCreatePublicHolidayTable =
     "updated TEXT NOT NULL," \
     "UNIQUE(date) ON CONFLICT ROLLBACK);";
 
+static const char * pszCreateAuditInteractionTable = 
+    "CREATE TABLE audit_interaction (" \
+    "id INTEGER PRIMARY KEY," \
+    "audit_timestamp TEXT NOT NULL," \
+    "entity_name TEXT NOT NULL," \
+    "sql_operation TEXT NOT NULL," \
+    "sql_statement TEXT NOT NULL," \
+    "created TEXT NOT NULL," \
+    "updated TEXT NOT NULL);";
+
 /*
 ** Create views, do this last...
 */
@@ -543,3 +553,5 @@ static const char * pszCategoryCodeIndex =
 static const char * pszPayeeCodeIndex = 
     "CREATE UNIQUE INDEX idx_payee_code ON payee(code);";
 
+static const char * pszAuditTimestampIndex = 
+    "CREATE INDEX idx_audit_timestamp ON audit_interaction(audit_timestamp);";

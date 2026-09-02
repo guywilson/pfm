@@ -125,8 +125,8 @@ class PFM_DB {
         pthread_mutex_t mutex;
         Logger & log = Logger::getInstance();
 
-        int (*_readHandler)(const std::string & statement) = NULL;
-        int (*_writeHandler)(const std::string & statement) = NULL;
+        int (*_readHandler)(const std::string & operation, const std::string & entityName, const std::string & statement) = NULL;
+        int (*_writeHandler)(const std::string & operation, const std::string & entityName, const std::string & statement) = NULL;
 
         PFM_DB() {
             isTransactionActive = false;
@@ -166,6 +166,10 @@ class PFM_DB {
         void createView(const char * sql);
         void createIndex(const char * sql);
 
+        void dropTable(const char * sql);
+        void dropView(const char * sql);
+        void dropIndex(const char * sql);
+
         int executeSelect(const std::string & statement, std::vector<DBRow> * rows);
         
         pfm_id_t executeInsert(const std::string & statement);
@@ -175,14 +179,14 @@ class PFM_DB {
         void executeRead(const std::string & statement, std::vector<DBRow> * rows);
         void executeWrite(const std::string & statement);
 
-        void onReadTrigger(const std::string & statement);
-        void onWriteTrigger(const std::string & statement);
+        void onReadTrigger(const std::string & operation, const std::string & entityName, const std::string & statement);
+        void onWriteTrigger(const std::string & operation, const std::string & entityName, const std::string & statement);
 
-        void registerReadCallback(int (*handler)(const std::string & statement)) {
+        void registerReadCallback(int (*handler)(const std::string & operation, const std::string & entityName, const std::string & statement)) {
             this->_readHandler = handler;
         }
 
-        void registerWriteCallback(int (*handler)(const std::string & statement)) {
+        void registerWriteCallback(int (*handler)(const std::string & operation, const std::string & entityName, const std::string & statement)) {
             this->_writeHandler = handler;
         }
 

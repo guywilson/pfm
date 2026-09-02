@@ -474,6 +474,8 @@ void PFM_DB::createTable(const char * sql) {
             __LINE__);
     }
 
+    onWriteTrigger("CREATE TABLE", "-", sql);
+
     log.exit("PFM_DB::createTable()");
 }
 
@@ -496,6 +498,8 @@ void PFM_DB::createView(const char * sql) {
             __FILE__, 
             __LINE__);
     }
+
+    onWriteTrigger("CREATE VIEW", "-", sql);
 
     log.exit("PFM_DB::createView()");
 }
@@ -520,7 +524,84 @@ void PFM_DB::createIndex(const char * sql) {
             __LINE__);
     }
 
+    onWriteTrigger("CREATE INDEX", "-", sql);
+
     log.exit("PFM_DB::createIndex()");
+}
+
+void PFM_DB::dropTable(const char * sql) {
+    log.entry("PFM_DB::dropTable()");
+    
+    log.sql("Dropping table with sql %s", sql);
+
+    try {
+        _executeSQLNoCallback(sql);
+    }
+    catch (pfm_error & e) {
+        log.error("Failed to drop table with error '%s'", e.what());
+
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to drop table with statement '%s' with error %s",
+                sql,
+                e.what()), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    onWriteTrigger("DROP TABLE", "-", sql);
+
+    log.exit("PFM_DB::dropTable()");
+}
+
+void PFM_DB::dropView(const char * sql) {
+    log.entry("PFM_DB::dropView()");
+    
+    log.sql("Dropping view with sql %s", sql);
+
+    try {
+        _executeSQLNoCallback(sql);
+    }
+    catch (pfm_error & e) {
+        log.error("Failed to drop view with error '%s'", e.what());
+
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to drop view with statement '%s' with error %s",
+                sql,
+                e.what()), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    onWriteTrigger("DROP VIEW", "-", sql);
+
+    log.exit("PFM_DB::dropView()");
+}
+
+void PFM_DB::dropIndex(const char * sql) {
+    log.entry("PFM_DB::dropIndex()");
+    
+    log.sql("Dropping index with sql %s", sql);
+
+    try {
+        _executeSQLNoCallback(sql);
+    }
+    catch (pfm_error & e) {
+        log.error("Failed to drop index with error '%s'", e.what());
+
+        throw pfm_error(
+            pfm_error::buildMsg(
+                "Failed to drop index with statement '%s' with error %s",
+                sql,
+                e.what()), 
+            __FILE__, 
+            __LINE__);
+    }
+
+    onWriteTrigger("DROP INDEX", "-", sql);
+
+    log.exit("PFM_DB::dropIndex()");
 }
 
 void PFM_DB::createSchema() {
@@ -541,6 +622,7 @@ void PFM_DB::createSchema() {
         createTable(pszCreateReportTable);
         createTable(pszCreateShortcutTable);
         createTable(pszCreatePublicHolidayTable);
+        createTable(pszCreateAuditInteractionTable);
 
         createView(pszCreateCOView);
         createView(pszCreateListRCView);
@@ -556,6 +638,7 @@ void PFM_DB::createSchema() {
         createIndex(pszTransactionChargeIndex);
         createIndex(pszCarriedOverLogDateIndex);
         createIndex(pszChargeLastPaymentDateIndex);
+        createIndex(pszAuditTimestampIndex);
 
         createCurrencies();
         createDefaultCategories();
@@ -720,26 +803,24 @@ void PFM_DB::executeDelete(const std::string & statement) {
 void PFM_DB::executeRead(const std::string & statement, std::vector<DBRow> * rows) {
     log.entry("PFM_DB::executeRead()");
     _executeSQLCallback(statement, rows);
-    onReadTrigger(statement);
     log.exit("PFM_DB::executeRead()");
 }
 
 void PFM_DB::executeWrite(const std::string & statement) {
     log.entry("PFM_DB::executeWrite()");
     _executeSQLNoCallback(statement);
-    onWriteTrigger(statement);
     log.exit("PFM_DB::executeWrite()");
 }
 
-void PFM_DB::onReadTrigger(const std::string & statement) {
+void PFM_DB::onReadTrigger(const std::string & operation, const std::string & entityName, const std::string & statement) {
     if (_readHandler != NULL) {
-        _readHandler(statement);
+        _readHandler(operation, entityName, statement);
     }
 }
 
-void PFM_DB::onWriteTrigger(const std::string & statement) {
+void PFM_DB::onWriteTrigger(const std::string & operation, const std::string & entityName, const std::string & statement) {
     if (_writeHandler != NULL) {
-        _writeHandler(statement);
+        _writeHandler(operation, entityName, statement);
     }
 }
 
