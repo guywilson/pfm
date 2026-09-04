@@ -6,6 +6,8 @@
 #include "db.h"
 #include "strdate.h"
 
+#define DB_AUDIT_SQL_STATEMENT_PRINT_WIDTH 80U
+
 int auditOnWriteHandler(const std::string & operation, const std::string & entityName, const std::string & statement);
 
 class DBAuditInteraction : public DBEntity {
@@ -57,12 +59,55 @@ class DBAuditInteraction : public DBEntity {
         }
 
         void print() {
-            DBEntity::print();
-
             std::cout << "AuditTimestamp: '" << auditTimestamp << "'" << std::endl;
             std::cout << "EntityName: '" << entityName << "'" << std::endl;
             std::cout << "SQLOperation: '" << sqlOperation << "'" << std::endl;
-            std::cout << "SQLStatement: '" << sqlStatement << "'" << std::endl;
+
+            static const std::string whitespace = " \t\r\n\f\v";
+            static const std::string continuationIndent(sizeof("SQLStatement: '") - 1, ' ');
+
+            std::cout << "SQLStatement: '";
+
+            size_t lineStart = 0;
+            bool firstLine = true;
+
+            while (lineStart < sqlStatement.length()) {
+                if (!firstLine) {
+                    std::cout << std::endl << continuationIndent;
+                }
+
+                size_t remaining = sqlStatement.length() - lineStart;
+                if (remaining <= DB_AUDIT_SQL_STATEMENT_PRINT_WIDTH) {
+                    std::cout << sqlStatement.substr(lineStart);
+                    break;
+                }
+
+                size_t wrapAt = sqlStatement.find_last_of(
+                    whitespace,
+                    lineStart + DB_AUDIT_SQL_STATEMENT_PRINT_WIDTH);
+
+                if (wrapAt == std::string::npos || wrapAt < lineStart) {
+                    wrapAt = sqlStatement.find_first_of(
+                        whitespace,
+                        lineStart + DB_AUDIT_SQL_STATEMENT_PRINT_WIDTH);
+                }
+
+                if (wrapAt == std::string::npos) {
+                    std::cout << sqlStatement.substr(lineStart);
+                    break;
+                }
+
+                std::cout << sqlStatement.substr(lineStart, wrapAt - lineStart);
+
+                lineStart = sqlStatement.find_first_not_of(whitespace, wrapAt);
+                if (lineStart == std::string::npos) {
+                    break;
+                }
+
+                firstLine = false;
+            }
+
+            std::cout << "'" << std::endl;
         }
 
         const std::string getTableName() const override {

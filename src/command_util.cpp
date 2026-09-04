@@ -260,10 +260,7 @@ void Command::showAuditInteraction() {
     DBAuditInteraction r;
     r.retrieve(ai.id);
 
-    AuditInteractionDetailsView view;
-
-    view.setInteraction(r);
-    view.show();
+    r.print();
 }
 
 void Command::deleteAuditInteractionRecords() {

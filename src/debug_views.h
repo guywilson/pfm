@@ -113,19 +113,6 @@ class AuditInteractionListView : public CLIListView {
         }
 };
 
-class AuditInteractionDetailsView : public CLITable {
-    public:
-        AuditInteractionDetailsView() : CLITable("Audit Interaction Details", 2, 3) {
-        }
-
-        void setInteraction(const DBAuditInteraction & ai) {
-            addCell(CLITableCell("Timestamp", ai.auditTimestamp, TIMESTAMP_FIELD_LENGTH), 0, 0);
-            addCell(CLITableCell("Entity", ai.entityName, 21), 1, 0);
-            addCell(CLITableCell("Operation", ai.sqlOperation, 15), 2, 0);
-            addCell(CLITableCell("SQL", ai.sqlStatement, 85), 0, 1);
-        }
-};
-
 class GenericListView : public CLIListView {
     public:
         GenericListView() : CLIListView() {
