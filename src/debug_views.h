@@ -8,10 +8,11 @@
 #include "pfm_error.h"
 #include "cli/view.h"
 #include "cli/list_view.h"
+#include "cli/table.h"
 #include "terminal.h"
 #include "custom_widgets.h"
 #include "db_v_carried_over.h"
-
+#include "db_audit.h"
 
 class CarriedOverListView : public CLIListView {
     public:
@@ -58,6 +59,70 @@ class CarriedOverListView : public CLIListView {
 
                 addRow(row);
             }
+        }
+};
+
+class AuditInteractionListView : public CLIListView {
+    public:
+        AuditInteractionListView() : CLIListView() {
+            if (Terminal::getWidth() < getMinimumWidth()) {
+                throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Terminal is not wide enough for CarriedOverListView. Terminal width %u, minimum width %u", 
+                        (unsigned int)Terminal::getWidth(), 
+                        (unsigned int)getMinimumWidth()));
+            }
+        }
+
+        inline uint16_t getMinimumWidth() override {
+            return (
+                LIST_VIEW_SEQUENCE_WIDTH +
+                TIMESTAMP_FIELD_LENGTH + 
+                20 + 
+                10 + 
+                40);
+        }
+
+        void addResults(DBResult<DBAuditInteraction> & result) {
+            char szTitle[TITLE_BUFFER_LEN];
+
+            snprintf(szTitle, TITLE_BUFFER_LEN, "Audit interaction records (%zu)", result.size());
+            setTitle(szTitle);
+
+            setColumns({
+                CLIListColumn("Seq", LIST_VIEW_SEQUENCE_WIDTH, CLIListColumn::rightAligned),
+                CLIListColumn("Timestamp", TIMESTAMP_FIELD_LENGTH, CLIListColumn::leftAligned),
+                CLIListColumn("Entity name", 20, CLIListColumn::leftAligned),
+                CLIListColumn("Operation", 10, CLIListColumn::leftAligned),
+                CLIListColumn("SQL", 40, CLIListColumn::rightAligned)
+            });
+
+            for (size_t i = 0;i < result.size();i++) {
+                DBAuditInteraction ai = result.at(i);
+
+                CLIListRow row(getNumColumns());
+
+                row.addCell(ai.sequence);
+                row.addCell(ai.auditTimestamp);
+                row.addCell(ai.entityName);
+                row.addCell(ai.sqlOperation);
+                row.addCell(ai.sqlStatement);
+
+                addRow(row);
+            }
+        }
+};
+
+class AuditInteractionDetailsView : public CLITable {
+    public:
+        AuditInteractionDetailsView() : CLITable("Audit Interaction Details", 2, 3) {
+        }
+
+        void setInteraction(const DBAuditInteraction & ai) {
+            addCell(CLITableCell("Timestamp", ai.auditTimestamp, TIMESTAMP_FIELD_LENGTH), 0, 0);
+            addCell(CLITableCell("Entity", ai.entityName, 21), 1, 0);
+            addCell(CLITableCell("Operation", ai.sqlOperation, 15), 2, 0);
+            addCell(CLITableCell("SQL", ai.sqlStatement, 85), 0, 1);
         }
 };
 

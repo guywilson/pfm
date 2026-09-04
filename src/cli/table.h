@@ -96,8 +96,8 @@ class CLITable : public CLIView {
         std::string title;
 
     public:
-        CLITable(const std::string & title, size_t numRows) {
-            this->numColumns = 2;
+        CLITable(const std::string & title, size_t numRows, size_t numColumns = 2) {
+            this->numColumns = numColumns;
             this->numRows = numRows;
             this->title = title;
 

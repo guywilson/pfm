@@ -14,6 +14,7 @@
 #include "rlcustom.h"
 #include "pfm_error.h"
 #include "db.h"
+#include "db_audit.h"
 #include "system.h"
 #include "strdate.h"
 #include "cfgmgr.h"
@@ -207,6 +208,76 @@ void Command::enterCalcMode() {
             }
         }
     }
+}
+
+DBAuditInteraction Command::getAuditInteraction(int sequence) {
+    CacheMgr & cacheMgr = CacheMgr::getInstance();
+
+    DBAuditInteraction ai = cacheMgr.getAuditInteraction(sequence);
+
+    return ai;
+}
+
+void Command::listAuditInteractionRecords() {
+    StrDate dateAfter = StrDate::nullDate;
+    StrDate dateBefore;
+
+    if (hasParameters()) {
+        dateAfter = getParameter("date>");
+
+        if (dateAfter.isNull()) {
+            throw pfm_validation_error("The 'date>' parameter must be specified");
+        }
+
+        dateBefore = getParameter("date<");
+    }
+    else {
+        throw pfm_validation_error("The 'date>' parameter must be specified and optionally the 'date<' can be specified");
+    }
+
+    DBAuditInteraction ai;
+    DBResult<DBAuditInteraction> results = ai.retrieveByDateRange(dateAfter, dateBefore);
+
+    CacheMgr & cache = CacheMgr::getInstance();
+
+    cache.clearAuditInteractionRecords();
+
+    for (size_t i = 0;i < results.size();i++) {
+        DBAuditInteraction auditInteraction = results[i];
+        cache.addAuditInteraction(auditInteraction.sequence, auditInteraction);
+    }
+
+    AuditInteractionListView view;
+    view.addResults(results);
+
+    view.show();
+}
+
+void Command::showAuditInteraction() {
+    std::string sequence = getParameter(SEQUENCE_PARAM_NAME);
+    DBAuditInteraction ai = getAuditInteraction(atoi(sequence.c_str()));
+
+    DBAuditInteraction r;
+    r.retrieve(ai.id);
+
+    AuditInteractionDetailsView view;
+
+    view.setInteraction(r);
+    view.show();
+}
+
+void Command::deleteAuditInteractionRecords() {
+    StrDate dateBefore;
+    dateBefore.addMonths(-3);
+
+    if (hasParameters()) {
+        dateBefore = getParameter("date<");
+    }
+
+    std::cout << "Deleting audit interaction records before " << dateBefore.shortDate() << std::endl << std::endl;
+
+    DBAuditInteraction ai;
+    ai.deleteBeforeDate(dateBefore);
 }
 
 void Command::backup() {

@@ -29,6 +29,8 @@ static std::string _currentDate;
 static bool _isDateOverride = false;
 static std::unordered_map<std::string, std::string> _publicHolidays;
 
+const std::string StrDate::nullDate = "N/A";
+
 void setOverrideDate(const std::string & date) {
     _currentDate = date;
     _isDateOverride = true;
@@ -439,7 +441,7 @@ void StrDate::set(const std::string & date) {
 }
 
 void StrDate::set(const char * date) {
-    if (strcmp(date, _nullDate.c_str()) == 0) {
+    if (strcmp(date, nullDate.c_str()) == 0) {
         clear();
     }
     else if (strlen(date) > 0) {
@@ -472,11 +474,11 @@ void StrDate::set(StrDate::YMD & date) {
 }
 
 void StrDate::clear() {
-    this->_date = _nullDate;
+    this->_date = nullDate;
 }
 
 bool StrDate::isNull() {
-    return (_date.compare(_nullDate) == 0 ? true : false);
+    return (_date.compare(nullDate) == 0 ? true : false);
 }
 
 time_t StrDate::epoch() {

@@ -296,6 +296,22 @@ const std::vector<CommandEntry> commandTable = {
         "Delete the shortcut specified by sequence", 
         [](Command& c){ c.deleteShortcut(); }},
 
+    {"list-carried-over-logs", {"lco"}, 
+        "", 
+        [](Command& c){ c.listCarriedOverLogs(); }},
+
+    {"list-audit-interaction", {"lai"}, 
+        "", 
+        [](Command& c){ c.listAuditInteractionRecords(); }},
+
+    {"show-audit-interaction", {"sai"}, 
+        "", 
+        [](Command& c){ c.showAuditInteraction(); }},
+
+    {"delete-audit-interaction", {"dai"}, 
+        "", 
+        [](Command& c){ c.deleteAuditInteractionRecords(); }},
+
     {"backup", {}, 
         "Backup the database to the specified JSON file", 
         [](Command& c){ c.backup(); }},
@@ -303,10 +319,6 @@ const std::vector<CommandEntry> commandTable = {
     {"restore", {}, 
         "Restore the database from the specified JSON file", 
         [](Command& c){ c.restore(); }},
-
-    {"list-carried-over-logs", {"lco"}, 
-        "", 
-        [](Command& c){ c.listCarriedOverLogs(); }},
 
     {"change-password", {}, 
         "Change the database password and re-encrypt the db", 

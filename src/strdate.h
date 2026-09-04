@@ -28,7 +28,6 @@ struct TimeComponents {
 class StrDate {
     private:
         std::string _date;
-        const std::string _nullDate = "N/A";
 
         Logger & log = Logger::getInstance();
 
@@ -79,6 +78,8 @@ class StrDate {
             sd_saturday = 6
         }
         sd_weekday;
+
+        static const std::string nullDate;
 
         StrDate();
         StrDate(const StrDate & sd);

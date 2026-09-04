@@ -108,6 +108,10 @@ class DBAuditInteraction : public DBEntity {
             os.flush();
         }
 
+        void onRowComplete(int sequence) override {
+            this->sequence = sequence;
+        }
+
         void assignColumn(DBColumn & column) override {
             DBEntity::assignColumn(column);
             

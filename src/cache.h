@@ -9,6 +9,7 @@
 #include "db_transaction.h"
 #include "db_transaction_report.h"
 #include "db_transfer_transaction_record.h"
+#include "db_audit.h"
 #include "pfm_error.h"
 
 class CacheMgr {
@@ -53,6 +54,10 @@ class CacheMgr {
             findCriteria.clear();
         }
 
+        void clearAuditInteractionRecords() {
+            clearCache(auditInteractionBySequence);
+        }
+
         void addRecurringCharge(int sequence, const DBRecurringCharge & charge) {
             putItem(recurringChargeBySequence, sequence, charge);
         }
@@ -77,6 +82,10 @@ class CacheMgr {
             putItem(transferBySequence, sequence, transfer);
         }
 
+        void addAuditInteraction(int sequence, const DBAuditInteraction & ai) {
+            putItem(auditInteractionBySequence, sequence, ai);
+        }
+
         const DBRecurringCharge & getRecurringCharge(int sequence) const {
             return getItem(recurringChargeBySequence, sequence, "DBRecurringCharge not found in cache.");
         }
@@ -99,6 +108,10 @@ class CacheMgr {
 
         const DBTransferTransactionRecord & getTransfer(int sequence) const {
             return getItem(transferBySequence, sequence, "DBTransferRecord not found in cache.");
+        }
+
+        const DBAuditInteraction& getAuditInteraction(int sequence) const {
+            return getItem(auditInteractionBySequence, sequence, "DBAuditInteraction not found in cache.");
         }
 
         void setFindCriteria(const std::string & criteria) {
@@ -149,6 +162,7 @@ class CacheMgr {
         SequenceCache<DBShortcut> shortcutBySequence;
         SequenceCache<DBPublicHoliday> holidayBySequence;
         SequenceCache<DBTransferTransactionRecord> transferBySequence;
+        SequenceCache<DBAuditInteraction> auditInteractionBySequence;
 
         std::string findCriteria;
 };

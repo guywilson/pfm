@@ -25,6 +25,7 @@
 #include "db_transaction_report.h"
 #include "db_shortcut.h"
 #include "db_public_holiday.h"
+#include "db_audit.h"
 #include "web_api.h"
 
 
@@ -201,11 +202,16 @@ class Command {
         void updateShortcut();
         void deleteShortcut();
         
+        void listAuditInteractionRecords();
+        DBAuditInteraction getAuditInteraction(int sequence);
+        void showAuditInteraction();
+        void deleteAuditInteractionRecords();
+
+        void listCarriedOverLogs();
+
         void backup();
         void restore();
         
-        void listCarriedOverLogs();
-
         void changePassword();
         void getDBKey();
         void saveDBKey();
