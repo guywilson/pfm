@@ -14,3 +14,10 @@ pfm.pass.key
 .DS_Store
 .pfm_key
 *.sql
+
+# Generated Autoconf files
+/autom4te.cache/
+/configure~
+/makefile
+/config.log
+/config.status

@@ -12,6 +12,99 @@ PFM is a personal finance application that uses a command-line interface to inte
 
 PFM supports multiple accounts, transactions, recurring charges, categories and payees. The data is stored in an encrypted SQLite database file, requiring a password to open.
 
+# BUILDING FROM SOURCE
+
+PFM requires a C++20 compiler, GNU make, and the development headers and
+libraries for GNU Readline/History, curses or terminfo, SQLCipher, libgcrypt,
+GMP, MPFR, libcred, libhttpserver and libmicrohttpd. The nlohmann JSON headers
+are also required. Install Pandoc to build and install the manual page.
+
+Generate the `configure` script using Autoconf (2.69 or newer; `autoreconf`
+also uses Automake's helper tools):
+
+```sh
+autoreconf --install
+```
+
+Then configure, build and install:
+
+```sh
+./configure --prefix=/usr/local
+make -j4
+make install
+```
+
+The script is named `configure`, invoked as `./configure`. It generates a
+`makefile`; the hand-written predecessor is kept as `makefile.original`. Installation
+may require elevated permissions depending on the chosen prefix. Use
+`make install DESTDIR=/path/to/staging` for a staged installation.
+
+For dependencies outside the compiler's default search paths, supply their
+include and library directories, for example:
+
+```sh
+./configure CPPFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib"
+```
+
+Choose a debug or release build when configuring:
+
+```sh
+./configure --enable-debug    # -g -O0: debug symbols, no optimization
+./configure --disable-debug   # -O2: release, no -g (the default)
+```
+
+Run one of these commands with any required dependency flags, then run `make`.
+Reconfiguring changes the generated makefile, so `make` recompiles existing
+objects with the selected flags. Explicit `CFLAGS` or `CXXFLAGS` override the
+defaults for that language, including debug and optimization flags.
+
+Both modes retain the original makefile's `-Wall -pedantic` warnings,
+`SQLITE_HAS_CODEC` definition, and dependency generation. C++ builds use
+`-std=c++20`, and compilation/linking retain pthread support. Debug builds
+also define `RUN_IN_DEBUGGER` and `DEBUG_PASSWORD` (empty by default), matching
+the original debugger-specific application behavior. Use
+`make DEBUG_PASSWD=example` to override the debug password; if changing it
+after compiling, run `make clean` first. The test-suite definition remains
+controlled by `--enable-test-suite`.
+
+Additional transitive libraries, if needed for static linking, can be supplied
+with `LIBS`. Use `./configure --enable-test-suite` to compile PFM's built-in
+test suite. The checked-in `src/version.c` supplies the application version;
+normal builds do not require `vbuild` or increment the version.
+
+To explicitly increment the version using the existing `vbuild` tool:
+
+```sh
+make version
+make -j4
+```
+
+`configure` locates `vbuild`; its absence does not prevent normal builds.
+Override its location with `./configure VBUILD=/path/to/vbuild` or
+`make version VBUILD=/path/to/vbuild`. The major and minor numbers come from
+the `MAJOR.MINOR` version in `AC_INIT` in `configure.ac`. When changing that
+release series, update `AC_INIT`, regenerate `configure`, and reconfigure.
+
+`make version` increments `pfm.ver` and regenerates `src/version.c`, including
+the timestamp, in the source tree even when using a separate build directory.
+Run it once before building a release, then commit both files and tag the
+release commit (for example, `v2.4.015`). Run `make version` and `make` as
+separate commands so that a parallel build cannot race the version update.
+Configuration and ordinary builds preserve the recorded version and timestamp.
+
+Separate build directories are supported:
+
+```sh
+mkdir -p build/autoconf
+cd build/autoconf
+../../configure
+make -j4
+```
+
+Without Pandoc, `make` builds only the executable; `make man` and `make install`
+require Pandoc. `make clean` removes build products, and `make distclean` also
+removes the generated makefile and configuration results.
+
 # OPTIONS
 
 **-db [db file]**
