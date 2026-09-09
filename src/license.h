@@ -1,57 +1,53 @@
+/*
+ * Copyright (C) 2025-2026 Guy Wilson
+ *
+ * This file is part of PFM.
+ *
+ * PFM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PFM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PFM. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 // Kept in the executable so --license provides the notices and complete
 // copyleft license texts required by PFM's direct dependencies.
 inline constexpr char licenseText[] = R"PFM_LICENSE(PFM
 
-Copyright (c) 2026, Guy Wilson
+Copyright (C) 2025-2026 Guy Wilson
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+PFM is free software: you can redistribute it and/or modify it under the terms
+of the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+PFM is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+You should have received a copy of the GNU General Public License along with
+PFM. If not, see <https://www.gnu.org/licenses/>.
 
 THIRD-PARTY SOFTWARE NOTICES
 
 PFM uses or distributes material from the projects listed below. The license
 texts following these notices form part of this notice.
 
-PFM's own source files are offered under the BSD 2-Clause terms above. A PFM
-executable linked with GNU Readline and GNU History is a combined work governed
-by the GNU General Public License version 3 or later. Distribution of such an
-executable must comply with that license, including its Corresponding Source
-requirements.
+PFM is distributed under the GNU General Public License version 3 or later.
+The third-party components retain their respective licenses and copyright
+notices as documented below.
 
 GNU Readline and GNU History
 Copyright (C) Free Software Foundation, Inc.
 License: GNU General Public License version 3 or later.
-
-GNU MP (GMP)
-Copyright 1991, 1996, 1999, 2000, 2007 Free Software Foundation, Inc.
-License elected for this distribution: GNU Lesser General Public License
-version 3 or later.
-
-GNU MPFR
-Copyright 2000-2025 Free Software Foundation, Inc.
-Contributed by the Pascaline and Caramba projects, INRIA.
-License: GNU Lesser General Public License version 3 or later.
 
 Libgcrypt
 Copyright (C) 1989,1991-2018 Free Software Foundation, Inc.

@@ -58,7 +58,7 @@ AC_SUBST([PFM_CPPFLAGS])
 CPPFLAGS="$CPPFLAGS $PFM_CPPFLAGS"
 
 dnl Keep dependency probes in C++ mode, as the application includes these headers.
-AC_CHECK_HEADERS([readline/readline.h readline/history.h sqlcipher/sqlite3.h gcrypt.h gmp.h mpfr.h libcred.hpp nlohmann/json.hpp microhttpd.h httpserver.hpp], [],
+AC_CHECK_HEADERS([readline/readline.h readline/history.h sqlcipher/sqlite3.h gcrypt.h libcred.hpp nlohmann/json.hpp microhttpd.h httpserver.hpp], [],
   [AC_MSG_ERROR([missing required header; install the development dependencies or set CPPFLAGS=-I/path/to/include])])
 
 dnl The current POSIX build uses pthreads for both compilation and linking.
@@ -76,8 +76,6 @@ AC_SEARCH_LIBS([tgetent], [tinfo ncurses curses], [],
 AC_CHECK_LIB([history], [add_history], [], [AC_MSG_ERROR([GNU History is required])])
 AC_CHECK_LIB([readline], [readline], [], [AC_MSG_ERROR([GNU Readline is required])])
 AC_CHECK_LIB([gcrypt], [gcry_check_version], [], [AC_MSG_ERROR([libgcrypt is required])])
-AC_CHECK_LIB([gmp], [__gmpz_init], [], [AC_MSG_ERROR([GMP is required])])
-AC_CHECK_LIB([mpfr], [mpfr_init2], [], [AC_MSG_ERROR([MPFR is required])])
 AC_CHECK_LIB([sqlcipher], [sqlite3_key], [], [AC_MSG_ERROR([SQLCipher with encryption support is required])])
 AC_CHECK_LIB([microhttpd], [MHD_get_version], [], [AC_MSG_ERROR([libmicrohttpd is required])])
 

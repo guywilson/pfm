@@ -16,7 +16,7 @@ PFM supports multiple accounts, transactions, recurring charges, categories and 
 
 PFM requires a C++20 compiler, GNU make, and the development headers and
 libraries for GNU Readline/History, curses or terminfo, SQLCipher, libgcrypt,
-GMP, MPFR, libcred, libhttpserver and libmicrohttpd. The nlohmann JSON headers
+libcred, libhttpserver and libmicrohttpd. The nlohmann JSON headers
 are also required. Install Pandoc to build and install the manual page.
 
 Generate the `configure` script using Autoconf (2.69 or newer; `autoreconf`
