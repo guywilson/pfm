@@ -171,7 +171,7 @@ std::string Expression::evaluate(const std::string & expression) {
     if (tokenStack.size() == 1) {
         Operand * result = tokenStack.poperand();
 
-        answer = result->toString(precision);
+        answer = result->toString();
 
         result->clear();
         delete result;

@@ -1,15 +1,10 @@
-#include <string>
+#pragma once
 
-#include <gmp.h>
-#include <mpfr.h>
+#include <string>
 
 #include "pfm_error.h"
 #include "token.h"
 #include "operand.h"
-
-
-#ifndef __INCL_OPERATOR
-#define __INCL_OPERATOR
 
 static inline bool isTokenPlus(const std::string & token) {
     return (token.compare("+") == 0);
@@ -163,8 +158,6 @@ class Operator : public Token {
                     throw calc_error("Invalid operator");
             }
 
-            return result.toString(INTERMEDIATE_PRECISION);
+            return result.toString();
         }
 };
-
-#endif

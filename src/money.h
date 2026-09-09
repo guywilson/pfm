@@ -71,10 +71,19 @@ class Money {
         Money & operator-=(const Money & rhs);
 
         const Money operator*(const int rhs);
+        const Money operator*(const Money & rhs);
         Money & operator*=(const int rhs);
+        Money & operator*=(const Money & rhs);
         
         const Money operator/(const int rhs);
+        const Money operator/(const Money & rhs);
         Money & operator/=(const int rhs);
+        Money & operator/=(const Money & rhs);
+
+        const Money operator%(const int rhs);
+        const Money operator%(const Money & rhs);
+        Money & operator%=(const int rhs);
+        Money & operator%=(const Money & rhs);
 
         bool operator==(const Money & rhs);
         bool operator!=(const Money & rhs);
@@ -406,6 +415,32 @@ class MoneyTest {
             }
         }
 
+        static void testOperatorTimesMoney() {
+            Money m1("10.25");
+            Money m2("2.00");
+            Money m3 = m1 * m2;
+
+            if (m3._getValue() != 2050L) {
+                throw pfm_error("testOperatorTimesMoney(): Test failed");
+            }
+            else {
+                std::cout << "testOperatorTimesMoney(): Test passed" << std::endl;
+            }
+        }
+
+        static void testOperatorTimesEqualsMoney() {
+            Money m1("10.25");
+            Money m2("2.00");
+            m1 *= m2;
+
+            if (m1._getValue() != 2050L) {
+                throw pfm_error("testOperatorTimesEqualsMoney(): Test failed");
+            }
+            else {
+                std::cout << "testOperatorTimesEqualsMoney(): Test passed" << std::endl;
+            }
+        }
+
         static void testOperatorDivide() {
             Money m1("107.86");
             Money m3 = m1 / 2;
@@ -427,6 +462,56 @@ class MoneyTest {
             }
             else {
                 std::cout << "testOperatorDivideEquals(): Test passed" << std::endl;
+            }
+        }
+
+        static void testOperatorModulus() {
+            Money m1("107.86");
+            Money m2 = m1 % 3;
+
+            if (m2._getValue() != 1L) {
+                throw pfm_error("testOperatorModulus(): Test failed");
+            }
+            else {
+                std::cout << "testOperatorModulus(): Test passed" << std::endl;
+            }
+        }
+
+        static void testOperatorModulusEquals() {
+            Money m1("107.86");
+            m1 %= 3;
+
+            if (m1._getValue() != 1L) {
+                throw pfm_error("testOperatorModulusEquals(): Test failed");
+            }
+            else {
+                std::cout << "testOperatorModulusEquals(): Test passed" << std::endl;
+            }
+        }
+
+        static void testOperatorModulusMoney() {
+            Money m1("107.86");
+            Money m2("3.00");
+            Money m3 = m1 % m2;
+
+            if (m3._getValue() != 286L) {
+                throw pfm_error("testOperatorModulusMoney(): Test failed");
+            }
+            else {
+                std::cout << "testOperatorModulusMoney(): Test passed" << std::endl;
+            }
+        }
+
+        static void testOperatorModulusEqualsMoney() {
+            Money m1("107.86");
+            Money m2("3.00");
+            m1 %= m2;
+
+            if (m1._getValue() != 286L) {
+                throw pfm_error("testOperatorModulusEqualsMoney(): Test failed");
+            }
+            else {
+                std::cout << "testOperatorModulusEqualsMoney(): Test passed" << std::endl;
             }
         }
 
@@ -781,6 +866,24 @@ class MoneyTest {
             }
 
             try {
+                testOperatorTimesMoney();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                std::cout << e.what() << std::endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorTimesEqualsMoney();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                std::cout << e.what() << std::endl;
+                numTestsFailed++;
+            }
+
+            try {
                 testOperatorDivide();
                 numTestsPassed++;
             }
@@ -791,6 +894,42 @@ class MoneyTest {
 
             try {
                 testOperatorDivideEquals();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                std::cout << e.what() << std::endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorModulus();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                std::cout << e.what() << std::endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorModulusEquals();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                std::cout << e.what() << std::endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorModulusMoney();
+                numTestsPassed++;
+            }
+            catch (pfm_error & e) {
+                std::cout << e.what() << std::endl;
+                numTestsFailed++;
+            }
+
+            try {
+                testOperatorModulusEqualsMoney();
                 numTestsPassed++;
             }
             catch (pfm_error & e) {

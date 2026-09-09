@@ -4205,7 +4205,7 @@ then :
 printf '%s\n' "#define STDC_HEADERS 1" >>confdefs.h
 
 fi
-       for ac_header in readline/readline.h readline/history.h sqlcipher/sqlite3.h gcrypt.h gmp.h mpfr.h libcred.hpp nlohmann/json.hpp microhttpd.h httpserver.hpp
+       for ac_header in readline/readline.h readline/history.h sqlcipher/sqlite3.h gcrypt.h libcred.hpp nlohmann/json.hpp microhttpd.h httpserver.hpp
 do :
   as_ac_Header=`printf '%s\n' "ac_cv_header_$ac_header" | sed "$as_sed_sh"`
 ac_fn_cxx_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -4448,100 +4448,6 @@ then :
 
 else case e in #(
   e) as_fn_error $? "libgcrypt is required" "$LINENO" 5 ;;
-esac
-fi
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for __gmpz_init in -lgmp" >&5
-printf %s "checking for __gmpz_init in -lgmp... " >&6; }
-if test ${ac_cv_lib_gmp___gmpz_init+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgmp  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-namespace conftest {
-  extern "C" int __gmpz_init ();
-}
-int
-main (void)
-{
-return conftest::__gmpz_init ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"
-then :
-  ac_cv_lib_gmp___gmpz_init=yes
-else case e in #(
-  e) ac_cv_lib_gmp___gmpz_init=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS ;;
-esac
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gmp___gmpz_init" >&5
-printf '%s\n' "$ac_cv_lib_gmp___gmpz_init" >&6; }
-if test "x$ac_cv_lib_gmp___gmpz_init" = xyes
-then :
-  printf '%s\n' "#define HAVE_LIBGMP 1" >>confdefs.h
-
-  LIBS="-lgmp $LIBS"
-
-else case e in #(
-  e) as_fn_error $? "GMP is required" "$LINENO" 5 ;;
-esac
-fi
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for mpfr_init2 in -lmpfr" >&5
-printf %s "checking for mpfr_init2 in -lmpfr... " >&6; }
-if test ${ac_cv_lib_mpfr_mpfr_init2+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmpfr  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-namespace conftest {
-  extern "C" int mpfr_init2 ();
-}
-int
-main (void)
-{
-return conftest::mpfr_init2 ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"
-then :
-  ac_cv_lib_mpfr_mpfr_init2=yes
-else case e in #(
-  e) ac_cv_lib_mpfr_mpfr_init2=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS ;;
-esac
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mpfr_mpfr_init2" >&5
-printf '%s\n' "$ac_cv_lib_mpfr_mpfr_init2" >&6; }
-if test "x$ac_cv_lib_mpfr_mpfr_init2" = xyes
-then :
-  printf '%s\n' "#define HAVE_LIBMPFR 1" >>confdefs.h
-
-  LIBS="-lmpfr $LIBS"
-
-else case e in #(
-  e) as_fn_error $? "MPFR is required" "$LINENO" 5 ;;
 esac
 fi
 

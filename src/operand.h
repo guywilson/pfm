@@ -1,20 +1,12 @@
+#pragma once
+
 #include <string>
 
 #include <ctype.h>
 #include <stdint.h>
 
-#include <gmp.h>
-#include <mpfr.h>
-
+#include "money.h"
 #include "token.h"
-
-
-#ifndef __INCL_OPERAND
-#define __INCL_OPERAND
-
-#define MPFR_BASE_PRECISION           1024L
-
-#define INTERMEDIATE_PRECISION          256
 
 #define BASE_10                          10
 #define DECIMAL                     BASE_10
@@ -32,11 +24,11 @@ static inline bool isOperandChar(char ch) {
 class Operand : public Token {
     private:
         void initialiseValue() {
-            mpfr_init2(value, MPFR_BASE_PRECISION);
+            value = 0.0;
         }
 
     public:
-        mpfr_t value;
+        Money value;
 
         Operand() {
             initialiseValue();
@@ -44,16 +36,16 @@ class Operand : public Token {
 
         Operand(const std::string & token) : Token(token) {
             initialiseValue();
-            mpfr_strtofr(value, token.c_str(), NULL, DECIMAL, MPFR_RNDA);
+            value = token;
         }
 
-        Operand(mpfr_t src) {
+        Operand(Money src) {
             initialiseValue();
-            mpfr_set(value, src, MPFR_RNDA);
+            value = src;
         }
 
         void clear() {
-            mpfr_clear(value);
+            value = 0.0;
         }
 
         static bool isOperand(const std::string & token) {
@@ -68,20 +60,12 @@ class Operand : public Token {
             return true;
         }
 
-        std::string toString(long precision = 2) {
-            char szOutputString[OUTPUT_MAX_STRING_LENGTH];
-            char szFormatString[32];
-            std::string output;
-
-            snprintf(szFormatString, 32, "%%.%ldRf", precision);
-            mpfr_snprintf(szOutputString, OUTPUT_MAX_STRING_LENGTH, szFormatString, value);
-            output.assign(szOutputString);
-
-            return output;
+        std::string toString() {
+            return value.rawStringValue();
         }
 
         virtual std::string evaluate() override {
-            return toString(INTERMEDIATE_PRECISION);
+            return toString();
         }
 
         static const std::string CLASS_NAME() {
@@ -92,58 +76,38 @@ class Operand : public Token {
             return Operand::CLASS_NAME();
         }
 
-        const Operand deg() {
-            Operand result;
-
-            mpfr_t  pi;
-            mpfr_t  one_eighty;
-
-            mpfr_init2(pi, MPFR_BASE_PRECISION);
-            mpfr_init2(one_eighty, MPFR_BASE_PRECISION);
-
-            mpfr_const_pi(pi, MPFR_RNDA);
-            mpfr_set_ui(one_eighty, 180U, MPFR_RNDA);
-            
-            mpfr_div(result.value, one_eighty, pi, MPFR_RNDA);
-            mpfr_mul(result.value, result.value, this->value, MPFR_RNDA);
-            result.setToken(result.toString(INTERMEDIATE_PRECISION));
-            return result;
-        }
-
         const Operand operator+(const Operand & rhs) {
             Operand result;
-            mpfr_add(result.value, this->value, rhs.value, MPFR_RNDA);
-            result.setToken(result.toString(INTERMEDIATE_PRECISION));
+            result.value = this->value + rhs.value;
+            result.setToken(result.toString());
             return result;
         }
 
         const Operand operator-(const Operand & rhs) {
             Operand result;
-            mpfr_sub(result.value, this->value, rhs.value, MPFR_RNDA);
-            result.setToken(result.toString(INTERMEDIATE_PRECISION));
+            result.value = this->value - rhs.value;
+            result.setToken(result.toString());
             return result;
         }
 
         const Operand operator*(const Operand & rhs) {
             Operand result;
-            mpfr_mul(result.value, this->value, rhs.value, MPFR_RNDA);
-            result.setToken(result.toString(INTERMEDIATE_PRECISION));
+            result.value = this->value * rhs.value;
+            result.setToken(result.toString());
             return result;
         }
 
         const Operand operator/(const Operand & rhs) {
             Operand result;
-            mpfr_div(result.value, this->value, rhs.value, MPFR_RNDA);
-            result.setToken(result.toString(INTERMEDIATE_PRECISION));
+            result.value = this->value / rhs.value;
+            result.setToken(result.toString());
             return result;
         }
 
         const Operand operator%(const Operand & rhs) {
             Operand result;
-            mpfr_remainder(result.value, this->value, rhs.value, MPFR_RNDA);
-            result.setToken(result.toString(INTERMEDIATE_PRECISION));
+            result.value = this->value % rhs.value;
+            result.setToken(result.toString());
             return result;
         }
 };
-
-#endif

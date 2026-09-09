@@ -307,8 +307,38 @@ const Money Money::operator*(const int rhs) {
     return result;
 }
 
+const Money Money::operator*(const Money & rhs) {
+    Money result = *this;
+    result *= rhs;
+    return result;
+}
+
 Money & Money::operator*=(const int rhs) {
     this->representedValue *= rhs;
+    return *this;
+}
+
+Money & Money::operator*=(const Money & rhs) {
+    /*
+    ** Both operands are stored in hundredths. Multiplying the represented
+    ** values therefore introduces an extra factor of 100, which must be
+    ** removed before storing the result. Use a wider intermediate so the
+    ** multiplication does not overflow money_t before it is rescaled.
+    */
+    int64_t product = (int64_t)this->representedValue *
+                      (int64_t)rhs.representedValue;
+    int64_t result = product / 100;
+    int64_t remainder = product % 100;
+
+    /* Match the round-half-away-from-zero behaviour used by _setValue(). */
+    if (remainder >= 50) {
+        result++;
+    }
+    else if (remainder <= -50) {
+        result--;
+    }
+
+    this->representedValue = (money_t)result;
     return *this;
 }
 
@@ -318,10 +348,45 @@ const Money Money::operator/(const int rhs) {
     return result;
 }
 
+const Money Money::operator/(const Money & rhs) {
+    Money result = *this;
+    result /= rhs;
+    return result;
+}
+
 Money & Money::operator/=(const int rhs) {
     double result = (double)this->representedValue;
     result /= (double)rhs;
     this->representedValue = (money_t)round(result);
+    return *this;
+}
+
+Money & Money::operator/=(const Money & rhs) {
+    double result = (double)this->representedValue;
+    result /= (double)rhs.representedValue;
+    this->representedValue = (money_t)round(result);
+    return *this;
+}
+
+const Money Money::operator%(const int rhs) {
+    Money result = *this;
+    result %= rhs;
+    return result;
+}
+
+const Money Money::operator%(const Money & rhs) {
+    Money result = *this;
+    result %= rhs;
+    return result;
+}
+
+Money & Money::operator%=(const int rhs) {
+    this->representedValue %= rhs;
+    return *this;
+}
+
+Money & Money::operator%=(const Money & rhs) {
+    this->representedValue %= rhs.representedValue;
     return *this;
 }
 
