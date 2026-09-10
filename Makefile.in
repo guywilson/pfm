@@ -76,7 +76,7 @@ uninstall:
 # Deliberately updates the source tree, including for out-of-tree builds.
 version:
 	@command -v "$(VBUILD)" >/dev/null 2>&1 || { echo "make version requires vbuild; set VBUILD=/path/to/vbuild" >&2; exit 1; }
-	"$(VBUILD)" -incfile "$(srcdir)/pfm.ver" -template "$(srcdir)/version.c.template" -out "$(srcdir)/src/version.c" -major $(MAJOR_VERSION) -minor $(MINOR_VERSION)
+	"$(VBUILD)" -i "$(srcdir)/pfm.ver" -t "$(srcdir)/version.c.template" -o "$(srcdir)/src/version.c" -major $(MAJOR_VERSION) -minor $(MINOR_VERSION)
 
 clean:
 	rm -f $(OBJECTS) $(DEPS) $(OBJECTS:.o=.Td) pfm pfm.1
