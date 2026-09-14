@@ -184,10 +184,11 @@ static int commandProcessor() {
 }
 
 int main(int argc, char ** argv) {
-    char * pszDatabase = strdup(DEFAULT_DATABASE_NAME);
     int status = 0;
     bool runScratch = false;
     int defaultLogLevel = DEFAULT_LOG_LEVEL;
+
+    std::string databaseName = DEFAULT_DATABASE_NAME;
 
     CmdArg cmdarg(argc, argv);
 
@@ -195,8 +196,7 @@ int main(int argc, char ** argv) {
         std::string arg = cmdarg.nextArg();
 
         if (arg.compare("-db") == 0) {
-            free(pszDatabase);
-            pszDatabase = strdup(cmdarg.nextArg().c_str());
+            databaseName = cmdarg.nextArg();
         }
         else if (arg.compare("-h") == 0 || arg.compare("-?") == 0) {
             printUsage();
@@ -243,17 +243,14 @@ int main(int argc, char ** argv) {
     PFM_DB & db = PFM_DB::getInstance();
 
     try {
-        db.open(pszDatabase);
+        db.open(databaseName);
     }
     catch (pfm_fatal & f) {
         log.fatal("Fatal error: %s", f.what());
         log.close();
         
-        free(pszDatabase);
         return -1;
     }
-
-    free(pszDatabase);
 
     /*
     ** Register a callback handler when db writes are performed,
