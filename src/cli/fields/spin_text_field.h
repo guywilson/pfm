@@ -48,12 +48,26 @@ class CLISpinTextField : public CLITextField {
             clear_history();
         }
 
+        inline std::string addSpinChar(const std::string & label) {
+            std::string newLabel = label;
+
+            size_t pos = label.find_last_of(':');
+            if (pos != std::string::npos) {
+                newLabel.replace(pos, 1, "\u2195");
+            }
+            else {
+                newLabel.append("\u2195 ");
+            }
+
+            return newLabel;
+        }
+
     public:
         CLISpinTextField() : CLITextField() {
             setLengthLimit(CODE_FIELD_MAX_LENGTH);
         }
 
-        CLISpinTextField(const std::string & label) : CLITextField(label) {
+        CLISpinTextField(const std::string & label) : CLITextField(addSpinChar(label)) {
             setLengthLimit(CODE_FIELD_MAX_LENGTH);
         }
 
