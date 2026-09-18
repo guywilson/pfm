@@ -195,37 +195,37 @@ int main(int argc, char ** argv) {
     while (cmdarg.hasMoreArgs()) {
         std::string arg = cmdarg.nextArg();
 
-        if (arg.compare("-db") == 0) {
+        if (arg == "-db") {
             databaseName = cmdarg.nextArg();
         }
-        else if (arg.compare("-h") == 0 || arg.compare("-?") == 0) {
+        else if (arg == "-h" || arg == "-?") {
             printUsage();
             return 0;
         }
-        else if (arg.compare("-date") == 0) {
+        else if (arg == "-date") {
             setOverrideDate(cmdarg.nextArg());
         }
-        else if (arg.compare("-v") == 0 || arg.compare("--version") == 0) {
+        else if (arg == "-v" || arg == "--version") {
             Command::version();
             return 0;
         }
-        else if (arg.compare("-l") == 0 || arg.compare("--license") == 0) {
+        else if (arg == "-l" || arg == "--license") {
             printLicense();
             return 0;
         }
-        else if (arg.compare("--headless") == 0) {
+        else if (arg == "--headless") {
             System::setIsHeadlessLinux(true);
         }
-        else if (arg.compare("--full-logging") == 0) {
+        else if (arg == "--full-logging") {
             defaultLogLevel = LOG_LEVEL_ALL;
         }
-        else if (arg.compare("--sql-logging") == 0) {
+        else if (arg == "--sql-logging") {
             defaultLogLevel |= LOG_LEVEL_SQL;
         }
-        else if (arg.compare("--debug-logging") == 0) {
+        else if (arg == "--debug-logging") {
             defaultLogLevel |= (LOG_LEVEL_DEBUG | LOG_LEVEL_INFO);
         }
-        else if (arg.compare("--run-scratch") == 0) {
+        else if (arg == "--run-scratch") {
             runScratch = true;
         }
         else {
