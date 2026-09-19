@@ -82,7 +82,7 @@ std::string cfgmgr::getValue(const std::string & key) {
 bool cfgmgr::getValueAsBoolean(const std::string & key) {
     std::string value = getValue(key);
 
-    return ((value.compare("yes") == 0  || value.compare("true") == 0 || value.compare("on") == 0) ? true : false);
+    return ((value.length() > 0 && (value == "yes" || value == "true" || value == "on")) ? true : false);
 }
 
 int cfgmgr::getValueAsInteger(const std::string & key) {

@@ -31,6 +31,26 @@
 #include "db_base.h"
 #include "db_audit.h"
 
+int auditOnReadHandler(const std::string & operation, const std::string & entityName, const std::string & statement) {
+    static DBAuditInteraction audit;
+
+    /*
+    ** We don't want to record reads into the audit_interaction table...
+    */
+    if (entityName != audit.getTableName()) {
+        audit.clear();
+
+        audit.auditTimestamp = StrDate::getTimestamp();
+        audit.entityName = entityName;
+        audit.sqlOperation = operation;
+        audit.sqlStatement = statement;
+
+        audit.save();
+    }
+
+    return 0;
+}
+
 int auditOnWriteHandler(const std::string & operation, const std::string & entityName, const std::string & statement) {
     static DBAuditInteraction audit;
 
@@ -48,7 +68,6 @@ int auditOnWriteHandler(const std::string & operation, const std::string & entit
 
         audit.save();
     }
-
 
     return 0;
 }

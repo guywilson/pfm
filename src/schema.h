@@ -68,7 +68,9 @@ const char * defaultConfig[][5] = {
     {"cycle.start", "1", "The day each monthly cycle starts on", "Y", "Y"},
     {"cycle.end", "last-working-day", "The day each monthly cycle ends on", "N", "Y"},
     {"limits.row", "50", "The row limit when retrieving records", "N", "Y"},
-    {"money.locale", "", "Locale used for money fields", "N", "Y"}
+    {"money.locale", "", "Locale used for money fields", "N", "Y"},
+    {"audit.read", "no", "Should we record db reads to the audit interaction table", "N", "Y"},
+    {"audit.write", "no", "Should we record db writes to the audit interaction table", "N", "Y"}
 };
 
 /*

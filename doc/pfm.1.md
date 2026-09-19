@@ -70,9 +70,43 @@ Update the account details with the given account code.
 
 Delete the account with the given account code. This will also delete all transactions and recurring charges associated with the account.
 
+**list-audit-interaction (lai)** [parameters]
+
+List audit interaction records.
+
+- date>:[date after] - The records after this date are listed
+- date<:[date before] - The records before this date are listed
+
+**show-audit-interacton (sai)** [audit interaction sequence number]
+
+Shows the details of the audit interaction record with the given sequence number.
+
+**delete-audit-interaction (dai)** [parameters]
+
+Delete audit interaction records. If no parameters are supplied, the command deletes records before 3 months ago.
+
+-date<:[date before] - delete the records before this date.
+
 **add-config-item (acfg)**
 
 Add a new config item. The user is prompted to enter the config item details.
+
+The following config items are created when a new database is created:
+
+```
+	cycle.start = 1					*The day each monthly cycle starts* (cannot be changed by the user)
+	cycle.end = "last-working-day"  *The day each monthly cycle ends*
+									Possible values:
+										last-working-day
+										last-friday
+										n e.g. 25 for a fixed day
+	limits.row = 50					*Limit of number of rows retrieved*
+	money.locale = ""				*Locale for the currency symbol* (leave blank for the default system locale)
+	audit.read = no					*Whether to record db reads to the audit interaction table*
+									Setting this to yes will slow down the program responsiveness
+									and fill up the audit interaction table quickly.
+	audit.write = no				*Whether to record db writes to the audit interaction table*
+```
 
 **list-config-items (lcfg)**
 
