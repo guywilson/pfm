@@ -252,13 +252,13 @@ int main(int argc, char ** argv) {
         return -1;
     }
 
+    initialiseReferenceData();
+
     /*
     ** Register a callback handler when db writes are performed,
     ** we use this to populate the audit_interaction table...
     */
     db.registerWriteCallback(auditOnWriteHandler);
-
-    initialiseReferenceData();
 
     if (runScratch) {
         /*

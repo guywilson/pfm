@@ -1,7 +1,6 @@
 AC_PREREQ([2.69])
 AC_INIT([pfm], [2.4])
 AC_CONFIG_SRCDIR([src/main.cpp])
-AC_CONFIG_AUX_DIR([build-aux])
 
 AC_ARG_ENABLE([debug],
   [AS_HELP_STRING([--enable-debug], [build with debug symbols and no optimization (default: release)])],
@@ -19,8 +18,6 @@ AC_MSG_NOTICE([build type: $pfm_build_type])
 
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_INSTALL
-AC_PROG_MKDIR_P
 
 dnl Preserve the warning policy from the hand-written makefile.
 CFLAGS="$CFLAGS -Wall -pedantic"
