@@ -7,7 +7,7 @@ datarootdir = @datarootdir@
 mandir = @mandir@
 
 CC = @CC@
-CXX = @CXX@
+CPP = @CXX@
 CPPFLAGS = @CPPFLAGS@
 CFLAGS = @CFLAGS@
 CXXFLAGS = @CXXFLAGS@
@@ -23,19 +23,29 @@ VBUILD = @VBUILD@
 MAJOR_VERSION = @MAJOR_VERSION@
 MINOR_VERSION = @MINOR_VERSION@
 
+SOURCE=$(srcdir)/src
+BUILD=$(srcdir)/build
+DEP=$(srcdir)/dep
+
+# precompile step
+PRECOMPILE = @ mkdir -p $(BUILD) $(DEP)
+# postcompile step
+POSTCOMPILE = @ mv -f $(DEP)/$*.Td $(DEP)/$*.d
+
 # Match the legacy debug password override: make DEBUG_PASSWD=example.
 DEBUG_PASSWD =
 DEBUG_CPPFLAGS =
 ifeq (@DEBUG_BUILD@,yes)
 DEBUG_CPPFLAGS = '-DDEBUG_PASSWORD="$(DEBUG_PASSWD)"'
 endif
-DEP_FLAGS = -MT $@ -MMD -MP -MF $(@:.o=.Td)
+DEP_FLAGS = -MT $@ -MMD -MP -MF $(DEP)/$*.Td
 
-C_SOURCES = $(wildcard $(srcdir)/src/*.c)
-CXX_SOURCES = $(wildcard $(srcdir)/src/*.cpp)
-OBJECTS = $(patsubst $(srcdir)/src/%.c,build/%.o,$(C_SOURCES)) \
-          $(patsubst $(srcdir)/src/%.cpp,build/%.o,$(CXX_SOURCES))
-DEPS = $(OBJECTS:.o=.d)
+C_SOURCES = $(wildcard $(SOURCE)/*.c)
+CPP_SOURCES = $(wildcard $(SOURCE)/*.cpp)
+OBJECTS = $(patsubst $(SOURCE)/%.c,$(BUILD)/%.o,$(C_SOURCES)) \
+          $(patsubst $(SOURCE)/%.cpp,$(BUILD)/%.o,$(CPP_SOURCES))
+DEPS = $(patsubst $(SOURCE)/%.c, $(DEP)/%.d, $(C_SOURCES)) \
+       $(patsubst $(SOURCE)/%.cpp, $(DEP)/%.d, $(CPP_SOURCES))
 
 .PHONY: all man install uninstall version clean distclean
 all: pfm
@@ -44,19 +54,17 @@ all: man
 endif
 
 pfm: $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
+	$(CPP) $(PTHREAD_FLAGS) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
-# Order-only prerequisite: directory timestamps must not trigger recompilation.
-build:
-	$(MKDIR_P) $@
+$(BUILD)/%.o: $(SOURCE)/%.c makefile
+	$(PRECOMPILE)
+	$(CC) $(CPPFLAGS) $(DEBUG_CPPFLAGS) $(CFLAGS) $(DEP_FLAGS) -c $< -o $@
+	$(POSTCOMPILE)
 
-build/%.o: $(srcdir)/src/%.c makefile | build
-	$(CC) $(CPPFLAGS) $(DEBUG_CPPFLAGS) $(CFLAGS) $(PTHREAD_FLAGS) $(DEP_FLAGS) -c $< -o $@
-	@ mv -f $(@:.o=.Td) $(@:.o=.d)
-
-build/%.o: $(srcdir)/src/%.cpp makefile | build
-	$(CXX) $(CPPFLAGS) $(DEBUG_CPPFLAGS) $(CXXFLAGS) $(DEP_FLAGS) -c $< -o $@
-	@ mv -f $(@:.o=.Td) $(@:.o=.d)
+$(BUILD)/%.o: $(SOURCE)/%.cpp makefile
+	$(PRECOMPILE)
+	$(CPP) $(CPPFLAGS) $(DEBUG_CPPFLAGS) $(CXXFLAGS) $(DEP_FLAGS) -c $< -o $@
+	$(POSTCOMPILE)
 
 -include $(DEPS)
 
@@ -66,20 +74,20 @@ pfm.1: $(srcdir)/doc/pfm.1.md
 	$(PANDOC) -s -t man -o $@ $<
 
 install: pfm man
-	$(MKDIR_P) "$(DESTDIR)$(bindir)" "$(DESTDIR)$(mandir)/man1"
-	$(INSTALL_PROGRAM) pfm "$(DESTDIR)$(bindir)/pfm"
-	$(INSTALL_DATA) pfm.1 "$(DESTDIR)$(mandir)/man1/pfm.1"
+	cp pfm /usr/local/bin
+	cp pfm.1 /usr/local/share/man/man1
 
 uninstall:
-	rm -f "$(DESTDIR)$(bindir)/pfm" "$(DESTDIR)$(mandir)/man1/pfm.1"
+	rm -f /usr/local/bin/pfm /usr/local/share/man/man1/pfm.1
 
 # Deliberately updates the source tree, including for out-of-tree builds.
 version:
 	@command -v "$(VBUILD)" >/dev/null 2>&1 || { echo "make version requires vbuild; set VBUILD=/path/to/vbuild" >&2; exit 1; }
-	"$(VBUILD)" -i "$(srcdir)/pfm.ver" -t "$(srcdir)/version.c.template" -o "$(srcdir)/src/version.c" -major $(MAJOR_VERSION) -minor $(MINOR_VERSION)
+	"$(VBUILD)" -i "$(srcdir)/pfm.ver" -t "$(srcdir)/version.c.template" -o "$(SOURCE)/version.c" -major $(MAJOR_VERSION) -minor $(MINOR_VERSION)
 
 clean:
-	rm -f $(OBJECTS) $(DEPS) $(OBJECTS:.o=.Td) pfm pfm.1
+	rm -rf $(BUILD) $(DEP)
+	rm -f pfm pfm.1
 
 distclean: clean
 	rm -f makefile config.log config.status
