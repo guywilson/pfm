@@ -35,9 +35,12 @@ int auditOnWriteHandler(const std::string & operation, const std::string & entit
     static DBAuditInteraction audit;
 
     /*
-    ** We must not record inserts into the audit_interaction table...
+    ** We don't want to record writes into the audit_interaction table
+    ** otherwise we'll get into an infinite loop...
     */
     if (entityName != audit.getTableName()) {
+        audit.clear();
+
         audit.auditTimestamp = StrDate::getTimestamp();
         audit.entityName = entityName;
         audit.sqlOperation = operation;
@@ -46,7 +49,6 @@ int auditOnWriteHandler(const std::string & operation, const std::string & entit
         audit.save();
     }
 
-    audit.clear();
 
     return 0;
 }
