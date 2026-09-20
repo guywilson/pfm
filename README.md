@@ -140,7 +140,6 @@ The following config items (see the add-config-item command below) are created w
 | **cycle.end = last-working-day** | *The day each cycle ends.* Possible values are: last-working-day, last-day, last-friday, any valid day of the month, e.g. 25 |
 | **limits.row = 50** | *Limit the number of rows retrieved* |
 | **money.local = “”** | *Locale for the currency symbol in money fields* (leave blank for the default system locale) |
-| **audit.read = no** | *Whether to record DB reads into the audit interaction table.* Note: Setting this to yes will severely impact program performance and fill the audit interaction table very quickly. **Not recommended.** |
 | **audit.write = no** | *Whether to record DB writes into the audit interaction table.* Any INSERT, UPDATE or DELETE statement will be recorded in the audit interaction table. |
 
 PFM supports shortcuts to commands that you run frequently. Shortcuts are activated by following with the backslash character '\' which will replace the shortcut with the command you have specified.

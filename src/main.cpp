@@ -256,14 +256,6 @@ int main(int argc, char ** argv) {
 
     cfgmgr & cfg = cfgmgr::getInstance();
 
-    if (cfg.getValueAsBoolean("audit.read")) {
-        /*
-        ** Register a callback handler when db reads are performed,
-        ** we use this to populate the audit_interaction table...
-        */
-        db.registerReadCallback(auditOnReadHandler);
-    }
-
     if (cfg.getValueAsBoolean("audit.write")) {
         /*
         ** Register a callback handler when db writes are performed,

@@ -27,7 +27,6 @@
 
 #define DB_AUDIT_SQL_STATEMENT_PRINT_WIDTH 80U
 
-int auditOnReadHandler(const std::string & operation, const std::string & entityName, const std::string & statement);
 int auditOnWriteHandler(const std::string & operation, const std::string & entityName, const std::string & statement);
 
 class DBAuditInteraction : public DBEntity {
