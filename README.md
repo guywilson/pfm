@@ -136,7 +136,6 @@ The following config items (see the add-config-item command below) are created w
 
 | Item | Notes |
 |:--|:--|
-| **cycle.start = 1** | *The day each cycle starts* (cannot be changed by the user) |
 | **cycle.end = last-working-day** | *The day each cycle ends.* Possible values are: last-working-day, last-day, last-friday, any valid day of the month, e.g. 25 |
 | **limits.row = 50** | *Limit the number of rows retrieved* |
 | **money.local = “”** | *Locale for the currency symbol in money fields* (leave blank for the default system locale) |

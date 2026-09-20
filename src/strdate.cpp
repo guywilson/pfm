@@ -563,7 +563,7 @@ int StrDate::getPeriodEndDay(StrDate & referenceDate) {
 
     int periodEnd;
 
-    if (isNumeric(cycleEnd)) {
+    if (isNumeric(cycleEnd) && atoi(cycleEnd.c_str()) > 0) {
         periodEnd = atoi(cycleEnd.c_str());
 
         StrDate specificDate(referenceDate.year(), referenceDate.month(), periodEnd);
@@ -574,7 +574,7 @@ int StrDate::getPeriodEndDay(StrDate & referenceDate) {
 
         periodEnd = specificDate.day();
     }
-    else if (cycleEnd.compare("last-working-day") == 0) {
+    else if (cycleEnd == "last-working-day") {
         StrDate lastWorkingDay = referenceDate;
         lastWorkingDay = lastWorkingDay.lastDayInMonth();
 
@@ -584,7 +584,7 @@ int StrDate::getPeriodEndDay(StrDate & referenceDate) {
 
         periodEnd = lastWorkingDay.day();
     }
-    else if (cycleEnd.compare("last-friday") == 0) {
+    else if (cycleEnd == "last-friday") {
         StrDate lastFriday = referenceDate;
         lastFriday = lastFriday.lastDayInMonth();
 
@@ -602,9 +602,12 @@ int StrDate::getPeriodEndDay(StrDate & referenceDate) {
 
         periodEnd = lastFriday.day();
     }
-    else {
+    else if (cycleEnd == "last-day") {
         StrDate lastDay = referenceDate.lastDayInMonth();
         periodEnd = lastDay.day();
+    }
+    else {
+        throw pfm_error(pfm_error::buildMsg("Invalid cycle end value '%s'", cycleEnd.c_str()));
     }
 
     log.debug("Got period end day as %d for date '%s'", periodEnd, referenceDate.shortDate().c_str());
