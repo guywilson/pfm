@@ -127,211 +127,25 @@ Prints the version information of the PFM program and exits.
 
 Prints the supported command line options and exits.
 
-# COMMANDS
+# NOTES
 
-Commands are listed below with the full name followed by accepted short forms in brackets.
+PFM uses an encrypted SQLite database file using the SQLCipher library. When a new database file is created, the user is prompted for a password to encrypt the database with, it is important to make this password both memorable (so you don’t forget it) and secure (so it cannot be easily guessed).
+The User will also be prompted for an access password, whose key is stored as a config item (see commands add-config-item, list-config-items below). For certain commands, the user is prompted for this access password to make sure you really want to run the command.
 
-Some commands take parameters, these take the form of:
-```
-parameter_name:parameter_value
-```
+The following config items (see the add-config-item command below) are created when a new database is created:
 
-Some commands, particularly those that update or delete an entity take a parameter to identify the particular entity, that is typically shown when the entities are listed. Sometimes this identifier is a code (as is the case with category or payee), and sometimes it is a sequence number (as is the case with transaction or recurring charge). This parameter is shown in square brackets after the command name. These parameters do not take the form above, they are simply the command followed by the code/sequence. If the parameter is a code, it is case sensitive.
+| Item | Notes |
+|:--|:--|
+| **cycle.start = 1** | *The day each cycle starts* (cannot be changed by the user) |
+| **cycle.end = last-working-day** | *The day each cycle ends.* Possible values are: last-working-day, last-day, last-friday, any valid day of the month, e.g. 25 |
+| **limits.row = 50** | *Limit the number of rows retrieved* |
+| **money.local = “”** | *Locale for the currency symbol in money fields* (leave blank for the default system locale) |
+| **audit.read = no** | *Whether to record DB reads into the audit interaction table.* Note: Setting this to yes will severely impact program performance and fill the audit interaction table very quickly. **Not recommended.** |
+| **audit.write = no** | *Whether to record DB writes into the audit interaction table.* Any INSERT, UPDATE or DELETE statement will be recorded in the audit interaction table. |
 
-Date fields accept the formats yyyy-mm-dd , dd-mm-yyyy, yyyy-Mmm-dd or dd-Mmm-yyyy only. Text fields should be delimited with "" if they contain spaces, e.g.
-```
-desc:"The quick brown fox jumped over the lazy dog"
-```
+PFM supports shortcuts to commands that you run frequently. Shortcuts are activated by following with the backslash character '\' which will replace the shortcut with the command you have specified.
 
-**add-account (aa)**
-
-Add a new account to the system. The user is prompted to enter the account details such as the account name and opening balance.
-
-**list-accounts (la)**
-
-List all accounts, displaying current balance, reconciled balance and balance after bills.
-
-**update-account (ua)** [account code]
-
-Update the account details with the given account code.
-
-**delete-account (da)** [account code]
-
-Delete the account with the given account code. This will also delete all transactions and recurring charges associated with the account.
-
-**list-audit-interaction (lai)** [parameters]
-
-List audit interaction records.
-
-- date>:[date after] - The records after this date are listed
-- date<:[date before] - The records before this date are listed
-
-**show-audit-interacton (sai)** [audit interaction sequence number]
-
-Shows the details of the audit interaction record with the given sequence number.
-
-**delete-audit-interaction (dai)** [parameters]
-
-Delete audit interaction records. If no parameters are supplied, the command deletes records before 3 months ago.
-
--date<:[date before] - delete the records before this date.
-
-**add-config-item (acfg)**
-
-Add a new config item. The user is prompted to enter the config item details.
-
-The following config items are created when a new database is created:
-
-```
-	cycle.start = 1					*The day each monthly cycle starts* (cannot be changed by the user)
-	cycle.end = "last-working-day"  *The day each monthly cycle ends*
-									Possible values:
-										last-working-day
-										last-friday
-										n e.g. 25 for a fixed day
-	limits.row = 50					*Limit of number of rows retrieved*
-	money.locale = ""				*Locale for the currency symbol* (leave blank for the default system locale)
-	audit.read = no					*Whether to record db reads to the audit interaction table*
-									Setting this to yes will slow down the program responsiveness
-									and fill up the audit interaction table quickly.
-	audit.write = no				*Whether to record db writes to the audit interaction table*
-```
-
-**list-config-items (lcfg)**
-
-List all config items with their values.
-
-**update-config-item (ucfg)** [config item code]
-
-Update the config item with the given config item code.
-
-**delete-config-item (dcfg)** [config item code]
-
-Delete the config item with the given code.
-
-**add-category (ac)**
-
-Add a new category to the system. The user is prompted to enter the category details.
-
-**list-categories (lc)**
-
-List all categories with their codes and descriptions.
-
-**update-category (uc)** [category code]
-
-Update the category details with the given category code.
-
-**delete-category (dc)** [category code]
-
-Delete the category with the given category code.
-
-**add-payee (ap)**
-
-Add a new payee to the system. The user is prompted to enter the payee details.
-
-**list-payees (lp)**
-
-List all payees with their codes and names.
-
-**update-payee (up)** [payee code]
-
-Update the payee details with the given payee code.
-
-**delete-payee (dp)** [payee code]
-
-Delete the payee with the given payee code.
-
-**add-recurring-charge (arc)** (*See extended form below*)
-
-Add a new recurring charge to the currently selected account. The user is prompted to enter the charge details if no parameters are supplied.
-
-**list-recurring-charges (lrc)**
-
-List all recurring charges for the currently selected account, displaying their details and sequence numbers.
-
-**update-recurring-charge (urc)** [recurring charge sequence number]
-
-Update the recurring charge details with the given sequence number.
-
-**delete-recurring-charge (drc)** [recurring charge sequence number]
-
-Delete the recurring charge with the given sequence number.
-
-**add-transaction (at, add)** (*See extended form below*)
-
-Add a new transaction to the currently selected account. The user is prompted to enter the transaction details if no parameters are supplied.
-
-**copy-transaction (ct, copy)** [transaction sequence number]
-
-Copy the transaction with the given sequence number. If no sequence number is supplied, copy the last non-recurring transaction created.
-
-**show-transaction (show, st)** [transaction sequence number]
-
-Show the details of the transaction with the given sequence number.
-
-**list-transactions (list, lt)** (*See extended forms below*)
-
-List transactions for the currently selected account, displaying their details and sequence numbers. By default, show up to 25 non-recurring transactions in descending date order.
-
-**update-transaction (ut)** [transaction sequence number]
-
-Update the transaction details with the given sequence number.
-
-**delete-transaction (dt)** [transaction sequence number]
-
-Delete the transaction with the given sequence number.
-
-**transfer-transaction (transfer, tr)** (*See extended form below*)
-
-Transfer money from the currently selected account to another account, creating a transaction in each account. The user is prompted to enter the transfer details if no parameters are supplied.
-
-**list-transfer-records (ltr)**
-
-List all transfer records, displaying their details and sequence numbers.
-
-**delete-transfer-record (dtr)** [transfer record sequence number]
-
-Delete the transfer record with the given sequence number. This will also delete both transactions associated with the transfer.
-
-**add-report (arp)**
-
-Add a new transaction report to the system. The user is prompted to enter the report details and transaction selection criteria.
-
-**list-reports (show-reports, lrp)**
-
-List all saved transaction reports with their details and sequence numbers.
-
-**update-report (urp)** [report sequence number]
-
-Update the transaction report details and transaction selection criteria with the given sequence number.
-
-**delete-report (drp)** [report sequence number]
-
-Delete the saved transaction report with the given sequence number.
-
-**run-report (run)** [report sequence number]
-
-Run the specified transaction report and display the results. Running a report is equivalent to running the **find-transaction (find)** command specifying the sql parameter.
-
-Manage shortcuts to commands that you run frequently, shortcuts are activated by following with the backslash character '\' which will replace the shortcut with the command you have specified
-
-**add-shortcut (ash)**
-
-Add a new shortcut to the system, the user is prompted to add the shortcut details.
-
-**list-shortcuts (lsh)**
-
-List all the shortcuts stored in the system including the sequence number.
-
-**update-shortcut (ush)** [shortcut sequence number]
-
-Update the given shortcut, the user is prompted to enter the details.
-
-**delete-shortcut (dsh)** [shortcut sequence number]
-
-Delete the given shortcut from the system.
-
-PFM also supports import and export of entities via the following commands, these all accept/output files in JSON format, other than the **export-transasctions-csv** command which will output a CSV file, useful; for analysis in a spreadsheet program for example.
+PFM also supports import and export of entities via the import/export comands, these all accept/output files in JSON format, other than the **export-transasctions-csv** command which will output a CSV file, useful; for analysis in a spreadsheet program for example.
 
 JSON import files must be in the format:
 
@@ -353,45 +167,89 @@ The PFM command **save-json-template** will save an example json file for the en
 
 > [!TIP] Google Sheets has extensions available to allow export of spreadsheet data into JSON format
 
-**import-categories (ic)** [JSON file path]
+# COMMANDS
 
-Import categories from the supplied JSON file that complies to the template above.
+PFM uses a command line interface, the user enters commands into the ‘pfm>’ prompt. Commands are listed below with the full name followed by accepted short forms in brackets.
 
-**export-categories (xc)** [JSON file path]
+Some commands take parameters, these take the form of:
+```
+parameter_name:parameter_value
+```
 
-Export all categories to the supplied JSON file.
+Some commands, particularly those that update or delete an entity take a parameter to identify the particular entity, that is typically shown when the entities are listed. Sometimes this identifier is a code (as is the case with category or payee), and sometimes it is a sequence number (as is the case with transaction or recurring charge). This parameter is shown in square brackets after the command name. These parameters do not take the form above, they are simply the command followed by the code/sequence. If the parameter is a code, it is case sensitive.
 
-**import-payees (ip)** [JSON file path]
+Date fields accept the formats yyyy-mm-dd , dd-mm-yyyy, yyyy-Mmm-dd or dd-Mmm-yyyy only. Text fields should be delimited with "" if they contain spaces, e.g.
+```
+desc:"The quick brown fox jumped over the lazy dog"
+```
 
-Import payees from the supplied JSON file that complies to the template above.
 
-**export-payees (xp)** [JSON file path]
+| Command | Description |
+|:--|:--|
+| **add-account (aa)** | Add a new account to the system. The user is prompted to enter the account details such as the account name and opening balance. |
+| **list-accounts (la)** | List all accounts, displaying current balance, reconciled balance and balance after bills. |
+| **update-account (ua)** [account code] | Update the account details with the given account code. |
+| **delete-account (da)** [account code] | Delete the account with the given account code. This will also delete all transactions and recurring charges associated with the account. |
+| **list-audit-interaction (lai)** [parameters] | List audit interaction records.- date>:[date after] - The records after this date are listed - date<:[date before] - The records before this date are listed |
+| **show-audit-interacton (sai)** [audit interaction sequence number] | Shows the details of the audit interaction record with the given sequence number. |
+| **delete-audit-interaction (dai)** [parameters] | Delete audit interaction records. If no parameters are supplied, the command deletes records before 3 months ago. Parameters: date<:[date before] - delete the records before this date. |
+| **add-config-item (acfg)** | Add a new config item. The user is prompted to enter the config item details. |
+| **list-config-items (lcfg)** | List all config items with their values. |
+| **update-config-item (ucfg)** [config item code] | Update the config item with the given config item code. |
+| **delete-config-item (dcfg)** [config item code] | Delete the config item with the given code. |
+| **add-category (ac)** | Add a new category to the system. The user is prompted to enter the category details. |
+| **list-categories (lc)** | List all categories with their codes and descriptions. |
+| **update-category (uc)** [category code] | Update the category details with the given category code. |
+| **delete-category (dc)** [category code] | Delete the category with the given category code. |
+| **add-payee (ap)** | Add a new payee to the system. The user is prompted to enter the payee details. |
+| **list-payees (lp)** | List all payees with their codes and names. |
+| **update-payee (up)** [payee code] | Update the payee details with the given payee code. |
+| **delete-payee (dp)** [payee code] | Delete the payee with the given payee code. |
+| **add-recurring-charge (arc)** (*See extended form below*) | Add a new recurring charge to the currently selected account. The user is prompted to enter the charge details if no parameters are supplied. |
+| **list-recurring-charges (lrc)** | List all recurring charges for the currently selected account, displaying their details and sequence numbers. |
+| **update-recurring-charge (urc)** [recurring charge sequence number] | Update the recurring charge details with the given sequence number. |
+| **delete-recurring-charge (drc)** [recurring charge sequence number] | Delete the recurring charge with the given sequence number. |
+| **add-transaction (at, add)** (*See extended form below*) | Add a new transaction to the currently selected account. The user is prompted to enter the transaction details if no parameters are supplied. |
+| **copy-transaction (ct, copy)** [transaction sequence number] | Copy the transaction with the given sequence number. If no sequence number is supplied, copy the last non-recurring transaction created. |
+| **show-transaction (show, st)** [transaction sequence number] | Show the details of the transaction with the given sequence number. |
+| **list-transactions (list, lt)** (*See extended forms below*) | List transactions for the currently selected account, displaying their details and sequence numbers. By default, show up to 25 non-recurring transactions in descending date order. |
+| **update-transaction (ut)** [transaction sequence number] | Update the transaction details with the given sequence number. |
+| **delete-transaction (dt)** [transaction sequence number] | Delete the transaction with the given sequence number. |
+| **transfer-transaction (transfer, tr)** (*See extended form below*) | Transfer money from the currently selected account to another account, creating a transaction in each account. The user is prompted to enter the transfer details if no parameters are supplied. |
+| **list-transfer-records (ltr)** | List all transfer records, displaying their details and sequence numbers. |
+| **delete-transfer-record (dtr)** [transfer record sequence number] | Delete the transfer record with the given sequence number. This will also delete both transactions associated with the transfer. |
+| **add-report (arp)** | Add a new transaction report to the system. The user is prompted to enter the report details and transaction selection criteria. |
+| **list-reports (show-reports, lrp)** | List all saved transaction reports with their details and sequence numbers. |
+| **update-report (urp)** [report sequence number] | Update the transaction report details and transaction selection criteria with the given sequence number. |
+| **delete-report (drp)** [report sequence number] | Delete the saved transaction report with the given sequence number. |
+| **run-report (run)** [report sequence number] | Run the specified transaction report and display the results. Running a report is equivalent to running the **find-transaction (find)** command specifying the sql parameter. |
+| **add-shortcut (ash)** | Add a new shortcut to the system, the user is prompted to add the shortcut details. |
+| **list-shortcuts (lsh)** | List all the shortcuts stored in the system including the sequence number. |
+| **update-shortcut (ush)** [shortcut sequence number] | Update the given shortcut, the user is prompted to enter the details. |
+| **delete-shortcut (dsh)** [shortcut sequence number] | Delete the given shortcut from the system. |
+| **import-categories (ic)** [JSON file path] | Import categories from the supplied JSON file that complies to the template above. |
+| **export-categories (xc)** [JSON file path] | Export all categories to the supplied JSON file. |
+| **import-payees (ip)** [JSON file path] | Import payees from the supplied JSON file that complies to the template above. |
+| **export-payees (xp)** [JSON file path] | Export all payees to the supplied JSON file. |
+| **import-recurring-charges (irc)** [JSON file path] | Import recurring charges from the supplied JSON file that complies to the template above. |
+| **export-recurring-charges (xrc)** [JSON file path] | Export all recurring charges to the supplied JSON file. |
+| **import-transactions (it)** [JSON file path] | Import transactions from the supplied JSON file that complies to the template above. |
+| **export-transactions (xt)** [JSON file path] | Export all transactions to the supplied JSON file. |
+| **export-transactions-csv (xtc)** [CSV file path] | Export all transactions to the supplied CSV file. |
+| **list-outstanding-charges (loc)** | Lists the oustanding charges this period for the currently selected account. |
+| **list-paid-charges (llc)** | Lists the paid charges this period for the currently selected account. |
+| **use** [account-code] | Set the current account context to the account specified with account-code. The list-accounts command will show which account is the *primary* account, the initial state will set this account as the current account context until it is changed with the use command. |
+| **save-json-template (sjt)** | Presents a menu to choose which entity to create a json template for, choose from account, payee, category, recurring charge, transaction. A file with the name <entity>_template.json is created in the current directory. |
+| **set-primary-account (spa)** [account code] | Sets the primary account, like the immortals in *Highlander*, there can be only one. On pfm startup, the primary account is selected so you don’t need to issue a **use** command. |
+| **clear-categories** | Deletes **all** stored categories, used for example if you don’t want any of the default categories created with a new file. |
+| **reconcile-transaction (reconcile, rt)** [sequence number] | Toggle the reconciled status of the transaction specified by sequence. |
+| **change-password** | Change the database password. |
+| **version** | Print the pfm version string. |
+| **help** | Display some usage information. |
+| **exit (quit, q)** | Quit the application. |
 
-Export all payees to the supplied JSON file.
-
-**import-recurring-charges (irc)** [JSON file path]
-
-Import recurring charges from the supplied JSON file that complies to the template above.
-
-**export-recurring-charges (xrc)** [JSON file path]
-
-Export all recurring charges to the supplied JSON file.
-
-**import-transactions (it)** [JSON file path]
-
-Import transactions from the supplied JSON file that complies to the template above.
-
-**export-transactions (xt)** [JSON file path]
-
-Export all transactions to the supplied JSON file.
-
-**export-transactions-csv (xtc)** [CSV file path]
-
-Export all transactions to the supplied CSV file.
-
+# EXTENDED FORM
 **add-recurring-charge (arc)** [parameters]
-
-Add a new recurring charge to the currently selected account
 
 - c:[category code] - The category code of the charge
 - p:[payee code] - The payee code of the charge
@@ -402,30 +260,7 @@ Add a new recurring charge to the currently selected account
 - amnt:[amount] - The amount
 - to:[account code] - The account code to transfer to, e.g. recurring transfer
 
-**list-outstanding-charges (loc)**
-
-Lists the oustanding charges this period for the currently selected account.
-
-**list-paid-charges (llc)**
-
-Lists the paid charges this period for the currently selected account.
-
-**add-transaction (at, add)** [parameters]
-
-Add a new transaction to the currently selected account
-
-- c:[category code] - The category code of the transaction
-- p:[payee code] - The payee code of the transaction
-- date:[date] - The date for the transaction (defaults to today)
-- desc:[description] - The description
-- ref:[reference] - The reference
-- type:[DB/CR] - Whether this is a debit or credit transaction
-- amnt:[amount] - The amount
-- rec:[Y/N] - Is the transaction reconciled or not
-
 **list-transactions (lt, list)** [parameters]
-
-List transactions for the currently selected account
 
 - num - number of results to be returned
 - all - return non-recurring and recurring transactions
@@ -443,8 +278,6 @@ list 50 all desc
 
 **find-transactions (find)** [parameters]
 
-Find transactions for the currently selected account
-
 Parameters are listed below, any parameters that accept wildcards recognise * as any string, ? as any character, e.g. desc:travel*.
 
 - date:[date] - transactions on the specified date(s)
@@ -459,7 +292,6 @@ Parameters are listed below, any parameters that accept wildcards recognise * as
 - type:[DB/CR] - transactions with type either debit or credit
 - amnt>:[amount] - transactions where the amount is greater than this
 - amnt<:[amount] - transactions where the amount is less than this
-
 - sql:[where clause parameters] - find transactions specified by the criteria. When you run a report, it will run this command with the report’s SQL criteria.
 
 This option will likely be useful only to those familiar with SQL (Structured Query Language). The **find** command
@@ -483,25 +315,7 @@ find sql:"category = 'BOOKS' AND amount > 25 AND recurring = 'N'"
 
 The query used in the **find** command can be saved as a report by issuing the **save-report** or **save** command.
 
-**use** [account-code]
-
-Set the current account context to the account specified with account-code. The list-accounts command will show which account is the *primary* account, the initial state will set this account as the current account context until it is changed with the use command.
-
-**save-json-template (sjt)**
-
-Presents a menu to choose which entity to create a json template for, choose from account, payee, category, recurring charge, transaction. A file with the name <entity>_template.json is created in the current directory.
-
-**set-primary-account (spa)** [account code]
-
-Sets the primary account, like the immortals in *Highlander*, there can be only one. On pfm startup, the primary account is selected so you don’t need to issue a **use** command.
-
-**clear-categories**
-
-Deletes **all** stored categories, used for example if you don’t want any of the default categories created with a new file.
-
 **transfer-transaction (transfer, tr)** [parameters]
-
-Add a new transfer transaction to the currently selected account
 
 - to:[account code] - The code of the account to transfer to
 - c:[category code] - The category code of the transaction
@@ -510,22 +324,10 @@ Add a new transfer transaction to the currently selected account
 - amnt:[amount] - The amount
 - rec:[Y/N] - Is the transaction reconciled or not
 
-**reconcile-transaction (reconcile, rt)** [sequence number]
+**sql-mode**
 
-Toggle the reconciled status of the transaction specified by sequence.
+Presents the user with a new ‘sql>’ prompt where they can enter standard SQLite SQL to query (and INSERT, UPDATE & DELETE) records in the database. The user is prompted for their access password to enter this mode. **Do not use unless you are familiar with SQL and understand the consequences of your actions.**
 
-**change-password**
+To leave sql mode, enter the command ‘.quit’. 
 
-Change the database password.
-
-**version**
-
-Print the pfm version string.
-
-**help**
-
-Display some usage information.
-
-**exit (quit, q)**
-
-Quit the application.
+To familiarise yourself with the database entities, I suggest you look at the PFM source code at: https://github.com/guywilson/pfm
