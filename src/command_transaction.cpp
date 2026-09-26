@@ -35,14 +35,28 @@
 #include "db_transaction.h"
 #include "db_v_transaction.h"
 #include "db_carried_over.h"
+#include "db_v_carried_over.h"
 #include "transaction_views.h"
 #include "debug_views.h"
 #include "cli_widget.h"
 #include "reconcile.h"
 
 void Command::listCarriedOverLogs() {
+    std::string accountCode;
+
+    if (hasParameters()) {
+        accountCode = getParameter(SIMPLE_PARAM_NAME);
+    }
+
     DBResult<DBCarriedOverView> result;
-    result.retrieveAll();
+
+    if (accountCode.length() > 0) {
+        DBCarriedOverView co;
+        result = co.retrieveByAccountCode(accountCode);
+    }
+    else {
+        result.retrieveAll();
+    }
 
     CarriedOverListView view;
     view.addResults(result);

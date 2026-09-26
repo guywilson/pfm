@@ -100,6 +100,22 @@ class DBCarriedOver : public DBEntity {
             this->balance =  src.balance;
         }
 
+        void set(JRecord & record) {
+            this->date = record.get("date");
+            this->description = record.get("description");
+            this->balance = record.get("amount");
+        }
+
+        JRecord getRecord() override  {
+            JRecord r;
+
+            r.add("date", this->date.shortDate());
+            r.add("description", this->description);
+            r.add("balance", this->balance.rawStringValue());
+
+            return r;
+        }
+
         void print() {
             DBEntity::print();
 

@@ -80,6 +80,10 @@ void APIListener::registerEndPoints(httpserver::webserver & ws) {
         APIListener::validateSession(request);
         return API::handleListRecurringCharges(request);
     });
+    ws.on_post("/api/co/list", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleListCarriedOverLogs(request);
+    });
 
     log.exit("APIListener::registerEndPoints()");
 }

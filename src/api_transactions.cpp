@@ -24,6 +24,7 @@
 
 #include "db_account.h"
 #include "db_v_transaction.h"
+#include "db_v_carried_over.h"
 #include "pfm_error.h"
 #include "logger.h"
 #include "cfgmgr.h"
@@ -222,6 +223,49 @@ http_response API::handleListTransactions(const httpserver::http_request & reque
     entity["transactions"] = {jsonEntities};
 
     log.exit("API::handleListTransactions()");
+
+    return httpserver::http_response::string(entity.dump());
+}
+
+http_response API::handleListCarriedOverLogs(const http_request & request) {
+    Logger & log = Logger::getInstance();
+
+    log.entry("API::handleListCarriedOverLogs()");
+
+    log.debug("API::handleListCarriedOverLogs() - received request body:");
+    log.debug("%s", request.get_content().data());
+
+    json js = json::parse(request.get_content().data());
+
+    std::string accountCode;
+    if (js.contains("account")) {
+        accountCode = js["account"].get<std::string>();
+    }
+
+    DBCarriedOverView view;
+    DBResult<DBCarriedOverView> results = view.retrieveByAccountCode(accountCode);
+
+    auto jsonEntities = json::array();
+
+    for (size_t i = 0;i < results.size();i++) {
+        DBCarriedOverView co = results.at(i);
+
+        JRecord record = co.getRecord();
+
+        json j = json::object();
+        object_t o = record.getObject();
+
+        for (const auto& [key, value] : o) {
+            j[key] = value;
+        }
+
+        jsonEntities.push_back(j);
+    }
+
+    json entity;
+    entity["carriedOverLogs"] = {jsonEntities};
+
+    log.exit("API::handleListCarriedOverLogs()");
 
     return httpserver::http_response::string(entity.dump());
 }

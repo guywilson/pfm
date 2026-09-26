@@ -51,6 +51,20 @@ class DBCarriedOverView : public DBCarriedOver {
             set(src);
         }
 
+        void set(JRecord & record) {
+            DBCarriedOver::set(record);
+
+            this->accountCode = record.get("accountCode");
+        }
+
+        JRecord getRecord() override  {
+            JRecord r = DBCarriedOver::getRecord();
+
+            r.add("accountCode", this->accountCode);
+
+            return r;
+        }
+
         void clear() {
             DBCarriedOver::clear();
 
@@ -78,4 +92,6 @@ class DBCarriedOverView : public DBCarriedOver {
         const std::string getClassName() const override {
             return "DBCarriedOverView";
         }
+
+        DBResult<DBCarriedOverView> retrieveByAccountCode(const std::string & accountCode);
 };

@@ -43,4 +43,6 @@ class API {
         static http_response handleListPayees(const http_request & request);
 
         static http_response handleListRecurringCharges(const http_request & request);
+
+        static http_response handleListCarriedOverLogs(const http_request & request);
 };
