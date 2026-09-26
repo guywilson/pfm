@@ -29,8 +29,8 @@
 #include "db_payee.h"
 
 
-#define DATE_FIELD_LENGTH                       10
-#define TIMESTAMP_FIELD_LENGTH                  19
+#define DATE_FIELD_LENGTH                       11
+#define TIMESTAMP_FIELD_LENGTH                  20
 
 class CategorySpinField : public CLISpinTextField {
     private:
