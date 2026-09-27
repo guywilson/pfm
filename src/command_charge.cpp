@@ -35,8 +35,6 @@
 
 
 void Command::addRecurringCharge() {
-    checkAccountSelected();
-
     if (hasParameters()) {
         DBRecurringCharge charge;
 
@@ -58,6 +56,18 @@ void Command::addRecurringCharge() {
         }
         catch (pfm_error & e) {
             charge.payeeId.clear();
+        }
+
+        std::string accountCode = getParameter("acc");
+
+        if (accountCode.length() == 0) {
+            charge.accountId = selectedAccount.id;
+        }
+        else {
+            DBAccount account;
+            account.retrieveByCode(accountCode);
+
+            charge.accountId = account.id;
         }
 
         std::string start = getParameter("start");
@@ -83,6 +93,8 @@ void Command::addRecurringCharge() {
 
         return;
     }
+
+    checkAccountSelected();
 
     AddRecurringChargeView view;
     view.show();

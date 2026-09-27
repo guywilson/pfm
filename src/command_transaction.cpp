@@ -71,8 +71,6 @@ void Command::clearRecurringTransactions() {
 }
 
 void Command::addTransaction() {
-    checkAccountSelected();
-
     if (hasParameters()) {
         DBTransaction transaction;
 
@@ -125,6 +123,8 @@ void Command::addTransaction() {
         transaction.save();
         return;
     }
+
+    checkAccountSelected();
 
     AddTransactionView view;
     view.show();

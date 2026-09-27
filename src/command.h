@@ -118,7 +118,7 @@ class Command {
         }
 
         void checkAccountSelected() {
-            if (selectedAccount.id == 0) {
+            if (selectedAccount.id.isNull()) {
                 throw pfm_error(getNoAccountSelectedMsg());
             }
         }

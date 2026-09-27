@@ -32,7 +32,6 @@ using namespace httpserver;
 
 const std::set<std::string> allowedCommands = {
     "add-account",
-    "use",
     "delete_account",
     "add-public-holiday",
     "add-category",
