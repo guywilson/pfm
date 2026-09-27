@@ -193,6 +193,15 @@ void Command::updateAccount() {
 }
 
 void Command::deleteAccount() {
+    if (hasParameters()) {
+        std::string accountCode = getParameter(SIMPLE_PARAM_NAME);
+
+        DBAccount account;
+        account.retrieveByCode(accountCode);
+
+        selectedAccount = account;
+    }
+    
     checkAccountSelected();
     selectedAccount.remove();
     selectedAccount.clear();
