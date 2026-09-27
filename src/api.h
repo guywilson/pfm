@@ -21,6 +21,8 @@
 
 #include <httpserver.hpp>
 
+//#define _COMPILE_TESTING_API_
+
 using namespace httpserver;
 
 /*
@@ -43,6 +45,9 @@ class API {
         static http_response handleListPayees(const http_request & request);
 
         static http_response handleListRecurringCharges(const http_request & request);
-
         static http_response handleListCarriedOverLogs(const http_request & request);
+
+#ifdef _COMPILE_TESTING_API_
+        static http_response handleRunCommand(const http_request & request);
+#endif
 };

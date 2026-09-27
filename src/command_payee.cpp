@@ -34,10 +34,18 @@
 
 
 void Command::addPayee() {
-    AddPayeeView view;
-    view.show();
+    DBPayee payee;
 
-    DBPayee payee = view.getPayee();
+    if (hasParameters()) {
+        payee.code = getParameter("code");
+        payee.name = getParameter("name");
+    }
+    else {
+        AddPayeeView view;
+        view.show();
+
+        payee = view.getPayee();
+    }
 
     payee.save();
 }

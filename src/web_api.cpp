@@ -84,6 +84,13 @@ void APIListener::registerEndPoints(httpserver::webserver & ws) {
         APIListener::validateSession(request);
         return API::handleListCarriedOverLogs(request);
     });
+    
+#ifdef _COMPILE_TESTING_API_
+    ws.on_post("/api/command", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleRunCommand(request);
+    });
+#endif
 
     log.exit("APIListener::registerEndPoints()");
 }

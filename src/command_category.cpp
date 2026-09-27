@@ -34,10 +34,18 @@
 
 
 void Command::addCategory() {
-    AddCategoryView view;
-    view.show();
+    DBCategory category;
 
-    DBCategory category = view.getCategory();
+    if (hasParameters()) {
+        category.code = getParameter("code");
+        category.description = getParameter("desc");
+    }
+    else {
+        AddCategoryView view;
+        view.show();
+
+        category = view.getCategory();
+    }
 
     category.save();
 }

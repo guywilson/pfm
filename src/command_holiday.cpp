@@ -34,10 +34,18 @@
 
 
 void Command::addHoliday() {
-    AddHolidayView view;
-    view.show();
+    DBPublicHoliday holiday;
 
-    DBPublicHoliday holiday = view.getHoliday();
+    if (hasParameters()) {
+        holiday.date = getParameter("date");
+        holiday.description = getParameter("desc");
+    }
+    else {
+        AddHolidayView view;
+        view.show();
+
+        holiday = view.getHoliday();
+    }
 
     holiday.save();
 

@@ -49,10 +49,22 @@ DBAccount Command::selectAccount(const std::string & accountCode) {
 }
 
 void Command::addAccount() {
-    AddAccountView view;
-    view.show();
+    DBAccount account;
 
-    DBAccount account = view.getAccount();
+    if (hasParameters()) {
+        account.code = getParameter("code");
+        account.name = getParameter("name");
+        account.openingDate = getParameter("opened");
+        account.openingBalance = strtod(getParameter("balance").c_str(), NULL);
+        account.balanceLimit = strtod(getParameter("limit").c_str(), NULL);
+    }
+    else {
+        AddAccountView view;
+        view.show();
+
+        account = view.getAccount();
+    }
+
     account.save();
 
     DBResult<DBAccount> accounts;

@@ -162,6 +162,8 @@ class DBPayment : public DBEntity {
         JRecord getRecord() override {
             JRecord r;
 
+            r.add("sequence", std::to_string(this->sequence));
+
             if (!this->accountId.isNull()) {
                 DBAccount account;
                 account.retrieve(this->accountId);
