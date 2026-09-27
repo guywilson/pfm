@@ -51,6 +51,7 @@
 #include "terminal.h"
 #include "money.h"
 #include "strdate.h"
+#include "pfm_id.h"
 #include "rlcustom.h"
 #include "license.h"
 #include "version.h"
@@ -116,10 +117,7 @@ static void checkTerminalSize(void) {
 
 void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
-    log.setLogLevel(LOG_LEVEL_ENTRYEXIT | LOG_LEVEL_SQL | LOG_LEVEL_INFO);
-
-    TransactionReconciler r;
-    r.reconcileTransactions("HSBC", "/Users/guy/Downloads/TransactionHistory.csv", "/Users/guy/mapping.json");
+    log.setLogLevel(LOG_LEVEL_ALL);
 }
 
 static void initialiseReferenceData() {
