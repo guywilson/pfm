@@ -63,3 +63,44 @@ http_response API::handleListCategories(const http_request & request) {
 
     return httpserver::http_response::string(entity.dump());
 }
+
+#ifdef _COMPILE_TESTING_API_
+http_response API::handleAddCategory(const http_request & request) {
+    Logger & log = Logger::getInstance();
+
+    log.entry("API::handleAddCategory()");
+
+    log.debug("API::handleAddCategory() - received request body:");
+    log.debug("%s", request.get_content().data());
+
+    json js = json::parse(request.get_content().data());
+
+    DBCategory category;
+
+    if (js.contains("code")) {
+        category.code = js["code"].get<std::string>();
+    }
+
+    if (js.contains("description")) {
+        category.description = js["description"].get<std::string>();
+    }
+
+    category.save();
+
+    DBCategory savedEntity;
+    savedEntity.retrieve(category.id);
+
+    JRecord record = savedEntity.getRecord();
+
+    json j = json::object();
+    object_t o = record.getObject();
+
+    for (const auto& [key, value] : o) {
+        j[key] = value;
+    }
+
+    log.exit("API::handleAddCategory()");
+
+    return httpserver::http_response::string(j.dump());
+}
+#endif

@@ -86,9 +86,49 @@ void APIListener::registerEndPoints(httpserver::webserver & ws) {
     });
     
 #ifdef _COMPILE_TESTING_API_
-    ws.on_post("/api/command", [](const httpserver::http_request & request) {
+    ws.on_post("/api/account/add", [](const httpserver::http_request & request) {
         APIListener::validateSession(request);
-        return API::handleRunCommand(request);
+        return API::handleAddAccount(request);
+    });
+    ws.on_post("/api/account/delete", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleDeleteAccount(request);
+    });
+    ws.on_post("/api/charge/add", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleAddRecurringCharge(request);
+    });
+    ws.on_post("/api/charge/delete", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleDeleteRecurringCharge(request);
+    });
+    ws.on_post("/api/category/add", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleAddCategory(request);
+    });
+    ws.on_post("/api/payee/add", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleAddPayee(request);
+    });
+    ws.on_post("/api/holiday/add", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleAddHoliday(request);
+    });
+    ws.on_post("/api/transaction/add", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleAddTransaction(request);
+    });
+    ws.on_post("/api/transaction/delete", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleDeleteTransaction(request);
+    });
+    ws.on_post("/api/transaction/reconcile", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleReconcileTransaction(request);
+    });
+    ws.on_post("/api/transaction/transafer", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleTransferTransaction(request);
     });
 #endif
 

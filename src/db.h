@@ -171,6 +171,10 @@ class PFM_DB {
         void createDefaultCategories();
         void createDefaultConfig();
         void createCurrencies();
+        
+        inline pfm_id_t getLastInsertedId() {
+            return sqlite3_last_insert_rowid(dbHandle);
+        }
 
     public:
         ~PFM_DB() {}
@@ -189,8 +193,7 @@ class PFM_DB {
         void dropView(const char * sql);
         void dropIndex(const char * sql);
 
-        int executeSelect(const std::string & statement, std::vector<DBRow> * rows);
-        
+        int executeSelect(const std::string & statement, std::vector<DBRow> * rows);        
         pfm_id_t executeInsert(const std::string & statement);
         void executeUpdate(const std::string & statement);
         void executeDelete(const std::string & statement);

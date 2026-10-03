@@ -43,11 +43,11 @@ pfm_id_t DBEntity::insert() {
 
     PFM_DB & db = PFM_DB::getInstance();
 
-    log.exit("DBEntity::insert()");
-
     pfm_id_t insertedId = db.executeInsert(statement);
 
     db.onWriteTrigger("INSERT", getTableName(), statement);
+
+    log.exit("DBEntity::insert()");
 
     return insertedId;
 }

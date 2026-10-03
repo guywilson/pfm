@@ -21,7 +21,7 @@
 
 #include <httpserver.hpp>
 
-// #define _COMPILE_TESTING_API_
+#define _COMPILE_TESTING_API_
 
 using namespace httpserver;
 
@@ -42,12 +42,27 @@ class API {
         static http_response handleListTransactions(const http_request & request);
 
         static http_response handleListCategories(const http_request & request);
+
         static http_response handleListPayees(const http_request & request);
 
         static http_response handleListRecurringCharges(const http_request & request);
+
         static http_response handleListCarriedOverLogs(const http_request & request);
 
 #ifdef _COMPILE_TESTING_API_
-        static http_response handleRunCommand(const http_request & request);
+        static http_response handleAddAccount(const http_request & request);
+        static http_response handleDeleteAccount(const http_request & request);
+
+        static http_response handleAddHoliday(const http_request & request);
+        static http_response handleAddCategory(const http_request & request);
+        static http_response handleAddPayee(const http_request & request);
+
+        static http_response handleAddTransaction(const http_request & request);
+        static http_response handleDeleteTransaction(const http_request & request);
+        static http_response handleReconcileTransaction(const http_request & request);
+        static http_response handleTransferTransaction(const http_request & request);
+
+        static http_response handleAddRecurringCharge(const http_request & request);
+        static http_response handleDeleteRecurringCharge(const http_request & request);
 #endif
 };

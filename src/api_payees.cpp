@@ -63,3 +63,44 @@ http_response API::handleListPayees(const http_request & request) {
 
     return httpserver::http_response::string(entity.dump());
 }
+
+#ifdef _COMPILE_TESTING_API_
+http_response API::handleAddPayee(const http_request & request) {
+    Logger & log = Logger::getInstance();
+
+    log.entry("API::handleAddPayee()");
+
+    log.debug("API::handleAddPayee() - received request body:");
+    log.debug("%s", request.get_content().data());
+
+    json js = json::parse(request.get_content().data());
+
+    DBPayee payee;
+
+    if (js.contains("code")) {
+        payee.code = js["code"].get<std::string>();
+    }
+
+    if (js.contains("name")) {
+        payee.name = js["name"].get<std::string>();
+    }
+
+    payee.save();
+
+    DBPayee savedEntity;
+    savedEntity.retrieve(payee.id);
+
+    JRecord record = savedEntity.getRecord();
+
+    json j = json::object();
+    object_t o = record.getObject();
+
+    for (const auto& [key, value] : o) {
+        j[key] = value;
+    }
+
+    log.exit("API::handleAddPayee()");
+
+    return httpserver::http_response::string(j.dump());
+}
+#endif

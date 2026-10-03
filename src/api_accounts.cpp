@@ -23,6 +23,7 @@
 #include <nlohmann/json.hpp>
 
 #include "db_account.h"
+#include "db_primary_account.h"
 #include "pfm_error.h"
 #include "logger.h"
 #include "cfgmgr.h"
@@ -72,3 +73,89 @@ http_response API::handleListAccounts(const http_request & request) {
 
     return httpserver::http_response::string(entity.dump());
 }
+
+#ifdef _COMPILE_TESTING_API_
+http_response API::handleAddAccount(const http_request & request) {
+    Logger & log = Logger::getInstance();
+
+    log.entry("API::handleAddAccount()");
+
+    log.debug("API::handleAddAccount() - received request body:");
+    log.debug("%s", request.get_content().data());
+
+    json js = json::parse(request.get_content().data());
+
+    DBAccount account;
+
+    if (js.contains("code")) {
+        account.code = js["code"].get<std::string>();
+    }
+
+    if (js.contains("name")) {
+        account.name = js["name"].get<std::string>();
+    }
+
+    if (js.contains("openingDate")) {
+        account.openingDate = js["openingDate"].get<std::string>();
+    }
+
+    if (js.contains("openingBalance")) {
+        account.openingBalance = js["openingBalance"].get<std::string>();
+    }
+
+    if (js.contains("balanceLimit")) {
+        account.balanceLimit = js["balanceLimit"].get<std::string>();
+    }
+
+    account.save();
+
+    DBResult<DBAccount> accounts;
+    if (accounts.retrieveAll() == 1) {
+        DBPrimaryAccount primaryAccount;
+        primaryAccount.removeAll();
+        primaryAccount.code = account.code;
+        primaryAccount.save();
+    }
+
+    DBAccount savedEntity;
+    savedEntity.retrieve(account.id);
+
+    JRecord record = savedEntity.getRecord();
+
+    json j = json::object();
+    object_t o = record.getObject();
+
+    for (const auto& [key, value] : o) {
+        j[key] = value;
+    }
+
+    log.exit("API::handleAddAccount()");
+
+    return httpserver::http_response::string(j.dump());
+}
+
+http_response API::handleDeleteAccount(const http_request & request) {
+    Logger & log = Logger::getInstance();
+
+    log.entry("API::handleDeleteAccount()");
+
+    log.debug("API::handleDeleteAccount() - received request body:");
+    log.debug("%s", request.get_content().data());
+
+    json js = json::parse(request.get_content().data());
+
+    if (!js.contains("code")) {
+        return httpserver::http_response::string("No account code supplied");
+    }
+
+    std::string code = js["code"].get<std::string>();
+
+    DBAccount account;
+    account.retrieveByCode(code);
+    account.remove();
+
+    log.exit("API::handleDeleteAccount()");
+
+    return httpserver::http_response::string("OK");
+}
+#endif

@@ -16,6 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with PFM. If not, see <https://www.gnu.org/licenses/>.
  */
+#ifndef SQLITE_HAS_CODEC
+#define SQLITE_HAS_CODEC
+#endif
 
 #include <iostream>
 #include <string>
@@ -749,7 +752,7 @@ int PFM_DB::executeSelect(const std::string & statement, std::vector<DBRow> * ro
 pfm_id_t PFM_DB::executeInsert(const std::string & statement) {
     log.entry("PFM_DB::executeInsert()");
     executeWrite(statement);
-    pfm_id_t id = sqlite3_last_insert_rowid(dbHandle);
+    pfm_id_t id = getLastInsertedId();
     log.exit("PFM_DB::executeInsert()");
 
     return id;
