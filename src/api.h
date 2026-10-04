@@ -40,6 +40,7 @@ using namespace httpserver;
 class API {
     public:
         static http_response handleListAccounts(const http_request & request);
+        static http_response handleGetAccount(const http_request & request);
 
         static http_response handleFindTransactions(const http_request & request);
         static http_response handleListTransactions(const http_request & request);

@@ -67,6 +67,50 @@ http_response API::handleListAccounts(const http_request & request) {
     return httpserver::http_response::string(entity.dump());
 }
 
+http_response API::handleGetAccount(const http_request & request) {
+    Logger & log = Logger::getInstance();
+    cfgmgr & cfg = cfgmgr::getInstance();
+
+    log.entry("API::handleGetAccount()");
+
+    log.debug("API::handleGetAccount() - received request body:");
+    log.debug("%s", request.get_content().data());
+
+    bool obfuscateNameField = cfg.getValueAsBoolean("server.obfuscate");
+
+    json js = json::parse(request.get_content().data());
+
+    std::string accountCode;
+    if (js.contains("account")) {
+        accountCode = js["account"].get<std::string>();
+    }
+
+    DBAccount account;
+    account.retrieveByCode(accountCode);
+
+    if (obfuscateNameField) {
+        account.name = "*****";
+    }
+    
+    json j = account.getJson();
+
+    account.doBalancePrerequisites();
+
+    Money currentBalance = account.calculateCurrentBalance();
+    Money reconciledBalance = account.calculateReconciledBalance();
+    Money balanceAfterBills = account.calculateBalanceAfterBills();
+    Money remainingBalance = account.calculateRemainingBalance(balanceAfterBills);
+
+    j["currentBalance"] = currentBalance.doubleValue();
+    j["reconciledBalance"] = reconciledBalance.doubleValue();
+    j["balanceAfterBills"] = balanceAfterBills.doubleValue();
+    j["remainingBalance"] = remainingBalance.doubleValue();
+
+    log.exit("API::handleGetAccount()");
+
+    return httpserver::http_response::string(j.dump());
+}
+
 #ifdef _COMPILE_TESTING_API_
 http_response API::handleAddAccount(const http_request & request) {
     Logger & log = Logger::getInstance();

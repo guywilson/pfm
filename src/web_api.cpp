@@ -60,6 +60,10 @@ void APIListener::registerEndPoints(httpserver::webserver & ws) {
         APIListener::validateSession(request);
         return API::handleListAccounts(request);
     });
+    ws.on_post("/api/account/get", [](const httpserver::http_request & request) {
+        APIListener::validateSession(request);
+        return API::handleGetAccount(request);
+    });
     ws.on_post("/api/transaction/find", [](const httpserver::http_request & request) {
         APIListener::validateSession(request);
         return API::handleFindTransactions(request);
