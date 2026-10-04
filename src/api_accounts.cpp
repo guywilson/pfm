@@ -54,14 +54,7 @@ http_response API::handleListAccounts(const http_request & request) {
             account.name = "*****";
         }
         
-        JRecord record = account.getRecord();
-
-        json j = json::object();
-        object_t o = record.getObject();
-
-        for (const auto& [key, value] : o) {
-            j[key] = value;
-        }
+        json j = account.getJson();
 
         jsonEntities.push_back(j);
     }
@@ -120,14 +113,7 @@ http_response API::handleAddAccount(const http_request & request) {
     DBAccount savedEntity;
     savedEntity.retrieve(account.id);
 
-    JRecord record = savedEntity.getRecord();
-
-    json j = json::object();
-    object_t o = record.getObject();
-
-    for (const auto& [key, value] : o) {
-        j[key] = value;
-    }
+    json j = savedEntity.getJson();
 
     log.exit("API::handleAddAccount()");
 

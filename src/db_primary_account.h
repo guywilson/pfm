@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
@@ -58,16 +60,16 @@ class DBPrimaryAccount : public DBEntity {
             this->code = src.code;
         }
 
-        void set(JRecord & record) {
-            this->code = record.get("code");
+        void set(json & j) {
+            this->code = j["code"].get<std::string>();
         }
 
-        JRecord getRecord() override  {
-            JRecord r;
+        json getJson() override {
+            json j;
 
-            r.add("code", code);
+            j["code"] = code;
 
-            return r;
+            return j;
         }
 
         void backup(std::ofstream & os) override {

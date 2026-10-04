@@ -44,14 +44,7 @@ http_response API::handleListPayees(const http_request & request) {
 
     for (size_t i = 0;i < results.size();i++) {
         DBPayee payee = results.at(i);
-        JRecord record = payee.getRecord();
-
-        json j = json::object();
-        object_t o = record.getObject();
-
-        for (const auto& [key, value] : o) {
-            j[key] = value;
-        }
+        json j = payee.getJson();
 
         jsonEntities.push_back(j);
     }
@@ -90,14 +83,7 @@ http_response API::handleAddPayee(const http_request & request) {
     DBPayee savedEntity;
     savedEntity.retrieve(payee.id);
 
-    JRecord record = savedEntity.getRecord();
-
-    json j = json::object();
-    object_t o = record.getObject();
-
-    for (const auto& [key, value] : o) {
-        j[key] = value;
-    }
+    json j = savedEntity.getJson();
 
     log.exit("API::handleAddPayee()");
 

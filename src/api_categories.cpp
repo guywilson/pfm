@@ -44,14 +44,7 @@ http_response API::handleListCategories(const http_request & request) {
 
     for (size_t i = 0;i < results.size();i++) {
         DBCategory category = results.at(i);
-        JRecord record = category.getRecord();
-
-        json j = json::object();
-        object_t o = record.getObject();
-
-        for (const auto& [key, value] : o) {
-            j[key] = value;
-        }
+        json j = category.getJson();
 
         jsonEntities.push_back(j);
     }
@@ -90,14 +83,7 @@ http_response API::handleAddCategory(const http_request & request) {
     DBCategory savedEntity;
     savedEntity.retrieve(category.id);
 
-    JRecord record = savedEntity.getRecord();
-
-    json j = json::object();
-    object_t o = record.getObject();
-
-    for (const auto& [key, value] : o) {
-        j[key] = value;
-    }
+    json j = savedEntity.getJson();
 
     log.exit("API::handleAddCategory()");
 

@@ -584,9 +584,9 @@ void Command::importTransactions() {
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBTransaction");
 
-    std::vector<JRecord> records = jfile.read("transactions");
+    std::vector<json> records = jfile.readJson("transactions");
 
-    for (JRecord & record : records) {
+    for (json & record : records) {
         DBTransaction transaction;
 
         transaction.set(record);
@@ -605,12 +605,12 @@ void Command::exportTransactions() {
     DBResult<DBTransaction> results;
     results.retrieveAll();
 
-    std::vector<JRecord> records;
+    std::vector<json> records;
 
     for (size_t i = 0;i < results.size();i++) {
         DBTransaction transaction = results.at(i);
 
-        JRecord r = transaction.getRecord();
+        json r = transaction.getJson();
         records.push_back(r);
     }
     

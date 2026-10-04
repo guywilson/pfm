@@ -23,6 +23,8 @@
 #include <utility>
 #include <stdint.h>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "db.h"
@@ -100,26 +102,26 @@ class DBTempCSV : public DBEntity {
             this->endDate = src.endDate;
         }
 
-        void set(JRecord & record) {
-            this->accountCode = record.get("accountCode");
-            this->date = record.get("date");
-            this->reference = record.get("reference");
-            this->description = record.get("description");
-            this->type = record.get("type");
-            this->amount = record.get("amount");
+        void set(json & j) {
+            this->accountCode = j["accountCode"].get<std::string>();
+            this->date = j["date"].get<std::string>();
+            this->reference = j["reference"].get<std::string>();
+            this->description = j["description"].get<std::string>();
+            this->type = j["type"].get<std::string>();
+            this->amount = j["amount"].get<double>();
         }
 
-        JRecord getRecord() override {
-            JRecord r;
+        json getJson() override {
+            json j;
 
-            r.add("accountCode", this->accountCode);
-            r.add("date", this->date.shortDate());
-            r.add("reference", this->reference);
-            r.add("description", this->description);
-            r.add("type", this->type);
-            r.add("amount", this->amount.rawStringValue());
+            j["accountCode"] = this->accountCode;
+            j["date"] = this->date.shortDate();
+            j["reference"] = this->reference;
+            j["description"] = this->description;
+            j["type"] = this->type;
+            j["amount"] = this->amount.doubleValue();
 
-            return r;
+            return j;
         }
 
         void print() {

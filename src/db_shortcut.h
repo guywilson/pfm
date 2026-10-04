@@ -25,6 +25,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
@@ -70,18 +72,18 @@ class DBShortcut : public DBEntity {
             this->replacementText =  src.replacementText;
         }
 
-        void set(JRecord & record) {
-            this->shortcut = record.get("shortcut");
-            this->replacementText = record.get("replacementText");
+        void set(json & j) {
+            this->shortcut = j["shortcut"].get<std::string>();
+            this->replacementText = j["replacementText"].get<std::string>();
         }
 
-        JRecord getRecord() override  {
-            JRecord r;
+        json getJson() override {
+            json j;
 
-            r.add("shortcut", shortcut);
-            r.add("replacementText", replacementText);
+            j["shortcut"] = shortcut;
+            j["replacementText"] = replacementText;
 
-            return r;
+            return j;
         }
 
         void print() {

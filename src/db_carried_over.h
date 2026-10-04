@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
@@ -100,20 +102,20 @@ class DBCarriedOver : public DBEntity {
             this->balance =  src.balance;
         }
 
-        void set(JRecord & record) {
-            this->date = record.get("date");
-            this->description = record.get("description");
-            this->balance = record.get("amount");
+        void set(json & j) {
+            this->date = j["date"].get<std::string>();
+            this->description = j["description"].get<std::string>();
+            this->balance = j["balance"].get<std::string>();
         }
 
-        JRecord getRecord() override  {
-            JRecord r;
+        json getJson() override {
+            json j;
 
-            r.add("date", this->date.shortDate());
-            r.add("description", this->description);
-            r.add("balance", this->balance.rawStringValue());
+            j["date"] = this->date.shortDate();
+            j["description"] = this->description;
+            j["balance"] = this->balance.doubleValue();
 
-            return r;
+            return j;
         }
 
         void print() {

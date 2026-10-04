@@ -25,6 +25,8 @@
 #include <vector>
 #include <fstream>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
@@ -91,24 +93,24 @@ class DBAccount : public DBEntity {
             this->balanceLimit =    src.balanceLimit;
         }
 
-        void set(JRecord & record) {
-            this->code = record.get("code");
-            this->name = record.get("name");
-            this->openingDate = record.get("openingDate");
-            this->openingBalance = record.get("openingBalance");
-            this->balanceLimit = record.get("balanceLimit");
+        void set(json & j) {
+            this->code = j["code"].get<std::string>();
+            this->name = j["name"].get<std::string>();
+            this->openingDate = j["openingDate"].get<std::string>();
+            this->openingBalance = j["openingBalance"].get<double>();
+            this->balanceLimit = j["balanceLimit"].get<double>();
         }
 
-        JRecord getRecord() override  {
-            JRecord r;
+        json getJson() override {
+            json j;
 
-            r.add("name", name);
-            r.add("code", code);
-            r.add("openingDate", openingDate.shortDate());
-            r.add("openingBalance", openingBalance.rawStringValue());
-            r.add("balanceLimit", balanceLimit.rawStringValue());
+            j["name"] = name;
+            j["code"] = code;
+            j["openingDate"] = openingDate.shortDate();
+            j["openingBalance"] = openingBalance.doubleValue();
+            j["balanceLimit"] = balanceLimit.doubleValue();
 
-            return r;
+            return j;
         }
 
         std::string getIDByCodeSubSelect() {

@@ -25,6 +25,8 @@
 #include <vector>
 #include <stdint.h>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "db_category.h"
@@ -232,33 +234,33 @@ class DBRecurringCharge : public DBPayment {
             this->transferTo = src.transferTo;
         }
 
-        void set(JRecord & record) {
-            DBPayment::set(record);
+        void set(json & j) {
+            DBPayment::set(j);
 
-            this->lastPaymentDate = record.get("lastPaymentDate");
-            this->frequency = Frequency::parse(record.get("frequency"));
-            this->endDate = record.get("endDate");
+            this->lastPaymentDate = j["lastPaymentDate"].get<std::string>();
+            this->frequency = Frequency::parse(j["frequency"].get<std::string>());
+            this->endDate = j["endDate"].get<std::string>();
 
             if (isTransfer) {
-                this->transferTo = record.get("transferTo");
+                this->transferTo = j["transferTo"].get<std::string>();
             }
         }
 
-        JRecord getRecord() override  {
-            JRecord r = DBPayment::getRecord();
+        json getJson() override {
+            json j = DBPayment::getJson();
 
-            r.add("lastPaymentDate", this->lastPaymentDate.shortDate());
-            r.add("endDate", this->endDate.shortDate());
-            r.add("frequency", this->frequency.toString());
+            j["lastPaymentDate"] = this->lastPaymentDate.shortDate();
+            j["endDate"] = this->endDate.shortDate();
+            j["frequency"] = this->frequency.toString();
 
             if (isTransfer) {
                 DBRecurringTransfer transfer;
                 transfer.retrieveByRecurringChargeId(id);
 
-                r.add("transferTo", transfer.accountTo.code);
+                j["transferTo"] = transfer.accountTo.code;
             }
 
-            return r;
+            return j;
         }
 
         void print() {

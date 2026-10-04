@@ -26,6 +26,7 @@
 #include <stdint.h>
 
 #include <sqlcipher/sqlite3.h>
+#include <nlohmann/json.hpp>
 
 #include "db_category.h"
 #include "db_payee.h"
@@ -145,22 +146,22 @@ class DBTransaction : public DBPayment {
             this->isReconciled = src.isReconciled;
         }
 
-        void set(JRecord & record) {
-            DBPayment::set(record);
+        void set(json & j) {
+            DBPayment::set(j);
 
-            this->reference = record.get("reference");
-            this->type = record.get("type");
-            this->isReconciled = record.getBoolValue("isReconciled");
+            this->reference = j["reference"].get<std::string>();
+            this->type = j["type"].get<std::string>();
+            this->isReconciled = j["isReconciled"].get<bool>();
         }
 
-        JRecord getRecord() override  {
-            JRecord r = DBPayment::getRecord();
+        json getJson() override {
+            json j = DBPayment::getJson();
 
-            r.add("reference", reference);
-            r.add("type", type);
-            r.add("isReconciled", isReconciled);
+            j["reference"] = this->reference;
+            j["type"] = this->type;
+            j["isReconciled"] = this->isReconciled;
 
-            return r;
+            return j;
         }
 
         void setFromRecurringCharge(const DBRecurringCharge & src) {

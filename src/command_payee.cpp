@@ -110,9 +110,9 @@ void Command::importPayees() {
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBPayee");
 
-    std::vector<JRecord> records = jfile.read("payees");
+    std::vector<json> records = jfile.readJson("payees");
 
-    for (JRecord & record : records) {
+    for (json & record : records) {
         DBPayee payee;
 
         payee.set(record);
@@ -126,12 +126,12 @@ void Command::exportPayees() {
     DBResult<DBPayee> results;
     results.retrieveAll();
 
-    std::vector<JRecord> records;
+    std::vector<json> records;
 
     for (size_t i = 0;i < results.size();i++) {
         DBPayee payee = results.at(i);
 
-        JRecord r = payee.getRecord();
+        json r = payee.getJson();
         records.push_back(r);
     }
     

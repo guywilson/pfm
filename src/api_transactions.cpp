@@ -39,6 +39,7 @@ using namespace httpserver;
 http_response API::handleFindTransactions(const httpserver::http_request & request) {
     Logger & log = Logger::getInstance();
     cfgmgr & cfg = cfgmgr::getInstance();
+    CacheMgr & cache = CacheMgr::getInstance();
 
     log.entry("API::handleFindTransactions()");
 
@@ -107,23 +108,20 @@ http_response API::handleFindTransactions(const httpserver::http_request & reque
     DBTransactionView view;
     DBResult<DBTransactionView> results = view.findTransactionsForCriteria(criteria);
 
+    cache.clearTransactions();
+
     auto jsonEntities = json::array();
 
     for (size_t i = 0;i < results.size();i++) {
         DBTransactionView transaction = results.at(i);
 
+        cache.addTransaction(transaction.sequence, transaction);
+
         if (obfuscateDescriptionField) {
             transaction.description = "*****";
         }
 
-        JRecord record = transaction.getRecord();
-
-        json j = json::object();
-        object_t o = record.getObject();
-
-        for (const auto& [key, value] : o) {
-            j[key] = value;
-        }
+        json j = transaction.getJson();
 
         jsonEntities.push_back(j);
     }
@@ -139,6 +137,7 @@ http_response API::handleFindTransactions(const httpserver::http_request & reque
 http_response API::handleListTransactions(const httpserver::http_request & request) {
     Logger & log = Logger::getInstance();
     cfgmgr & cfg = cfgmgr::getInstance();
+    CacheMgr & cache = CacheMgr::getInstance();
 
     log.entry("API::handleListTransactions()");
 
@@ -202,23 +201,20 @@ http_response API::handleListTransactions(const httpserver::http_request & reque
     DBTransactionView view;
     DBResult<DBTransactionView> results = view.listByAccountID(accountId, type, isThisPeriod, order, rowLimit);
 
+    cache.clearTransactions();
+
     auto jsonEntities = json::array();
 
     for (size_t i = 0;i < results.size();i++) {
         DBTransactionView transaction = results.at(i);
 
+        cache.addTransaction(transaction.sequence, transaction);
+
         if (obfuscateDescriptionField) {
             transaction.description = "*****";
         }
 
-        JRecord record = transaction.getRecord();
-
-        json j = json::object();
-        object_t o = record.getObject();
-
-        for (const auto& [key, value] : o) {
-            j[key] = value;
-        }
+        json j = transaction.getJson();
 
         jsonEntities.push_back(j);
     }
@@ -254,14 +250,7 @@ http_response API::handleListCarriedOverLogs(const http_request & request) {
     for (size_t i = 0;i < results.size();i++) {
         DBCarriedOverView co = results.at(i);
 
-        JRecord record = co.getRecord();
-
-        json j = json::object();
-        object_t o = record.getObject();
-
-        for (const auto& [key, value] : o) {
-            j[key] = value;
-        }
+        json j = co.getJson();
 
         jsonEntities.push_back(j);
     }
@@ -323,8 +312,7 @@ http_response API::handleAddTransaction(const http_request & request) {
     }
 
     if (js.contains("isReconciled")) {
-        std::string isReconciled = js["isReconciled"].get<std::string>();
-        transaction.isReconciled = (isReconciled == "Y" || isReconciled == "Yes" || isReconciled == "yes");
+        transaction.isReconciled = js["isReconciled"].get<bool>();
     }
 
     if (js.contains("type")) {
@@ -332,7 +320,7 @@ http_response API::handleAddTransaction(const http_request & request) {
     }
 
     if (js.contains("amount")) {
-        transaction.amount = js["amount"].get<std::string>();
+        transaction.amount = js["amount"].get<double>();
     }
 
     transaction.save();
@@ -340,14 +328,7 @@ http_response API::handleAddTransaction(const http_request & request) {
     DBTransaction savedTransaction;
     savedTransaction.retrieve(transaction.id);
 
-    JRecord r = savedTransaction.getRecord();
-
-    json j = json::object();
-    object_t o = r.getObject();
-
-    for (const auto& [key, value] : o) {
-        j[key] = value;
-    }
+    json j = savedTransaction.getJson();
 
     log.exit("API::handleAddTransaction()");
 
@@ -416,14 +397,7 @@ http_response API::handleReconcileTransaction(const http_request & request) {
     DBTransaction savedTransaction;
     savedTransaction.retrieve(transaction.id);
 
-    JRecord r = savedTransaction.getRecord();
-
-    json j = json::object();
-    object_t o = r.getObject();
-
-    for (const auto& [key, value] : o) {
-        j[key] = value;
-    }
+    json j = savedTransaction.getJson();
 
     log.exit("API::handleReconcileTransaction()");
 

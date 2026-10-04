@@ -26,6 +26,7 @@
 #include <stdint.h>
 
 #include <sqlcipher/sqlite3.h>
+#include <nlohmann/json.hpp>
 
 #include "db_account.h"
 #include "db_category.h"
@@ -36,7 +37,6 @@
 #include "jfile.h"
 #include "money.h"
 #include "cfgmgr.h"
-
 
 class DBPayment : public DBEntity {
     protected:
@@ -130,21 +130,25 @@ class DBPayment : public DBEntity {
             this->payee.set(src.payee);
         }
 
-        void set(JRecord & record) {
-            std::string accountCode = record.get("accountCode");
+        void set(json & j) {
+            std::string accountCode = j["accountCode"].get<std::string>();
             account.retrieveByCode(accountCode);
 
             try {
-                std::string categoryCode = record.get("categoryCode");
-                category.retrieveByCode(categoryCode);
+                if (j.contains("categoryCode")) {
+                    std::string categoryCode = j["categoryCode"].get<std::string>();
+                    category.retrieveByCode(categoryCode);
+                }
             }
             catch (pfm_error & e) {
                 // Do nothing
             }
 
             try {
-                std::string payeeCode = record.get("payeeCode");
-                payee.retrieveByCode(payeeCode);
+                if (j.contains("payeeCode")) {
+                    std::string payeeCode = j["payeeCode"].get<std::string>();
+                    payee.retrieveByCode(payeeCode);
+                }
             }
             catch (pfm_error & e) {
                 // Do nothing
@@ -153,41 +157,41 @@ class DBPayment : public DBEntity {
             this->accountId = account.id;
             this->categoryId = category.id;
             this->payeeId = payee.id;
-            this->amount = record.get("amount");
-            this->date = record.get("date");
-            this->description = record.get("description");
-            this->isTransfer = record.getBoolValue("isTransfer");
+            this->amount = j["amount"].get<double>();
+            this->date = j["date"].get<std::string>();
+            this->description = j["description"].get<std::string>();
+            this->isTransfer = j["isTransfer"].get<bool>();
         }
 
-        JRecord getRecord() override {
-            JRecord r;
+        json getJson() override {
+            json j;
 
-            r.add("sequence", std::to_string(this->sequence));
+            j["sequence"] = this->sequence;
 
             if (!this->accountId.isNull()) {
                 DBAccount account;
                 account.retrieve(this->accountId);
-                r.add("accountCode", account.code);
+                j["accountCode"] = account.code;
             }
 
             if (!this->categoryId.isNull()) {
                 DBCategory category;
                 category.retrieve(this->categoryId);
-                r.add("categoryCode", category.code);
+                j["categoryCode"] = category.code;
             }
 
             if (!this->payeeId.isNull()) {
                 DBPayee payee;
                 payee.retrieve(this->payeeId);
-                r.add("payeeCode", payee.code);
+                j["payeeCode"] = payee.code;
             }
 
-            r.add("date", this->date.shortDate());
-            r.add("description", this->description);
-            r.add("amount", this->amount.rawStringValue());
-            r.add("isTransfer", isTransfer);
+            j["date"] = this->date.shortDate();
+            j["description"] = this->description;
+            j["amount"] = this->amount.doubleValue();
+            j["isTransfer"] = this->isTransfer;
 
-            return r;
+            return j;
         }
 
         void print() {

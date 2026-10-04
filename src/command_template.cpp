@@ -176,10 +176,10 @@ void Command::saveJsonTemplate() {
     std::string filename = name + "_template.json";
     JFileWriter writer(filename, entity->getClassName());
 
-    std::vector<JRecord> records;
+    std::vector<json> records;
 
-    records.push_back(entity->getRecord());
-    records.push_back(entity->getRecord());
+    records.push_back(entity->getJson());
+    records.push_back(entity->getJson());
 
     writer.write(records, name);
 

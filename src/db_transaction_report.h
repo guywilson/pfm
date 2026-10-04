@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "pfm_error.h"
@@ -69,18 +71,18 @@ class DBTransactionReport : public DBEntity {
             this->sqlWhereClause =  src.sqlWhereClause;
         }
 
-        void set(JRecord & record) {
-            this->description = record.get("description");
-            this->sqlWhereClause = record.get("sql");
+        void set(json & j) {
+            this->description = j["description"].get<std::string>();
+            this->sqlWhereClause = j["sql"].get<std::string>();
         }
 
-        JRecord getRecord() override  {
-            JRecord r;
+        json getJson() override {
+            json j;
 
-            r.add("description", description);
-            r.add("sql", sqlWhereClause);
+            j["description"] = description;
+            j["sql"] = sqlWhereClause;
 
-            return r;
+            return j;
         }
 
         void print() {

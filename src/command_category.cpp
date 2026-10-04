@@ -110,9 +110,9 @@ void Command::importCategories() {
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBCategory");
 
-    std::vector<JRecord> records = jfile.read("categories");
+    std::vector<json> records = jfile.readJson("categories");
 
-    for (JRecord & record : records) {
+    for (json & record : records) {
         DBCategory category;
 
         category.set(record);
@@ -126,12 +126,12 @@ void Command::exportCategories() {
     DBResult<DBCategory> results;
     results.retrieveAll();
 
-    std::vector<JRecord> records;
+    std::vector<json> records;
 
     for (size_t i = 0;i < results.size();i++) {
         DBCategory category = results.at(i);
 
-        JRecord r = category.getRecord();
+        json r = category.getJson();
         records.push_back(r);
     }
     

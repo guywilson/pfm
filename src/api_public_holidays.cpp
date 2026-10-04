@@ -57,14 +57,7 @@ http_response API::handleAddHoliday(const http_request & request) {
     clearPublicHolidays();
     DBPublicHoliday::populatePublicHolidays();
 
-    JRecord record = savedEntity.getRecord();
-
-    json j = json::object();
-    object_t o = record.getObject();
-
-    for (const auto& [key, value] : o) {
-        j[key] = value;
-    }
+    json j = savedEntity.getJson();
 
     log.exit("API::handleAddHoliday()");
 

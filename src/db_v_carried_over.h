@@ -25,6 +25,8 @@
 #include <vector>
 #include <stdint.h>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "db_carried_over.h"
@@ -51,18 +53,18 @@ class DBCarriedOverView : public DBCarriedOver {
             set(src);
         }
 
-        void set(JRecord & record) {
-            DBCarriedOver::set(record);
+        void set(json & j) {
+            DBCarriedOver::set(j);
 
-            this->accountCode = record.get("accountCode");
+            this->accountCode = j["accountCode"].get<std::string>();
         }
 
-        JRecord getRecord() override  {
-            JRecord r = DBCarriedOver::getRecord();
+        json getJson() override {
+            json j = DBCarriedOver::getJson();
 
-            r.add("accountCode", this->accountCode);
+            j["accountCode"] = this->accountCode;
 
-            return r;
+            return j;
         }
 
         void clear() {

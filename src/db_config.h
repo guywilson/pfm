@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "db.h"
@@ -80,24 +82,24 @@ class DBConfig : public DBEntity {
             this->isVisible = src.isVisible;
         }
 
-        void set(JRecord & record) {
-            this->key = record.get("key");
-            this->value = record.get("value");
-            this->description = record.get("description");
-            this->isReadOnly = record.getBoolValue("isReadOnly");
-            this->isVisible = record.getBoolValue("isVisible");
+        void set(json & j) {
+            this->key = j["key"].get<std::string>();
+            this->value = j["value"].get<std::string>();
+            this->description = j["description"].get<std::string>();
+            this->isReadOnly = j["isReadOnly"].get<bool>();
+            this->isVisible = j["isVisible"].get<bool>();
         }
 
-        JRecord getRecord() override  {
-            JRecord r;
+        json getJson() override {
+            json j;
 
-            r.add("key", key);
-            r.add("value", value);
-            r.add("description", description);
-            r.add("isReadOnly", isReadOnly);
-            r.add("isVisible", isVisible);
+            j["key"] = key;
+            j["value"] = value;
+            j["description"] = description;
+            j["isReadOnly"] = isReadOnly;
+            j["isVisible"] = isVisible;
 
-            return r;
+            return j;
         }
 
         void print() {

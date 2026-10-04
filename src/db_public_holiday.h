@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "db.h"
@@ -63,18 +65,18 @@ class DBPublicHoliday : public DBEntity {
             this->description = src.description;
         }
 
-        void set(JRecord & record) {
-            this->date = record.get("date");
-            this->description = record.get("description");
+        void set(json & j) {
+            this->date = j["date"].get<std::string>();
+            this->description = j["description"].get<std::string>();
         }
 
-        JRecord getRecord() override  {
-            JRecord r;
+        json getJson() override {
+            json j;
 
-            r.add("date", this->date.shortDate());
-            r.add("description", this->description);
+            j["date"] = this->date.shortDate();
+            j["description"] = this->description;
 
-            return r;
+            return j;
         }
 
         void print() {

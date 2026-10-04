@@ -237,9 +237,9 @@ void Command::importRecurringCharges() {
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBRecurringCharge");
 
-    std::vector<JRecord> records = jfile.read("charges");
+    std::vector<json> records = jfile.readJson("charges");
 
-    for (JRecord & record : records) {
+    for (json & record : records) {
         DBRecurringCharge charge;
 
         charge.set(record);
@@ -253,12 +253,12 @@ void Command::exportRecurringCharges() {
     DBResult<DBRecurringCharge> results;
     results.retrieveAll();
 
-    std::vector<JRecord> records;
+    std::vector<json> records;
 
     for (size_t i = 0;i < results.size();i++) {
         DBRecurringCharge charge = results.at(i);
 
-        JRecord r = charge.getRecord();
+        json r = charge.getJson();
         records.push_back(r);
     }
     

@@ -126,9 +126,9 @@ void Command::importHolidays() {
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBPublicHoliday");
 
-    std::vector<JRecord> records = jfile.read("holidays");
+    std::vector<json> records = jfile.readJson("holidays");
 
-    for (JRecord & record : records) {
+    for (json & record : records) {
         DBPublicHoliday holiday;
 
         holiday.set(record);

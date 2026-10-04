@@ -213,9 +213,9 @@ void Command::importAccounts() {
     JFileReader jfile = JFileReader(jsonFileName);
     jfile.validate("DBAccount");
 
-    std::vector<JRecord> records = jfile.read("accounts");
+    std::vector<json> records = jfile.readJson("accounts");
 
-    for (JRecord & record : records) {
+    for (json & record : records) {
         DBAccount account;
 
         account.set(record);
@@ -229,12 +229,12 @@ void Command::exportAccounts() {
     DBResult<DBAccount> results;
     results.retrieveAll();
 
-    std::vector<JRecord> records;
+    std::vector<json> records;
 
     for (size_t i = 0;i < results.size();i++) {
         DBAccount account = results.at(i);
 
-        JRecord r = account.getRecord();
+        json r = account.getJson();
         records.push_back(r);
     }
     

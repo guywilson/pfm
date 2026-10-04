@@ -31,6 +31,7 @@
 #include <stdint.h>
 
 #include <sqlcipher/sqlite3.h>
+#include <nlohmann/json.hpp>
 
 #include "db.h"
 #include "strdate.h"
@@ -668,9 +669,9 @@ class DBEntity {
         
         virtual ~DBEntity() {}
 
-        virtual JRecord getRecord() {
-            JRecord r;
-            return r;
+        virtual json getJson() {
+            json j;
+            return j;
         }
 
         virtual void backup(std::ofstream & os) {

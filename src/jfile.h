@@ -30,28 +30,11 @@
 
 #include <nlohmann/json.hpp>
 
+#include "money.h"
+#include "strdate.h"
 #include "pfm_error.h"
 
 using json = nlohmann::json;
-
-using object_t = std::map<std::string, std::string>;
-using objects_t = std::vector<object_t>;
-
-class JRecord {
-    private:
-        object_t record;
-
-    public:
-        JRecord();
-        JRecord(object_t & o);
-
-        std::string get(const char * name);
-        bool getBoolValue(const char * name);
-
-        object_t getObject();
-        void add(const char * name, const std::string & value);
-        void add(const char * name, const bool value);
-};
 
 class JFileReader {
     private:
@@ -60,7 +43,7 @@ class JFileReader {
     public:
         JFileReader(const std::string & filename);
 
-        std::vector<JRecord> read(const std::string & name);
+        std::vector<json> readJson(const std::string & name);
 
         void validate(const std::string & className);
 };
@@ -75,6 +58,6 @@ class JFileWriter {
         JFileWriter(const std::string & filename, const std::string & className);
         ~JFileWriter();
 
-        void write(std::vector<JRecord> & records, const std::string & name, const std::string & className);
-        void write(std::vector<JRecord> & records, const std::string & name);
+        void write(std::vector<json> & records, const std::string & name);
+        void write(std::vector<json> & records, const std::string & name, const std::string & className);
 };

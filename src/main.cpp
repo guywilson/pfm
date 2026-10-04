@@ -118,6 +118,19 @@ static void checkTerminalSize(void) {
 void unitTestCodeFragment() {
     Logger & log = Logger::getInstance();
     log.setLogLevel(LOG_LEVEL_ALL);
+
+    pfm_id_t transactionId = 212;
+
+    DBTransaction transaction;
+    transaction.retrieve(transactionId);
+
+    json j = transaction.getJson();
+    std::cout << j.dump() << std::endl << std::endl;
+
+    DBTransaction transaction2;
+    transaction2.set(j);
+
+    transaction2.print();
 }
 
 static void initialiseReferenceData() {

@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include <sqlcipher/sqlite3.h>
 
 #include "db.h"
@@ -63,18 +65,18 @@ class DBCategory : public DBEntity {
             this->code = src.code;
         }
 
-        void set(JRecord & record) {
-            this->code = record.get("code");
-            this->description = record.get("description");
+        void set(json & j) {
+            this->code = j["code"].get<std::string>();
+            this->description = j["description"].get<std::string>();
         }
 
-        JRecord getRecord() override  {
-            JRecord r;
+        json getJson() override {
+            json j;
 
-            r.add("code", this->code);
-            r.add("description", this->description);
+            j["code"] = this->code;
+            j["description"] = this->description;
 
-            return r;
+            return j;
         }
 
         void print() {
