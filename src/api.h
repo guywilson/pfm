@@ -21,7 +21,7 @@
 
 #include <httpserver.hpp>
 
-#define _COMPILE_TESTING_API_
+// #define _COMPILE_TESTING_API_
 
 using namespace httpserver;
 
@@ -32,7 +32,10 @@ using namespace httpserver;
 ** invalidate any previous session keys and create a new one.
 **
 ** Tempting though it is to surface endpoints to create, update and delete entites,
-** this API is read-only for obvious security reasons.
+** this API is read-only by default for obvious security reasons.
+**
+** In order to run full end-to-end testing, the API can be compiled with _COMPILE_TESTING_API_
+** which introduces certain add/delete APIs...
 */
 class API {
     public:
