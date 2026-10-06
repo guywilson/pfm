@@ -168,7 +168,7 @@ static int commandProcessor(bool startServer, uint16_t port) {
     }
 
     if (startServer) {
-        command.process("start port:" + std::to_string(port));
+        command.process("start " + std::to_string(port));
     }
 
     int status = 0;

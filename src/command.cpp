@@ -116,8 +116,12 @@ void Command::handleExceptions(const std::string & command, const std::string & 
     std::string value = trim(token);
 
     if (isStringNumeric(token)) {
-        if (command == "list") {
+        if (command == "list" || command == "list-transactions") {
             std::string name = "rows";
+            parameters[name].push_back(value);
+        }
+        else if (command == "start" || command == "start-api-server") {
+            std::string name = "port";
             parameters[name].push_back(value);
         }
         else {
