@@ -71,7 +71,10 @@ static void printUsage(void) {
     std::cout << "pfm [options]" << std::endl;
     std::cout << "Options:" << std::endl;
     std::cout << "\t-db <db name> if not specified, defaults to '.pfm' in the current dir" << std::endl;
-    std::cout << "\t-h displays the usage information" << std::endl;
+    std::cout << "\t--help displays the usage information" << std::endl;
+    std::cout << "\t--headless explicitly tells PFM it is running in a headless (server) environment." << std::endl;
+    std::cout << "\t-p <port> the port to listen on for the api, reads from the DB config if not specified" << std::endl;
+    std::cout << "\t--start-server starts the api server on the port specified" << std::endl;
     std::cout << "\t--license, -l print the license" << std::endl;
     std::cout << "\t--version, -v print the program version" << std::endl << std::endl;
 }
@@ -152,7 +155,7 @@ static int getNumAccounts() {
     return accounts.size();
 }
 
-static int commandProcessor() {
+static int commandProcessor(bool startServer, uint16_t port) {
     Command command;
     int numAccounts = getNumAccounts();
 
@@ -162,6 +165,10 @@ static int commandProcessor() {
     else {
         std::string primaryAccountCode = DBPrimaryAccount::getPrimaryAccountCode();
         command.process("use " + primaryAccountCode);
+    }
+
+    if (startServer) {
+        command.process("start port:" + std::to_string(port));
     }
 
     int status = 0;
@@ -197,7 +204,9 @@ static int commandProcessor() {
 int main(int argc, char ** argv) {
     int status = 0;
     bool runScratch = false;
+    bool startServer = false;
     int defaultLogLevel = DEFAULT_LOG_LEVEL;
+    uint16_t port;
 
     std::string databaseName = DEFAULT_DATABASE_NAME;
 
@@ -209,7 +218,7 @@ int main(int argc, char ** argv) {
         if (arg == "-db") {
             databaseName = cmdarg.nextArg();
         }
-        else if (arg == "-h" || arg == "-?") {
+        else if (arg == "--help") {
             printUsage();
             return 0;
         }
@@ -226,6 +235,12 @@ int main(int argc, char ** argv) {
         }
         else if (arg == "--headless") {
             System::setIsHeadlessLinux(true);
+        }
+        else if (arg == "--start-server") {
+            startServer = true;
+        }
+        else if (arg == "-p" || arg == "-port") {
+            port = (uint16_t)strtoul(cmdarg.nextArg().c_str(), NULL, 10);
         }
         else if (arg == "--full-logging") {
             defaultLogLevel = LOG_LEVEL_ALL;
@@ -280,7 +295,7 @@ int main(int argc, char ** argv) {
         ** Run scratch code, suitable for unit testing...
         */
         unitTestCodeFragment();
-        status = commandProcessor();
+        status = commandProcessor(startServer, port);
     }
     else {
         /*
@@ -288,7 +303,7 @@ int main(int argc, char ** argv) {
         ** 1) There is a fatal error
         ** 2) The user explicitly quits the application
         */
-        status = commandProcessor();
+        status = commandProcessor(startServer, port);
     }
  
     db.close();

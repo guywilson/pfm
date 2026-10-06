@@ -146,13 +146,13 @@ void * APIListener::run() {
 
     cfgmgr & cfg = cfgmgr::getInstance();
 
-    uint16_t port = (uint16_t)cfg.getValueAsInteger("server.port");
+    uint16_t * port = (uint16_t *)getThreadParameters();
 
     std::string tls_key_path = cfg.getValue("server.key");
     std::string tls_cert_path = cfg.getValue("server.cert");
 
     httpserver::webserver ws{
-        httpserver::create_webserver(port)
+        httpserver::create_webserver(*port)
             .put_processed_data_to_content()
             .use_ssl()
             .https_mem_key(tls_key_path)
@@ -168,7 +168,7 @@ void * APIListener::run() {
     std::cout << "Session ID: " << session.createSession() << std::endl;
     fflush(stdout);
 
-    log.debug("Starting web API server on port %u...", (unsigned int)port);
+    log.debug("Starting web API server on port %u...", (unsigned int)*port);
 
     ws.start(true);
 

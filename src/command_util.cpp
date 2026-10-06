@@ -82,7 +82,16 @@ void Command::saveDBKey() {
 }
 
 void Command::startAPIServer() {
-    listener.start();
+    if (hasParameters()) {
+        std::string port = getParameter("port");
+        apiPort = strtoul(port.c_str(), NULL, 10);
+    }
+    else {
+        cfgmgr & cfg = cfgmgr::getInstance();
+        apiPort = (uint16_t)cfg.getValueAsInteger("server.port");
+    }
+
+    listener.start(&apiPort);
     PosixThread::sleep(1UL);
 }
 

@@ -115,6 +115,16 @@ Specifies the filename of the SQLite database to open. If you do not specify thi
 
 Explicitly tells PFM that it is running in a headless (server) environment. Without this, PFM will try to work it out for itself. PFM uses this to determine if it should get the database key from secure storage (macOS keychain, GNU Key Manager or Windows Credential Manager) or from the user entering a password.
 
+**-port, -p [port number]**
+
+Specifies the port to listen on when starting the API server. If not specified, PFM will attempt to read
+from the DB config table. The user can set up the config item with the add-config command, PFM expects the 
+config for the port to have the key 'server.port'.
+
+**--start-server**
+
+Automatically starts the server listening on the specified port when the program starts.
+
 **--license, -l**
 
 Prints the license information of the PFM program and exits.

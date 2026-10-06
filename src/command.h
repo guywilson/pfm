@@ -58,6 +58,7 @@ class Command {
         std::vector<std::string> commandHistory;
         DBAccount selectedAccount;
         APIListener listener;
+        uint16_t apiPort;
 
         Logger & log = Logger::getInstance();
         cfgmgr & cfg = cfgmgr::getInstance();
