@@ -227,6 +227,32 @@ static int commandProcessor(bool startServer, uint16_t port) {
     return status;
 }
 
+static void initialiseDatabase(PFM_DB & db, const std::string & databaseName) {
+    Logger & log = Logger::getInstance();
+
+    try {
+        db.open(databaseName);
+    }
+    catch (pfm_fatal & f) {
+        log.fatal("Fatal error: %s", f.what());
+        log.close();
+        
+        return;
+    }
+
+    initialiseReferenceData();
+
+    cfgmgr & cfg = cfgmgr::getInstance();
+
+    if (cfg.getValueAsBoolean("audit.write")) {
+        /*
+        ** Register a callback handler when db writes are performed,
+        ** we use this to populate the audit_interaction table...
+        */
+        db.registerWriteCallback(auditOnWriteHandler);
+    }
+}
+
 int main(int argc, char ** argv) {
     int status = 0;
     bool runScratch = false;
@@ -290,31 +316,10 @@ int main(int argc, char ** argv) {
     Logger & log = Logger::getInstance();
     log.init("./pfm.log", defaultLogLevel);
 
-    checkTerminalSize();
-
     PFM_DB & db = PFM_DB::getInstance();
+    initialiseDatabase(db, databaseName);
 
-    try {
-        db.open(databaseName);
-    }
-    catch (pfm_fatal & f) {
-        log.fatal("Fatal error: %s", f.what());
-        log.close();
-        
-        return -1;
-    }
-
-    initialiseReferenceData();
-
-    cfgmgr & cfg = cfgmgr::getInstance();
-
-    if (cfg.getValueAsBoolean("audit.write")) {
-        /*
-        ** Register a callback handler when db writes are performed,
-        ** we use this to populate the audit_interaction table...
-        */
-        db.registerWriteCallback(auditOnWriteHandler);
-    }
+    checkTerminalSize();
 
     if (runScratch) {
         /*
