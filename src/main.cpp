@@ -155,6 +155,29 @@ static int getNumAccounts() {
     return accounts.size();
 }
 
+static void writeSessionFile(const std::string & sessionId) {
+    FILE * sessionFilePtr = fopen("session.id", "wt");
+
+    if (sessionFilePtr == NULL) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Failed to create session file 'session.id': %s", 
+                    strerror(errno)));
+    }
+
+    size_t bytesWritten = fwrite(sessionId.c_str(), sizeof(char), sessionId.length(), sessionFilePtr);
+
+    if (bytesWritten != sessionId.length()) {
+        throw pfm_error(
+                pfm_error::buildMsg(
+                    "Expected to write %zu bytes but actually wrote %zu bytes", 
+                    sessionId.length(), 
+                    bytesWritten));
+    }
+
+    fclose(sessionFilePtr);
+}
+
 static int commandProcessor(bool startServer, uint16_t port) {
     Command command;
     int numAccounts = getNumAccounts();
@@ -171,26 +194,7 @@ static int commandProcessor(bool startServer, uint16_t port) {
         command.addParameter("port", std::to_string(port));
         std::string sessionId = command.startAPIServer();
 
-        FILE * sessionFilePtr = fopen("session.id", "wt");
-
-        if (sessionFilePtr == NULL) {
-            throw pfm_error(
-                    pfm_error::buildMsg(
-                        "Failed to create session file 'session.id': %s", 
-                        strerror(errno)));
-        }
-
-        size_t bytesWritten = fwrite(sessionId.c_str(), sizeof(char), sessionId.length(), sessionFilePtr);
-
-        if (bytesWritten != sessionId.length()) {
-            throw pfm_error(
-                    pfm_error::buildMsg(
-                        "Expected to write %zu bytes but actually wrote %zu bytes", 
-                        sessionId.length(), 
-                        bytesWritten));
-        }
-
-        fclose(sessionFilePtr);
+        writeSessionFile(sessionId);
     }
 
     int status = 0;
