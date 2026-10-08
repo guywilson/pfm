@@ -14,6 +14,7 @@ pfm.pass.key
 .DS_Store
 .pfm_key
 *.sql
+session.id
 
 # Generated Autoconf files
 /autom4te.cache/

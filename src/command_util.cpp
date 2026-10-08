@@ -81,7 +81,7 @@ void Command::saveDBKey() {
     }
 }
 
-void Command::startAPIServer() {
+std::string Command::startAPIServer() {
     if (hasParameters()) {
         std::string port = getParameter("port");
         apiPort = strtoul(port.c_str(), NULL, 10);
@@ -93,6 +93,12 @@ void Command::startAPIServer() {
 
     listener.start(&apiPort);
     PosixThread::sleep(1UL);
+
+    std::string sessionId = listener.getSessionId();
+
+    std::cout << "API server session ID: '" << sessionId << "'" << std::endl << std::endl;
+
+    return sessionId;
 }
 
 int Command::getLogLevelParameter(std::string & level) {

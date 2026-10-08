@@ -19,18 +19,25 @@
 
 #pragma once
 
+#include <string>
+
 #include <httpserver.hpp>
 
+#include "system.h"
 #include "posixthread.h"
 
 class APIListener : public PosixThread {
     private:
+        std::string sessionId = "";
+
         static void validateSession(const httpserver::http_request & request);
-        
+
         void registerEndPoints(httpserver::webserver & ws);
 
     public:
         APIListener() : PosixThread() {}
+
+        std::string getSessionId();
 
         void * run() override;
 };

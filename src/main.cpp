@@ -168,7 +168,29 @@ static int commandProcessor(bool startServer, uint16_t port) {
     }
 
     if (startServer) {
-        command.process("start " + std::to_string(port));
+        command.addParameter("port", std::to_string(port));
+        std::string sessionId = command.startAPIServer();
+
+        FILE * sessionFilePtr = fopen("session.id", "wt");
+
+        if (sessionFilePtr == NULL) {
+            throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Failed to create session file 'session.id': %s", 
+                        strerror(errno)));
+        }
+
+        size_t bytesWritten = fwrite(sessionId.c_str(), sizeof(char), sessionId.length(), sessionFilePtr);
+
+        if (bytesWritten != sessionId.length()) {
+            throw pfm_error(
+                    pfm_error::buildMsg(
+                        "Expected to write %zu bytes but actually wrote %zu bytes", 
+                        sessionId.length(), 
+                        bytesWritten));
+        }
+
+        fclose(sessionFilePtr);
     }
 
     int status = 0;

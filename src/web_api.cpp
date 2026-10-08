@@ -34,7 +34,7 @@
 #include "web_api.h"
 #include "api.h"
 
-static SessionManager session;
+static SessionManager session;        
 
 void APIListener::validateSession(const httpserver::http_request & request) {
     Logger & log = Logger::getInstance();
@@ -139,6 +139,10 @@ void APIListener::registerEndPoints(httpserver::webserver & ws) {
     log.exit("APIListener::registerEndPoints()");
 }
 
+std::string APIListener::getSessionId() {
+    return this->sessionId;
+}
+
 void * APIListener::run() {
     Logger & log = Logger::getInstance();
 
@@ -165,8 +169,7 @@ void * APIListener::run() {
 
     registerEndPoints(ws);
 
-    std::cout << "Session ID: " << session.createSession() << std::endl;
-    fflush(stdout);
+    this->sessionId = session.createSession();
 
     log.debug("Starting web API server on port %u...", (unsigned int)*port);
 

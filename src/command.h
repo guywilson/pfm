@@ -236,7 +236,7 @@ class Command {
         void getDBKey();
         void saveDBKey();
 
-        void startAPIServer();
+        std::string startAPIServer();
 
         void enterSQLMode();
         void enterCalcMode();
@@ -247,6 +247,10 @@ class Command {
 
         static void help();
         static void version();
+
+        void addParameter(const std::string & name, const std::string & value) {
+            parameters[name].push_back(value);
+        }
 
         bool process(const std::string & commandLine);
         bool process(const httpserver::http_request & request);
