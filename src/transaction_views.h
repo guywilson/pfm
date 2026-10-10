@@ -44,7 +44,7 @@ class AddTransactionView : public CLIView {
     private:
         CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
         PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
-        DateField dateField = DateField("Date (yyyy-mm-dd)[today]: ");
+        DateField dateField = DateField("Date (yyyy-[mm/Mmm]-dd)[today]: ");
         CLITextField descriptionField = CLITextField("Description: ");
         CLITextField referenceField = CLITextField("Reference: ");
         CLITextField creditDebitField = CLITextField("Credit/Debit [DB]: ");
@@ -622,8 +622,8 @@ class FindTransactionView : public CLIView {
         CategorySpinField categoryField = CategorySpinField("Category (max. 5 chars): ");
         PayeeSpinField payeeField = PayeeSpinField("Payee (max. 5 chars): ");
         CLITextField descriptionField = CLITextField("Transaction description: ");
-        DateField afterDateField = DateField("Earlist date (yyyy-mm-dd): ");
-        DateField beforeDateField = DateField("Latest date (yyyy-mm-dd)[today]: ");
+        DateField afterDateField = DateField("Earlist date (yyyy-[mm/Mmm]-dd): ");
+        DateField beforeDateField = DateField("Latest date (yyyy-[mm/Mmm]-dd)[today]: ");
         CLITextField recurringIncludeType = CLITextField("Include recurring (yes, no, only)[no]: ");
 
     public:
