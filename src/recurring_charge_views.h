@@ -40,8 +40,8 @@ class AddRecurringChargeView : public CLIView {
     private:
         CategorySpinField categoryField = CategorySpinField("Category code (max. 5 chars): ");
         PayeeSpinField payeeField = PayeeSpinField("Payee code (max. 5 chars): ");
-        DateField startDateField = DateField("Start date (yyyy-mm-dd)[today]: ");
-        DateField endDateField = DateField("End date (yyyy-mm-dd): ");
+        DateField startDateField = DateField("Start date (yyyy-[mm|Mmm]-dd)[today]: ");
+        DateField endDateField = DateField("End date (yyyy-[mm|Mmm]-dd): ");
         CLITextField descriptionField = CLITextField("Description: ");
         FrequencyField frequencyField = FrequencyField("Frequency (N[wmy]): ");
         CLICurrencyField amountField = CLICurrencyField("Amount: ");
